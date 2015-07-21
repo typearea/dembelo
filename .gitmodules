@@ -1,0 +1,21 @@
+[submodule "puppet/modules/nginx"]
+	path = puppet/modules/nginx
+	url = https://github.com/example42/puppet-nginx.git
+[submodule "puppet/modules/mysql"]
+	path = puppet/modules/mysql
+	url = https://github.com/example42/puppet-mysql.git
+[submodule "puppet/modules/apt"]
+	path = puppet/modules/apt
+	url = https://github.com/puppetlabs/puppetlabs-apt
+[submodule "puppet/modules/phpqatools"]
+	path = puppet/modules/phpqatools
+	url = https://github.com/rafaelfelix/puppet-phpqatools
+[submodule "puppet/modules/puppetlabs-stdlib"]
+	path = puppet/modules/puppetlabs-stdlib
+	url = https://github.com/puppetlabs/puppetlabs-stdlib.git
+[submodule "puppet/modules/wget"]
+	path = puppet/modules/wget
+	url = https://github.com/maestrodev/puppet-wget.git
+[submodule "puppet/modules/redis"]
+	path = puppet/modules/redis
+	url = https://github.com/thomasvandoren/puppet-redis.git
