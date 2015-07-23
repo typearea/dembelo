@@ -15,8 +15,9 @@
 7. per ssh in der Vagrantbox einloggen: vagrant ssh
 8. ins Installationsverzeichnis wechseln: cd /vagrant/www/
 9. externe PHP-Abhängigkeiten installieren: composer update
-10. Dembelo im Browser aufrufen: [http://33.33.33.100](33.33.33.100)
-11. Vagrantbox schließen: vagrant halt
+10. Bilder/JS/CSS kompilieren: php app/console assetic:dump --env=prod
+11. Dembelo im Browser aufrufen: [http://33.33.33.100](33.33.33.100)
+12. Vagrantbox schließen: vagrant halt
 
 ### Installation ohne Vagrant
 Mit einem beliebigen Webserver und einem aktuellen PHP (>5.3.9) kann man Dembelo auch ohne Vagrant in Betrieb nehmen.
@@ -34,3 +35,7 @@ Mit einem beliebigen Webserver und einem aktuellen PHP (>5.3.9) kann man Dembelo
 
 ## Dank an:
 [github.com/irmantas/symfony2-vagrant](https://github.com/irmantas/symfony2-vagrant) für die Vagrant/Puppet/Composer-Basis.
+
+## Deployment
+* Cache leeren: php app/console cache:clear --env=prod
+* Assets erstellen: php app/console assetic:dump --env=prod

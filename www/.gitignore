@@ -10,3 +10,6 @@
 /vendor/
 /bin/
 /composer.phar
+/web/css/
+/web/images/
+/web/js/
