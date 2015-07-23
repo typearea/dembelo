@@ -1,0 +1,45 @@
+html, body, .container-fluid {
+    height: 100%;
+}
+
+@media (min-width: 1024px) {
+    .container-fluid {
+        max-width: 1024px;
+    }
+}
+
+body {
+    padding: 1px;
+}
+
+@media screen and (orientation: landscape) {
+    body {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
+.row {
+    height: 25%;
+}
+.col-xs-3 {
+    overflow: hidden;
+    height: 100%;
+    padding: 0;
+}
+
+#row1 {
+    padding-bottom: 5px;
+}
+
+#row1 > div {
+    height: 100%;
+}
+
+#row4 {
+    padding-top: 5px;
+}
+
+#row4 > div {
+    height: 100%;
+}
