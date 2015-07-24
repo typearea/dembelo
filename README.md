@@ -2,16 +2,19 @@
 
 ## Installation
 
-### Installation mit [Vagrant](https://www.vagrantup.com/)
+### Installation mit [Vagrant](https://www.vagrantup.com/) Also für Leute die nicht sowieso einen Webserver und vollständige Entwicklungsoberfläche am laufen haben.
 
-1. Installation Vagrant, siehe vagrantup.com
-2. Installation NFS
+1. Installiere Vagrant, siehe hierzu vagrantup.com
+2. Installiere den NFS Server
     1. unter Windows: vagrant plugin install vagrant-winnfsd ([mehr Informationen](https://github.com/GM-Alex/vagrant-winnfsd))
-    2. unter Linux: die übliche Paketverwaltung
-3. Git-Repository klonen: git clone git@github.com:typearea/dembelo.git
-4. in das neu angelegte Verzeichnis _dembelo_ wechseln
-5. Git-Submodule installieren: git submodule update --init
-6. Vagrantbox starten: vagrant up (kann ein Weilchen dauern)
+    2. unter Linux: mit Hilfe der üblichen Paketverwaltung 
+3. Installiere Git: 
+4. Installiere VirtualBox oder ein Aquivalent: 
+5. Klone das Git-Repository mit: git clone https://github.com/typearea/dembelo.git
+6. wechsle in das neu angelegte Verzeichnis _dembelo_ : cd dembelo
+7. installieren dort die Git-Submodule: git submodule update --init
+8. starte Vagrantbox: vagrant up (kann ein Weilchen dauern)
+
 7. per ssh in der Vagrantbox einloggen: vagrant ssh
 8. ins Installationsverzeichnis wechseln: cd /vagrant/www/
 9. externe PHP-Abhängigkeiten installieren: composer update
