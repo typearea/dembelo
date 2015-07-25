@@ -2,26 +2,34 @@ $(document).ready(function() {
     $( window ).resize(function() {
         resizeImages();
     });
-    resizeImages();
+    $("img").one("load", function() {
+        resizeImage(this);
+    }).each(function() {
+        if(this.complete) $(this).load();
+    });
 });
 
 function resizeImages() {
     $('#main-page img').each(function() {
-        var imageHeight = this.naturalHeight;
-        var imageWidth = this.naturalWidth;
-        var divHeight = parseInt($(this).closest('div').css('height'));
-        var divWidth = parseInt($(this).closest('div').css('width'));
-        if (imageHeight/imageWidth < divHeight/divWidth) { // Querformat
-            if (imageHeight > divHeight) {
-                $(this).css('height', divHeight + 'px');
-                $(this).css('width', '');
-            }
-        } else { // Hochformat
-            if (imageWidth > divWidth) {
-                $(this).css('width', divWidth + 'px');
-                $(this).css('height', '');
-            }
-        }
+        resizeImage(this);
 
     });
+}
+
+function resizeImage(imageElement) {
+    var imageHeight = imageElement.naturalHeight;
+    var imageWidth = imageElement.naturalWidth;
+    var divHeight = parseInt($(imageElement).closest('div').css('height'));
+    var divWidth = parseInt($(imageElement).closest('div').css('width'));
+    if (imageHeight/imageWidth < divHeight/divWidth) { // Querformat
+        if (imageHeight > divHeight) {
+            $(imageElement).css('height', divHeight + 'px');
+            $(imageElement).css('width', '');
+        }
+    } else { // Hochformat
+        if (imageWidth > divWidth) {
+            $(imageElement).css('width', divWidth + 'px');
+            $(imageElement).css('height', '');
+        }
+    }
 }
