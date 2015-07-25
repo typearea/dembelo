@@ -1,9 +1,9 @@
 <?php
 
-namespace AppBundle;
+namespace DembeloMain;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class AppBundle extends Bundle
+class DembeloMain extends Bundle
 {
 }

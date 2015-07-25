@@ -14,7 +14,7 @@
             <!-- Optional theme -->
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
 
-            {% stylesheets '@AppBundle/Resources/public/css/*' filter='cssrewrite' %}
+            {% stylesheets '@DembeloMain/Resources/public/css/*' filter='cssrewrite' %}
                 <link rel="stylesheet" href="{{ asset_url }}">
             {% endstylesheets %}
 
@@ -35,7 +35,7 @@
                 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
             <![endif]-->
 
-            {% javascripts '@AppBundle/Resources/public/js/*' %}
+            {% javascripts '@DembeloMain/Resources/public/js/*' %}
                 <script src="{{ asset_url }}"></script>
             {% endjavascripts %}
 

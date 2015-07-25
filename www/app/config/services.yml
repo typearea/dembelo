@@ -5,5 +5,5 @@ parameters:
 
 services:
 #    service_name:
-#        class: AppBundle\Directory\ClassName
+#        class: DembeloMain\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
