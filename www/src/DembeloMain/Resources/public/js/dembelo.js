@@ -1,19 +1,29 @@
-$(document).ready(function() {
-    $( window ).resize(function() {
-        resizeImages();
-    });
-    $("img").one("load", function() {
-        resizeImage(this);
-    }).each(function() {
-        if(this.complete) $(this).load();
-    });
-});
+$(document).ready(
+    function() {
+        $(window).resize(
+            function() {
+                resizeImages();
+            }
+        );
+        $("img").one(
+            "load", function() {
+                resizeImage(this);
+            }
+        ).each(
+            function() {
+                if(this.complete) { $(this).load(); }
+            }
+        );
+    }
+);
 
 function resizeImages() {
-    $('#main-page img').each(function() {
-        resizeImage(this);
+    $('#main-page img').each(
+        function() {
+            resizeImage(this);
 
-    });
+        }
+    );
 }
 
 function resizeImage(imageElement) {
