@@ -59,5 +59,5 @@ Mit einem beliebigen Webserver und einem aktuellen PHP (>5.3.9) kann man Dembelo
 Aufruf: /vagrant/www/vendor/phpunit/phpunit/phpunit /vagrant/www/app/
 
 ### CodeSniffer
-Aufruf: phpcs /vagrant/www/src
+Aufruf: phpcs --standard=symfony2 /vagrant/www/src
 

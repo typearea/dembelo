@@ -15,8 +15,14 @@ namespace DembeloMain\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+/**
+ * Class DefaultControllerTest
+ */
 class DefaultControllerTest extends WebTestCase
 {
+    /**
+     * tests the index action
+     */
     public function testIndex()
     {
         $client = static::createClient();
@@ -25,5 +31,17 @@ class DefaultControllerTest extends WebTestCase
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertTrue($crawler->filter('html:contains("Dembelo")')->count() > 0);
+    }
+
+    /**
+     * tests the read action
+     */
+    public function testRead()
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/themenfeld/1');
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 }

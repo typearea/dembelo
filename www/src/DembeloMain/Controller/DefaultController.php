@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class DefaultController
- * @package DembeloMain
  */
 class DefaultController extends Controller
 {
@@ -36,6 +35,8 @@ class DefaultController extends Controller
 
     /**
      * @Route("/themenfeld/{themeId}", name="themenfeld")
+     *
+     * @param string $themeId theme ID from URL
      *
      * @return string
      */
