@@ -12,6 +12,7 @@
             <directory>../src/*/*Bundle/Tests</directory>
             <directory>../src/*/Bundle/*Bundle/Tests</directory>
             <directory>../src/*Bundle/Tests</directory>
+            <directory>../src/DembeloMain/Tests</directory>
         </testsuite>
     </testsuites>
 
@@ -31,6 +32,8 @@
                 <directory>../src/*/*Bundle/Tests</directory>
                 <directory>../src/*/Bundle/*Bundle/Resources</directory>
                 <directory>../src/*/Bundle/*Bundle/Tests</directory>
+                <directory>../src/DembeloMain/Resources</directory>
+                <directory>../src/DembeloMain/Tests</directory>
             </exclude>
         </whitelist>
     </filter>
