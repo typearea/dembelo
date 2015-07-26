@@ -56,7 +56,7 @@ Mit einem beliebigen Webserver und einem aktuellen PHP (>5.3.9) kann man Dembelo
 ## Entwicklung
 
 ### PHPUnit
-Aufruf: /vagrant/www/vendor/phpunit/phpunit/phpunit src/
+Aufruf: /vagrant/www/vendor/phpunit/phpunit/phpunit /vagrant/www/app/
 
 ### CodeSniffer
 Aufruf: phpcs /vagrant/www/src
