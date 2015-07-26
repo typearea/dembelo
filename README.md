@@ -12,8 +12,8 @@ Voraussetzungen:
 * Vagrant([Webseite](https://www.vagrantup.com/)|[Download](https://www.vagrantup.com/downloads.html))
 * git ([Webseite](https://git-scm.com/)|[Download](https://git-scm.com/downloads))
 * NFS-Server
-    1. unter Windows: vagrant plugin install vagrant-winnfsd ([mehr Informationen](https://github.com/GM-Alex/vagrant-winnfsd))
-    2. unter Linux: mit Hilfe der üblichen Paketverwaltung 
+** unter Windows: vagrant plugin install vagrant-winnfsd ([mehr Informationen](https://github.com/GM-Alex/vagrant-winnfsd))
+** unter Linux: mit Hilfe der üblichen Paketverwaltung 
 
 1. Klone das Git-Repository mit: git clone https://github.com/typearea/dembelo.git
 2. wechsle in das neu angelegte Verzeichnis _dembelo_ : cd dembelo
@@ -28,6 +28,7 @@ Voraussetzungen:
 
 ### Installation ohne Vagrant
 Mit einem beliebigen Webserver und einem aktuellen PHP (>5.3.9) kann man Dembelo auch ohne Vagrant in Betrieb nehmen.
+
 1. Git-Repository klonen: git clone git@github.com:typearea/dembelo.git
 2. ins Installationsverzeichnis wechseln: cd dembelo/www/
 3. externe PHP-Abhängigkeiten installieren: composer update
