@@ -44,6 +44,33 @@
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body id="{% block bodyid %}{% endblock %}">
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="{{ path('mainpage') }}">Dembelo</a>
+                </div>
+
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="{% block skipcssclass %}{% endblock %}"><a href="#">Skip/Reload</a></li>
+                        {% block infohomelink %}<li><a href="#">Home</a></li>{% endblock %}
+                        <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Einstellungen<span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Einloggen</a></li>
+                                <li><a href="#">Registrieren</a></li>
+                            </ul>
+                        </li>
+                    </ul
+                </div>
+            </div>
+        </nav>
         {% block body %}{% endblock %}
     </body>
 </html>
