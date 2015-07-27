@@ -1,0 +1,16 @@
+{% extends 'dialog.html.twig' %}
+
+{% block modalLabel %}Login{% endblock %}
+
+{% block modalFormStart %}{{ form_start(form) }}{% endblock %}
+
+{% block modalContent %}
+    {{ form_row(form.email) }}
+    {{ form_row(form.password) }}
+{% endblock %}
+
+{% block modalFooter %}
+    {{ form_row(form.save) }}
+{% endblock %}
+
+{% block modalFormEnd %}{{ form_end(form) }}{% endblock %}

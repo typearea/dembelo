@@ -2,6 +2,7 @@
 <div class="modal fade" id="{{ dialogId }}" tabindex="-1" role="dialog" aria-labelledby="{{ dialogId }}Label">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
+            {% block modalFormStart %}{% endblock %}
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="{{ dialogId }}Label">{% block modalLabel %}Modal Label{% endblock %}</h4>
@@ -15,6 +16,7 @@
                     <button type="button" class="btn btn-primary">Login</button>
                 {% endblock %}
             </div>
+            {% block modalFormEnd %}{% endblock %}
         </div>
     </div>
 </div>

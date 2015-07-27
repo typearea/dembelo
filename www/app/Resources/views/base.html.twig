@@ -62,7 +62,7 @@
         </nav>
         {% block body %}{% endblock %}
 
-        {{ include('login.html.twig', {'dialogId': 'modalLogin'}) }}
-        {{ include('register.html.twig', {'dialogId': 'modalRegister'}) }}
+        {{ render(controller('DembeloMain:User:login')) }}
+        {{ render(controller('DembeloMain:User:register')) }}
     </body>
 </html>
