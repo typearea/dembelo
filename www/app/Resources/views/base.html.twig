@@ -52,14 +52,17 @@
                         {% block infohomelink %}<li><a href="{{ path('mainpage') }}"><span class="glyphicon glyphicon-home"></span></a></li>{% endblock %}
                         <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Einloggen</a></li>
-                                <li><a href="#">Registrieren</a></li>
+                                <li><a href="#" data-toggle="modal" data-target="#modalLogin">Einloggen</a></li>
+                                <li><a href="#" data-toggle="modal" data-target="#modalRegister">Registrieren</a></li>
                             </ul>
                         </li>
-                    </ul
+                    </ul>
                 </div>
             </div>
         </nav>
         {% block body %}{% endblock %}
+
+        {{ include('login.html.twig', {'dialogId': 'modalLogin'}) }}
+        {{ include('register.html.twig', {'dialogId': 'modalRegister'}) }}
     </body>
 </html>
