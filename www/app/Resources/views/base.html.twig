@@ -59,8 +59,8 @@
 
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
-                        <li class="{% block skipcssclass %}{% endblock %}"><a href="#">Skip/Reload</a></li>
-                        {% block infohomelink %}<li><a href="#">Home</a></li>{% endblock %}
+                        <li class="{% block skipcssclass %}{% endblock %}"><a href="#"><span class="glyphicon glyphicon-repeat"></span></a></li>
+                        {% block infohomelink %}<li><a href="{{ path('mainpage') }}"><span class="glyphicon glyphicon-home"></span></a></li>{% endblock %}
                         <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
                             <ul class="dropdown-menu">
                                 <li><a href="#">Einloggen</a></li>
