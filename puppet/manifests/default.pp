@@ -13,7 +13,7 @@ class dev-packages {
     include gcc
     include wget
 
-    $devPackages = [ "vim", "curl", "git", "nodejs", "npm", "capistrano", "rubygems", "openjdk-7-jdk", "libaugeas-ruby" ]
+    $devPackages = [ "vim", "curl", "git", "nodejs", "npm", "capistrano", "ruby", "openjdk-7-jdk", "libaugeas-ruby" ]
     package { $devPackages:
         ensure => "installed",
         require => Exec['apt-get update'],
@@ -30,12 +30,12 @@ class dev-packages {
 
     exec { 'install capifony using RubyGems':
         command => 'gem install capifony',
-        require => Package["rubygems"],
+        require => Package["ruby"],
     }
 
     exec { 'install sass with compass using RubyGems':
         command => 'gem install compass',
-        require => Package["rubygems"],
+        require => Package["ruby"],
     }
 
     exec { 'install capistrano_rsync_with_remote_cache using RubyGems':
