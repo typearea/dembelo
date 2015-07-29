@@ -50,7 +50,8 @@ Mit einem beliebigen Webserver und einem aktuellen PHP (>5.3.9) kann man Dembelo
 
 ## Helfen/Mitarbeit
 * Wir laden dazu ein, dembelo zu [forken](https://help.github.com/articles/fork-a-repo/) und [Pull-Requests](https://help.github.com/articles/using-pull-requests/) zu erstellen, damit wir eure Arbeit nach Dembelo-Master übernehmen können.
-* Wir nutzen die ["Issues"](https://github.com/typearea/dembelo/issues) in unserem github-Repository zur Planung der Weiterentwicklung.
+* Wir nutzen die ["Issues"](https://github.com/typearea/dembelo/issues) in unserem github-Repository zur Planung der Weiterentwicklung, nutzt bitte die Meilenstein-Ansicht.
+* Im [Wiki](https://github.com/typearea/dembelo/wiki) findet sich eine Spezifikation und Konzeptionsthemen.
 * Tretet mit uns per Mail in Kontakt: tina.giesler@typearea.de-
 
 ## Entwicklung
