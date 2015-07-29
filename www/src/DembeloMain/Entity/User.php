@@ -41,4 +41,14 @@ class User
     {
         $this->password = $password;
     }
+
+    public function getUsername()
+    {
+        return $this->getEmail();
+    }
+
+    public function setUsername($username)
+    {
+        $this->setEmail($username);
+    }
 }

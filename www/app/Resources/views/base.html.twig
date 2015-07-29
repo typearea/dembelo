@@ -52,8 +52,13 @@
                         {% block infohomelink %}<li><a href="{{ path('mainpage') }}"><span class="glyphicon glyphicon-home"></span></a></li>{% endblock %}
                         <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#" data-toggle="modal" data-target="#modalLogin">Einloggen</a></li>
-                                <li><a href="#" data-toggle="modal" data-target="#modalRegister">Registrieren</a></li>
+                                {% if is_granted('ROLE_USER') %}
+                                    <li><a href="{{ path('logout') }}">Ausloggen</a></li>
+                                {% else %}
+                                    <li><a href="{{ path('login_route') }}">Einloggen</a></li>
+                                    <li><a href="{{ path('register') }}">Registrieren</a></li>
+                                {% endif %}
+
                             </ul>
                         </li>
                     </ul>
@@ -62,7 +67,5 @@
         </nav>
         {% block body %}{% endblock %}
 
-        {{ render(controller('DembeloMain:User:login')) }}
-        {{ render(controller('DembeloMain:User:register')) }}
     </body>
 </html>

@@ -5,7 +5,17 @@ security:
     # http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers
     providers:
         in_memory:
-            memory: ~
+            memory:
+                users:
+                    michael@4horsemen.de:
+                        password: $2a$12$D5qSIjvkpBwXgL3EMYQyMOwTl0LDe0OASrsGPc1KCZvo9i.E0.Xgq
+                        roles: 'ROLE_USER'
+                    vistin@4horsemen.de:
+                        password: $2a$12$HmGHnn74Y/7jNMaZR/U6oO6AJUr74X1U7kkPueDRSuIAc7xk0RVuG
+                        roles: 'ROLE_USER'
+                    admin@dembelo.de:
+                        password: $2a$12$ZQIXVmCQaCCWzM7Ca8nrwudYwaKEtagnkkcz/YRLIvvnQgRa.6YTy
+                        roles: 'ROLE_ADMIN'
 
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs
@@ -13,8 +23,12 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        main:
+        default:
             anonymous: ~
+            http_basic: ~
+            form_login:
+                login_path: /login
+                check_path: /login_check
             # activate different ways to authenticate
 
             # http_basic: ~
@@ -22,3 +36,14 @@ security:
 
             # form_login: ~
             # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
+
+        # secured_area:
+            # ...
+            logout:
+                path:   /logout
+                target: /
+
+    encoders:
+        Symfony\Component\Security\Core\User\User:
+            algorithm: bcrypt
+            cost: 12

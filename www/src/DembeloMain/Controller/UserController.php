@@ -17,7 +17,7 @@ namespace DembeloMain\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use DembeloMain\Entity\User;
+use DembeloMain\Entity\User AS DembeloUser;
 
 /**
  * Class DefaultController
@@ -25,33 +25,36 @@ use DembeloMain\Entity\User;
 class UserController extends Controller
 {
     /**
-     * @Route("/login", name="login")
+     * @Route("/login", name="login_route")
      *
      * @return string
      */
-    public function loginAction(Request $request)
+    public function loginAction()
     {
-        $user = new User;
+        $authenticationUtils = $this->get('security.authentication_utils');
+        $error = $authenticationUtils->getLastAuthenticationError();
 
-        $form = $this->createFormBuilder($user)
-            ->setAction($this->generateUrl('login'))
-            ->add('email', 'email')
-            ->add('password', 'password')
-            ->add('save', 'submit', array('label' => 'Login', 'attr' => array('class' => 'btn btn-primary')))
-            ->getForm();
+        // last username entered by the user
+        $lastUsername = $authenticationUtils->getLastUsername();
 
-        $form->handleRequest($request);
-
-        if ($form->isValid()) {
-        }
 
         return $this->render(
             'user/login.html.twig',
             array(
-                'dialogId' => 'modalLogin',
-                'form' => $form->createView()
+                'last_username' => $lastUsername,
+                'error' => $error,
             )
         );
+    }
+
+    /**
+     * @Route("/login_check", name="login_check")
+     *
+     * @return string
+     */
+    public function loginCheckAction()
+    {
+
     }
 
     /**
@@ -63,7 +66,7 @@ class UserController extends Controller
     {
         return $this->render(
             'user/register.html.twig',
-            array('dialogId' => 'modalRegister')
+            array()
         );
     }
 }
