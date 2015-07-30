@@ -14,10 +14,10 @@
 
 namespace DembeloMain\Controller;
 
+use DembeloMain\Document\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use DembeloMain\Entity\User AS DembeloUser;
 
 /**
  * Class DefaultController
@@ -37,12 +37,23 @@ class UserController extends Controller
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
+        $user = new User();
+        $user->setEmail($lastUsername);
+
+        $form = $this->createFormBuilder($user)
+            ->setAction($this->generateUrl('login_check'))
+            ->add('_username', 'email', array('label' => 'Email'))
+            ->add('password', 'password', array('label' => 'Passwort'))
+            ->add('save', 'submit', array('label' => 'Einloggen', 'attr' => array('class' => 'btn btn-primary')))
+            ->getForm();
+
 
         return $this->render(
             'user/login.html.twig',
             array(
-                'last_username' => $lastUsername,
+                //'last_username' => $lastUsername,
                 'error' => $error,
+                'form' => $form->createView()
             )
         );
     }
