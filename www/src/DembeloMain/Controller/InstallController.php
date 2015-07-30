@@ -41,7 +41,7 @@ class InstallController extends Controller
         $user = $userRepository->findOneByEmail('michael@4horsemen.de');
 
         if (is_null($user)) {
-            $user = new User;
+            $user = new User();
             $user->setEmail('michael@4horsemen.de');
             $password = $encoder->encodePassword($user, 'dembelo');
             $user->setPassword($password);
@@ -51,7 +51,7 @@ class InstallController extends Controller
         $user = $userRepository->findOneByEmail('vistin@4horsemen.de');
 
         if (is_null($user)) {
-            $user = new User;
+            $user = new User();
             $user->setEmail('vistin@4horsemen.de');
             $password = $encoder->encodePassword($user, 'dembelo');
             $user->setPassword($password);

@@ -45,55 +45,110 @@ class User implements UserInterface, \Serializable
      */
     protected $password;
 
+    /**
+     * gets the mongodb id
+     *
+     * @return string
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * sets the mongoDB id
+     *
+     * @param string $id
+     */
     public function setId($id)
     {
         $this->id = $id;
     }
 
+    /**
+     * gets the email
+     *
+     * @return string
+     */
     public function getEmail()
     {
         return $this->email;
     }
 
+    /**
+     * sets the usermail, used for security
+     *
+     * @return string
+     */
     public function getUsername()
     {
         return $this->getEmail();
     }
 
+    /**
+     * sets the email used as username
+     *
+     * @param string $email
+     */
     public function setEmail($email)
     {
         $this->email = $email;
     }
 
+    /**
+     * gets the password
+     *
+     * @return string
+     */
     public function getPassword()
     {
         return $this->password;
     }
 
+    /**
+     * sets the password
+     *
+     * @param string $password
+     */
     public function setPassword($password)
     {
         $this->password = $password;
     }
 
+    /**
+     * from UserInterface, not needed for our encoder
+     *
+     * @return null
+     */
     public function getSalt()
     {
         return null;
     }
 
+    /**
+     * gets the user's roles
+     *
+     * @return array
+     *
+     * @todo store the user's roles in DB
+     */
     public function getRoles()
     {
         return array('ROLE_USER');
     }
 
+    /**
+     * from UserInterface
+     */
     public function eraseCredentials()
     {
     }
 
+    /**
+     * serializes the object
+     *
+     * @return string
+     */
     public function serialize()
     {
         return serialize(array(
@@ -105,6 +160,11 @@ class User implements UserInterface, \Serializable
         ));
     }
 
+    /**
+     * unserializes the object
+     *
+     * @param string $serialized
+     */
     public function unserialize($serialized)
     {
         list (
@@ -115,5 +175,4 @@ class User implements UserInterface, \Serializable
             // $this->salt
             ) = unserialize($serialized);
     }
-
 }

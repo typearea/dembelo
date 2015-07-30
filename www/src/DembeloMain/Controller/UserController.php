@@ -51,9 +51,8 @@ class UserController extends Controller
         return $this->render(
             'user/login.html.twig',
             array(
-                //'last_username' => $lastUsername,
                 'error' => $error,
-                'form' => $form->createView()
+                'form' => $form->createView(),
             )
         );
     }
