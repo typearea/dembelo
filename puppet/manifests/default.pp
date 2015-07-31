@@ -69,21 +69,9 @@ class nginx-setup {
     }
 }
 
-class { "mysql":
-    root_password => 'auto',
-}
-
-mysql::grant { 'dembelo':
-    mysql_privileges => 'ALL',
-    mysql_password => 'dembelo',
-    mysql_db => 'dembelo',
-    mysql_user => 'dembelo',
-    mysql_host => 'localhost',
-}
-
 class php-setup {
 
-    $php = ["php5-fpm", "php5-cli", "php5-dev", "php5-gd", "php5-curl", "php-apc", "php5-mcrypt", "php5-xdebug", "php5-sqlite", "php5-mysql", "php5-memcache", "php5-intl", "php5-tidy", "php5-imap", "php5-imagick"]
+    $php = ["php5-fpm", "php5-cli", "php5-dev", "php5-gd", "php5-curl", "php-apc", "php5-mcrypt", "php5-xdebug", "php5-memcache", "php5-intl", "php5-tidy", "php5-imap", "php5-imagick"]
 
     exec { 'add-apt-repository ppa:ondrej/php5':
         command => '/usr/bin/add-apt-repository ppa:ondrej/php5',
@@ -120,11 +108,6 @@ class php-setup {
     package { "libmagickwand-dev":
         ensure => present,
         require => Package["imagemagick"],
-    }
-
-    package { "phpmyadmin":
-        ensure => present,
-        require => Package[$php],
     }
 
     exec { 'pecl install mongo':
