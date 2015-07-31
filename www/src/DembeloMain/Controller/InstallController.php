@@ -1,15 +1,23 @@
 <?php
 
-/**
- * This file is part of the Dembelo.
+/* Copyright (C) 2015 Michael Giesler <michael@horsemen.de>
  *
- * (c) Michael Giesler <michael@horsemen.de>
+ * This file is part of Dembelo.
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * Dembelo is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Dembelo is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License 3 for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License 3
+ * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package DembeloMain
- * @author Michael Giesler <michael@4horsemen.de>
  */
 
 namespace DembeloMain\Controller;
