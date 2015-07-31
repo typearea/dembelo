@@ -1,5 +1,10 @@
 # Dembelo
 
+## Über Dembelo
+
+Dembelo ist freie Software lizenziert unter der GNU Affero General Public License 3 und jeder späteren
+Version der Lizenz, so wie diese von der Free Software Foundation herausgegeben wurden.
+
 ## Installation
 Vagrant ist ein Tool zur Verwaltung von virtuellen Maschinen. Dembelo nutzt es, um für VirtualBox eine virtuelle
 Maschine aus dem Internet herunterzuladen und für Dembelo korrekt zu konfigurieren.
