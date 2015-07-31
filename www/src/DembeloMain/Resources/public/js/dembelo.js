@@ -1,8 +1,12 @@
 $(document).ready(
     function() {
+
+        resizeMainPage()
+
         $(window).resize(
             function() {
                 resizeImages();
+                resizeMainPage()
             }
         );
         $("img").one(
@@ -42,4 +46,13 @@ function resizeImage(imageElement) {
             $(imageElement).css('height', '');
         }
     }
+}
+
+function resizeMainPage() {
+
+    var el = $('#mainpagecontainer');
+    var windowheight = $( window ).height();
+    var eltop = el.offset().top;
+    el.height(windowheight-eltop);
+
 }
