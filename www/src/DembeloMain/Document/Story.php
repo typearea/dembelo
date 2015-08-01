@@ -25,15 +25,12 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Class Textnode
+ * Class Topic
  *
  * @MongoDB\Document
  */
-class Textnode {
-
-    const TYPE_INTRODUCTION = 0;
-    const TYPE_DEEPENING = 1;
-
+class Story
+{
     const STATUS_INACTIVE = 0;
     const STATUS_ACTIVE = 1;
 
@@ -43,29 +40,14 @@ class Textnode {
     protected $id;
 
     /**
-     * @MongoDB\ObjectId
+     * @MongoDB\String
      */
-    protected $author_id;
-
-    /**
-     * @MongoDB\Date
-     */
-    protected $created;
+    protected $name;
 
     /**
      * @MongoDB\ObjectId
      */
     protected $topic_id;
-
-    /**
-     * @MongoDB\ObjectId
-     */
-    protected $story_id;
-
-    /**
-     * @MongoDB\Int
-     */
-    protected $type;
 
     /**
      * @MongoDB\Int
@@ -75,43 +57,37 @@ class Textnode {
     /**
      * @return mixed
      */
-    public function getAuthorId()
+    public function getId()
     {
-        return $this->author_id;
+        return $this->id;
     }
 
     /**
-     * sets the author id
-     *
-     * @param string $author_id
+     * @param mixed $id
      */
-    public function setAuthorId($author_id)
+    public function setId($id)
     {
-        $this->author_id = $author_id;
+        $this->id = $id;
     }
 
     /**
-     * gets the timestamp of creation
-     *
-     * @return string
+     * @return mixed
      */
-    public function getCreated()
+    public function getName()
     {
-        return $this->created;
+        return $this->name;
     }
 
     /**
-     * sets the timestamp of creation
-     *
-     * @param string $created
+     * @param mixed $name
      */
-    public function setCreated($created)
+    public function setName($name)
     {
-        $this->created = $created;
+        $this->name = $name;
     }
 
     /**
-     * @return string
+     * @return mixed
      */
     public function getTopicId()
     {
@@ -119,7 +95,7 @@ class Textnode {
     }
 
     /**
-     * @param string $topic_id
+     * @param mixed $topic_id
      */
     public function setTopicId($topic_id)
     {
@@ -127,39 +103,7 @@ class Textnode {
     }
 
     /**
-     * @return string
-     */
-    public function getStoryId()
-    {
-        return $this->story_id;
-    }
-
-    /**
-     * @param string $story_id
-     */
-    public function setStoryId($story_id)
-    {
-        $this->story_id = $story_id;
-    }
-
-    /**
-     * @return integer
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param integer $type
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * @return integer
+     * @return mixed
      */
     public function getStatus()
     {
@@ -167,31 +111,11 @@ class Textnode {
     }
 
     /**
-     * @param integer $status
+     * @param mixed $status
      */
     public function setStatus($status)
     {
         $this->status = $status;
-    }
-
-    /**
-     * gets the mongodb id
-     *
-     * @return string
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * sets the mongoDB id
-     *
-     * @param string $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
     }
 
 
