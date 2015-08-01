@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2015 Michael Giesler <michael@horsemen.de>
+/* Copyright (C) 2015 Michael Giesler
  *
  * This file is part of Dembelo.
  *
