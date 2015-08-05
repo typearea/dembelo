@@ -73,6 +73,11 @@ class Textnode {
     protected $status;
 
     /**
+     * @MongoDB\String
+     */
+    protected $text;
+
+    /**
      * @return mixed
      */
     public function getAuthorId()
@@ -192,6 +197,16 @@ class Textnode {
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    public function getText()
+    {
+        return $this->text;
+    }
+
+    public function setText($text)
+    {
+        $this->text = $text;
     }
 
 

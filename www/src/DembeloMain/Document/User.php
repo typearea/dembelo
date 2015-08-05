@@ -57,6 +57,12 @@ class User implements UserInterface, \Serializable
     protected $password;
 
     /**
+     * @MongoDB\Collection
+     * @Assert\NotBlank()
+     */
+    protected $roles;
+
+    /**
      * gets the mongodb id
      *
      * @return string
@@ -140,12 +146,15 @@ class User implements UserInterface, \Serializable
      * gets the user's roles
      *
      * @return array
-     *
-     * @todo store the user's roles in DB
      */
     public function getRoles()
     {
-        return array('ROLE_USER');
+        return $this->roles;
+    }
+
+    public function setRoles(array $roles)
+    {
+        $this->roles = $roles;
     }
 
     /**
