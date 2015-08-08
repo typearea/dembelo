@@ -8,32 +8,33 @@ Falls man selber bereits einen Webserver mit PHP betreibt, bietet sich die Insta
 
 ### Installation mit [Vagrant](https://www.vagrantup.com/)
 Voraussetzungen:
+
 * VirtualBox ([Webseite](https://www.virtualbox.org/)|[Installation](https://www.virtualbox.org/manual/ch02.html))
 * Vagrant([Webseite](https://www.vagrantup.com/)|[Download](https://www.vagrantup.com/downloads.html))
 * git ([Webseite](https://git-scm.com/)|[Download](https://git-scm.com/downloads))
 * NFS-Server
-  * unter Windows: vagrant plugin install vagrant-winnfsd ([mehr Informationen](https://github.com/GM-Alex/vagrant-winnfsd))
+  * unter Windows: `vagrant plugin install vagrant-winnfsd` ([mehr Informationen](https://github.com/GM-Alex/vagrant-winnfsd))
   * unter Linux: mit Hilfe der üblichen Paketverwaltung 
 
-1. Klone das Git-Repository mit: git clone https://github.com/typearea/dembelo.git
-2. wechsle in das neu angelegte Verzeichnis _dembelo_ : cd dembelo
-3. installieren dort die Git-Submodule: git submodule update --init
-4. starte Vagrantbox: vagrant up (kann beim ersten Mal ein Weilchen dauern)
-5. per ssh in der Vagrantbox einloggen: vagrant ssh
-6. ins Installationsverzeichnis wechseln: cd /vagrant/www/
-7. externe PHP-Abhängigkeiten installieren: composer update
-8. Bilder/JS/CSS kompilieren: php app/console assetic:dump --env=prod
-9. Dembelo im Browser aufrufen: [http://33.33.33.100](33.33.33.100)
-10. Vagrantbox schließen: vagrant halt
+1. Klone das Git-Repository mit: `git clone https://github.com/typearea/dembelo.git`
+2. Wechsle in das neu angelegte Verzeichnis _dembelo_ : `cd dembelo`
+3. Installieren dort die Git-Submodule: `git submodule update --init`
+4. Starte Vagrantbox: `vagrant up` (kann beim ersten Mal ein Weilchen dauern)
+5. Logge dich per ssh in der Vagrantbox ein: `vagrant ssh`
+6. Wechsle ins Installationsverzeichnis: `cd /vagrant/www/`
+7. Installiere externe PHP-Abhängigkeiten: `composer update`
+8. Kompiliere Bilder/JS/CSS: `php app/console assetic:dump --env=prod`
+9. Rufe Dembelo im Browser auf: [http://33.33.33.100](33.33.33.100)
+10. Schließe bei Bedarf die Vagrantbox wieder: `vagrant halt`
 
 ### Installation ohne Vagrant
 Mit einem beliebigen Webserver und einem aktuellen PHP (>5.3.9) kann man Dembelo auch ohne Vagrant in Betrieb nehmen.
 
-1. Git-Repository klonen: git clone git@github.com:typearea/dembelo.git
-2. ins Installationsverzeichnis wechseln: cd dembelo/www/
-3. externe PHP-Abhängigkeiten installieren: composer update
-4. Document Root des Webservers auf das dembelo/www/web/-Verzeichnis verweisen lassen
-5. Je nach Konfiguration Dembelo im Browser aufrufen.
+1. Klone das Git-Repository: `git clone git@github.com:typearea/dembelo.git`
+2. Wechsle ins Installationsverzeichnis: `cd dembelo/www/`
+3. Installiere externe PHP-Abhängigkeiten: `composer update`
+4. Lasse das Document Root des Webservers auf das dembelo/www/web/-Verzeichnis verweisen
+5. Rufe je nach Konfiguration Dembelo im Browser auf
 
 ## Datenbank einrichten
 Über die Konsole kann man nun einen Admin- und einen "normalen" Benutzer anlegen, sowie ein paar Dummydaten erzeugen:
@@ -51,5 +52,5 @@ php app/console dembelo:install
 [github.com/irmantas/symfony2-vagrant](https://github.com/irmantas/symfony2-vagrant) für die Vagrant/Puppet/Composer-Basis.
 
 ## Deployment
-* Cache leeren: php app/console cache:clear --env=prod
-* Assets erstellen: php app/console assetic:dump --env=prod
+* den Cache leeren: `php app/console cache:clear --env=prod`
+* Assets erstellen: `php app/console assetic:dump --env=prod`
