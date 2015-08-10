@@ -1,0 +1,50 @@
+{% extends 'AdminBundle::admin.html.twig' %}
+
+{% block body %}
+
+    <script type="text/javascript" charset="utf-8">
+
+        var mainMenuData = [
+            {id: "1", type: "folder", value: "Benutzer", css: "folder_music"},
+            {id: "2", type: "folder", value: "Autoren", css: "folder_music"},
+            {id: "3", type: "folder", value: "Themenfelder", css: "folder_music"},
+            {id: "4", type: "folder", value: "Geschichten", css: "folder_music"}
+        ];
+
+        webix.ui({
+            rows: [
+                {
+                    view: "template",
+                    type: "header", template: "Dembelo Admin Area"
+                },
+                {
+                    cols: [
+                        {view: "tree", id: "mytree", gravity: 0.3, select: true, data: mainMenuData},
+                        {view: "resizer"},
+                        {
+                            rows: [
+                                {
+                                    view: "toolbar",
+                                    elements: [
+                                        { view:"button", value:"Hinzufügen",    width:100, type: "form" },
+                                        { view:"button", value:"Löschen", width:100, type: "danger" }
+                                    ]
+                                },
+                                {
+                                    view: "datatable",
+                                    autoConfig: true,
+                                    select: true,
+                                    url: "{{ path('admin_datatable') }}",
+                                    datatype: "json"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        })
+
+    </script>
+
+    Die Admin-Oberfläche wird aufgebaut ...
+{% endblock %}
