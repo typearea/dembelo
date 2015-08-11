@@ -2,13 +2,12 @@ language: php
 php:
 - 5.5
 - 5.4
-- hhvm
 before_install:
 - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 services:
   - mongodb
 script:
-- phpunit www/app/
+- phpunit -c www/app/
 - phpcs --standard=symfony2 www/src
 install:
 - composer --working-dir="www" install
