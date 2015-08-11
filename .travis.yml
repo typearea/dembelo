@@ -4,3 +4,5 @@ php:
 - 5.4
 - hhvm
 script: phpunit www/src/DembeloMain/Tests/Controller/DefaultControllerTest.php
+install:
+- cd web; composer install
