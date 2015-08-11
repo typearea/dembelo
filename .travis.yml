@@ -8,6 +8,5 @@ services:
   - mongodb
 script:
 - phpunit -c www/app/
-- phpcs --standard=symfony2 www/src
 install:
 - composer --working-dir="www" install
