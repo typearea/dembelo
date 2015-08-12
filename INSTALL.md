@@ -28,6 +28,15 @@ Voraussetzungen:
 10. Rufe Dembelo im Browser auf: [http://33.33.33.100](33.33.33.100)
 11. Schließe bei Bedarf die Vagrantbox wieder: `vagrant halt`
 
+#### Starten des Servers
+1. Starte im Installationsverzeichnis die Vargrantbox: `vagrant up` (geht nach der initialen Installation sehr flott)
+2. Rufe Dembelo im Browser auf: [http://33.33.33.100](33.33.33.100)
+3. Schließe bei Bedarf die Vagrantbox wieder: `vagrant halt`
+
+#### Löschen der Installation
+1. Lösche im Installationsverzeichnis mit `vagrant destroy` die virtuelle Maschine.
+2. Lösche dann das Installationsverzeichnis.
+
 ### Installation ohne Vagrant
 Mit einem beliebigen Webserver und einem aktuellen PHP (>5.3.9) kann man Dembelo auch ohne Vagrant in Betrieb nehmen.
 
