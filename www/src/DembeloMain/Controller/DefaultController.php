@@ -29,6 +29,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use DembeloMain\Document\Topic;
+use DembeloMain\Document\Story;
+use DembeloMain\Document\Textnode;
+
 
 /**
  * Class DefaultController
@@ -55,15 +58,17 @@ class DefaultController extends Controller
         $connection->close();
 
         if (!is_null($topics)) {
-            shuffle($topics);
-            $topicsInfo = array();
+            if (count($topics) > 0) {
+                shuffle($topics);
+                $topicsInfo = array();
 
-            foreach ($topics as $topic) {
-                $topicsInfo[] = array('id' => $topic->getId(),
-                                      'name' => $topic->getName());
+                foreach ($topics as $topic) {
+                    $topicsInfo[] = array('id' => $topic->getId(),
+                                        'name' => $topic->getName());
+                }
+
+                return $this->render('default/index.html.twig', array('topics' => $topicsInfo));
             }
-
-            return $this->render('default/index.html.twig', array('topics' => $topicsInfo));
         }
 
         return $this->render('default/index.html.twig');
@@ -78,6 +83,93 @@ class DefaultController extends Controller
      */
     public function readAction($themeId)
     {
+        $textnodes = null;
+
+        $securityContext = $this->get('security.context');
+
+        if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED') === true ||
+            $securityContext->isGranted('IS_AUTHENTICATED_FULLY') === true) {
+            $user = $securityContext->getToken()->getUser();
+
+            $textnodeId = $user->getCurrentTextnode($themeId);
+
+            if (is_null($textnodeId)) {
+                $mongo = $this->get('doctrine_mongodb');
+                $connection = $mongo->getConnection();
+
+                if (!$connection->getMongo()) {
+                    $connection->connect();
+                }
+
+                $repository = $mongo->getRepository('DembeloMain:Story');
+                $stories = $repository->findBy(array('topic_id' => new \MongoId($themeId),
+                                                     'status' => Story::STATUS_ACTIVE));
+
+                if (!is_null($stories)) {
+                    if (count($stories) > 0) {
+                        shuffle($stories);
+
+                        $repository = $mongo->getRepository('DembeloMain:Textnode');
+                        $textnodes = $repository->findBy(array('story_id' => new \MongoId($stories[0]->getId()),
+                                                               'status' => Textnode::STATUS_ACTIVE,
+                                                               'type' => Textnode::TYPE_INTRODUCTION));
+
+                        if (!is_null($textnodes)) {
+                            $textnodeId = $textnodes[0]->getId();
+                            $textnodeText = $textnodes[0]->getText();
+
+                            $dm = $mongo->getManager();
+                            $user->setCurrentTextnode($themeId, $textnodeId);
+                            $dm->persist($user);
+                        }
+                    }
+                }
+
+                $connection->close();
+            }
+            else {
+                $mongo = $this->get('doctrine_mongodb');
+                $connection = $mongo->getConnection();
+
+                $repository = $mongo->getRepository('DembeloMain:Textnode');
+                $textnodes = $repository->findBy(array('id' => new \MongoId($textnodeId),
+                                                       'status' => Textnode::STATUS_ACTIVE));
+
+                $connection->close();
+            }
+        }
+        else {
+            $mongo = $this->get('doctrine_mongodb');
+            $connection = $mongo->getConnection();
+
+            if (!$connection->getMongo()) {
+                $connection->connect();
+            }
+
+            $repository = $mongo->getRepository('DembeloMain:Story');
+            $stories = $repository->findBy(array('topic_id' => new \MongoId($themeId),
+                                                 'status' => Story::STATUS_ACTIVE));
+
+            if (!is_null($stories)) {
+                if (count($stories) > 0) {
+                    shuffle($stories);
+
+                    $repository = $mongo->getRepository('DembeloMain:Textnode');
+                    $textnodes = $repository->findBy(array('story_id' => new \MongoId($stories[0]->getId()),
+                                                        'status' => Textnode::STATUS_ACTIVE,
+                                                        'type' => Textnode::TYPE_INTRODUCTION));
+                }
+            }
+
+            $connection->close();
+        }
+
+        if (!is_null($textnodes)) {
+            if (count($textnodes) > 0) {
+                return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
+            }
+        }
+
         return $this->render('default/read.html.twig');
     }
 }
