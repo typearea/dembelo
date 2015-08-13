@@ -1,6 +1,6 @@
 <?php
 
-/* Copyright (C) 2015 Michael Giesler
+/* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
  *
@@ -61,6 +61,11 @@ class User implements UserInterface, \Serializable
      * @Assert\NotBlank()
      */
     protected $roles;
+
+    /**
+     * @MongoDB\Collection
+     */
+    protected $currentTextnodes;
 
     /**
      * gets the mongodb id
@@ -165,6 +170,20 @@ class User implements UserInterface, \Serializable
         $this->roles = $roles;
     }
 
+    public function getCurrentTextnode($themeId)
+    {
+        if (isset($this->currentTextnodes[$themeId]) === true) {
+            return $this->currentTextnodes[$themeId];
+        }
+
+        return null;
+    }
+
+    public function setCurrentTextnode($themeId, $textnodeId)
+    {
+        $this->currentTextnodes[$themeId] = $textnodeId;
+    }
+
     /**
      * from UserInterface
      */
@@ -185,6 +204,7 @@ class User implements UserInterface, \Serializable
             $this->password,
             // see section on salt below
             // $this->salt,
+            $this->currentTextnodes
         ));
     }
 
@@ -200,7 +220,8 @@ class User implements UserInterface, \Serializable
             $this->email,
             $this->password,
             // see section on salt below
-            // $this->salt
+            // $this->salt,
+            $this->currentTextnodes
             ) = unserialize($serialized);
     }
 }

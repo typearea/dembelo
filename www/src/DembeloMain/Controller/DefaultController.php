@@ -1,6 +1,6 @@
 <?php
 
-/* Copyright (C) 2015 Michael Giesler
+/* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
  *
@@ -28,6 +28,7 @@ namespace DembeloMain\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use DembeloMain\Document\Topic;
 
 /**
  * Class DefaultController
@@ -41,6 +42,30 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
+        $mongo = $this->get('doctrine_mongodb');
+        $connection = $mongo->getConnection();
+
+        if (!$connection->getMongo()) {
+            $connection->connect();
+        }
+
+        $repository = $mongo->getRepository('DembeloMain:Topic');
+        $topics = $repository->findByStatus(Topic::STATUS_ACTIVE);
+
+        $connection->close();
+
+        if (!is_null($topics)) {
+            shuffle($topics);
+            $topicsInfo = array();
+
+            foreach ($topics as $topic) {
+                $topicsInfo[] = array('id' => $topic->getId(),
+                                      'name' => $topic->getName());
+            }
+
+            return $this->render('default/index.html.twig', array('topics' => $topicsInfo));
+        }
+
         return $this->render('default/index.html.twig');
     }
 
