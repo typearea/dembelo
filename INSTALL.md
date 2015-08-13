@@ -24,8 +24,18 @@ Voraussetzungen:
 6. Wechsle ins Installationsverzeichnis: `cd /vagrant/www/`
 7. Installiere externe PHP-Abhängigkeiten: `composer update`
 8. Kompiliere Bilder/JS/CSS: `php app/console assetic:dump --env=prod`
-9. Rufe Dembelo im Browser auf: [http://33.33.33.100](33.33.33.100)
-10. Schließe bei Bedarf die Vagrantbox wieder: `vagrant halt`
+9. Webserver neu starten: `/etc/init.d/nginx restart `
+10. Rufe Dembelo im Browser auf: [http://33.33.33.100](33.33.33.100)
+11. Schließe bei Bedarf die Vagrantbox wieder: `vagrant halt`
+
+#### Starten des Servers
+1. Starte im Installationsverzeichnis die Vargrantbox: `vagrant up` (geht nach der initialen Installation sehr flott)
+2. Rufe Dembelo im Browser auf: [http://33.33.33.100](33.33.33.100)
+3. Schließe bei Bedarf die Vagrantbox wieder: `vagrant halt`
+
+#### Löschen der Installation
+1. Lösche im Installationsverzeichnis mit `vagrant destroy` die virtuelle Maschine.
+2. Lösche dann das Installationsverzeichnis.
 
 ### Installation ohne Vagrant
 Mit einem beliebigen Webserver und einem aktuellen PHP (>5.3.9) kann man Dembelo auch ohne Vagrant in Betrieb nehmen.
@@ -33,8 +43,11 @@ Mit einem beliebigen Webserver und einem aktuellen PHP (>5.3.9) kann man Dembelo
 1. Klone das Git-Repository: `git clone git@github.com:typearea/dembelo.git`
 2. Wechsle ins Installationsverzeichnis: `cd dembelo/www/`
 3. Installiere externe PHP-Abhängigkeiten: `composer update`
-4. Lasse das Document Root des Webservers auf das dembelo/www/web/-Verzeichnis verweisen
-5. Rufe je nach Konfiguration Dembelo im Browser auf
+4. Kompiliere Bilder/JS/CSS: `php app/console assetic:dump --env=prod`
+5. Lasse das Document Root des Webservers auf das dembelo/www/web/-Verzeichnis verweisen
+6. Rufe je nach Konfiguration Dembelo im Browser auf
+
+## 
 
 ## Datenbank einrichten
 Über die Konsole kann man nun einen Admin- und einen "normalen" Benutzer anlegen, sowie ein paar Dummydaten erzeugen:

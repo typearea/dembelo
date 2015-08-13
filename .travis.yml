@@ -1,0 +1,12 @@
+language: php
+php:
+- 5.5
+- 5.4
+before_install:
+- echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+services:
+  - mongodb
+script:
+- phpunit -c www/app/
+install:
+- composer --working-dir="www" install
