@@ -19,32 +19,91 @@
                 },
                 {
                     cols: [
-                        {view: "tree", id: "mytree", gravity: 0.3, select: true, data: mainMenuData},
+                        {
+                            id: "mainnav",
+                            view: "tree",
+                            gravity: 0.2,
+                            select: true,
+                            data: mainMenuData
+                        },
                         {view: "resizer"},
                         {
                             rows: [
                                 {
-                                    view: "toolbar",
-                                    elements: [
-                                        { view:"button", value:"Hinzufügen",    width:100, type: "form" },
-                                        { view:"button", value:"Löschen", width:100, type: "danger" }
+                                    fitBiggest:true,
+                                    multiview: true,
+                                    cells: [
+                                        {
+                                            id: "userstuff",
+                                            cols: [
+                                                {
+                                                    id: "usergrid",
+                                                    view: "datatable",
+                                                    autoConfig: true,
+                                                    select: true,
+                                                    datatype: "json"
+                                                },
+                                                {
+                                                    view: "form",
+                                                    id: "userform",
+                                                    gravity: 0.5,
+                                                    elements: [
+                                                        {view: "text", name: "email", label: "Email"},
+                                                        {view:"button", value:"Speichern" }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "authorgrid",
+                                            view: "datatable",
+                                            autoConfig: true,
+                                            select: true,
+                                            datatype: "json"
+                                        },
+                                        {
+                                            id: "topicgrid",
+                                            view: "datatable",
+                                            autoConfig: true,
+                                            select: true,
+                                            datatype: "json"
+                                        },
+                                        {
+                                            id: "storygrid",
+                                            view: "datatable",
+                                            autoConfig: true,
+                                            select: true,
+                                            datatype: "json"
+                                        }
                                     ]
-                                },
-                                {
-                                    view: "datatable",
-                                    autoConfig: true,
-                                    select: true,
-                                    url: "{{ path('admin_datatable') }}",
-                                    datatype: "json"
                                 }
                             ]
                         }
                     ]
                 }
             ]
-        })
+        });
+
+        $$("mainnav").attachEvent("onAfterSelect", function(id){
+            if (id == 1) {
+                $$('usergrid').load("{{ path('admin_users') }}");
+                $$('userstuff').show();
+            } else if (id == 2) {
+                $$('authorgrid').load("{{ path('admin_authors') }}");
+                $$('authorgrid').show();
+            } else if (id == 3) {
+                $$('topicgrid').load("{{ path('admin_topics') }}");
+                $$('topicgrid').show();
+            } else if (id == 4) {
+                $$('storygrid').load("{{ path('admin_stories') }}");
+                $$('storygrid').show();
+            }
+        });
+
+        $$("mainnav").select(1);
+
+        $$('userform').bind($$('usergrid'));
 
     </script>
 
-    Die Admin-Oberfläche wird aufgebaut ...
 {% endblock %}

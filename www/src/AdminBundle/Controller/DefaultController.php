@@ -29,6 +29,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use StdClass;
 
 /**
  * Class DefaultController
@@ -46,17 +47,103 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/datatable", name="admin_datatable")
+     * @Route("/users", name="admin_users")
      *
      * @return String
      */
-    public function datatableAction()
+    public function usersAction()
     {
-        return new Response('[
-    { id:"1", person: "Nanny", place: "Alabama", age: "45" },
-    { id:"2", person: "Derek", place: "New York", age: "23" },
-    { id:"3", person: "Samuel", place: "Oregon", age: "32"}
-]');
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:User');
+
+        $users = $repository->findAll();
+
+        $output = array();
+        /* @var $user \DembeloMain\Document\User */
+        foreach ($users AS $user) {
+            $obj = new StdClass();
+            $obj->id = $user->getId();
+            $obj->email = $user->getEmail();
+            $obj->roles = join(', ', $user->getRoles());
+            $output[] = $obj;
+        }
+
+        return new Response(\json_encode($output));
     }
 
+    /**
+     * @Route("/authors", name="admin_authors")
+     *
+     * @return String
+     */
+    public function authorsAction()
+    {
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Author');
+
+        $users = $repository->findAll();
+
+        $output = array();
+        /* @var $user \DembeloMain\Document\User */
+        foreach ($users AS $user) {
+            $obj = new StdClass();
+            $obj->id = $user->getId();
+            $obj->name = $user->getName();
+            $output[] = $obj;
+        }
+
+        return new Response(\json_encode($output));
+    }
+
+    /**
+     * @Route("/topics", name="admin_topics")
+     *
+     * @return String
+     */
+    public function topicsAction()
+    {
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Topic');
+
+        $users = $repository->findAll();
+
+        $output = array();
+        /* @var $user \DembeloMain\Document\User */
+        foreach ($users AS $user) {
+            $obj = new StdClass();
+            $obj->id = $user->getId();
+            $obj->name = $user->getName();
+            $output[] = $obj;
+        }
+
+        return new Response(\json_encode($output));
+    }
+
+    /**
+     * @Route("/stories", name="admin_stories")
+     *
+     * @return String
+     */
+    public function storiesAction()
+    {
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Story');
+
+        $users = $repository->findAll();
+
+        $output = array();
+        /* @var $user \DembeloMain\Document\User */
+        foreach ($users AS $user) {
+            $obj = new StdClass();
+            $obj->id = $user->getId();
+            $obj->name = $user->getName();
+            $output[] = $obj;
+        }
+
+        return new Response(\json_encode($output));
+    }
 }
