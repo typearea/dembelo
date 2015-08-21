@@ -73,7 +73,7 @@
                                                     elements: [
                                                         {view: "text", name: "email", label: "Email", validate:webix.rules.isEmail},
                                                         {view: "combo", name: "roles", label: "Rolle", options: ["ROLE_ADMIN", "ROLE_USER"], validate:webix.rules.isNotEmpty},
-                                                        {view: "text", type:"password", label:"Passwort"},
+                                                        {view: "text", name: "password", type:"password", label:"Passwort"},
                                                         {view: "button", value:"Speichern", click:"formsave('user')" }
                                                     ]
                                                 }
@@ -121,10 +121,10 @@
             webix.ajax().post("{{ path('admin_formsave') }}", values, function(text) {
                 var params = JSON.parse(text);
                 if (params['error'] === false) {
-                    if (params['newId']) {
-                        $$(id).id_setter(params['newId']);
-                    }
                     $$(id).save();
+                    if (params['newId']) {
+                        $$(type + 'grid').getSelectedItem().id = params['newId'];
+                    }
                 } else  {
                     webix.modalbox({
                         title:"Fehler",
