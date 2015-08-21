@@ -37,19 +37,44 @@
                                             id: "userstuff",
                                             cols: [
                                                 {
-                                                    id: "usergrid",
-                                                    view: "datatable",
-                                                    autoConfig: true,
-                                                    select: true,
-                                                    datatype: "json"
+                                                    rows: [
+                                                        {
+                                                            view: "toolbar",
+                                                            cols: [
+                                                                {
+                                                                    id: "newUserBtn",
+                                                                    view: "button",
+                                                                    value: "Neu",
+                                                                    type: "form",
+                                                                    click: "$$('usergrid').add({id: 'new', email: '', roles: 'ROLE_USER'})"
+                                                                },
+                                                                {
+                                                                    id: "deleteUserBtn",
+                                                                    view: "button",
+                                                                    value: "Löschen",
+                                                                    type: "danger",
+                                                                    click: "delItem('user')"
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            id: "usergrid",
+                                                            view: "datatable",
+                                                            autoConfig: true,
+                                                            select: true,
+                                                            datatype: "json"
+                                                        }
+                                                    ]
                                                 },
                                                 {
                                                     view: "form",
                                                     id: "userform",
                                                     gravity: 0.5,
                                                     elements: [
-                                                        {view: "text", name: "email", label: "Email"},
-                                                        {view:"button", value:"Speichern" }
+                                                        {view: "text", name: "email", label: "Email", validate:webix.rules.isEmail},
+                                                        {view: "combo", name: "roles", label: "Rolle", options: ["ROLE_ADMIN", "ROLE_USER"], validate:webix.rules.isNotEmpty},
+                                                        {view: "text", type:"password", label:"Passwort"},
+                                                        {view: "button", value:"Speichern", click:"formsave('user')" }
                                                     ]
                                                 }
                                             ]
@@ -83,6 +108,61 @@
                 }
             ]
         });
+
+        function formsave(type) {
+            var id = type + "form",
+                    values = $$(id).getValues();
+            values['formtype'] = type;
+
+            if (!$$(id).validate()) {
+                return;
+            }
+
+            webix.ajax().post("{{ path('admin_formsave') }}", values, function(text) {
+                var params = JSON.parse(text);
+                if (params['error'] === false) {
+                    if (params['newId']) {
+                        $$(id).id_setter(params['newId']);
+                    }
+                    $$(id).save();
+                } else  {
+                    webix.modalbox({
+                        title:"Fehler",
+                        buttons:["Ok",],
+                        text:"Das Speichern ist leider fehlgeschlagen..."
+                    });
+                }
+            });
+        }
+
+        function delItem(type) {
+            var id = type + "grid",
+                values = {};
+            values['id'] = $$(id).getSelectedId().row;
+            values['formtype'] = type;
+
+            if (values['id'] === undefined) {
+                webix.modalbox({
+                    title:"Fehler",
+                    buttons:["Ok",],
+                    text:"Keine Zeile zum Löschen ausgewählt."
+                });
+                return;
+            }
+
+            webix.ajax().post("{{ path('admin_formdel') }}", values, function(text) {
+                var params = JSON.parse(text);
+                if (params['error'] === false) {
+                    $$(id).remove($$(id).getSelectedId());
+                } else {
+                    webix.modalbox({
+                        title:"Fehler",
+                        buttons:["Ok",],
+                        text:"Das Löschen ist leider fehlgeschlagen..."
+                    });
+                }
+            });
+        }
 
         $$("mainnav").attachEvent("onAfterSelect", function(id){
             if (id == 1) {

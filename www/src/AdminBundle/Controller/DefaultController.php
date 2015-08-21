@@ -30,6 +30,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use StdClass;
+use DembeloMain\Document\User;
+use DembeloMain\Document\Author;
+use DembeloMain\Document\Topic;
+use DembeloMain\Document\Story;
 
 /**
  * Class DefaultController
@@ -145,5 +149,95 @@ class DefaultController extends Controller
         }
 
         return new Response(\json_encode($output));
+    }
+
+    /**
+     * @Route("/save", name="admin_formsave")
+     *
+     * @return String
+     */
+    public function formsaveAction()
+    {
+        $request = Request::createFromGlobals();
+        $params = $request->request->all();
+
+        if (!in_array($params['formtype'], array('user', 'author', 'topic', 'story'))) {
+            return new Response(\json_encode(array('error' => true)));
+        }
+        $formtype = ucfirst($params['formtype']);
+
+        /* @var $mongo \Doctrine\Bundle\MongoDBBundle\ManagerRegistry */
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $dm \Doctrine\ODM\MongoDB\DocumentManager*/
+        $dm = $mongo->getManager();
+
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:' . $formtype);
+        if (isset($params['id']) && $params['id'] == 'new') {
+            $className = $repository->getClassName();
+            $item = new $className();
+        } else {
+            $item = $repository->find($params['id']);
+            if ($item->getId() != $params['id']) {
+                return new Response(\json_encode(array('error' => true)));
+            }
+        }
+        foreach ($params AS $param => $value) {
+            if (in_array($param, array('id', 'formtype'))) {
+                continue;
+            }
+            if ($param == 'password' && empty($value)) {
+                continue;
+            } elseif ($param == 'password') {
+                $encoder = $this->get('security.password_encoder');
+                $value = $encoder->encodePassword($item, $value);
+            }
+            $method = 'set' . ucfirst($param);
+            $item->$method($value);
+        }
+        $dm->persist($item);
+        $dm->flush();
+
+        $output = array(
+            'error' => false,
+            'newId' => $item->getId()
+        );
+
+        return new Response(\json_encode($output));
+
+    }
+
+    /**
+     * @Route("/delete", name="admin_formdel")
+     *
+     * @return String
+     */
+    public function formdelAction()
+    {
+        $request = Request::createFromGlobals();
+        $params = $request->request->all();
+
+        if (!in_array($params['formtype'], array('user', 'author', 'topic', 'story'))) {
+            return new Response(\json_encode(array('error' => true)));
+        }
+
+        $formtype = ucfirst($params['formtype']);
+
+        /* @var $mongo \Doctrine\Bundle\MongoDBBundle\ManagerRegistry */
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $dm \Doctrine\ODM\MongoDB\DocumentManager*/
+        $dm = $mongo->getManager();
+
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:' . $formtype);
+        if (!isset($params['id']) || empty($params['id'])) {
+            return new Response(\json_encode(array('error' => true)));
+        }
+
+        $user = $repository->find($params['id']);
+        $dm->remove($user);
+        $dm->flush();
+        return new Response(\json_encode(array('error' => false)));
+
     }
 }
