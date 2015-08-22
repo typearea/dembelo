@@ -33,6 +33,7 @@ use DembeloMain\Document\Story;
 use DembeloMain\Document\Textnode;
 
 
+
 /**
  * Class DefaultController
  */
@@ -59,15 +60,7 @@ class DefaultController extends Controller
 
         if (!is_null($topics)) {
             if (count($topics) > 0) {
-                shuffle($topics);
-                $topicsInfo = array();
-
-                foreach ($topics as $topic) {
-                    $topicsInfo[] = array('id' => $topic->getId(),
-                                        'name' => $topic->getName());
-                }
-
-                return $this->render('default/index.html.twig', array('topics' => $topicsInfo));
+                return $this->render('default/index.html.twig', array('topics' => $topics));
             }
         }
 
@@ -102,26 +95,22 @@ class DefaultController extends Controller
                 }
 
                 $repository = $mongo->getRepository('DembeloMain:Story');
-                $stories = $repository->findBy(array('topic_id' => new \MongoId($themeId),
-                                                     'status' => Story::STATUS_ACTIVE));
+                $story = $repository->findOneBy(array('topic_id' => new \MongoId($themeId),
+                                                      'status' => Story::STATUS_ACTIVE));
 
-                if (!is_null($stories)) {
-                    if (count($stories) > 0) {
-                        shuffle($stories);
+                if (!is_null($story)) {
+                    $repository = $mongo->getRepository('DembeloMain:Textnode');
+                    $textnodes = $repository->findBy(array('story_id' => new \MongoId($story->getId()),
+                                                           'status' => Textnode::STATUS_ACTIVE,
+                                                           'type' => Textnode::TYPE_INTRODUCTION));
 
-                        $repository = $mongo->getRepository('DembeloMain:Textnode');
-                        $textnodes = $repository->findBy(array('story_id' => new \MongoId($stories[0]->getId()),
-                                                               'status' => Textnode::STATUS_ACTIVE,
-                                                               'type' => Textnode::TYPE_INTRODUCTION));
+                    if (!is_null($textnodes)) {
+                        $textnodeId = $textnodes[0]->getId();
+                        $textnodeText = $textnodes[0]->getText();
 
-                        if (!is_null($textnodes)) {
-                            $textnodeId = $textnodes[0]->getId();
-                            $textnodeText = $textnodes[0]->getText();
-
-                            $dm = $mongo->getManager();
-                            $user->setCurrentTextnode($themeId, $textnodeId);
-                            $dm->persist($user);
-                        }
+                        $dm = $mongo->getManager();
+                        $user->setCurrentTextnode($themeId, $textnodeId);
+                        $dm->persist($user);
                     }
                 }
 
@@ -147,18 +136,14 @@ class DefaultController extends Controller
             }
 
             $repository = $mongo->getRepository('DembeloMain:Story');
-            $stories = $repository->findBy(array('topic_id' => new \MongoId($themeId),
-                                                 'status' => Story::STATUS_ACTIVE));
+            $story = $repository->findOneBy(array('topic_id' => new \MongoId($themeId),
+                                                  'status' => Story::STATUS_ACTIVE));
 
-            if (!is_null($stories)) {
-                if (count($stories) > 0) {
-                    shuffle($stories);
-
-                    $repository = $mongo->getRepository('DembeloMain:Textnode');
-                    $textnodes = $repository->findBy(array('story_id' => new \MongoId($stories[0]->getId()),
-                                                        'status' => Textnode::STATUS_ACTIVE,
-                                                        'type' => Textnode::TYPE_INTRODUCTION));
-                }
+            if (!is_null($story)) {
+                $repository = $mongo->getRepository('DembeloMain:Textnode');
+                $textnodes = $repository->findBy(array('story_id' => new \MongoId($story->getId()),
+                                                       'status' => Textnode::STATUS_ACTIVE,
+                                                       'type' => Textnode::TYPE_INTRODUCTION));
             }
 
             $connection->close();
