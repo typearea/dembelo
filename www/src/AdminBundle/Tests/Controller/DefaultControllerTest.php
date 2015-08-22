@@ -35,39 +35,16 @@ use AdminBundle\Controller\DefaultController;
 class DefaultControllerTest extends WebTestCase
 {
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Client
-     */
-    private $client = null;
-
-    private function getClient()
-    {
-        return static::createClient(array(), array(
-            'PHP_AUTH_USER' => 'admin@dembelo.tld',
-            'PHP_AUTH_PW'   => 'dembelo',
-        ));
-    }
-
-    /**
      * tests the index action
      */
     public function testIndex()
     {
-        $client = $this->getClient();
+        $client = static::createClient();
         $crawler = $client->request('GET', '/admin/');
 
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertTrue($crawler->filter('html:contains("Admin Area")')->count() > 0);
-    }
 
-    /**
-     * tests the usersAction
-     */
-    public function testUsers()
-    {
-        $client = $this->getClient();
-        $crawler = $client->request('GET', '/admin/users');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertJson($crawler->text());
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
+        $this->assertTrue($crawler->filter('html:contains("login")')->count() > 0);
     }
 
     /**
