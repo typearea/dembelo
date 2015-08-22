@@ -34,6 +34,10 @@ use AdminBundle\Controller\DefaultController;
  */
 class DefaultControllerTest extends WebTestCase
 {
+    private $container;
+    private $repository;
+    private $service;
+
     /**
      * tests the index action
      */
@@ -52,24 +56,13 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testUserAction()
     {
-        $container = $this->getMock("Symfony\Component\DependencyInjection\ContainerInterface");
-        $service = $this->getMockBuilder("Doctrine\Bundle\MongoDBBundle\ManagerRegistry")->disableOriginalConstructor()->getMock();
-        $repository = $this->getMockBuilder("Doctrine\ODM\MongoDB\DocumentRepository")->disableOriginalConstructor()->getMock();
-        $container->expects($this->once())
-            ->method("get")
-            ->with($this->equalTo('doctrine_mongodb'))
-            ->will($this->returnValue($service));
-        $service->expects($this->once())
-            ->method("getRepository")
-            ->with($this->equalTo('DembeloMain:User'))
-            ->will($this->returnValue($repository));
-        $repository->expects($this->once())
+        $this->loadMongoContainer();
+        $this->repository->expects($this->once())
             ->method("findAll")
             ->will($this->returnValue(array()));
 
-
         $controller = new DefaultController();
-        $controller->setContainer($container);
+        $controller->setContainer($this->container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $controller->usersAction();
@@ -83,18 +76,7 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testUserActionWithUsers()
     {
-        $container = $this->getMock("Symfony\Component\DependencyInjection\ContainerInterface");
-        $service = $this->getMockBuilder("Doctrine\Bundle\MongoDBBundle\ManagerRegistry")->disableOriginalConstructor()->getMock();
-        $repository = $this->getMockBuilder("Doctrine\ODM\MongoDB\DocumentRepository")->disableOriginalConstructor()->getMock();
-        $container->expects($this->once())
-            ->method("get")
-            ->with($this->equalTo('doctrine_mongodb'))
-            ->will($this->returnValue($service));
-        $service->expects($this->once())
-            ->method("getRepository")
-            ->with($this->equalTo('DembeloMain:User'))
-            ->will($this->returnValue($repository));
-
+        $this->loadMongoContainer();
         $user1 = new User();
         $user1->setEmail('email1');
         $user1->setId('id1');
@@ -108,19 +90,186 @@ class DefaultControllerTest extends WebTestCase
             $user1,
             $user2
         );
-        $repository->expects($this->once())
+        $this->repository->expects($this->once())
             ->method("findAll")
             ->will($this->returnValue($userArray));
 
 
         $controller = new DefaultController();
-        $controller->setContainer($container);
+        $controller->setContainer($this->container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $controller->usersAction();
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
         $this->assertJsonStringEqualsJsonString('[{"id":"id1","email":"email1","roles":"ROLE_ADMIN"},{"id":"id2","email":"email2","roles":"ROLE_USER"}]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
+    }
+
+    private function loadMongoContainer()
+    {
+        $this->loadMockedContainer();
+        $this->loadMockedMongoRepository();
+    }
+
+    public function tearDown()
+    {
+        $this->container = null;
+        $this->repository = null;
+        $this->service = null;
+    }
+
+    private function loadMockedContainer()
+    {
+        $this->container = $this->getMock("Symfony\Component\DependencyInjection\ContainerInterface");
+    }
+
+    private function loadMockedMongoRepository()
+    {
+        $this->service = $this->getMockBuilder("Doctrine\Bundle\MongoDBBundle\ManagerRegistry")->disableOriginalConstructor()->getMock();
+        $this->repository = $this->getMockBuilder("Doctrine\ODM\MongoDB\DocumentRepository")->disableOriginalConstructor()->getMock();
+        $this->container->expects($this->once())
+            ->method("get")
+            ->with($this->equalTo('doctrine_mongodb'))
+            ->will($this->returnValue($this->service));
+        $this->service->expects($this->once())
+            ->method("getRepository")
+            ->with($this->equalTo('DembeloMain:User'))
+            ->will($this->returnValue($this->repository));
+
+    }
+
+    public function testFormsaveWithoutParameters()
+    {
+        $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
+        $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
+        $postArray = array(
+        );
+        $postMock->expects($this->once())
+            ->method("all")
+            ->will($this->returnValue($postArray));
+        $request->request = $postMock;
+
+        $controller = new DefaultController();
+        $controller->setContainer($this->container);
+
+        /* @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $controller->formsaveAction($request);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $json = $response->getContent();
+        $this->assertJson($json);
+        $json = json_decode($json);
+        $this->assertTrue($json->error);
+    }
+
+    public function testFormsaveWithWrongParameters()
+    {
+        $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
+        $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
+        $postArray = array(
+            'formtype' => 'nonexistant'
+        );
+        $postMock->expects($this->once())
+            ->method("all")
+            ->will($this->returnValue($postArray));
+        $request->request = $postMock;
+
+        $controller = new DefaultController();
+        $controller->setContainer($this->container);
+
+        /* @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $controller->formsaveAction($request);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $json = $response->getContent();
+        $this->assertJson($json);
+        $json = json_decode($json);
+        $this->assertTrue($json->error);
+    }
+
+    public function testFormsaveUpdateUser()
+    {
+        $user = new User();
+        $user->setId('someId');
+        $user->setEmail('some@email.de');
+        $user->setRoles('ROLE_USER');
+
+        $this->loadMongoContainer();
+        $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
+        $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
+        $postArray = array(
+            'formtype' => 'user',
+            'id' => $user->getId()
+
+        );
+        $postMock->expects($this->once())
+            ->method("all")
+            ->will($this->returnValue($postArray));
+        $request->request = $postMock;
+
+        $this->repository->expects($this->once())
+            ->method('find')
+            ->with($user->getId())
+            ->will($this->returnValue($user));
+
+        $dm = $this->getMockBuilder('Doctrine\ODM\MongoDB\DocumentManager')->disableOriginalConstructor()->getMock();
+
+        $this->service->expects($this->once())
+            ->method('getManager')
+            ->will($this->returnValue($dm));
+
+        $controller = new DefaultController();
+        $controller->setContainer($this->container);
+
+        /* @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $controller->formsaveAction($request);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $json = $response->getContent();
+        $this->assertJson($json);
+        $json = json_decode($json);
+        $this->assertFalse($json->error);
+        $this->assertEquals($user->getId(), $json->newId);
+    }
+
+    public function testFormsaveUpdateUserDoesNotExist()
+    {
+        $user = new User();
+        $user->setId('someId');
+        $user->setEmail('some@email.de');
+        $user->setRoles('ROLE_USER');
+
+        $this->loadMongoContainer();
+        $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
+        $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
+        $postArray = array(
+            'formtype' => 'user',
+            'id' => $user->getId()
+
+        );
+        $postMock->expects($this->once())
+            ->method("all")
+            ->will($this->returnValue($postArray));
+        $request->request = $postMock;
+
+        $this->repository->expects($this->once())
+            ->method('find')
+            ->with($user->getId())
+            ->will($this->returnValue(null));
+
+        $dm = $this->getMockBuilder('Doctrine\ODM\MongoDB\DocumentManager')->disableOriginalConstructor()->getMock();
+
+        $this->service->expects($this->once())
+            ->method('getManager')
+            ->will($this->returnValue($dm));
+
+        $controller = new DefaultController();
+        $controller->setContainer($this->container);
+
+        /* @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $controller->formsaveAction($request);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $json = $response->getContent();
+        $this->assertJson($json);
+        $json = json_decode($json);
+        $this->assertTrue($json->error);
     }
 
 }

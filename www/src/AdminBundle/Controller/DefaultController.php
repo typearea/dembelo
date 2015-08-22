@@ -40,6 +40,7 @@ use DembeloMain\Document\Story;
  */
 class DefaultController extends Controller
 {
+
     /**
      * @Route("/", name="admin_mainpage")
      *
@@ -154,14 +155,14 @@ class DefaultController extends Controller
     /**
      * @Route("/save", name="admin_formsave")
      *
+     * @param Request $request
      * @return String
      */
-    public function formsaveAction()
+    public function formsaveAction(Request $request)
     {
-        $request = Request::createFromGlobals();
         $params = $request->request->all();
 
-        if (!in_array($params['formtype'], array('user', 'author', 'topic', 'story'))) {
+        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'author', 'topic', 'story'))) {
             return new Response(\json_encode(array('error' => true)));
         }
         $formtype = ucfirst($params['formtype']);
@@ -178,7 +179,7 @@ class DefaultController extends Controller
             $item = new $className();
         } else {
             $item = $repository->find($params['id']);
-            if ($item->getId() != $params['id']) {
+            if (is_null($item) || $item->getId() != $params['id']) {
                 return new Response(\json_encode(array('error' => true)));
             }
         }
@@ -210,11 +211,11 @@ class DefaultController extends Controller
     /**
      * @Route("/delete", name="admin_formdel")
      *
+     * @param Request $request
      * @return String
      */
-    public function formdelAction()
+    public function formdelAction(Request $request)
     {
-        $request = Request::createFromGlobals();
         $params = $request->request->all();
 
         if (!in_array($params['formtype'], array('user', 'author', 'topic', 'story'))) {
