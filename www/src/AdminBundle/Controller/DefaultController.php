@@ -218,7 +218,7 @@ class DefaultController extends Controller
     {
         $params = $request->request->all();
 
-        if (!in_array($params['formtype'], array('user', 'author', 'topic', 'story'))) {
+        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'author', 'topic', 'story'))) {
             return new Response(\json_encode(array('error' => true)));
         }
 
@@ -236,6 +236,9 @@ class DefaultController extends Controller
         }
 
         $user = $repository->find($params['id']);
+        if (is_null($user)) {
+            return new Response(\json_encode(array('error' => true)));
+        }
         $dm->remove($user);
         $dm->flush();
         return new Response(\json_encode(array('error' => false)));

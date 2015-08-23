@@ -41,7 +41,7 @@ class DefaultControllerTest extends WebTestCase
     /**
      * tests the index action
      */
-    public function testIndex()
+    public function testIndexAction()
     {
         $client = static::createClient();
         $crawler = $client->request('GET', '/admin/');
@@ -138,7 +138,7 @@ class DefaultControllerTest extends WebTestCase
 
     }
 
-    public function testFormsaveWithoutParameters()
+    public function testFormsaveActionWithoutParameters()
     {
         $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
         $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
@@ -161,7 +161,7 @@ class DefaultControllerTest extends WebTestCase
         $this->assertTrue($json->error);
     }
 
-    public function testFormsaveWithWrongParameters()
+    public function testFormsaveActionWithWrongParameters()
     {
         $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
         $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
@@ -185,7 +185,7 @@ class DefaultControllerTest extends WebTestCase
         $this->assertTrue($json->error);
     }
 
-    public function testFormsaveUpdateUser()
+    public function testFormsaveActionExistingUser()
     {
         $user = new User();
         $user->setId('someId');
@@ -229,7 +229,7 @@ class DefaultControllerTest extends WebTestCase
         $this->assertEquals($user->getId(), $json->newId);
     }
 
-    public function testFormsaveUpdateUserDoesNotExist()
+    public function testFormsaveActionNotExistingUser()
     {
         $user = new User();
         $user->setId('someId');
@@ -270,6 +270,158 @@ class DefaultControllerTest extends WebTestCase
         $this->assertJson($json);
         $json = json_decode($json);
         $this->assertTrue($json->error);
+    }
+
+    public function testFormsaveActionWithoutAdminPermission()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/admin/save');
+
+
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
+        $this->assertTrue($crawler->filter('html:contains("login")')->count() > 0);
+    }
+
+    public function testFormdelActionWithoutAdminPermission()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/admin/delete');
+
+
+        $this->assertEquals(302, $client->getResponse()->getStatusCode());
+        $this->assertTrue($crawler->filter('html:contains("login")')->count() > 0);
+    }
+
+    public function testFormdelActionWithoutParameters()
+    {
+        $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
+        $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
+        $postArray = array(
+        );
+        $postMock->expects($this->once())
+            ->method("all")
+            ->will($this->returnValue($postArray));
+        $request->request = $postMock;
+
+        $controller = new DefaultController();
+        $controller->setContainer($this->container);
+
+        /* @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $controller->formdelAction($request);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $json = $response->getContent();
+        $this->assertJson($json);
+        $json = json_decode($json);
+        $this->assertTrue($json->error);
+    }
+
+    public function testFormdelActionWithWrongParameters()
+    {
+        $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
+        $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
+        $postArray = array(
+            'formtype' => 'foobar'
+        );
+        $postMock->expects($this->once())
+            ->method("all")
+            ->will($this->returnValue($postArray));
+        $request->request = $postMock;
+
+        $controller = new DefaultController();
+        $controller->setContainer($this->container);
+
+        /* @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $controller->formdelAction($request);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $json = $response->getContent();
+        $this->assertJson($json);
+        $json = json_decode($json);
+        $this->assertTrue($json->error);
+    }
+
+    public function testFormdelActionNonExistingUser()
+    {
+        $user = new User();
+        $user->setId('someId');
+        $user->setEmail('some@email.de');
+        $user->setRoles('ROLE_USER');
+
+        $this->loadMongoContainer();
+        $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
+        $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
+        $postArray = array(
+            'formtype' => 'user',
+            'id' => 'nonexisting'
+        );
+        $postMock->expects($this->once())
+            ->method("all")
+            ->will($this->returnValue($postArray));
+        $request->request = $postMock;
+
+        $this->repository->expects($this->once())
+            ->method('find')
+            ->with('nonexisting')
+            ->will($this->returnValue(null));
+
+        $controller = new DefaultController();
+        $controller->setContainer($this->container);
+
+        /* @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $controller->formdelAction($request);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $json = $response->getContent();
+        $this->assertJson($json);
+        $json = json_decode($json);
+        $this->assertTrue($json->error);
+    }
+
+    public function testFormdelActionExistingUser()
+    {
+        $user = new User();
+        $user->setId('someId');
+        $user->setEmail('some@email.de');
+        $user->setRoles('ROLE_USER');
+
+        $this->loadMongoContainer();
+        $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
+        $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
+        $postArray = array(
+            'formtype' => 'user',
+            'id' => $user->getId()
+        );
+        $postMock->expects($this->once())
+            ->method("all")
+            ->will($this->returnValue($postArray));
+        $request->request = $postMock;
+
+        $this->repository->expects($this->once())
+            ->method('find')
+            ->with($user->getId())
+            ->will($this->returnValue($user));
+
+        $dm = $this->getMockBuilder('Doctrine\ODM\MongoDB\DocumentManager')->disableOriginalConstructor()->getMock();
+
+        $this->service->expects($this->once())
+            ->method('getManager')
+            ->will($this->returnValue($dm));
+
+        $dm->expects($this->once())
+            ->method('remove')
+            ->with($user);
+
+        $dm->expects($this->once())
+            ->method('flush');
+
+        $controller = new DefaultController();
+        $controller->setContainer($this->container);
+
+        /* @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $controller->formdelAction($request);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $json = $response->getContent();
+        $this->assertJson($json);
+        $json = json_decode($json);
+        $this->assertFalse($json->error);
     }
 
 }
