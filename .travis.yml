@@ -7,7 +7,7 @@ before_install:
 services:
   - mongodb
 script:
-- sudo phpcs --config-set installed_paths www/vendor/escapestudios/symfony2-coding-standard
+- phpcs --config-set installed_paths www/vendor/escapestudios/symfony2-coding-standard
 - phpcs --standard=symfony2 www/src
 - phpunit -c www/app/
 install:
