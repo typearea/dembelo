@@ -33,8 +33,12 @@ Version der Lizenz, so wie diese von der Free Software Foundation herausgegeben 
 ## Entwicklung
 
 ### PHPUnit
-Aufruf: /vagrant/www/vendor/phpunit/phpunit/phpunit -c /vagrant/www/app/
+* Aufruf: /vagrant/www/vendor/phpunit/phpunit/phpunit -c /vagrant/www/app/
 
 ### CodeSniffer
-Aufruf: cd /vagrant/www/ && phpcs --standard=symfony2 src
+
+    cd /vagrant/
+    sudo phpcs --config-set installed_paths www/vendor/escapestudios/symfony2-coding-standard
+    phpcs --standard=symfony2 www/src
+
 
