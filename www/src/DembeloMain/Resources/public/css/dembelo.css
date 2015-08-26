@@ -6,6 +6,19 @@ html, body, .container-fluid {
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+body {
+     padding: 1%; 
+    /*background-color: #8D7966;*/
+}
+
+@media screen and (orientation: landscape) {
+    body {
+        padding-left: 25%;
+        padding-right: 25%;
+    }
 }
 
 @media (min-width: 1024px) {
@@ -14,20 +27,9 @@ html, body, .container-fluid {
     }
 }
 
-body {
-    padding: 1%;
-}
-
-@media screen and (orientation: landscape) {
-    body {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-}
-
-.row {
+/*.row {
     height: 25%;
-}
+}*/
 .col-xs-3 {
     overflow: hidden;
     height: 100%;
@@ -36,14 +38,20 @@ body {
 
 #row1 {
     padding-bottom: 5px;
+    height:20%
 }
 
 #row1 > div {
     height: 100%;
 }
 
+#row2, #row3 {
+  height:30%;  
+}
+
 #row4 {
     padding-top: 5px;
+    height:20%
 }
 
 #row4 > div {
@@ -68,4 +76,9 @@ body {
 
 .container > .navbar-header {
     margin-left: 0;
+}
+
+#row1 > div {
+  padding-left: 0px;
+  padding-right: 0px;
 }
