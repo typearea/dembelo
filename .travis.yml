@@ -4,11 +4,13 @@ php:
 - 5.4
 before_install:
 - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-- sudo phpcs --config-set installed_paths www/vendor/escapestudios/symfony2-coding-standard
 services:
   - mongodb
 script:
+- sudo phpcs --config-set installed_paths www/vendor/escapestudios/symfony2-coding-standard
 - phpcs --standard=symfony2 www/src
 - phpunit -c www/app/
 install:
 - composer --working-dir="www" install
+- pyrus install pear/PHP_CodeSniffer
+- phpenv rehash
