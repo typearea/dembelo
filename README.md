@@ -1,5 +1,7 @@
 # Dembelo
 
+[![Build Status](https://travis-ci.org/typearea/dembelo.svg?branch=master)](https://travis-ci.org/typearea/dembelo)
+
 ## Über Dembelo
 
 Dembelo ist Software für das Eintauchen in neue Unterhaltungsliteratur, welche keine herkömmliche lineare
@@ -26,13 +28,13 @@ Version der Lizenz, so wie diese von der Free Software Foundation herausgegeben 
 * Wir laden dazu ein, dembelo zu [forken](https://help.github.com/articles/fork-a-repo/) und [Pull-Requests](https://help.github.com/articles/using-pull-requests/) zu erstellen, damit wir eure Arbeit nach Dembelo-Master übernehmen können.
 * Wir nutzen die ["Issues"](https://github.com/typearea/dembelo/issues) in unserem github-Repository zur Planung der Weiterentwicklung, nutzt bitte die Meilenstein-Ansicht.
 * Im [Wiki](https://github.com/typearea/dembelo/wiki) findet sich eine Spezifikation und Konzeptionsthemen.
-* Tretet mit uns per Mail in Kontakt: tina.giesler@typearea.de-
+* Tretet mit uns per Mail in Kontakt: tina.giesler@typearea.de
 
 ## Entwicklung
 
 ### PHPUnit
-Aufruf: /vagrant/www/vendor/phpunit/phpunit/phpunit /vagrant/www/app/
+Aufruf: /vagrant/www/vendor/phpunit/phpunit/phpunit -c /vagrant/www/app/
 
 ### CodeSniffer
-Aufruf: phpcs --standard=symfony2 /vagrant/www/src
+Aufruf: cd /vagrant/www/ && phpcs --standard=symfony2 src
 
