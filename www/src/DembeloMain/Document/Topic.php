@@ -29,7 +29,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @MongoDB\Document
  */
-class Topic {
+class Topic
+{
     const STATUS_INACTIVE = 0;
     const STATUS_ACTIVE = 1;
 
@@ -95,6 +96,4 @@ class Topic {
     {
         $this->status = $status;
     }
-
-
 }

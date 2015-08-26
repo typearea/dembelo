@@ -152,6 +152,11 @@ class User implements UserInterface, \Serializable
         return $this->roles;
     }
 
+    /**
+     * sets the roles
+     *
+     * @param array $roles
+     */
     public function setRoles($roles)
     {
         if (!is_array($roles)) {

@@ -66,7 +66,7 @@ class DefaultController extends Controller
 
         $output = array();
         /* @var $user \DembeloMain\Document\User */
-        foreach ($users AS $user) {
+        foreach ($users as $user) {
             $obj = new StdClass();
             $obj->id = $user->getId();
             $obj->email = $user->getEmail();
@@ -92,7 +92,7 @@ class DefaultController extends Controller
 
         $output = array();
         /* @var $user \DembeloMain\Document\User */
-        foreach ($users AS $user) {
+        foreach ($users as $user) {
             $obj = new StdClass();
             $obj->id = $user->getId();
             $obj->name = $user->getName();
@@ -117,7 +117,7 @@ class DefaultController extends Controller
 
         $output = array();
         /* @var $user \DembeloMain\Document\User */
-        foreach ($users AS $user) {
+        foreach ($users as $user) {
             $obj = new StdClass();
             $obj->id = $user->getId();
             $obj->name = $user->getName();
@@ -142,7 +142,7 @@ class DefaultController extends Controller
 
         $output = array();
         /* @var $user \DembeloMain\Document\User */
-        foreach ($users AS $user) {
+        foreach ($users as $user) {
             $obj = new StdClass();
             $obj->id = $user->getId();
             $obj->name = $user->getName();
@@ -173,7 +173,7 @@ class DefaultController extends Controller
         $dm = $mongo->getManager();
 
         /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:' . $formtype);
+        $repository = $mongo->getRepository('DembeloMain:'.$formtype);
         if (isset($params['id']) && $params['id'] == 'new') {
             $className = $repository->getClassName();
             $item = new $className();
@@ -183,7 +183,7 @@ class DefaultController extends Controller
                 return new Response(\json_encode(array('error' => true)));
             }
         }
-        foreach ($params AS $param => $value) {
+        foreach ($params as $param => $value) {
             if (in_array($param, array('id', 'formtype'))) {
                 continue;
             }
@@ -193,7 +193,7 @@ class DefaultController extends Controller
                 $encoder = $this->get('security.password_encoder');
                 $value = $encoder->encodePassword($item, $value);
             }
-            $method = 'set' . ucfirst($param);
+            $method = 'set'.ucfirst($param);
             $item->$method($value);
         }
         $dm->persist($item);
@@ -201,7 +201,7 @@ class DefaultController extends Controller
 
         $output = array(
             'error' => false,
-            'newId' => $item->getId()
+            'newId' => $item->getId(),
         );
 
         return new Response(\json_encode($output));
@@ -230,7 +230,7 @@ class DefaultController extends Controller
         $dm = $mongo->getManager();
 
         /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:' . $formtype);
+        $repository = $mongo->getRepository('DembeloMain:'.$formtype);
         if (!isset($params['id']) || empty($params['id'])) {
             return new Response(\json_encode(array('error' => true)));
         }
@@ -241,6 +241,7 @@ class DefaultController extends Controller
         }
         $dm->remove($user);
         $dm->flush();
+
         return new Response(\json_encode(array('error' => false)));
 
     }

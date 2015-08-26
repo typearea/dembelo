@@ -29,8 +29,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @MongoDB\Document
  */
-class Textnode {
-
+class Textnode
+{
     const TYPE_INTRODUCTION = 0;
     const TYPE_DEEPENING = 1;
 
@@ -45,7 +45,7 @@ class Textnode {
     /**
      * @MongoDB\ObjectId
      */
-    protected $author_id;
+    protected $authorId;
 
     /**
      * @MongoDB\Date
@@ -55,12 +55,12 @@ class Textnode {
     /**
      * @MongoDB\ObjectId
      */
-    protected $topic_id;
+    protected $topicId;
 
     /**
      * @MongoDB\ObjectId
      */
-    protected $story_id;
+    protected $storyId;
 
     /**
      * @MongoDB\Int
@@ -82,17 +82,17 @@ class Textnode {
      */
     public function getAuthorId()
     {
-        return $this->author_id;
+        return $this->authorId;
     }
 
     /**
      * sets the author id
      *
-     * @param string $author_id
+     * @param string $authorId
      */
-    public function setAuthorId($author_id)
+    public function setAuthorId($authorId)
     {
-        $this->author_id = $author_id;
+        $this->authorId = $authorId;
     }
 
     /**
@@ -120,15 +120,15 @@ class Textnode {
      */
     public function getTopicId()
     {
-        return $this->topic_id;
+        return $this->topicId;
     }
 
     /**
-     * @param string $topic_id
+     * @param string $topicId
      */
-    public function setTopicId($topic_id)
+    public function setTopicId($topicId)
     {
-        $this->topic_id = $topic_id;
+        $this->topicId = $topicId;
     }
 
     /**
@@ -136,15 +136,15 @@ class Textnode {
      */
     public function getStoryId()
     {
-        return $this->story_id;
+        return $this->storyId;
     }
 
     /**
-     * @param string $story_id
+     * @param string $storyId
      */
-    public function setStoryId($story_id)
+    public function setStoryId($storyId)
     {
-        $this->story_id = $story_id;
+        $this->storyId = $storyId;
     }
 
     /**
@@ -199,15 +199,23 @@ class Textnode {
         $this->id = $id;
     }
 
+    /**
+     * gets the textnode's text
+     *
+     * @return string
+     */
     public function getText()
     {
         return $this->text;
     }
 
+    /**
+     * sets the textnode's text
+     *
+     * @param string $text
+     */
     public function setText($text)
     {
         $this->text = $text;
     }
-
-
 }

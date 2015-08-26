@@ -24,7 +24,6 @@
 
 namespace DembeloMain\Command;
 
-
 use DembeloMain\Document\Textnode;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,6 +35,10 @@ use DembeloMain\Document\Story;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
+/**
+ * Class InstallCommand
+ * @package DembeloMain
+ */
 class InstallCommand extends ContainerAwareCommand
 {
 
@@ -189,7 +192,7 @@ class InstallCommand extends ContainerAwareCommand
         $textnode->setAuthorId($this->dummyData['authors'][0]->getId());
         $textnode->setCreated(date('Y-m-d H:i:s'));
         $textnode->setStoryId($this->dummyData['stories'][0]->getId());
-        $textnode->setText($loremIpsum->getWords (3500));
+        $textnode->setText($loremIpsum->getWords(3500));
         $textnode->setType(Textnode::TYPE_INTRODUCTION);
         $dm->persist($textnode);
 
@@ -199,7 +202,7 @@ class InstallCommand extends ContainerAwareCommand
         $textnode->setAuthorId($this->dummyData['authors'][0]->getId());
         $textnode->setCreated(date('Y-m-d H:i:s'));
         $textnode->setStoryId($this->dummyData['stories'][0]->getId());
-        $textnode->setText($loremIpsum->getWords (3500));
+        $textnode->setText($loremIpsum->getWords(3500));
         $textnode->setType(Textnode::TYPE_DEEPENING);
         $dm->persist($textnode);
 
@@ -209,7 +212,7 @@ class InstallCommand extends ContainerAwareCommand
         $textnode->setAuthorId($this->dummyData['authors'][0]->getId());
         $textnode->setCreated(date('Y-m-d H:i:s'));
         $textnode->setStoryId($this->dummyData['stories'][0]->getId());
-        $textnode->setText($loremIpsum->getWords (3500));
+        $textnode->setText($loremIpsum->getWords(3500));
         $textnode->setType(Textnode::TYPE_DEEPENING);
         $dm->persist($textnode);
 
@@ -219,7 +222,7 @@ class InstallCommand extends ContainerAwareCommand
         $textnode->setAuthorId($this->dummyData['authors'][0]->getId());
         $textnode->setCreated(date('Y-m-d H:i:s'));
         $textnode->setStoryId($this->dummyData['stories'][1]->getId());
-        $textnode->setText($loremIpsum->getWords (3500));
+        $textnode->setText($loremIpsum->getWords(3500));
         $textnode->setType(Textnode::TYPE_INTRODUCTION);
         $dm->persist($textnode);
 
@@ -229,7 +232,7 @@ class InstallCommand extends ContainerAwareCommand
         $textnode->setAuthorId($this->dummyData['authors'][0]->getId());
         $textnode->setCreated(date('Y-m-d H:i:s'));
         $textnode->setStoryId($this->dummyData['stories'][1]->getId());
-        $textnode->setText($loremIpsum->getWords (3500));
+        $textnode->setText($loremIpsum->getWords(3500));
         $textnode->setType(Textnode::TYPE_DEEPENING);
         $dm->persist($textnode);
 
@@ -239,7 +242,7 @@ class InstallCommand extends ContainerAwareCommand
         $textnode->setAuthorId($this->dummyData['authors'][0]->getId());
         $textnode->setCreated(date('Y-m-d H:i:s'));
         $textnode->setStoryId($this->dummyData['stories'][1]->getId());
-        $textnode->setText($loremIpsum->getWords (3500));
+        $textnode->setText($loremIpsum->getWords(3500));
         $textnode->setType(Textnode::TYPE_DEEPENING);
         $dm->persist($textnode);
     }

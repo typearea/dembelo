@@ -96,5 +96,4 @@ class Author
     {
         $this->status = $status;
     }
-
 }

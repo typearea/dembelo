@@ -40,12 +40,12 @@ class ReadPath
     /**
      * @MongoDB\ObjectId
      */
-    protected $user_id;
+    protected $userId;
 
     /**
      * @MongoDB\ObjectId
      */
-    protected $textnode_id;
+    protected $textnodeId;
 
     /**
      * @MongoDB\Date
@@ -55,7 +55,7 @@ class ReadPath
     /**
      * @MongoDB\ObjectId
      */
-    protected $previous_textnode_id;
+    protected $previousTextnodeId;
 
     /**
      * @return mixed
@@ -78,15 +78,15 @@ class ReadPath
      */
     public function getUserId()
     {
-        return $this->user_id;
+        return $this->userId;
     }
 
     /**
-     * @param mixed $user_id
+     * @param mixed $userId
      */
-    public function setUserId($user_id)
+    public function setUserId($userId)
     {
-        $this->user_id = $user_id;
+        $this->userId = $userId;
     }
 
     /**
@@ -94,15 +94,15 @@ class ReadPath
      */
     public function getTextnodeId()
     {
-        return $this->textnode_id;
+        return $this->textnodeId;
     }
 
     /**
-     * @param mixed $textnode_id
+     * @param mixed $textnodeId
      */
-    public function setTextnodeId($textnode_id)
+    public function setTextnodeId($textnodeId)
     {
-        $this->textnode_id = $textnode_id;
+        $this->textnodeId = $textnodeId;
     }
 
     /**
@@ -126,15 +126,14 @@ class ReadPath
      */
     public function getPreviousTextnodeId()
     {
-        return $this->previous_textnode_id;
+        return $this->previousTextnodeId;
     }
 
     /**
-     * @param mixed $previous_textnode_id
+     * @param mixed $previousTextnodeId
      */
-    public function setPreviousTextnodeId($previous_textnode_id)
+    public function setPreviousTextnodeId($previousTextnodeId)
     {
-        $this->previous_textnode_id = $previous_textnode_id;
+        $this->previousTextnodeId = $previousTextnodeId;
     }
-
 }

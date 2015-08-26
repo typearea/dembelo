@@ -47,7 +47,7 @@ class Story
     /**
      * @MongoDB\ObjectId
      */
-    protected $topic_id;
+    protected $topicId;
 
     /**
      * @MongoDB\Int
@@ -91,15 +91,15 @@ class Story
      */
     public function getTopicId()
     {
-        return $this->topic_id;
+        return $this->topicId;
     }
 
     /**
-     * @param mixed $topic_id
+     * @param mixed $topicId
      */
-    public function setTopicId($topic_id)
+    public function setTopicId($topicId)
     {
-        $this->topic_id = $topic_id;
+        $this->topicId = $topicId;
     }
 
     /**
@@ -117,6 +117,4 @@ class Story
     {
         $this->status = $status;
     }
-
-
 }
