@@ -174,8 +174,8 @@ class User implements UserInterface, \Serializable
      * Gets the last textnode ID of topic \p $themeId the user was reading.
      *
      * @param string $themeId Theme (= topic) ID.
-     * @retval null There wasn't a textnode ID set for topic \p $themeId yet.
-     * @return Textnode ID.
+     * @return string|null Textnode ID or null, if there wasn't a textnode
+     *     ID set for topic \p $themeId yet.
      */
     public function getCurrentTextnode($themeId)
     {
