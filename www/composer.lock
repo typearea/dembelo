@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "aa199bdc8a72f34e2787832ae7f6094b",
+    "hash": "00f662542c6be8d2fc70e7c92e2fc87b",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -755,7 +755,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/mongodb-odm/zipball/e934061c53758634e2376c082efc19afe21770de",
+                "url": "https://api.github.com/repos/doctrine/mongodb-odm/zipball/d1054ff1bb5a08c140820cedb16af56904102084",
                 "reference": "e934061c53758634e2376c082efc19afe21770de",
                 "shasum": ""
             },
@@ -1773,6 +1773,59 @@
                 "framework"
             ],
             "time": "2015-07-31 13:24:45"
+        },
+        {
+            "name": "twbs/bootstrap-sass",
+            "version": "v3.3.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/twbs/bootstrap-sass.git",
+                "reference": "d64d48fd23c9624cc5c996e6516b7dc33fde5919"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/twbs/bootstrap-sass/zipball/d64d48fd23c9624cc5c996e6516b7dc33fde5919",
+                "reference": "d64d48fd23c9624cc5c996e6516b7dc33fde5919",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.3.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mark Otto"
+                },
+                {
+                    "name": "Thomas McDonald"
+                },
+                {
+                    "name": "Tristan Harward"
+                },
+                {
+                    "name": "Peter Gumeson"
+                },
+                {
+                    "name": "Gleb Mazovetskiy"
+                },
+                {
+                    "name": "Jacob Thornton"
+                }
+            ],
+            "description": "bootstrap-sass is a Sass-powered version of Bootstrap, ready to drop right into your Sass powered applications.",
+            "homepage": "http://github.com/twbs/bootstrap-sass",
+            "keywords": [
+                "bootstrap",
+                "css",
+                "sass"
+            ],
+            "time": "2015-06-16 16:29:50"
         },
         {
             "name": "twig/twig",

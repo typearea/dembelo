@@ -9,12 +9,16 @@
         {% block stylesheets %}
             <!-- Bootstrap -->
             <!-- Latest compiled and minified CSS -->
-            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+            <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" -->
 
             <!-- Optional theme -->
-            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+            <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" -->
 
-            {% stylesheets '@DembeloMain/Resources/public/css/*' filter='cssrewrite' %}
+            {% stylesheets
+                '../vendor/twbs/bootstrap-sass/assets/stylesheets/_bootstrap.scss'
+                '../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/_theme.scss'
+                '@DembeloMain/Resources/public/css/*'
+                filter='sass' output='css/compiled/app.css' %}
                 <link rel="stylesheet" href="{{ asset_url }}">
             {% endstylesheets %}
 
