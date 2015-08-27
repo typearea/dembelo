@@ -49,7 +49,8 @@ class DefaultControllerTest extends WebTestCase
     }
 
     /**
-     * tests the read action
+     * @brief Tests the action of reading a textnode without an active
+     *     user session.
      */
     public function testReadWithoutLogin()
     {

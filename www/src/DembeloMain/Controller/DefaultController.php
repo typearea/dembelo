@@ -32,8 +32,6 @@ use DembeloMain\Document\Topic;
 use DembeloMain\Document\Story;
 use DembeloMain\Document\Textnode;
 
-
-
 /**
  * Class DefaultController
  */
@@ -96,13 +94,13 @@ class DefaultController extends Controller
 
                 $repository = $mongo->getRepository('DembeloMain:Story');
                 $story = $repository->findOneBy(array('topic_id' => new \MongoId($themeId),
-                                                      'status' => Story::STATUS_ACTIVE));
+                                                      'status' => Story::STATUS_ACTIVE, ));
 
                 if (!is_null($story)) {
                     $repository = $mongo->getRepository('DembeloMain:Textnode');
                     $textnodes = $repository->findBy(array('story_id' => new \MongoId($story->getId()),
                                                            'status' => Textnode::STATUS_ACTIVE,
-                                                           'type' => Textnode::TYPE_INTRODUCTION));
+                                                           'type' => Textnode::TYPE_INTRODUCTION, ));
 
                     if (!is_null($textnodes)) {
                         $textnodeId = $textnodes[0]->getId();
@@ -115,19 +113,17 @@ class DefaultController extends Controller
                 }
 
                 $connection->close();
-            }
-            else {
+            } else {
                 $mongo = $this->get('doctrine_mongodb');
                 $connection = $mongo->getConnection();
 
                 $repository = $mongo->getRepository('DembeloMain:Textnode');
                 $textnodes = $repository->findBy(array('id' => new \MongoId($textnodeId),
-                                                       'status' => Textnode::STATUS_ACTIVE));
+                                                       'status' => Textnode::STATUS_ACTIVE, ));
 
                 $connection->close();
             }
-        }
-        else {
+        } else {
             $mongo = $this->get('doctrine_mongodb');
             $connection = $mongo->getConnection();
 
@@ -137,13 +133,13 @@ class DefaultController extends Controller
 
             $repository = $mongo->getRepository('DembeloMain:Story');
             $story = $repository->findOneBy(array('topic_id' => new \MongoId($themeId),
-                                                  'status' => Story::STATUS_ACTIVE));
+                                                  'status' => Story::STATUS_ACTIVE, ));
 
             if (!is_null($story)) {
                 $repository = $mongo->getRepository('DembeloMain:Textnode');
                 $textnodes = $repository->findBy(array('story_id' => new \MongoId($story->getId()),
                                                        'status' => Textnode::STATUS_ACTIVE,
-                                                       'type' => Textnode::TYPE_INTRODUCTION));
+                                                       'type' => Textnode::TYPE_INTRODUCTION, ));
             }
 
             $connection->close();

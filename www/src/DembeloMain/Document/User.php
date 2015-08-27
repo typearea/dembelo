@@ -170,6 +170,12 @@ class User implements UserInterface, \Serializable
         $this->roles = $roles;
     }
 
+    /**
+     * @brief Gets the last textnode ID of topic \p $themeId the user was reading.
+     * @param string $themeId Theme (= topic) ID.
+     * @retval null There wasn't a textnode ID set for topic \p $themeId yet.
+     * @return Textnode ID.
+     */
     public function getCurrentTextnode($themeId)
     {
         if (isset($this->currentTextnodes[$themeId]) === true) {
@@ -179,6 +185,13 @@ class User implements UserInterface, \Serializable
         return null;
     }
 
+    /**
+     * @brief Sets the textnode ID for topic \p $themeID the user is
+     *     currently reading.
+     * @param string $themeId    Theme ID.
+     * @param string $textnodeId ID of the textnode the user is
+     *     currently reading.
+     */
     public function setCurrentTextnode($themeId, $textnodeId)
     {
         $this->currentTextnodes[$themeId] = $textnodeId;
@@ -204,7 +217,7 @@ class User implements UserInterface, \Serializable
             $this->password,
             // see section on salt below
             // $this->salt,
-            $this->currentTextnodes
+            $this->currentTextnodes,
         ));
     }
 
