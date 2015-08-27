@@ -58,6 +58,8 @@ class DefaultControllerTest extends WebTestCase
         $service = $this->getMockBuilder("Doctrine\Bundle\MongoDBBundle\ManagerRegistry")->disableOriginalConstructor()->getMock();
         $connection = $this->getMockBuilder("Doctrine\MongoDB\Connection")->disableOriginalConstructor()->getMock();
         $repository = $this->getMockBuilder("Doctrine\ODM\MongoDB\DocumentRepository")->disableOriginalConstructor()->getMock();
+        $template = $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
+        $response = $this->getMock("Symfony\Component\HttpFoundation\Response");
 
         $container->expects($this->at(0))
             ->method("get")
@@ -85,7 +87,7 @@ class DefaultControllerTest extends WebTestCase
         $story->setName("Lorem I");
         $story->setTopicId("55d2b934658f5cc23c3c986c");
         $story->setStatus(Story::STATUS_ACTIVE);
-        
+
         $repository->expects($this->once())
             ->method("findOneBy")
             ->will($this->returnValue($story));
@@ -102,17 +104,20 @@ class DefaultControllerTest extends WebTestCase
             ->method("findBy")
             ->will($this->returnValue(array($textnode)));
 
+        $container->expects($this->at(2))
+            ->method("get")
+            ->with("templating")
+            ->will($this->returnValue($template));
+        $template->expects($this->once())
+            ->method("renderResponse")
+            ->with("default/read.html.twig", array("textnodeText" => "Lorem ipsum dolor sit amet."))
+            ->will($this->returnValue($response));
 
         $controller = new DefaultController();
         $controller->setContainer($container);
 
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->readAction("55d2b934658f5cc23c3c986c");
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-        /** @todo Do result checking. */
-        //$this->assertJsonStringEqualsJsonString('[]', $response->getContent());
-        $this->assertEquals('200', $response->getStatusCode());
+        $result = $controller->readAction("55d2b934658f5cc23c3c986c");
     }
-    
+
     /** @todo Implement testReadWithLogin(). */
 }
