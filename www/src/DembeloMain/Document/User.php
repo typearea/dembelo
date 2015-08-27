@@ -171,7 +171,8 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * @brief Gets the last textnode ID of topic \p $themeId the user was reading.
+     * Gets the last textnode ID of topic \p $themeId the user was reading.
+     *
      * @param string $themeId Theme (= topic) ID.
      * @retval null There wasn't a textnode ID set for topic \p $themeId yet.
      * @return Textnode ID.
@@ -186,8 +187,9 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * @brief Sets the textnode ID for topic \p $themeID the user is
+     * Sets the textnode ID for topic \p $themeID the user is
      *     currently reading.
+     *
      * @param string $themeId    Theme ID.
      * @param string $textnodeId ID of the textnode the user is
      *     currently reading.
