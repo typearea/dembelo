@@ -1,3 +1,8 @@
+/* hier müssen unsere Bootstrap-Variablen stehen */
+
+@import '../../../../../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap';
+@import '../../../../../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/theme';
+
 html, body, .container-fluid {
     height: 100%;
 }
@@ -10,7 +15,7 @@ html, body, .container-fluid {
 }
 
 body {
-     padding: 1%; 
+     padding: 1%;
     /*background-color: #8D7966;*/
 }
 
@@ -46,7 +51,7 @@ body {
 }
 
 #row2, #row3 {
-  height:30%;  
+  height:30%;
 }
 
 #row4 {
