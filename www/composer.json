@@ -24,7 +24,7 @@
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.3",
-        "phpunit/phpunit": "4.4.*",
+        "phpunit/phpunit": "4.8.*",
         "escapestudios/symfony2-coding-standard": "~2.0",
         "apoutchika/loremipsum-bundle": "dev-master"
     },
