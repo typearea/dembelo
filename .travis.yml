@@ -16,3 +16,6 @@ install:
 - composer --working-dir="www" install
 - pyrus install pear/PHP_CodeSniffer
 - phpenv rehash
+matrix:
+  allow_failures:
+    - php: 7
