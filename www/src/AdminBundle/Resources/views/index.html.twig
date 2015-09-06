@@ -4,12 +4,16 @@
 
     <script type="text/javascript" charset="utf-8">
 
-        var mainMenuData = [
-            {id: "1", type: "folder", value: "Benutzer", css: "folder_music"},
-            {id: "2", type: "folder", value: "Autoren", css: "folder_music"},
-            {id: "3", type: "folder", value: "Themenfelder", css: "folder_music"},
-            {id: "4", type: "folder", value: "Geschichten", css: "folder_music"}
-        ];
+        var mainMenuData = {{ mainMenuData|raw }},
+                paths = {
+                    adminUsers: "{{ path('admin_users') }}",
+                    adminLicensees: "{{ path('admin_licensees') }}",
+                    adminAuthors: "{{ path('admin_authors') }}",
+                    adminTopics: "{{ path('admin_topics') }}",
+                    adminStories: "{{ path('admin_stories') }}",
+                    adminFormSave: "{{ path('admin_formsave') }}",
+                    adminFormDel: "{{ path('admin_formdel') }}"
+                };
 
         webix.ui({
             rows: [
@@ -38,25 +42,7 @@
                                             cols: [
                                                 {
                                                     rows: [
-                                                        {
-                                                            view: "toolbar",
-                                                            cols: [
-                                                                {
-                                                                    id: "newUserBtn",
-                                                                    view: "button",
-                                                                    value: "Neu",
-                                                                    type: "form",
-                                                                    click: "$$('usergrid').add({id: 'new', email: '', roles: 'ROLE_USER'})"
-                                                                },
-                                                                {
-                                                                    id: "deleteUserBtn",
-                                                                    view: "button",
-                                                                    value: "Löschen",
-                                                                    type: "danger",
-                                                                    click: "delItem('user')"
-                                                                }
-                                                            ]
-                                                        },
+                                                        dembeloAdmin.getToolbar('user'),
                                                         {
                                                             id: "usergrid",
                                                             view: "datatable",
@@ -74,7 +60,33 @@
                                                         {view: "text", name: "email", label: "Email", validate:webix.rules.isEmail},
                                                         {view: "combo", name: "roles", label: "Rolle", options: ["ROLE_ADMIN", "ROLE_USER"], validate:webix.rules.isNotEmpty},
                                                         {view: "text", name: "password", type:"password", label:"Passwort"},
-                                                        {view: "button", value:"Speichern", click:"formsave('user')" }
+                                                        {view: "button", value:"Speichern", click:"dembeloAdmin.formsave('user')" }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            id: "licenseestuff",
+                                            cols: [
+                                                {
+                                                    rows: [
+                                                        dembeloAdmin.getToolbar('licensee'),
+                                                        {
+                                                            id: "licenseegrid",
+                                                            view: "datatable",
+                                                            autoConfig: true,
+                                                            select: true,
+                                                            datatype: "json"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    view: "form",
+                                                    id: "licenseeform",
+                                                    gravity: 0.5,
+                                                    elements: [
+                                                        {view: "text", name: "name", label: "Name", validate:webix.rules.isNotEmpty},
+                                                        {view: "button", value:"Speichern", click:"dembeloAdmin.formsave('licensee')" }
                                                     ]
                                                 }
                                             ]
@@ -109,80 +121,7 @@
             ]
         });
 
-        function formsave(type) {
-            var id = type + "form",
-                    values = $$(id).getValues();
-            values['formtype'] = type;
-
-            if (!$$(id).validate()) {
-                return;
-            }
-
-            webix.ajax().post("{{ path('admin_formsave') }}", values, function(text) {
-                var params = JSON.parse(text);
-                if (params['error'] === false) {
-                    $$(id).save();
-                    if (params['newId']) {
-                        $$(type + 'grid').getSelectedItem().id = params['newId'];
-                    }
-                } else  {
-                    webix.modalbox({
-                        title:"Fehler",
-                        buttons:["Ok",],
-                        text:"Das Speichern ist leider fehlgeschlagen..."
-                    });
-                }
-            });
-        }
-
-        function delItem(type) {
-            var id = type + "grid",
-                values = {};
-            values['id'] = $$(id).getSelectedId().row;
-            values['formtype'] = type;
-
-            if (values['id'] === undefined) {
-                webix.modalbox({
-                    title:"Fehler",
-                    buttons:["Ok",],
-                    text:"Keine Zeile zum Löschen ausgewählt."
-                });
-                return;
-            }
-
-            webix.ajax().post("{{ path('admin_formdel') }}", values, function(text) {
-                var params = JSON.parse(text);
-                if (params['error'] === false) {
-                    $$(id).remove($$(id).getSelectedId());
-                } else {
-                    webix.modalbox({
-                        title:"Fehler",
-                        buttons:["Ok",],
-                        text:"Das Löschen ist leider fehlgeschlagen..."
-                    });
-                }
-            });
-        }
-
-        $$("mainnav").attachEvent("onAfterSelect", function(id){
-            if (id == 1) {
-                $$('usergrid').load("{{ path('admin_users') }}");
-                $$('userstuff').show();
-            } else if (id == 2) {
-                $$('authorgrid').load("{{ path('admin_authors') }}");
-                $$('authorgrid').show();
-            } else if (id == 3) {
-                $$('topicgrid').load("{{ path('admin_topics') }}");
-                $$('topicgrid').show();
-            } else if (id == 4) {
-                $$('storygrid').load("{{ path('admin_stories') }}");
-                $$('storygrid').show();
-            }
-        });
-
-        $$("mainnav").select(1);
-
-        $$('userform').bind($$('usergrid'));
+        dembeloAdmin.init();
 
     </script>
 

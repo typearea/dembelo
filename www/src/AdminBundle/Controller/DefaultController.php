@@ -34,6 +34,7 @@ use DembeloMain\Document\User;
 use DembeloMain\Document\Author;
 use DembeloMain\Document\Topic;
 use DembeloMain\Document\Story;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 /**
  * Class DefaultController
@@ -48,7 +49,16 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-        return $this->render('AdminBundle::index.html.twig');
+        $mainMenuData = [
+            ['id' => "1", 'type' => "folder", 'value' => "Benutzer", 'css' => "folder_music"],
+            ['id' => "2", 'type' => "folder", 'value' => "Lizenznehmer", 'css' => "folder_music"],
+            ['id' => "3", 'type' => "folder", 'value' => "Autoren", 'css' => "folder_music"],
+            ['id' => "4", 'type' => "folder", 'value' => "Themenfelder", 'css' => "folder_music"],
+            ['id' => "5", 'type' => "folder", 'value' => "Geschichten", 'css' => "folder_music"]
+        ];
+
+        $jsonEncoder = new JsonEncoder();
+        return $this->render('AdminBundle::index.html.twig', array('mainMenuData' => $jsonEncoder->encode($mainMenuData, 'json')));
     }
 
     /**
@@ -71,6 +81,31 @@ class DefaultController extends Controller
             $obj->id = $user->getId();
             $obj->email = $user->getEmail();
             $obj->roles = join(', ', $user->getRoles());
+            $output[] = $obj;
+        }
+
+        return new Response(\json_encode($output));
+    }
+
+    /**
+     * @Route("/licensees", name="admin_licensees")
+     *
+     * @return String
+     */
+    public function licenseesAction()
+    {
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Licensee');
+
+        $licensees = $repository->findAll();
+
+        $output = array();
+        /* @var $licensee \DembeloMain\Document\Licensee */
+        foreach ($licensees as $licensee) {
+            $obj = new StdClass();
+            $obj->id = $licensee->getId();
+            $obj->name = $licensee->getName();
             $output[] = $obj;
         }
 
@@ -162,7 +197,7 @@ class DefaultController extends Controller
     {
         $params = $request->request->all();
 
-        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'author', 'topic', 'story'))) {
+        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'author', 'topic', 'story'))) {
             return new Response(\json_encode(array('error' => true)));
         }
         $formtype = ucfirst($params['formtype']);
