@@ -96,23 +96,33 @@ class DefaultController extends Controller
                 $story = $repository->findOneBy(array('topic_id' => new \MongoId($themeId),
                                                       'status' => Story::STATUS_ACTIVE, ));
 
-                if (!is_null($story)) {
-                    $repository = $mongo->getRepository('DembeloMain:Textnode');
-                    $textnodes = $repository->findBy(array('story_id' => new \MongoId($story->getId()),
-                                                           'status' => Textnode::STATUS_ACTIVE,
-                                                           'type' => Textnode::TYPE_INTRODUCTION, ));
-
-                    if (!is_null($textnodes)) {
-                        $textnodeId = $textnodes[0]->getId();
-                        $textnodeText = $textnodes[0]->getText();
-
-                        $dm = $mongo->getManager();
-                        $user->setCurrentTextnode($themeId, $textnodeId);
-                        $dm->persist($user);
-                    }
+                if (is_null($story)) {
+                    $connection->close();
+                    throw $this->createNotFoundException('No Story for Topic \''.$themeId.'\' found.');
                 }
 
+                $repository = $mongo->getRepository('DembeloMain:Textnode');
+                $textnodes = $repository->findBy(array('story_id' => new \MongoId($story->getId()),
+                                                       'status' => Textnode::STATUS_ACTIVE,
+                                                       'type' => Textnode::TYPE_INTRODUCTION, ));
+
+                if (is_null($textnodes)) {
+                    $connection->close();
+                    throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\', Story \''.$story->getId().'\' found.');
+                }
+
+                if (count($textnodes) <= 0) {
+                    $connection->close();
+                    throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\', Story \''.$story->getId().'\' found.');
+                }
+
+                $dm = $mongo->getManager();
+                $user->setCurrentTextnode($themeId, $textnodes[0]->getId());
+                $dm->persist($user);
+
                 $connection->close();
+
+                return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
             } else {
                 $mongo = $this->get('doctrine_mongodb');
                 $connection = $mongo->getConnection();
@@ -121,7 +131,19 @@ class DefaultController extends Controller
                 $textnodes = $repository->findBy(array('id' => new \MongoId($textnodeId),
                                                        'status' => Textnode::STATUS_ACTIVE, ));
 
+                if (is_null($textnodes)) {
+                    $connection->close();
+                    throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\', Story \''.$story->getId().'\' found.');
+                }
+
+                if (count($textnodes) <= 0) {
+                    $connection->close();
+                    throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\', Story \''.$story->getId().'\' found.');
+                }
+
                 $connection->close();
+
+                return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
             }
         } else {
             $mongo = $this->get('doctrine_mongodb');
@@ -135,22 +157,29 @@ class DefaultController extends Controller
             $story = $repository->findOneBy(array('topic_id' => new \MongoId($themeId),
                                                   'status' => Story::STATUS_ACTIVE, ));
 
-            if (!is_null($story)) {
-                $repository = $mongo->getRepository('DembeloMain:Textnode');
-                $textnodes = $repository->findBy(array('story_id' => new \MongoId($story->getId()),
-                                                       'status' => Textnode::STATUS_ACTIVE,
-                                                       'type' => Textnode::TYPE_INTRODUCTION, ));
+            if (is_null($story)) {
+                $connection->close();
+                throw $this->createNotFoundException('No Story for Topic \''.$themeId.'\' found.');
+            }
+
+            $repository = $mongo->getRepository('DembeloMain:Textnode');
+            $textnodes = $repository->findBy(array('story_id' => new \MongoId($story->getId()),
+                                                    'status' => Textnode::STATUS_ACTIVE,
+                                                    'type' => Textnode::TYPE_INTRODUCTION, ));
+
+            if (is_null($textnodes)) {
+                $connection->close();
+                throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\', Story \''.$story->getId().'\' found.');
+            }
+
+            if (count($textnodes) <= 0) {
+                $connection->close();
+                throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\', Story \''.$story->getId().'\' found.');
             }
 
             $connection->close();
-        }
 
-        if (!is_null($textnodes)) {
-            if (count($textnodes) > 0) {
-                return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
-            }
+            return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
         }
-
-        return $this->render('default/read.html.twig');
     }
 }

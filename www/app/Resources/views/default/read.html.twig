@@ -26,16 +26,6 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 
 {% block body %}
 
-{% if textnodeText is defined %}
-
 {{ textnodeText | raw }}
-
-{% else %}
-
-<p>
-Kein Text vorhanden.
-</p>
-
-{% endif %}
 
 {% endblock %}
