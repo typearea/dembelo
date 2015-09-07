@@ -42,6 +42,7 @@ dembeloAdmin = (function () {
             $$("mainnav").select(1);
 
             $$('userform').bind($$('usergrid'));
+            $$('licenseeform').bind($$('licenseegrid'));
         },
         formsave: function (type) {
             var id = type + "form",
