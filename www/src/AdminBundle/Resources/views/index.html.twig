@@ -48,7 +48,11 @@
                                                             view: "datatable",
                                                             autoConfig: true,
                                                             select: true,
-                                                            datatype: "json"
+                                                            datatype: "json",
+                                                            columns: [
+                                                                {id: 'email', header: 'Email', fillspace: true},
+                                                                {id: 'roles', header: 'Rolle', format:function(value){ switch(value){case 'ROLE_ADMIN': return 'Admin';case 'ROLE_LICENSEE': return 'Lizenznehmer';} return 'Benutzer';}}
+                                                            ]
                                                         }
                                                     ]
                                                 },
@@ -58,7 +62,7 @@
                                                     gravity: 0.5,
                                                     elements: [
                                                         {view: "text", name: "email", label: "Email", validate:webix.rules.isEmail},
-                                                        {view: "combo", name: "roles", label: "Rolle", options: ["ROLE_ADMIN", "ROLE_USER"], validate:webix.rules.isNotEmpty},
+                                                        {view: "combo", name: "roles", label: "Rolle", options: [{id:"ROLE_ADMIN", value: "Admin"}, {id:"ROLE_USER", value: "Benutzer"}, {id:"ROLE_LICENSEE", value: "Lizenznehmer"}], validate:webix.rules.isNotEmpty},
                                                         {view: "text", name: "password", type:"password", label:"Passwort"},
                                                         {view: "button", value:"Speichern", click:"dembeloAdmin.formsave('user')" }
                                                     ]
