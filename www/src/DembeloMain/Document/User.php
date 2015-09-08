@@ -63,6 +63,11 @@ class User implements UserInterface, \Serializable
     protected $roles;
 
     /**
+     * @MongoDB\ObjectId
+     */
+    protected $licenseeId;
+
+    /**
      * gets the mongodb id
      *
      * @return string
@@ -202,5 +207,25 @@ class User implements UserInterface, \Serializable
             // see section on salt below
             // $this->salt
             ) = unserialize($serialized);
+    }
+
+    /**
+     * sets the licensee id
+     *
+     * @param string $id licensee ID
+     */
+    public function setLicenseeId($id)
+    {
+        $this->licenseeId = $id;
+    }
+
+    /**
+     * gets the licensee id
+     *
+     * @return string
+     */
+    public function getLicenseeId()
+    {
+        return $this->licenseeId;
     }
 }

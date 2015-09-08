@@ -162,4 +162,21 @@ class UserTest extends WebTestCase
     {
         $this->assertNull($this->user->eraseCredentials());
     }
+
+    /**
+     * tests getLicenseeId()
+     */
+    public function testGetLicenseeIdShouldBeNullIfNotSet()
+    {
+        $this->assertNull($this->user->getLicenseeId());
+    }
+
+    /**
+     * tests setLicenseeId()
+     */
+    public function testGetLicenseeIdShouldBeEqualSetLicenseeId()
+    {
+        $this->user->setLicenseeId('test');
+        $this->assertEquals('test', $this->user->getLicenseeId());
+    }
 }

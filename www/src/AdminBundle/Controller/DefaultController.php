@@ -114,6 +114,35 @@ class DefaultController extends Controller
     }
 
     /**
+     * @Route("/licenseeSuggest", name="admin_licensee_suggest")
+     *
+     * @param Request $request
+     * @return String
+     */
+    public function licenseeSuggestAction(Request $request)
+    {
+        $filter = $request->query->get('filter');
+
+        $searchString = $filter['value'];
+
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Licensee');
+
+        $licensees = $repository->findBy(array('name' => new \MongoRegex('/' . $searchString . '/')), null, 10);
+
+        $output = array();
+        foreach ($licensees AS $licensee) {
+            $output[] = array(
+                'id' => $licensee->getId(),
+                'value' => $licensee->getName(),
+            );
+        }
+
+        return new Response(\json_encode($output));
+    }
+
+    /**
      * @Route("/authors", name="admin_authors")
      *
      * @return String

@@ -12,7 +12,8 @@
                     adminTopics: "{{ path('admin_topics') }}",
                     adminStories: "{{ path('admin_stories') }}",
                     adminFormSave: "{{ path('admin_formsave') }}",
-                    adminFormDel: "{{ path('admin_formdel') }}"
+                    adminFormDel: "{{ path('admin_formdel') }}",
+                    adminLicenceeSuggest: "{{ path('admin_licensee_suggest') }}"
                 };
 
         webix.ui({
@@ -62,7 +63,8 @@
                                                     gravity: 0.5,
                                                     elements: [
                                                         {view: "text", name: "email", label: "Email", validate:webix.rules.isEmail},
-                                                        {view: "combo", name: "roles", label: "Rolle", options: [{id:"ROLE_ADMIN", value: "Admin"}, {id:"ROLE_USER", value: "Benutzer"}, {id:"ROLE_LICENSEE", value: "Lizenznehmer"}], validate:webix.rules.isNotEmpty},
+                                                        {view: "combo", id: "userformrole", name: "roles", label: "Rolle", options: [{id:"ROLE_ADMIN", value: "Admin"}, {id:"ROLE_USER", value: "Benutzer"}, {id:"ROLE_LICENSEE", value: "Lizenznehmer"}], validate:webix.rules.isNotEmpty},
+                                                        {view: "combo", id: "userformlicensee", name: "licenseeId", label: "Lizenznehmer", suggest: paths.adminLicenceeSuggest, disabled: true},
                                                         {view: "text", name: "password", type:"password", label:"Passwort"},
                                                         {view: "button", value:"Speichern", click:"dembeloAdmin.formsave('user')" }
                                                     ]

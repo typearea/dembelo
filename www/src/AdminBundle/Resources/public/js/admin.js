@@ -16,11 +16,12 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*global paths*/
 dembeloAdmin = (function () {
 
     return {
         init: function () {
-            $$("mainnav").attachEvent("onAfterSelect", function(id){
+            $$("mainnav").attachEvent("onAfterSelect", function (id){
                 if (id == 1) {
                     $$('usergrid').load(paths.adminUsers);
                     $$('userstuff').show();
@@ -42,6 +43,15 @@ dembeloAdmin = (function () {
             $$("mainnav").select(1);
 
             $$('userform').bind($$('usergrid'));
+            $$('userformrole').attachEvent('onChange', function (newValue) {
+                if (newValue == 'ROLE_LICENSEE') {
+                    $$('userformlicensee').enable()
+                } else {
+                    $$('userformlicensee').setValue('');
+                    $$('userformlicensee').disable()
+                }
+            });
+
             $$('licenseeform').bind($$('licenseegrid'));
         },
         formsave: function (type) {
@@ -63,7 +73,7 @@ dembeloAdmin = (function () {
                 } else {
                     webix.modalbox({
                         title: "Fehler",
-                        buttons: ["Ok",],
+                        buttons: ["Ok"],
                         text: "Das Speichern ist leider fehlgeschlagen..."
                     });
                 }
@@ -79,7 +89,7 @@ dembeloAdmin = (function () {
             if (values['id'] === undefined) {
                 webix.modalbox({
                     title: "Fehler",
-                    buttons: ["Ok",],
+                    buttons: ["Ok"],
                     text: "Keine Zeile zum Löschen ausgewählt."
                 });
                 return;
@@ -92,7 +102,7 @@ dembeloAdmin = (function () {
                 } else {
                     webix.modalbox({
                         title: "Fehler",
-                        buttons: ["Ok",],
+                        buttons: ["Ok"],
                         text: "Das Löschen ist leider fehlgeschlagen..."
                     });
                 }
@@ -105,10 +115,10 @@ dembeloAdmin = (function () {
 
             switch(type) {
                 case 'user':
-                    clickString = "$$('usergrid').add({id: 'new', email: '', roles: 'ROLE_USER'})"
+                    clickString = "$$('usergrid').add({id: 'new', email: '', roles: 'ROLE_USER'})";
                     break;
                 case 'licensee':
-                    clickString = "$$('licenseegrid').add({id: 'new', name: ''})"
+                    clickString = "$$('licenseegrid').add({id: 'new', name: ''})";
                     break;
             }
 
