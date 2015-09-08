@@ -54,10 +54,11 @@ class DefaultController extends Controller
             ['id' => "2", 'type' => "folder", 'value' => "Lizenznehmer", 'css' => "folder_music"],
             ['id' => "3", 'type' => "folder", 'value' => "Autoren", 'css' => "folder_music"],
             ['id' => "4", 'type' => "folder", 'value' => "Themenfelder", 'css' => "folder_music"],
-            ['id' => "5", 'type' => "folder", 'value' => "Geschichten", 'css' => "folder_music"]
+            ['id' => "5", 'type' => "folder", 'value' => "Geschichten", 'css' => "folder_music"],
         ];
 
         $jsonEncoder = new JsonEncoder();
+        
         return $this->render('AdminBundle::index.html.twig', array('mainMenuData' => $jsonEncoder->encode($mainMenuData, 'json')));
     }
 
