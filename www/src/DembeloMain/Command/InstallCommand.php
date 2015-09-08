@@ -133,13 +133,84 @@ class InstallCommand extends ContainerAwareCommand
     {
         $repository = $mongo->getRepository('DembeloMain:Topic');
 
-        $topic = $repository->findOneByName('Lorem');
-
         $this->dummyData['topics'] = array();
 
+        $topic = $repository->findOneByName('Lorem');
         if (is_null($topic)) {
             $topic = new Topic();
             $topic->setName('Lorem');
+            $topic->setStatus(Topic::STATUS_ACTIVE);
+            $dm->persist($topic);
+        }
+        $this->dummyData['topics'][] = $topic;
+
+        $topic = $repository->findOneByName('Thema 2');
+        if (is_null($topic)) {
+            $topic = new Topic();
+            $topic->setName('Thema 2');
+            $topic->setStatus(Topic::STATUS_ACTIVE);
+            $dm->persist($topic);
+        }
+        $this->dummyData['topics'][] = $topic;
+
+        $topic = $repository->findOneByName('Thema 3');
+        if (is_null($topic)) {
+            $topic = new Topic();
+            $topic->setName('Thema 3');
+            $topic->setStatus(Topic::STATUS_ACTIVE);
+            $dm->persist($topic);
+        }
+        $this->dummyData['topics'][] = $topic;
+
+        $topic = $repository->findOneByName('Thema 4');
+        if (is_null($topic)) {
+            $topic = new Topic();
+            $topic->setName('Thema 4');
+            $topic->setStatus(Topic::STATUS_ACTIVE);
+            $dm->persist($topic);
+        }
+        $this->dummyData['topics'][] = $topic;
+
+        $topic = $repository->findOneByName('Thema 5');
+        if (is_null($topic)) {
+            $topic = new Topic();
+            $topic->setName('Thema 5');
+            $topic->setStatus(Topic::STATUS_ACTIVE);
+            $dm->persist($topic);
+        }
+        $this->dummyData['topics'][] = $topic;
+
+        $topic = $repository->findOneByName('Thema 6');
+        if (is_null($topic)) {
+            $topic = new Topic();
+            $topic->setName('Thema 6');
+            $topic->setStatus(Topic::STATUS_ACTIVE);
+            $dm->persist($topic);
+        }
+        $this->dummyData['topics'][] = $topic;
+
+        $topic = $repository->findOneByName('Thema 7');
+        if (is_null($topic)) {
+            $topic = new Topic();
+            $topic->setName('Thema 7');
+            $topic->setStatus(Topic::STATUS_ACTIVE);
+            $dm->persist($topic);
+        }
+        $this->dummyData['topics'][] = $topic;
+
+        $topic = $repository->findOneByName('Thema 8');
+        if (is_null($topic)) {
+            $topic = new Topic();
+            $topic->setName('Thema 8');
+            $topic->setStatus(Topic::STATUS_ACTIVE);
+            $dm->persist($topic);
+        }
+        $this->dummyData['topics'][] = $topic;
+
+        $topic = $repository->findOneByName('Thema 9');
+        if (is_null($topic)) {
+            $topic = new Topic();
+            $topic->setName('Thema 9');
             $topic->setStatus(Topic::STATUS_ACTIVE);
             $dm->persist($topic);
         }
