@@ -58,7 +58,7 @@ class DefaultController extends Controller
         ];
 
         $jsonEncoder = new JsonEncoder();
-        
+
         return $this->render('AdminBundle::index.html.twig', array('mainMenuData' => $jsonEncoder->encode($mainMenuData, 'json')));
     }
 
