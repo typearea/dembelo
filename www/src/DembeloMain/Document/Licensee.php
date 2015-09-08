@@ -84,5 +84,4 @@ class Licensee
     {
         $this->name = $name;
     }
-
 }
