@@ -284,7 +284,7 @@ class DefaultController extends Controller
     {
         $params = $request->request->all();
 
-        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'author', 'topic', 'story'))) {
+        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'author', 'topic', 'story'))) {
             return new Response(\json_encode(array('error' => true)));
         }
 
