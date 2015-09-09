@@ -80,10 +80,12 @@ class DefaultControllerTest extends WebTestCase
         $user1->setEmail('email1');
         $user1->setId('id1');
         $user1->setRoles('ROLE_ADMIN');
+        $user1->setLicenseeId('lic1');
         $user2 = new User();
         $user2->setEmail('email2');
         $user2->setId('id2');
         $user2->setRoles('ROLE_USER');
+        $user2->setLicenseeId('lic2');
 
         $userArray = array(
             $user1,
@@ -100,7 +102,7 @@ class DefaultControllerTest extends WebTestCase
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $controller->usersAction();
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-        $this->assertJsonStringEqualsJsonString('[{"id":"id1","email":"email1","roles":"ROLE_ADMIN"},{"id":"id2","email":"email2","roles":"ROLE_USER"}]', $response->getContent());
+        $this->assertJsonStringEqualsJsonString('[{"id":"id1","email":"email1","roles":"ROLE_ADMIN","licenseeId":"lic1"},{"id":"id2","email":"email2","roles":"ROLE_USER","licenseeId":"lic2"}]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
     }
 

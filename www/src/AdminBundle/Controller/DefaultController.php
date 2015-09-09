@@ -82,6 +82,7 @@ class DefaultController extends Controller
             $obj->id = $user->getId();
             $obj->email = $user->getEmail();
             $obj->roles = join(', ', $user->getRoles());
+            $obj->licenseeId = $user->getLicenseeId();
             $output[] = $obj;
         }
 
