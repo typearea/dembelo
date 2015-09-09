@@ -130,10 +130,10 @@ class DefaultController extends Controller
         /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
         $repository = $mongo->getRepository('DembeloMain:Licensee');
 
-        $licensees = $repository->findBy(array('name' => new \MongoRegex('/' . $searchString . '/')), null, 10);
+        $licensees = $repository->findBy(array('name' => new \MongoRegex('/'.$searchString.'/')), null, 10);
 
         $output = array();
-        foreach ($licensees AS $licensee) {
+        foreach ($licensees as $licensee) {
             $output[] = array(
                 'id' => $licensee->getId(),
                 'value' => $licensee->getName(),
