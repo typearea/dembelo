@@ -24,6 +24,7 @@
 
 namespace DembeloMain\Command;
 
+use DembeloMain\Document\Licensee;
 use DembeloMain\Document\Textnode;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -59,6 +60,9 @@ class InstallCommand extends ContainerAwareCommand
 
         $dm = $mongo->getManager();
 
+        $this->createLicensees($mongo, $dm);
+        $output->writeln("Licensees installed...");
+
         $this->createUsers($mongo, $dm);
         $output->writeln("Users installed...");
 
@@ -79,37 +83,65 @@ class InstallCommand extends ContainerAwareCommand
         $output->writeln("<info>Installation Done</info>");
     }
 
+    private function createLicensees(ManagerRegistry $mongo, DocumentManager $dm)
+    {
+        $repository = $mongo->getRepository('DembeloMain:Licensee');
+
+        $licensees = array(
+            array('name' => 'Lizenznehmer 1'),
+            array('name' => 'Lizenznehmer 2'),
+        );
+
+        $this->dummyData['licensees'] = array();
+
+        foreach ($licensees as $licenseeData) {
+            $licensee = $repository->findOneByName($licenseeData['name']);
+
+            if (is_null($licensee)) {
+                $licensee = new Licensee();
+                $licensee->setName($licenseeData['name']);
+                $dm->persist($licensee);
+            }
+            $this->dummyData['licensees'][] = $licensee;
+        }
+
+    }
+
     private function createUsers(ManagerRegistry $mongo, DocumentManager $dm)
     {
         $repository = $mongo->getRepository('DembeloMain:User');
 
         $encoder = $this->getContainer()->get('security.password_encoder');
 
-        $user = $repository->findOneByEmail('admin@dembelo.tld');
 
         $this->dummyData['users'] = array();
 
-        if (is_null($user)) {
-            $user = new User();
-            $user->setEmail('admin@dembelo.tld');
-            $password = $encoder->encodePassword($user, 'dembelo');
-            $user->setPassword($password);
-            $user->setRoles(array("ROLE_ADMIN"));
-            $dm->persist($user);
-        }
-        $this->dummyData['users'][] = $user;
+        $users = array(
+            array('email' => 'admin@dembelo.tld', 'password' => 'dembelo', 'roles' => array('ROLE_ADMIN')),
+            array('email' => 'reader@dembelo.tld', 'password' => 'dembelo', 'roles' => array('ROLE_USER')),
+            array('email' => 'licensee@dembelo.tld', 'password' => 'dembelo', 'roles' => array('ROLE_LICENSEE')),
+        );
 
-        $user = $repository->findOneByEmail('reader@dembelo.tld');
+        foreach ($users as $userData) {
+            $user = $repository->findOneByEmail($userData['email']);
 
-        if (is_null($user)) {
-            $user = new User();
-            $user->setEmail('reader@dembelo.tld');
-            $password = $encoder->encodePassword($user, 'dembelo');
-            $user->setPassword($password);
-            $user->setRoles(array("ROLE_USER"));
-            $dm->persist($user);
+            if (is_null($user)) {
+                $user = new User();
+                $user->setEmail($userData['email']);
+                $password = $encoder->encodePassword($user, $userData['password']);
+                $user->setPassword($password);
+                $user->setRoles($userData['roles']);
+
+                if (in_array('ROLE_LICENSEE', $userData['roles'])) {
+                    $user->setLicenseeId($this->dummyData['licensees'][0]->getId());
+                }
+
+                $dm->persist($user);
+            }
+            $this->dummyData['users'][] = $user;
+
         }
-        $this->dummyData['users'][] = $user;
+
     }
 
     private function createAuthors(ManagerRegistry $mongo, DocumentManager $dm)
