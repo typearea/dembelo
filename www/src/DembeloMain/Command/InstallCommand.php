@@ -30,7 +30,6 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use DembeloMain\Document\User;
-use DembeloMain\Document\Author;
 use DembeloMain\Document\Topic;
 use DembeloMain\Document\Story;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
@@ -65,9 +64,6 @@ class InstallCommand extends ContainerAwareCommand
 
         $this->createUsers($mongo, $dm);
         $output->writeln("Users installed...");
-
-        $this->createAuthors($mongo, $dm);
-        $output->writeln("Authors installed...");
 
         $this->createTopics($mongo, $dm);
         $output->writeln("Topics installed...");
@@ -144,23 +140,6 @@ class InstallCommand extends ContainerAwareCommand
 
     }
 
-    private function createAuthors(ManagerRegistry $mongo, DocumentManager $dm)
-    {
-        $repository = $mongo->getRepository('DembeloMain:Author');
-
-        $author = $repository->findOneByName('Alfons Autor');
-
-        $this->dummyData['authors'] = array();
-
-        if (is_null($author)) {
-            $author = new Author();
-            $author->setName('Alfons Autor');
-            $author->setStatus(Author::STATUS_ACTIVE);
-            $dm->persist($author);
-        }
-        $this->dummyData['authors'][] = $author;
-    }
-
     private function createTopics(ManagerRegistry $mongo, DocumentManager $dm)
     {
         $repository = $mongo->getRepository('DembeloMain:Topic');
@@ -221,7 +200,6 @@ class InstallCommand extends ContainerAwareCommand
         $textnode = new Textnode();
         $textnode->setStatus(Textnode::STATUS_ACTIVE);
         $textnode->setTopicId($this->dummyData['topics'][0]->getId());
-        $textnode->setAuthorId($this->dummyData['authors'][0]->getId());
         $textnode->setCreated(date('Y-m-d H:i:s'));
         $textnode->setStoryId($this->dummyData['stories'][0]->getId());
         $textnode->setText($loremIpsum->getWords(3500));
@@ -231,7 +209,6 @@ class InstallCommand extends ContainerAwareCommand
         $textnode = new Textnode();
         $textnode->setStatus(Textnode::STATUS_ACTIVE);
         $textnode->setTopicId($this->dummyData['topics'][0]->getId());
-        $textnode->setAuthorId($this->dummyData['authors'][0]->getId());
         $textnode->setCreated(date('Y-m-d H:i:s'));
         $textnode->setStoryId($this->dummyData['stories'][0]->getId());
         $textnode->setText($loremIpsum->getWords(3500));
@@ -241,7 +218,6 @@ class InstallCommand extends ContainerAwareCommand
         $textnode = new Textnode();
         $textnode->setStatus(Textnode::STATUS_ACTIVE);
         $textnode->setTopicId($this->dummyData['topics'][0]->getId());
-        $textnode->setAuthorId($this->dummyData['authors'][0]->getId());
         $textnode->setCreated(date('Y-m-d H:i:s'));
         $textnode->setStoryId($this->dummyData['stories'][0]->getId());
         $textnode->setText($loremIpsum->getWords(3500));
@@ -251,7 +227,6 @@ class InstallCommand extends ContainerAwareCommand
         $textnode = new Textnode();
         $textnode->setStatus(Textnode::STATUS_ACTIVE);
         $textnode->setTopicId($this->dummyData['topics'][0]->getId());
-        $textnode->setAuthorId($this->dummyData['authors'][0]->getId());
         $textnode->setCreated(date('Y-m-d H:i:s'));
         $textnode->setStoryId($this->dummyData['stories'][1]->getId());
         $textnode->setText($loremIpsum->getWords(3500));
@@ -261,7 +236,6 @@ class InstallCommand extends ContainerAwareCommand
         $textnode = new Textnode();
         $textnode->setStatus(Textnode::STATUS_ACTIVE);
         $textnode->setTopicId($this->dummyData['topics'][0]->getId());
-        $textnode->setAuthorId($this->dummyData['authors'][0]->getId());
         $textnode->setCreated(date('Y-m-d H:i:s'));
         $textnode->setStoryId($this->dummyData['stories'][1]->getId());
         $textnode->setText($loremIpsum->getWords(3500));
@@ -271,7 +245,6 @@ class InstallCommand extends ContainerAwareCommand
         $textnode = new Textnode();
         $textnode->setStatus(Textnode::STATUS_ACTIVE);
         $textnode->setTopicId($this->dummyData['topics'][0]->getId());
-        $textnode->setAuthorId($this->dummyData['authors'][0]->getId());
         $textnode->setCreated(date('Y-m-d H:i:s'));
         $textnode->setStoryId($this->dummyData['stories'][1]->getId());
         $textnode->setText($loremIpsum->getWords(3500));

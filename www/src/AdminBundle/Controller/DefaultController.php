@@ -31,7 +31,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use StdClass;
 use DembeloMain\Document\User;
-use DembeloMain\Document\Author;
 use DembeloMain\Document\Topic;
 use DembeloMain\Document\Story;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -52,9 +51,8 @@ class DefaultController extends Controller
         $mainMenuData = [
             ['id' => "1", 'type' => "folder", 'value' => "Benutzer", 'css' => "folder_music"],
             ['id' => "2", 'type' => "folder", 'value' => "Lizenznehmer", 'css' => "folder_music"],
-            ['id' => "3", 'type' => "folder", 'value' => "Autoren", 'css' => "folder_music"],
-            ['id' => "4", 'type' => "folder", 'value' => "Themenfelder", 'css' => "folder_music"],
-            ['id' => "5", 'type' => "folder", 'value' => "Geschichten", 'css' => "folder_music"],
+            ['id' => "3", 'type' => "folder", 'value' => "Themenfelder", 'css' => "folder_music"],
+            ['id' => "4s", 'type' => "folder", 'value' => "Geschichten", 'css' => "folder_music"],
         ];
 
         $jsonEncoder = new JsonEncoder();
@@ -144,31 +142,6 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/authors", name="admin_authors")
-     *
-     * @return String
-     */
-    public function authorsAction()
-    {
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:Author');
-
-        $users = $repository->findAll();
-
-        $output = array();
-        /* @var $user \DembeloMain\Document\User */
-        foreach ($users as $user) {
-            $obj = new StdClass();
-            $obj->id = $user->getId();
-            $obj->name = $user->getName();
-            $output[] = $obj;
-        }
-
-        return new Response(\json_encode($output));
-    }
-
-    /**
      * @Route("/topics", name="admin_topics")
      *
      * @return String
@@ -228,7 +201,7 @@ class DefaultController extends Controller
     {
         $params = $request->request->all();
 
-        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'author', 'topic', 'story'))) {
+        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'story'))) {
             return new Response(\json_encode(array('error' => true)));
         }
         $formtype = ucfirst($params['formtype']);
@@ -284,7 +257,7 @@ class DefaultController extends Controller
     {
         $params = $request->request->all();
 
-        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'author', 'topic', 'story'))) {
+        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'story'))) {
             return new Response(\json_encode(array('error' => true)));
         }
 

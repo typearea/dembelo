@@ -29,12 +29,9 @@ dembeloAdmin = (function () {
                     $$('licenseegrid').load(paths.adminLicensees);
                     $$('licenseestuff').show();
                 } else if (id == 3) {
-                    $$('authorgrid').load(paths.adminAuthors);
-                    $$('authorgrid').show();
-                } else if (id == 4) {
                     $$('topicgrid').load(paths.adminTopics);
                     $$('topicgrid').show();
-                } else if (id == 5) {
+                } else if (id == 4) {
                     $$('storygrid').load(paths.adminStories);
                     $$('storygrid').show();
                 }

@@ -8,7 +8,6 @@
                 paths = {
                     adminUsers: "{{ path('admin_users') }}",
                     adminLicensees: "{{ path('admin_licensees') }}",
-                    adminAuthors: "{{ path('admin_authors') }}",
                     adminTopics: "{{ path('admin_topics') }}",
                     adminStories: "{{ path('admin_stories') }}",
                     adminFormSave: "{{ path('admin_formsave') }}",
@@ -96,13 +95,6 @@
                                                     ]
                                                 }
                                             ]
-                                        },
-                                        {
-                                            id: "authorgrid",
-                                            view: "datatable",
-                                            autoConfig: true,
-                                            select: true,
-                                            datatype: "json"
                                         },
                                         {
                                             id: "topicgrid",

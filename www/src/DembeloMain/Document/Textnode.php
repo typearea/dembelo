@@ -43,11 +43,6 @@ class Textnode
     protected $id;
 
     /**
-     * @MongoDB\ObjectId
-     */
-    protected $authorId;
-
-    /**
      * @MongoDB\Date
      */
     protected $created;
@@ -76,24 +71,6 @@ class Textnode
      * @MongoDB\String
      */
     protected $text;
-
-    /**
-     * @return mixed
-     */
-    public function getAuthorId()
-    {
-        return $this->authorId;
-    }
-
-    /**
-     * sets the author id
-     *
-     * @param string $authorId
-     */
-    public function setAuthorId($authorId)
-    {
-        $this->authorId = $authorId;
-    }
 
     /**
      * gets the timestamp of creation
