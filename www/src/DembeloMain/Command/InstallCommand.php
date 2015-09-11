@@ -34,6 +34,7 @@ use DembeloMain\Document\Topic;
 use DembeloMain\Document\Story;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Class InstallCommand
@@ -48,11 +49,74 @@ class InstallCommand extends ContainerAwareCommand
     {
         $this
             ->setName('dembelo:install')
-            ->setDescription('Installation Routine');
-        ;
+            ->setDescription('Installation Routine')
+            ->addOption('purge-db', null,
+                InputOption::VALUE_NONE,
+                'deletes all content from DB before installation')
+            ->addOption('with-dummy-data', null,
+                InputOption::VALUE_NONE,
+                'installs some dummy data to play with');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
+    {
+
+        if ($input->getOption('purge-db')) {
+            $this->purgeDB($output);
+            $output->writeln("<info>Database cleared</info>");
+        }
+
+        $this->installDefaultUsers($output);
+        $output->writeln("<info>Default users installed</info>");
+
+        if ($input->getOption('with-dummy-data')) {
+            $this->installDummyData($output);
+            $output->writeln("<info>Dummy data installed</info>");
+        }
+
+    }
+
+    protected function purgeDB()
+    {
+        $collectionClasses = array(
+            'DembeloMain\Document\Licensee',
+            'DembeloMain\Document\ReadPath',
+            'DembeloMain\Document\Story',
+            'DembeloMain\Document\Textnode',
+            'DembeloMain\Document\Topic',
+            'DembeloMain\Document\User',
+        );
+
+        $mongo = $this->getContainer()->get('doctrine_mongodb');
+        $dm = $mongo->getManager();
+
+        foreach ($collectionClasses AS $collectionClass) {
+            $collection = $dm->getDocumentCollection($collectionClass);
+            $collection->remove(array());
+        }
+
+    }
+
+    protected function installDefaultUsers(OutputInterface $output)
+    {
+        $this->installAdminUser();
+        $output->writeln('admin user installed');
+    }
+
+    protected function installAdminUser()
+    {
+        $mongo = $this->getContainer()->get('doctrine_mongodb');
+
+        $dm = $mongo->getManager();
+
+        $users = array(
+            array('email' => 'admin@dembelo.tld', 'password' => 'dembelo', 'roles' => array('ROLE_ADMIN')),
+        );
+
+        $this->installUsers($users, $mongo, $dm);
+    }
+
+    protected function installDummyData(OutputInterface $output)
     {
 
         $mongo = $this->getContainer()->get('doctrine_mongodb');
@@ -76,7 +140,6 @@ class InstallCommand extends ContainerAwareCommand
 
         $dm->flush();
 
-        $output->writeln("<info>Installation Done</info>");
     }
 
     private function createLicensees(ManagerRegistry $mongo, DocumentManager $dm)
@@ -105,18 +168,24 @@ class InstallCommand extends ContainerAwareCommand
 
     private function createUsers(ManagerRegistry $mongo, DocumentManager $dm)
     {
+        $users = array(
+            array('email' => 'reader@dembelo.tld', 'password' => 'dembelo', 'roles' => array('ROLE_USER')),
+            array('email' => 'licensee@dembelo.tld', 'password' => 'dembelo', 'roles' => array('ROLE_LICENSEE')),
+        );
+
+        $this->installUsers($users, $mongo, $dm);
+
+    }
+
+    private function installUsers(array $users, ManagerRegistry $mongo, DocumentManager $dm)
+    {
         $repository = $mongo->getRepository('DembeloMain:User');
 
         $encoder = $this->getContainer()->get('security.password_encoder');
 
-
-        $this->dummyData['users'] = array();
-
-        $users = array(
-            array('email' => 'admin@dembelo.tld', 'password' => 'dembelo', 'roles' => array('ROLE_ADMIN')),
-            array('email' => 'reader@dembelo.tld', 'password' => 'dembelo', 'roles' => array('ROLE_USER')),
-            array('email' => 'licensee@dembelo.tld', 'password' => 'dembelo', 'roles' => array('ROLE_LICENSEE')),
-        );
+        if (!isset($this->dummyData['users'])) {
+            $this->dummyData['users'] = array();
+        }
 
         foreach ($users as $userData) {
             $user = $repository->findOneByEmail($userData['email']);
@@ -134,10 +203,10 @@ class InstallCommand extends ContainerAwareCommand
 
                 $dm->persist($user);
             }
+
             $this->dummyData['users'][] = $user;
 
         }
-
     }
 
     private function createTopics(ManagerRegistry $mongo, DocumentManager $dm)
@@ -146,86 +215,28 @@ class InstallCommand extends ContainerAwareCommand
 
         $this->dummyData['topics'] = array();
 
-        $topic = $repository->findOneByName('Lorem');
-        if (is_null($topic)) {
-            $topic = new Topic();
-            $topic->setName('Lorem');
-            $topic->setStatus(Topic::STATUS_ACTIVE);
-            $dm->persist($topic);
-        }
-        $this->dummyData['topics'][] = $topic;
+        $topicData = array(
+            array('name' => 'Themenfeld 2', 'status' => Topic::STATUS_ACTIVE),
+            array('name' => 'Themenfeld 3', 'status' => Topic::STATUS_ACTIVE),
+            array('name' => 'Themenfeld 4', 'status' => Topic::STATUS_ACTIVE),
+            array('name' => 'Themenfeld 5', 'status' => Topic::STATUS_ACTIVE),
+            array('name' => 'Themenfeld 6', 'status' => Topic::STATUS_ACTIVE),
+            array('name' => 'Themenfeld 7', 'status' => Topic::STATUS_ACTIVE),
+            array('name' => 'Themenfeld 8', 'status' => Topic::STATUS_ACTIVE),
+            array('name' => 'Themenfeld 9', 'status' => Topic::STATUS_ACTIVE),
+        );
 
-        $topic = $repository->findOneByName('Thema 2');
-        if (is_null($topic)) {
-            $topic = new Topic();
-            $topic->setName('Thema 2');
-            $topic->setStatus(Topic::STATUS_ACTIVE);
-            $dm->persist($topic);
+        foreach ($topicData AS $topicDatum) {
+            $topic = $repository->findOneByName($topicDatum['name']);
+            if (is_null($topic)) {
+                $topic = new Topic();
+                $topic->setName($topicDatum['name']);
+                $topic->setStatus($topicDatum['status']);
+                $dm->persist($topic);
+            }
+            $this->dummyData['topics'][] = $topic;
         }
-        $this->dummyData['topics'][] = $topic;
 
-        $topic = $repository->findOneByName('Thema 3');
-        if (is_null($topic)) {
-            $topic = new Topic();
-            $topic->setName('Thema 3');
-            $topic->setStatus(Topic::STATUS_ACTIVE);
-            $dm->persist($topic);
-        }
-        $this->dummyData['topics'][] = $topic;
-
-        $topic = $repository->findOneByName('Thema 4');
-        if (is_null($topic)) {
-            $topic = new Topic();
-            $topic->setName('Thema 4');
-            $topic->setStatus(Topic::STATUS_ACTIVE);
-            $dm->persist($topic);
-        }
-        $this->dummyData['topics'][] = $topic;
-
-        $topic = $repository->findOneByName('Thema 5');
-        if (is_null($topic)) {
-            $topic = new Topic();
-            $topic->setName('Thema 5');
-            $topic->setStatus(Topic::STATUS_ACTIVE);
-            $dm->persist($topic);
-        }
-        $this->dummyData['topics'][] = $topic;
-
-        $topic = $repository->findOneByName('Thema 6');
-        if (is_null($topic)) {
-            $topic = new Topic();
-            $topic->setName('Thema 6');
-            $topic->setStatus(Topic::STATUS_ACTIVE);
-            $dm->persist($topic);
-        }
-        $this->dummyData['topics'][] = $topic;
-
-        $topic = $repository->findOneByName('Thema 7');
-        if (is_null($topic)) {
-            $topic = new Topic();
-            $topic->setName('Thema 7');
-            $topic->setStatus(Topic::STATUS_ACTIVE);
-            $dm->persist($topic);
-        }
-        $this->dummyData['topics'][] = $topic;
-
-        $topic = $repository->findOneByName('Thema 8');
-        if (is_null($topic)) {
-            $topic = new Topic();
-            $topic->setName('Thema 8');
-            $topic->setStatus(Topic::STATUS_ACTIVE);
-            $dm->persist($topic);
-        }
-        $this->dummyData['topics'][] = $topic;
-
-        $topic = $repository->findOneByName('Thema 9');
-        if (is_null($topic)) {
-            $topic = new Topic();
-            $topic->setName('Thema 9');
-            $topic->setStatus(Topic::STATUS_ACTIVE);
-            $dm->persist($topic);
-        }
-        $this->dummyData['topics'][] = $topic;
     }
 
     private function createStories(ManagerRegistry $mongo, DocumentManager $dm)
