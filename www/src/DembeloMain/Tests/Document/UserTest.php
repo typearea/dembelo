@@ -140,7 +140,8 @@ class UserTest extends WebTestCase
         $this->user->setId('id');
         $this->user->setEmail('email');
         $this->user->setPassword('pw');
-        $this->assertEquals(serialize(array('id', 'email', 'pw')), $this->user->serialize());
+        $this->user->setCurrentTextnode('55cd2a9808985ca80c3c986c', '55cd2a9808985ca80c3c9877');
+        $this->assertEquals(serialize(array('id', 'email', 'pw', array('55cd2a9808985ca80c3c986c' => '55cd2a9808985ca80c3c9877'))), $this->user->serialize());
     }
 
     /**
@@ -148,11 +149,12 @@ class UserTest extends WebTestCase
      */
     public function testUnserialize()
     {
-        $serialized = serialize(array('id', 'email', 'pw'));
+        $serialized = serialize(array('id', 'email', 'pw', array('55cd2a9808985ca80c3c986c' => '55cd2a9808985ca80c3c9877')));
         $this->user->unserialize($serialized);
         $this->assertEquals('id', $this->user->getId());
         $this->assertEquals('email', $this->user->getEmail());
         $this->assertEquals('pw', $this->user->getPassword());
+        $this->assertEquals('55cd2a9808985ca80c3c9877', $this->user->getCurrentTextnode('55cd2a9808985ca80c3c986c'));
     }
 
     /**

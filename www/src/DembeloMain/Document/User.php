@@ -1,6 +1,6 @@
 <?php
 
-/* Copyright (C) 2015 Michael Giesler
+/* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
  *
@@ -66,6 +66,11 @@ class User implements UserInterface, \Serializable
      * @MongoDB\ObjectId
      */
     protected $licenseeId;
+
+    /**
+     * @MongoDB\Collection
+     */
+    protected $currentTextnodes;
 
     /**
      * gets the mongodb id
@@ -171,6 +176,35 @@ class User implements UserInterface, \Serializable
     }
 
     /**
+     * Gets the last textnode ID of topic \p $themeId the user was reading.
+     *
+     * @param string $themeId Theme (= topic) ID.
+     * @return string|null Textnode ID or null, if there wasn't a textnode
+     *     ID set for topic \p $themeId yet.
+     */
+    public function getCurrentTextnode($themeId)
+    {
+        if (isset($this->currentTextnodes[$themeId]) === true) {
+            return $this->currentTextnodes[$themeId];
+        }
+
+        return null;
+    }
+
+    /**
+     * Sets the textnode ID for topic \p $themeID the user is
+     *     currently reading.
+     *
+     * @param string $themeId    Theme ID.
+     * @param string $textnodeId ID of the textnode the user is
+     *     currently reading.
+     */
+    public function setCurrentTextnode($themeId, $textnodeId)
+    {
+        $this->currentTextnodes[$themeId] = $textnodeId;
+    }
+
+    /**
      * from UserInterface
      */
     public function eraseCredentials()
@@ -190,6 +224,7 @@ class User implements UserInterface, \Serializable
             $this->password,
             // see section on salt below
             // $this->salt,
+            $this->currentTextnodes,
         ));
     }
 
@@ -205,7 +240,8 @@ class User implements UserInterface, \Serializable
             $this->email,
             $this->password,
             // see section on salt below
-            // $this->salt
+            // $this->salt,
+            $this->currentTextnodes
             ) = unserialize($serialized);
     }
 
