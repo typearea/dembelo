@@ -74,41 +74,27 @@ class DefaultController extends Controller
     {
         $textnodes = null;
 
-        $securityContext = $this->get('security.context');
+        /* @var $authorizationChecker \Symfony\Component\Security\Core\Authorization\AuthorizationChecker */
+        $authorizationChecker = $this->get('security.authorization_checker');
+        /* @var $tokenStorage Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage */
+        $tokenStorage = $this->get('security.token_storage');
+        $mongo = $this->get('doctrine_mongodb');
 
-        if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED') === true ||
-            $securityContext->isGranted('IS_AUTHENTICATED_FULLY') === true) {
-            $user = $securityContext->getToken()->getUser();
+        if ($authorizationChecker->isGranted('ROLE_USER')) {
+            $user = $tokenStorage->getToken()->getUser();
 
             $textnodeId = $user->getCurrentTextnode($themeId);
 
             if (is_null($textnodeId)) {
-                $mongo = $this->get('doctrine_mongodb');
-                $connection = $mongo->getConnection();
-
-                if (!$connection->getMongo()) {
-                    $connection->connect();
-                }
-
-                $repository = $mongo->getRepository('DembeloMain:Story');
-                $story = $repository->findOneBy(array('topic_id' => new \MongoId($themeId),
-                                                      'status' => Story::STATUS_ACTIVE, ));
-
-                if (is_null($story)) {
-                    throw $this->createNotFoundException('No Story for Topic \''.$themeId.'\' found.');
-                }
-
                 $repository = $mongo->getRepository('DembeloMain:Textnode');
-                $textnodes = $repository->findBy(array('story_id' => new \MongoId($story->getId()),
-                                                       'status' => Textnode::STATUS_ACTIVE,
-                                                       'type' => Textnode::TYPE_INTRODUCTION, ));
+                $textnodes = $repository->findBy(array(
+                    'topic_id' => new \MongoId($themeId),
+                    'status' => Textnode::STATUS_ACTIVE,
+                    'type' => Textnode::TYPE_INTRODUCTION,
+                ));
 
-                if (is_null($textnodes)) {
-                    throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\', Story \''.$story->getId().'\' found.');
-                }
-
-                if (count($textnodes) <= 0) {
-                    throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\', Story \''.$story->getId().'\' found.');
+                if (empty($textnodes)) {
+                    throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\' found.');
                 }
 
                 $dm = $mongo->getManager();
@@ -117,53 +103,34 @@ class DefaultController extends Controller
 
                 return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
             } else {
-                $mongo = $this->get('doctrine_mongodb');
-                $connection = $mongo->getConnection();
-
                 $repository = $mongo->getRepository('DembeloMain:Textnode');
-                $textnodes = $repository->findBy(array('id' => new \MongoId($textnodeId),
-                                                       'status' => Textnode::STATUS_ACTIVE, ));
+                $textnodes = $repository->findBy(array(
+                    'id' => new \MongoId($textnodeId),
+                    'status' => Textnode::STATUS_ACTIVE,
+                ));
 
-                if (is_null($textnodes)) {
-                    throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\', Story \''.$story->getId().'\' found.');
-                }
-
-                if (count($textnodes) <= 0) {
-                    throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\', Story \''.$story->getId().'\' found.');
+                if (empty($textnodes)) {
+                    throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\' found.');
                 }
 
                 return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
             }
-        } else {
-            $mongo = $this->get('doctrine_mongodb');
-            $connection = $mongo->getConnection();
-
-            if (!$connection->getMongo()) {
-                $connection->connect();
-            }
-
-            $repository = $mongo->getRepository('DembeloMain:Story');
-            $story = $repository->findOneBy(array('topic_id' => new \MongoId($themeId),
-                                                  'status' => Story::STATUS_ACTIVE, ));
-
-            if (is_null($story)) {
-                throw $this->createNotFoundException('No Story for Topic \''.$themeId.'\' found.');
-            }
-
-            $repository = $mongo->getRepository('DembeloMain:Textnode');
-            $textnodes = $repository->findBy(array('story_id' => new \MongoId($story->getId()),
-                                                    'status' => Textnode::STATUS_ACTIVE,
-                                                    'type' => Textnode::TYPE_INTRODUCTION, ));
-
-            if (is_null($textnodes)) {
-                throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\', Story \''.$story->getId().'\' found.');
-            }
-
-            if (count($textnodes) <= 0) {
-                throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\', Story \''.$story->getId().'\' found.');
-            }
-
-            return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
         }
+
+        $repository = $mongo->getRepository('DembeloMain:Textnode');
+        $textnodes = $repository->findBy(
+            array(
+                'story_id' => new \MongoId($themeId),
+                'status' => Textnode::STATUS_ACTIVE,
+                'type' => Textnode::TYPE_INTRODUCTION,
+            )
+        );
+
+        if (empty($textnodes)) {
+            throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\' found.');
+        }
+
+        return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
+
     }
 }

@@ -55,43 +55,34 @@ class DefaultControllerTest extends WebTestCase
     public function testReadWithoutLogin()
     {
         $container = $this->getMock("Symfony\Component\DependencyInjection\ContainerInterface");
-        $securityContext = $this->getMockBuilder("Symfony\Component\Security\Core\SecurityContext")->disableOriginalConstructor()->getMock();
-        $service = $this->getMockBuilder("Doctrine\Bundle\MongoDBBundle\ManagerRegistry")->disableOriginalConstructor()->getMock();
-        $connection = $this->getMockBuilder("Doctrine\MongoDB\Connection")->disableOriginalConstructor()->getMock();
+        $authorizationChecker = $this->getMockBuilder('foobar')->setMethods(array('isGranted'))->getMock();
+        $tokenStorage = $this->getMockBuilder("Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage")->disableOriginalConstructor()->getMock();
+        $mongo = $this->getMockBuilder("Doctrine\Bundle\MongoDBBundle\ManagerRegistry")->disableOriginalConstructor()->getMock();
         $repository = $this->getMockBuilder("Doctrine\ODM\MongoDB\DocumentRepository")->disableOriginalConstructor()->getMock();
         $template = $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
         $response = $this->getMock("Symfony\Component\HttpFoundation\Response");
 
         $container->expects($this->at(0))
             ->method("get")
-            ->with($this->equalTo('security.context'))
-            // Security context without any privileges.
-            ->will($this->returnValue($securityContext));
+            ->with($this->equalTo('security.authorization_checker'))
+            ->will($this->returnValue($authorizationChecker));
         $container->expects($this->at(1))
             ->method("get")
+            ->with($this->equalTo('security.token_storage'))
+            ->will($this->returnValue($tokenStorage));
+        $container->expects($this->at(2))
+            ->method("get")
             ->with($this->equalTo('doctrine_mongodb'))
-            ->will($this->returnValue($service));
-        $service->expects($this->at(0))
-            ->method("getConnection")
-            ->will($this->returnValue($connection));
-        $service->expects($this->at(1))
-            ->method("getRepository")
-            ->with($this->equalTo('DembeloMain:Story'))
-            ->will($this->returnValue($repository));
-        $service->expects($this->at(2))
+            ->will($this->returnValue($mongo));
+        $mongo->expects($this->once())
             ->method("getRepository")
             ->with($this->equalTo('DembeloMain:Textnode'))
             ->will($this->returnValue($repository));
 
-        $story = new Story();
-        $story->setId("55d2b934658f5cc23c3c986d");
-        $story->setName("Lorem I");
-        $story->setTopicId("55d2b934658f5cc23c3c986c");
-        $story->setStatus(Story::STATUS_ACTIVE);
-
-        $repository->expects($this->once())
-            ->method("findOneBy")
-            ->will($this->returnValue($story));
+        $authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->with($this->equalTo('ROLE_USER'))
+            ->will($this->returnValue(false));
 
         $textnode = new Textnode();
         $textnode->setTopicId("55d2b934658f5cc23c3c986c");
@@ -105,19 +96,21 @@ class DefaultControllerTest extends WebTestCase
             ->method("findBy")
             ->will($this->returnValue(array($textnode)));
 
-        $container->expects($this->at(2))
+        $container->expects($this->at(3))
             ->method("get")
             ->with("templating")
             ->will($this->returnValue($template));
         $template->expects($this->once())
             ->method("renderResponse")
             ->with("default/read.html.twig", array("textnodeText" => "Lorem ipsum dolor sit amet."))
-            ->will($this->returnValue($response));
+            ->will($this->returnValue('renderresponse'));
 
         $controller = new DefaultController();
         $controller->setContainer($container);
 
         $result = $controller->readAction("55d2b934658f5cc23c3c986c");
+
+        $this->assertEquals('renderresponse', $result);
     }
 
     /** @todo Implement testReadWithLogin(). */
