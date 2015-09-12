@@ -279,58 +279,55 @@ class InstallCommand extends ContainerAwareCommand
 
         $loremIpsum = $this->getContainer()->get('apoutchika.lorem_ipsum');
 
-        $textnode = new Textnode();
-        $textnode->setStatus(Textnode::STATUS_ACTIVE);
-        $textnode->setTopicId($this->dummyData['topics'][0]->getId());
-        $textnode->setCreated(date('Y-m-d H:i:s'));
-        $textnode->setStoryId($this->dummyData['stories'][0]->getId());
-        $textnode->setText($loremIpsum->getWords(3500));
-        $textnode->setType(Textnode::TYPE_INTRODUCTION);
-        $dm->persist($textnode);
+        $textnodeData = array(
+            array(
+                'topic_id' => $this->dummyData['topics'][0]->getId(),
+                'story_id' => $this->dummyData['stories'][0]->getId(),
+                'text' => $loremIpsum->getWords(3500),
+                'type' => Textnode::TYPE_INTRODUCTION,
+            ),
+            array(
+                'topic_id' => $this->dummyData['topics'][0]->getId(),
+                'story_id' => $this->dummyData['stories'][0]->getId(),
+                'text' => $loremIpsum->getWords(3500),
+                'type' => Textnode::TYPE_DEEPENING,
+            ),
+            array(
+                'topic_id' => $this->dummyData['topics'][0]->getId(),
+                'story_id' => $this->dummyData['stories'][0]->getId(),
+                'text' => $loremIpsum->getWords(3500),
+                'type' => Textnode::TYPE_DEEPENING,
+            ),
+            array(
+                'topic_id' => $this->dummyData['topics'][0]->getId(),
+                'story_id' => $this->dummyData['stories'][1]->getId(),
+                'text' => $loremIpsum->getWords(3500),
+                'type' => Textnode::TYPE_INTRODUCTION,
+            ),
+            array(
+                'topic_id' => $this->dummyData['topics'][0]->getId(),
+                'story_id' => $this->dummyData['stories'][1]->getId(),
+                'text' => $loremIpsum->getWords(3500),
+                'type' => Textnode::TYPE_DEEPENING,
+            ),
+            array(
+                'topic_id' => $this->dummyData['topics'][0]->getId(),
+                'story_id' => $this->dummyData['stories'][1]->getId(),
+                'text' => $loremIpsum->getWords(3500),
+                'type' => Textnode::TYPE_DEEPENING,
+            ),
+        );
 
-        $textnode = new Textnode();
-        $textnode->setStatus(Textnode::STATUS_ACTIVE);
-        $textnode->setTopicId($this->dummyData['topics'][0]->getId());
-        $textnode->setCreated(date('Y-m-d H:i:s'));
-        $textnode->setStoryId($this->dummyData['stories'][0]->getId());
-        $textnode->setText($loremIpsum->getWords(3500));
-        $textnode->setType(Textnode::TYPE_DEEPENING);
-        $dm->persist($textnode);
+        foreach ($textnodeData as $textnodeDatum) {
+            $textnode = new Textnode();
+            $textnode->setStatus(Textnode::STATUS_ACTIVE);
+            $textnode->setTopicId($textnodeDatum['topic_id']);
+            $textnode->setCreated(date('Y-m-d H:i:s'));
+            $textnode->setStoryId($textnodeDatum['story_id']);
+            $textnode->setText($textnodeDatum['text']);
+            $textnode->setType($textnodeDatum['type']);
+            $dm->persist($textnode);
+        }
 
-        $textnode = new Textnode();
-        $textnode->setStatus(Textnode::STATUS_ACTIVE);
-        $textnode->setTopicId($this->dummyData['topics'][0]->getId());
-        $textnode->setCreated(date('Y-m-d H:i:s'));
-        $textnode->setStoryId($this->dummyData['stories'][0]->getId());
-        $textnode->setText($loremIpsum->getWords(3500));
-        $textnode->setType(Textnode::TYPE_DEEPENING);
-        $dm->persist($textnode);
-
-        $textnode = new Textnode();
-        $textnode->setStatus(Textnode::STATUS_ACTIVE);
-        $textnode->setTopicId($this->dummyData['topics'][0]->getId());
-        $textnode->setCreated(date('Y-m-d H:i:s'));
-        $textnode->setStoryId($this->dummyData['stories'][1]->getId());
-        $textnode->setText($loremIpsum->getWords(3500));
-        $textnode->setType(Textnode::TYPE_INTRODUCTION);
-        $dm->persist($textnode);
-
-        $textnode = new Textnode();
-        $textnode->setStatus(Textnode::STATUS_ACTIVE);
-        $textnode->setTopicId($this->dummyData['topics'][0]->getId());
-        $textnode->setCreated(date('Y-m-d H:i:s'));
-        $textnode->setStoryId($this->dummyData['stories'][1]->getId());
-        $textnode->setText($loremIpsum->getWords(3500));
-        $textnode->setType(Textnode::TYPE_DEEPENING);
-        $dm->persist($textnode);
-
-        $textnode = new Textnode();
-        $textnode->setStatus(Textnode::STATUS_ACTIVE);
-        $textnode->setTopicId($this->dummyData['topics'][0]->getId());
-        $textnode->setCreated(date('Y-m-d H:i:s'));
-        $textnode->setStoryId($this->dummyData['stories'][1]->getId());
-        $textnode->setText($loremIpsum->getWords(3500));
-        $textnode->setType(Textnode::TYPE_DEEPENING);
-        $dm->persist($textnode);
     }
 }
