@@ -176,16 +176,16 @@ class User implements UserInterface, \Serializable
     }
 
     /**
-     * Gets the last textnode ID of topic \p $themeId the user was reading.
+     * Gets the last textnode ID of topic \p $topicId the user was reading.
      *
-     * @param string $themeId Theme (= topic) ID.
+     * @param string $topicId Theme (= topic) ID.
      * @return string|null Textnode ID or null, if there wasn't a textnode
-     *     ID set for topic \p $themeId yet.
+     *     ID set for topic \p $topicId yet.
      */
-    public function getCurrentTextnode($themeId)
+    public function getCurrentTextnode($topicId)
     {
-        if (isset($this->currentTextnodes[$themeId]) === true) {
-            return $this->currentTextnodes[$themeId];
+        if (isset($this->currentTextnodes[$topicId]) === true) {
+            return $this->currentTextnodes[$topicId];
         }
 
         return null;
@@ -195,13 +195,13 @@ class User implements UserInterface, \Serializable
      * Sets the textnode ID for topic \p $themeID the user is
      *     currently reading.
      *
-     * @param string $themeId    Theme ID.
+     * @param string $topicId    Theme ID.
      * @param string $textnodeId ID of the textnode the user is
      *     currently reading.
      */
-    public function setCurrentTextnode($themeId, $textnodeId)
+    public function setCurrentTextnode($topicId, $textnodeId)
     {
-        $this->currentTextnodes[$themeId] = $textnodeId;
+        $this->currentTextnodes[$topicId] = $textnodeId;
     }
 
     /**

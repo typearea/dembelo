@@ -64,13 +64,13 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/themenfeld/{themeId}", name="themenfeld")
+     * @Route("/themenfeld/{topicId}", name="themenfeld")
      *
-     * @param string $themeId theme ID from URL
+     * @param string $topicId theme ID from URL
      *
      * @return string
      */
-    public function readAction($themeId)
+    public function readAction($topicId)
     {
         $textnodes = null;
 
@@ -83,22 +83,22 @@ class DefaultController extends Controller
         if ($authorizationChecker->isGranted('ROLE_USER')) {
             $user = $tokenStorage->getToken()->getUser();
 
-            $textnodeId = $user->getCurrentTextnode($themeId);
+            $textnodeId = $user->getCurrentTextnode($topicId);
 
             if (is_null($textnodeId)) {
                 $repository = $mongo->getRepository('DembeloMain:Textnode');
                 $textnodes = $repository->findBy(array(
-                    'topic_id' => new \MongoId($themeId),
+                    'topicId' => new \MongoId($topicId),
                     'status' => Textnode::STATUS_ACTIVE,
                     'type' => Textnode::TYPE_INTRODUCTION,
                 ));
 
                 if (empty($textnodes)) {
-                    throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\' found.');
+                    throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found, while the user was logged in, but without current textnode ID set.');
                 }
 
                 $dm = $mongo->getManager();
-                $user->setCurrentTextnode($themeId, $textnodes[0]->getId());
+                $user->setCurrentTextnode($topicId, $textnodes[0]->getId());
                 $dm->persist($user);
 
                 return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
@@ -110,7 +110,7 @@ class DefaultController extends Controller
                 ));
 
                 if (empty($textnodes)) {
-                    throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\' found.');
+                    throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found, while the user was logged in with the current textnode ID \''.$textnodeId.'\' set.');
                 }
 
                 return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
@@ -120,14 +120,14 @@ class DefaultController extends Controller
         $repository = $mongo->getRepository('DembeloMain:Textnode');
         $textnodes = $repository->findBy(
             array(
-                'story_id' => new \MongoId($themeId),
+                'topicId' => new \MongoId($topicId),
                 'status' => Textnode::STATUS_ACTIVE,
                 'type' => Textnode::TYPE_INTRODUCTION,
             )
         );
 
         if (empty($textnodes)) {
-            throw $this->createNotFoundException('No Textnode for Topic \''.$themeId.'\' found.');
+            throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found, while the user wasn\'t logged in.');
         }
 
         return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
