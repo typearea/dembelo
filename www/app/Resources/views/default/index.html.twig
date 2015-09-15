@@ -27,7 +27,7 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 {% block body %}
     <div id="mainpagecontainer" class="container-fluid">
         <div id="row1" class="row ">
-            <div class="col-xs-12 bg-success">Lesezeichen</div>
+            <div class="col-xs-12 bg-bookmark">{{ include('default/carousel.html.twig', {}) }}</div>
         </div>
         {% if topics[0] is defined or topics[1] is defined or topics[2] is defined or topics[3] is defined %}
         <div id="row2" class="row">

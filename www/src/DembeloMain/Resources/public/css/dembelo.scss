@@ -109,3 +109,7 @@ body {
   padding:1% 10%;
   background-color: #F8F1E9;
 }
+
+#carousel-bookmark, .carousel-inner, .carousel-inner > .item {
+  height: inherit;
+}
