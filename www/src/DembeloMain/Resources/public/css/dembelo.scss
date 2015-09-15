@@ -1,5 +1,22 @@
 /* hier muessen unsere Bootstrap-Variablen stehen */
 
+$body-bg:                #8D7966;
+$brand-primary:		 #005F6B;
+
+/* Buttons */
+$btn-default-color:      #333;
+$btn-default-bg:         #D8C8B8;
+$btn-default-border:     #8D7966;
+$btn-link-disabled-color:#F8F1E9;
+
+/* dropdown */
+$dropdown-bg:		#F8F1E9;
+$component-active-color:#F8F1E9;
+$dropdown-link-hover-bg:#D8C8B8;
+
+$dropdown-divider-bg:   #F8F1E9;
+
+
 @import '../../../../../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap';
 @import '../../../../../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/theme';
 
@@ -88,3 +105,7 @@ body {
   padding-right: 0px;
 }
 
+#shadow {
+  padding:1% 10%;
+  background-color: #F8F1E9;
+}
