@@ -33,7 +33,7 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
         <div id="row2" class="row">
             <div class="col-xs-3">
                 {% if topics[0].id is defined and topics[0].name is defined %}
-                <a href="{{ path('themenfeld', {'themeId': topics[0].id}) }}">
+                <a href="{{ path('themenfeld', {'topicId': topics[0].id}) }}">
                     {# Doesn't work, see https://github.com/kriswallsmith/assetic/issues/60 #}
                     {#% image '@DembeloMain/Resources/public/images/bg_' ~ topics[0].id ~ '.jpg' %#}
                     {% image '@DembeloMain/Resources/public/images/bg02.jpg' %}
@@ -44,7 +44,7 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
             </div>
             <div class="col-xs-3">
                 {% if topics[1].id is defined and topics[1].name is defined %}
-                <a href="{{ path('themenfeld', {'themeId': topics[1].id}) }}">
+                <a href="{{ path('themenfeld', {'topicId': topics[1].id}) }}">
                     {% image '@DembeloMain/Resources/public/images/bg02.jpg' %}
                     <img src="{{ asset_url }}" alt="{{ topics[1].name }}" />
                     {% endimage %}
@@ -53,7 +53,7 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
             </div>
             <div class="col-xs-3">
                 {% if topics[2].id is defined and topics[2].name is defined %}
-                <a href="{{ path('themenfeld', {'themeId': topics[2].id}) }}">
+                <a href="{{ path('themenfeld', {'topicId': topics[2].id}) }}">
                     {% image '@DembeloMain/Resources/public/images/bg03.jpg' %}
                     <img src="{{ asset_url }}" alt="{{ topics[2].name }}" />
                     {% endimage %}
@@ -62,7 +62,7 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
             </div>
             <div class="col-xs-3">
                 {% if topics[3].id is defined and topics[3].name is defined %}
-                <a href="{{ path('themenfeld', {'themeId': topics[3].id}) }}">
+                <a href="{{ path('themenfeld', {'topicId': topics[3].id}) }}">
                     {% image '@DembeloMain/Resources/public/images/bg04.jpg' %}
                     <img src="{{ asset_url }}" alt="{{ topics[3].name }}" />
                     {% endimage %}
@@ -75,7 +75,7 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
         <div id="row3" class="row">
             <div class="col-xs-3">
                 {% if topics[4].id is defined and topics[4].name is defined %}
-                <a href="{{ path('themenfeld', {'themeId': topics[4].id}) }}">
+                <a href="{{ path('themenfeld', {'topicId': topics[4].id}) }}">
                     {% image '@DembeloMain/Resources/public/images/bg05.jpg' %}
                     <img src="{{ asset_url }}" alt="{{ topics[4].name }}" />
                     {% endimage %}
@@ -84,7 +84,7 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
             </div>
             <div class="col-xs-3">
                 {% if topics[5].id is defined and topics[5].name is defined %}
-                <a href="{{ path('themenfeld', {'themeId': topics[5].id}) }}">
+                <a href="{{ path('themenfeld', {'topicId': topics[5].id}) }}">
                     {% image '@DembeloMain/Resources/public/images/bg06.jpg' %}
                     <img src="{{ asset_url }}" alt="{{ topics[5].name }}" />
                     {% endimage %}
@@ -93,7 +93,7 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
             </div>
             <div class="col-xs-3">
                 {% if topics[6].id is defined and topics[6].name is defined %}
-                <a href="{{ path('themenfeld', {'themeId': topics[6].id}) }}">
+                <a href="{{ path('themenfeld', {'topicId': topics[6].id}) }}">
                     {% image '@DembeloMain/Resources/public/images/bg07.jpg' %}
                     <img src="{{ asset_url }}" alt="{{ topics[6].name }}" />
                     {% endimage %}
@@ -102,7 +102,7 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
             </div>
             <div class="col-xs-3">
                 {% if topics[7].id is defined and topics[7].name is defined %}
-                <a href="{{ path('themenfeld', {'themeId': topics[7].id}) }}">
+                <a href="{{ path('themenfeld', {'topicId': topics[7].id}) }}">
                     {% image '@DembeloMain/Resources/public/images/bg08.jpg' %}
                     <img src="{{ asset_url }}" alt="{{ topics[7].name }}" />
                     {% endimage %}
