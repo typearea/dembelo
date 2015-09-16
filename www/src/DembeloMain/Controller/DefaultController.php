@@ -51,13 +51,32 @@ class DefaultController extends Controller
             $connection->connect();
         }
 
+        /* @var $authorizationChecker \Symfony\Component\Security\Core\Authorization\AuthorizationChecker */
+        $authorizationChecker = $this->get('security.authorization_checker');
+        /* @var $tokenStorage Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage */
+        $tokenStorage = $this->get('security.token_storage');
+
+        if ($authorizationChecker->isGranted('ROLE_USER')) {
+            $user = $tokenStorage->getToken()->getUser();
+
+            $textnodeId = $user->getCurrentTextnode();
+
+            if (!is_null($textnodeId)) {
+                /**
+                 * @todo Redirect to textnode, if the user browsed the index page directly (without
+                 *     navigating to the index page via the menu) with an active user session resulting
+                 *     from the "remember me" (cookie based) option. If the latter case isn't identified
+                 *     correctly, the index page may always redirect to a textnode and wouldn't be
+                 *     browsable any more.
+                 */
+            }
+        }
+
         $repository = $mongo->getRepository('DembeloMain:Topic');
         $topics = $repository->findByStatus(Topic::STATUS_ACTIVE);
 
-        if (!is_null($topics)) {
-            if (count($topics) > 0) {
-                return $this->render('default/index.html.twig', array('topics' => $topics));
-            }
+        if (!empty($topics)) {
+            return $this->render('default/index.html.twig', array('topics' => $topics));
         }
 
         return $this->render('default/index.html.twig');
@@ -66,11 +85,11 @@ class DefaultController extends Controller
     /**
      * @Route("/themenfeld/{topicId}", name="themenfeld")
      *
-     * @param string $topicId theme ID from URL
+     * @param string $topicId Topic ID from URL
      *
      * @return string
      */
-    public function readAction($topicId)
+    public function readTopicAction($topicId)
     {
         $textnodes = null;
 
@@ -83,7 +102,7 @@ class DefaultController extends Controller
         if ($authorizationChecker->isGranted('ROLE_USER')) {
             $user = $tokenStorage->getToken()->getUser();
 
-            $textnodeId = $user->getCurrentTextnode($topicId);
+            $textnodeId = $user->getCurrentTextnode();
 
             if (is_null($textnodeId)) {
                 $repository = $mongo->getRepository('DembeloMain:Textnode');
@@ -97,11 +116,7 @@ class DefaultController extends Controller
                     throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found, while the user was logged in, but without current textnode ID set.');
                 }
 
-                $dm = $mongo->getManager();
-                $user->setCurrentTextnode($topicId, $textnodes[0]->getId());
-                $dm->persist($user);
-
-                return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
+                return $this->redirectToRoute('text', array('textnodeId' => $textnodes[0]->getId()));
             } else {
                 $repository = $mongo->getRepository('DembeloMain:Textnode');
                 $textnodes = $repository->findBy(array(
@@ -113,7 +128,7 @@ class DefaultController extends Controller
                     throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found, while the user was logged in with the current textnode ID \''.$textnodeId.'\' set.');
                 }
 
-                return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
+                return $this->redirectToRoute('text', array('textnodeId' => $textnodes[0]->getId()));
             }
         }
 
@@ -130,7 +145,46 @@ class DefaultController extends Controller
             throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found, while the user wasn\'t logged in.');
         }
 
-        return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
+        return $this->redirectToRoute('text', array('textnodeId' => $textnodes[0]->getId()));
+    }
 
+    /**
+     * @Route("/text/{textnodeId}", name="text")
+     *
+     * @param string $textnodeId Textnode ID from URL
+     *
+     * @return string
+     */
+    public function readTextnodeAction($textnodeId)
+    {
+        $mongo = $this->get('doctrine_mongodb');
+
+        $repository = $mongo->getRepository('DembeloMain:Textnode');
+        $textnodes = $repository->findBy(
+            array(
+                'id' => new \MongoId($textnodeId),
+                'status' => Textnode::STATUS_ACTIVE,
+            )
+        );
+
+        if (empty($textnodes)) {
+            throw $this->createNotFoundException('No Textnode with ID \''.$textnodeId.'\' found.');
+        }
+
+        /* @var $authorizationChecker \Symfony\Component\Security\Core\Authorization\AuthorizationChecker */
+        $authorizationChecker = $this->get('security.authorization_checker');
+        /* @var $tokenStorage Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage */
+        $tokenStorage = $this->get('security.token_storage');
+
+        if ($authorizationChecker->isGranted('ROLE_USER')) {
+            $user = $tokenStorage->getToken()->getUser();
+
+            $dm = $mongo->getManager();
+            $user->setCurrentTextnode($textnodeId);
+            $dm->persist($user);
+            $dm->flush();
+        }
+
+        return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
     }
 }
