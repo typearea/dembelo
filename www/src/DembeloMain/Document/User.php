@@ -68,9 +68,9 @@ class User implements UserInterface, \Serializable
     protected $licenseeId;
 
     /**
-     * @MongoDB\Collection
+     * @MongoDB\ObjectId
      */
-    protected $currentTextnodes;
+    protected $currentTextnode;
 
     /**
      * gets the mongodb id
@@ -178,30 +178,24 @@ class User implements UserInterface, \Serializable
     /**
      * Gets the last textnode ID of topic \p $topicId the user was reading.
      *
-     * @param string $topicId Theme (= topic) ID.
-     * @return string|null Textnode ID or null, if there wasn't a textnode
-     *     ID set for topic \p $topicId yet.
+     * @return string|null Textnode ID or null, if there wasn't a current
+     *     textnode ID set so far.
      */
-    public function getCurrentTextnode($topicId)
+    public function getCurrentTextnode()
     {
-        if (isset($this->currentTextnodes[$topicId]) === true) {
-            return $this->currentTextnodes[$topicId];
-        }
-
-        return null;
+        return $this->currentTextnode;
     }
 
     /**
-     * Sets the textnode ID for topic \p $themeID the user is
-     *     currently reading.
+     * Saves the ID of the textnode the user is currently
+     *     reading.
      *
-     * @param string $topicId    Theme ID.
      * @param string $textnodeId ID of the textnode the user is
      *     currently reading.
      */
-    public function setCurrentTextnode($topicId, $textnodeId)
+    public function setCurrentTextnode($textnodeId)
     {
-        $this->currentTextnodes[$topicId] = $textnodeId;
+        $this->currentTextnode = $textnodeId;
     }
 
     /**
@@ -224,7 +218,7 @@ class User implements UserInterface, \Serializable
             $this->password,
             // see section on salt below
             // $this->salt,
-            $this->currentTextnodes,
+            $this->currentTextnode,
         ));
     }
 
@@ -241,7 +235,7 @@ class User implements UserInterface, \Serializable
             $this->password,
             // see section on salt below
             // $this->salt,
-            $this->currentTextnodes
+            $this->currentTextnode,
             ) = unserialize($serialized);
     }
 
