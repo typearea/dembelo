@@ -26,6 +26,8 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 
 {% block body %}
 
-{{ textnodeText | raw }}
+{{ textnode.text | raw }}
+
+{{ include('default/read.metadata.html.twig') }}
 
 {% endblock %}

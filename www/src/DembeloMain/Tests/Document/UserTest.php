@@ -23,13 +23,13 @@
  * @package DembeloMain
  */
 
-namespace DembeloMain\Tests\Controller;
+namespace DembeloMain\Tests\Document;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use DembeloMain\Document\User;
 
 /**
- * Class DefaultControllerTest
+ * Class DocumentUserTest
  */
 class UserTest extends WebTestCase
 {
