@@ -22,6 +22,8 @@
 namespace DembeloMain\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use DembeloMain\Document\Licensee;
+use DembeloMain\Document\Topic;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -31,8 +33,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Textnode
 {
-    const TYPE_INTRODUCTION = 0;
-    const TYPE_DEEPENING = 1;
 
     const STATUS_INACTIVE = 0;
     const STATUS_ACTIVE = 1;
@@ -48,19 +48,9 @@ class Textnode
     protected $created;
 
     /**
-     * @MongoDB\ObjectId
+     * @MongoDb\ObjectId
      */
     protected $topicId;
-
-    /**
-     * @MongoDB\ObjectId
-     */
-    protected $storyId;
-
-    /**
-     * @MongoDB\Int
-     */
-    protected $type;
 
     /**
      * @MongoDB\Int
@@ -71,6 +61,21 @@ class Textnode
      * @MongoDB\String
      */
     protected $text;
+
+    /**
+     * @MongoDB\Bool
+     */
+    protected $access;
+
+    /**
+     * @MongoDB\Hash
+     */
+    protected $metadata;
+
+    /**
+     * @MongoDB\ObjectId
+     */
+    protected $licenseeId;
 
     /**
      * gets the timestamp of creation
@@ -93,7 +98,7 @@ class Textnode
     }
 
     /**
-     * @return string
+     * @return String
      */
     public function getTopicId()
     {
@@ -101,43 +106,11 @@ class Textnode
     }
 
     /**
-     * @param string $topicId
+     * @param String $topicId
      */
     public function setTopicId($topicId)
     {
         $this->topicId = $topicId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getStoryId()
-    {
-        return $this->storyId;
-    }
-
-    /**
-     * @param string $storyId
-     */
-    public function setStoryId($storyId)
-    {
-        $this->storyId = $storyId;
-    }
-
-    /**
-     * @return integer
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param integer $type
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
     }
 
     /**
@@ -194,5 +167,65 @@ class Textnode
     public function setText($text)
     {
         $this->text = $text;
+    }
+
+    /**
+     * gets the textnode's metadata
+     *
+     * @return array
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * sets the textnode's metadata
+     *
+     * @param array $metadata
+     */
+    public function setMetadata(array $metadata)
+    {
+        $this->metadata = $metadata;
+    }
+
+    /**
+     * sets the textnode's licensee ID
+     *
+     * @param String $licenseeId
+     */
+    public function setLicenseeId($licenseeId)
+    {
+        $this->licenseeId = $licenseeId;
+    }
+
+    /**
+     * gets the textnode's licensee ID
+     *
+     * @return String
+     */
+    public function getLicenseeId()
+    {
+        return $this->licenseeId;
+    }
+
+    /**
+     * sets the access parameter
+     *
+     * @param bool $access
+     */
+    public function setAccess($access)
+    {
+        $this->access = (bool) $access;
+    }
+
+    /**
+     * gets the access parameter
+     *
+     * @return bool
+     */
+    public function getAccess()
+    {
+        return $this->access;
     }
 }

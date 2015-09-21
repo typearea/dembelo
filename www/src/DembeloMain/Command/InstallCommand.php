@@ -50,12 +50,18 @@ class InstallCommand extends ContainerAwareCommand
         $this
             ->setName('dembelo:install')
             ->setDescription('Installation Routine')
-            ->addOption('purge-db', null,
+            ->addOption(
+                'purge-db',
+                null,
                 InputOption::VALUE_NONE,
-                'deletes all content from DB before installation')
-            ->addOption('with-dummy-data', null,
+                'deletes all content from DB before installation'
+            )
+            ->addOption(
+                'with-dummy-data',
+                null,
                 InputOption::VALUE_NONE,
-                'installs some dummy data to play with');
+                'installs some dummy data to play with'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -81,7 +87,6 @@ class InstallCommand extends ContainerAwareCommand
         $collectionClasses = array(
             'DembeloMain\Document\Licensee',
             'DembeloMain\Document\ReadPath',
-            'DembeloMain\Document\Story',
             'DembeloMain\Document\Textnode',
             'DembeloMain\Document\Topic',
             'DembeloMain\Document\User',
@@ -90,7 +95,7 @@ class InstallCommand extends ContainerAwareCommand
         $mongo = $this->getContainer()->get('doctrine_mongodb');
         $dm = $mongo->getManager();
 
-        foreach ($collectionClasses AS $collectionClass) {
+        foreach ($collectionClasses as $collectionClass) {
             $collection = $dm->getDocumentCollection($collectionClass);
             $collection->remove(array());
         }
@@ -131,9 +136,6 @@ class InstallCommand extends ContainerAwareCommand
 
         $this->createTopics($mongo, $dm);
         $output->writeln("Topics installed...");
-
-        $this->createStories($mongo, $dm);
-        $output->writeln("Stories installed...");
 
         $this->createTextnodes($mongo, $dm);
         $output->writeln("Textnodes installed...");
@@ -226,7 +228,7 @@ class InstallCommand extends ContainerAwareCommand
             array('name' => 'Themenfeld 9', 'status' => Topic::STATUS_ACTIVE),
         );
 
-        foreach ($topicData AS $topicDatum) {
+        foreach ($topicData as $topicDatum) {
             $topic = $repository->findOneByName($topicDatum['name']);
             if (is_null($topic)) {
                 $topic = new Topic();
@@ -239,41 +241,14 @@ class InstallCommand extends ContainerAwareCommand
 
     }
 
-    private function createStories(ManagerRegistry $mongo, DocumentManager $dm)
-    {
-        $repository = $mongo->getRepository('DembeloMain:Story');
-
-        $this->dummyData['stories'] = array();
-
-        $topicId = $this->dummyData['topics'][0]->getId();
-
-        $story = $repository->findOneByName('Ipsum');
-        if (is_null($story)) {
-            $story = new Story();
-            $story->setName('Ipsum');
-            $story->setStatus(Story::STATUS_ACTIVE);
-            $story->setTopicId($topicId);
-            $dm->persist($story);
-        }
-        $this->dummyData['stories'][] = $story;
-
-        $story = $repository->findOneByName('Ipsum II');
-        if (is_null($story)) {
-            $story = new Story();
-            $story->setName('Ipsum II');
-            $story->setStatus(Story::STATUS_ACTIVE);
-            $story->setTopicId($topicId);
-            $dm->persist($story);
-        }
-        $this->dummyData['stories'][] = $story;
-    }
-
     private function createTextnodes(ManagerRegistry $mongo, DocumentManager $dm)
     {
+        $loremIpsumLength = 3500;
+
         $repository = $mongo->getRepository('DembeloMain:Textnode');
 
-        $allIntroductions = $repository->findByType(Textnode::TYPE_INTRODUCTION);
-        if (count($allIntroductions) >= 2) {
+        $allAccessNodes = $repository->findByAccess(true);
+        if (count($allAccessNodes) >= 7) {
             return;
         }
 
@@ -281,51 +256,82 @@ class InstallCommand extends ContainerAwareCommand
 
         $textnodeData = array(
             array(
-                'topic_id' => $this->dummyData['topics'][0]->getId(),
-                'story_id' => $this->dummyData['stories'][0]->getId(),
-                'text' => $loremIpsum->getWords(3500),
-                'type' => Textnode::TYPE_INTRODUCTION,
+                'topic' => $this->dummyData['topics'][0],
+                'text' => $loremIpsum->getWords($loremIpsumLength),
+                'access' => true,
+                'licensee' => $this->dummyData['licensees'][0],
+                'metadata' => array(
+                    'Titel' => 'Titel 1',
+                    'Autor' => 'Autor 1',
+                    'Verlag' => 'Verlag 1',
+                ),
             ),
             array(
-                'topic_id' => $this->dummyData['topics'][0]->getId(),
-                'story_id' => $this->dummyData['stories'][0]->getId(),
-                'text' => $loremIpsum->getWords(3500),
-                'type' => Textnode::TYPE_DEEPENING,
+                'text' => $loremIpsum->getWords($loremIpsumLength),
+                'access' => false,
+                'licensee' => $this->dummyData['licensees'][0],
+                'metadata' => array(
+                    'Titel' => 'Titel 2',
+                    'Autor' => 'Autor 2',
+                    'Verlag' => 'Verlag 2',
+                ),
             ),
             array(
-                'topic_id' => $this->dummyData['topics'][0]->getId(),
-                'story_id' => $this->dummyData['stories'][0]->getId(),
-                'text' => $loremIpsum->getWords(3500),
-                'type' => Textnode::TYPE_DEEPENING,
+                'text' => $loremIpsum->getWords($loremIpsumLength),
+                'access' => false,
+                'licensee' => $this->dummyData['licensees'][0],
+                'metadata' => array(
+                    'Titel' => 'Titel 3',
+                    'Autor' => 'Autor 3',
+                    'Verlag' => 'Verlag 3',
+                ),
             ),
             array(
-                'topic_id' => $this->dummyData['topics'][0]->getId(),
-                'story_id' => $this->dummyData['stories'][1]->getId(),
-                'text' => $loremIpsum->getWords(3500),
-                'type' => Textnode::TYPE_INTRODUCTION,
+                'topic' => $this->dummyData['topics'][1],
+                'text' => $loremIpsum->getWords($loremIpsumLength),
+                'access' => true,
+                'licensee' => $this->dummyData['licensees'][0],
+                'metadata' => array(
+                    'Titel' => 'Titel 4',
+                    'Autor' => 'Autor 4',
+                    'Verlag' => 'Verlag 4',
+                ),
             ),
             array(
-                'topic_id' => $this->dummyData['topics'][0]->getId(),
-                'story_id' => $this->dummyData['stories'][1]->getId(),
-                'text' => $loremIpsum->getWords(3500),
-                'type' => Textnode::TYPE_DEEPENING,
+                'text' => $loremIpsum->getWords($loremIpsumLength),
+                'access' => false,
+                'licensee' => $this->dummyData['licensees'][0],
+                'metadata' => array(
+                    'Titel' => 'Titel 5',
+                    'Autor' => 'Autor 5',
+                    'Verlag' => 'Verlag 5',
+                ),
             ),
             array(
-                'topic_id' => $this->dummyData['topics'][0]->getId(),
-                'story_id' => $this->dummyData['stories'][1]->getId(),
-                'text' => $loremIpsum->getWords(3500),
-                'type' => Textnode::TYPE_DEEPENING,
+                'text' => $loremIpsum->getWords($loremIpsumLength),
+                'access' => false,
+                'licensee' => $this->dummyData['licensees'][0],
+                'metadata' => array(
+                    'Titel' => 'Titel 6',
+                    'Autor' => 'Autor 6',
+                    'Verlag' => 'Verlag 6',
+                ),
             ),
         );
 
         foreach ($textnodeData as $textnodeDatum) {
             $textnode = new Textnode();
             $textnode->setStatus(Textnode::STATUS_ACTIVE);
-            $textnode->setTopicId($textnodeDatum['topic_id']);
+            if (isset($textnodeDatum['topic'])) {
+                $textnode->setTopicId($textnodeDatum['topic']->getId());
+            }
+            if (isset($textnodeDatum['licensee'])) {
+                $textnode->setLicenseeId($textnodeDatum['licensee']->getId());
+            }
             $textnode->setCreated(date('Y-m-d H:i:s'));
-            $textnode->setStoryId($textnodeDatum['story_id']);
             $textnode->setText($textnodeDatum['text']);
-            $textnode->setType($textnodeDatum['type']);
+            $textnode->setAccess($textnodeDatum['access']);
+            $textnode->setMetadata($textnodeDatum['metadata']);
             $dm->persist($textnode);
         }
 

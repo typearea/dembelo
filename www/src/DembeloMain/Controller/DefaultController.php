@@ -106,17 +106,17 @@ class DefaultController extends Controller
 
             if (is_null($textnodeId)) {
                 $repository = $mongo->getRepository('DembeloMain:Textnode');
-                $textnodes = $repository->findBy(array(
-                    'topicId' => new \MongoId($topicId),
-                    'status' => Textnode::STATUS_ACTIVE,
-                    'type' => Textnode::TYPE_INTRODUCTION,
-                ));
+                $textnode = $repository->createQueryBuilder()
+                    ->field('topicId')->equals(new \MongoId($topicId))
+                    ->field('status')->equals(Textnode::STATUS_ACTIVE)
+                    ->field('access')->equals(true)
+                    ->getQuery()->getSingleResult();
 
-                if (empty($textnodes)) {
+                if (is_null($textnode)) {
                     throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found, while the user was logged in, but without current textnode ID set.');
                 }
 
-                return $this->redirectToRoute('text', array('textnodeId' => $textnodes[0]->getId()));
+                return $this->redirectToRoute('text', array('textnodeId' => $textnode->getId()));
             } else {
                 $repository = $mongo->getRepository('DembeloMain:Textnode');
                 $textnodes = $repository->findBy(array(
@@ -133,19 +133,17 @@ class DefaultController extends Controller
         }
 
         $repository = $mongo->getRepository('DembeloMain:Textnode');
-        $textnodes = $repository->findBy(
-            array(
-                'topicId' => new \MongoId($topicId),
-                'status' => Textnode::STATUS_ACTIVE,
-                'type' => Textnode::TYPE_INTRODUCTION,
-            )
-        );
+        $textnode = $repository->createQueryBuilder()
+            ->field('topicId')->equals(new \MongoId($topicId))
+            ->field('status')->equals(Textnode::STATUS_ACTIVE)
+            ->field('access')->equals(true)
+            ->getQuery()->getSingleResult();
 
-        if (empty($textnodes)) {
+        if (is_null($textnode)) {
             throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found, while the user wasn\'t logged in.');
         }
 
-        return $this->redirectToRoute('text', array('textnodeId' => $textnodes[0]->getId()));
+        return $this->redirectToRoute('text', array('textnodeId' => $textnode->getId()));
     }
 
     /**
@@ -185,6 +183,8 @@ class DefaultController extends Controller
             $dm->flush();
         }
 
-        return $this->render('default/read.html.twig', array('textnodeText' => $textnodes[0]->getText()));
+        $textnode = $textnodes[0];
+
+        return $this->render('default/read.html.twig', array('textnode' => $textnode));
     }
 }

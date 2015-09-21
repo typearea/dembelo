@@ -1,0 +1,12 @@
+<div class="well clearfix">
+    <p class="text-muted">Das war:</p>
+    <h2>
+        {{ textnode.getMetadata.Titel }} <br />
+        <small>von {{ textnode.getMetadata.Autor }} aus {{ textnode.getMetadata.Verlag }}</small>
+    </h2>
+    <div class="pull-right">
+        {% image '@DembeloMain/Resources/public/images/cc-by-sa.png' %}
+            <img src="{{ asset_url }}" alt="Creative Commons BY-SA 4.0 International" />
+        {% endimage %}
+    </div>
+</div>
