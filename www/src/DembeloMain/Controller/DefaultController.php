@@ -107,7 +107,7 @@ class DefaultController extends Controller
             if (is_null($textnodeId)) {
                 $repository = $mongo->getRepository('DembeloMain:Textnode');
                 $textnode = $repository->createQueryBuilder()
-                    ->field('topic.id')->equals(new \MongoId($topicId))
+                    ->field('topicId')->equals(new \MongoId($topicId))
                     ->field('status')->equals(Textnode::STATUS_ACTIVE)
                     ->field('access')->equals(true)
                     ->getQuery()->getSingleResult();
@@ -134,7 +134,7 @@ class DefaultController extends Controller
 
         $repository = $mongo->getRepository('DembeloMain:Textnode');
         $textnode = $repository->createQueryBuilder()
-            ->field('topic.id')->equals(new \MongoId($topicId))
+            ->field('topicId')->equals(new \MongoId($topicId))
             ->field('status')->equals(Textnode::STATUS_ACTIVE)
             ->field('access')->equals(true)
             ->getQuery()->getSingleResult();
