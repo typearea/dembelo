@@ -323,10 +323,10 @@ class InstallCommand extends ContainerAwareCommand
             $textnode = new Textnode();
             $textnode->setStatus(Textnode::STATUS_ACTIVE);
             if (isset($textnodeDatum['topic'])) {
-                $textnode->setTopic($textnodeDatum['topic']);
+                $textnode->setTopicId($textnodeDatum['topic']->getId());
             }
             if (isset($textnodeDatum['licensee'])) {
-                $textnode->setLicensee($textnodeDatum['licensee']);
+                $textnode->setLicenseeId($textnodeDatum['licensee']->getId());
             }
             $textnode->setCreated(date('Y-m-d H:i:s'));
             $textnode->setText($textnodeDatum['text']);
