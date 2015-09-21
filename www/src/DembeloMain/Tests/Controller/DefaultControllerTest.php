@@ -99,7 +99,7 @@ class DefaultControllerTest extends WebTestCase
 
         $queryBuilder->expects($this->at(0))
             ->method('field')
-            ->with('topic.id')
+            ->with('topicId')
             ->will($this->returnSelf());
 
         $queryBuilder->expects($this->at(1))
