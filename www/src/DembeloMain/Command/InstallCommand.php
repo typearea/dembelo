@@ -50,11 +50,15 @@ class InstallCommand extends ContainerAwareCommand
         $this
             ->setName('dembelo:install')
             ->setDescription('Installation Routine')
-            ->addOption('purge-db', null,
+            ->addOption(
+                'purge-db',
+                null,
                 InputOption::VALUE_NONE,
                 'deletes all content from DB before installation'
             )
-            ->addOption('with-dummy-data', null,
+            ->addOption(
+                'with-dummy-data',
+                null,
                 InputOption::VALUE_NONE,
                 'installs some dummy data to play with'
             );
