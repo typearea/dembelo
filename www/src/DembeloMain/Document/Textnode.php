@@ -48,9 +48,9 @@ class Textnode
     protected $created;
 
     /**
-     * @MongoDb\EmbedOne(targetDocument="Topic")
+     * @MongoDb\ObjectId
      */
-    protected $topic;
+    protected $topicId;
 
     /**
      * @MongoDB\Int
@@ -73,9 +73,9 @@ class Textnode
     protected $metadata;
 
     /**
-     * @MongoDB\EmbedOne(targetDocument="Licensee")
+     * @MongoDB\ObjectId
      */
-    protected $licensee;
+    protected $licenseeId;
 
     /**
      * gets the timestamp of creation
@@ -98,19 +98,19 @@ class Textnode
     }
 
     /**
-     * @return Topic
+     * @return String
      */
-    public function getTopic()
+    public function getTopicId()
     {
-        return $this->topic;
+        return $this->topicId;
     }
 
     /**
-     * @param Topic $topic
+     * @param String $topicId
      */
-    public function setTopic($topic)
+    public function setTopicId($topicId)
     {
-        $this->topic = $topic;
+        $this->topicId = $topicId;
     }
 
     /**
@@ -190,30 +190,40 @@ class Textnode
     }
 
     /**
-     * sets the textnode's licensee
+     * sets the textnode's licensee ID
      *
-     * @param Licensee $licensee
+     * @param String $licenseeId
      */
-    public function setLicensee(Licensee $licensee)
+    public function setLicenseeId($licenseeId)
     {
-        $this->licensee = $licensee;
+        $this->licenseeId = $licenseeId;
     }
 
     /**
-     * gets the textnode's licensee
+     * gets the textnode's licensee ID
      *
-     * @return Licensee
+     * @return String
      */
-    public function getLicensee()
+    public function getLicenseeId()
     {
-        return $this->licensee;
+        return $this->licenseeId;
     }
 
+    /**
+     * sets the access parameter
+     *
+     * @param bool $access
+     */
     public function setAccess($access)
     {
-        $this->access = (bool)$access;
+        $this->access = (bool) $access;
     }
 
+    /**
+     * gets the access parameter
+     *
+     * @return bool
+     */
     public function getAccess()
     {
         return $this->access;

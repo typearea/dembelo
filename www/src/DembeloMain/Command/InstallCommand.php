@@ -52,10 +52,12 @@ class InstallCommand extends ContainerAwareCommand
             ->setDescription('Installation Routine')
             ->addOption('purge-db', null,
                 InputOption::VALUE_NONE,
-                'deletes all content from DB before installation')
+                'deletes all content from DB before installation'
+            )
             ->addOption('with-dummy-data', null,
                 InputOption::VALUE_NONE,
-                'installs some dummy data to play with');
+                'installs some dummy data to play with'
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -89,7 +91,7 @@ class InstallCommand extends ContainerAwareCommand
         $mongo = $this->getContainer()->get('doctrine_mongodb');
         $dm = $mongo->getManager();
 
-        foreach ($collectionClasses AS $collectionClass) {
+        foreach ($collectionClasses as $collectionClass) {
             $collection = $dm->getDocumentCollection($collectionClass);
             $collection->remove(array());
         }
@@ -222,7 +224,7 @@ class InstallCommand extends ContainerAwareCommand
             array('name' => 'Themenfeld 9', 'status' => Topic::STATUS_ACTIVE),
         );
 
-        foreach ($topicData AS $topicDatum) {
+        foreach ($topicData as $topicDatum) {
             $topic = $repository->findOneByName($topicDatum['name']);
             if (is_null($topic)) {
                 $topic = new Topic();

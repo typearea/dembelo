@@ -25,6 +25,7 @@
 
 namespace DembeloMain\Tests\Controller;
 
+use DembeloMain\Document\Topic;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use DembeloMain\Controller\DefaultController;
 use DembeloMain\Document\Textnode;
@@ -59,12 +60,20 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testReadTopicWithoutLogin()
     {
+        $textnode = new Textnode();
+        $textnode->setId("55f5ab3708985c4b188b4577");
+        $textnode->setTopicId("foobar");
+        $textnode->setAccess(true);
+        $textnode->setStatus(Textnode::STATUS_ACTIVE);
+        $textnode->setText("Lorem ipsum dolor sit amet.");
+
         $container = $this->getMock("Symfony\Component\DependencyInjection\ContainerInterface");
         $authorizationChecker = $this->getMockBuilder('foobar')->setMethods(array('isGranted'))->getMock();
         $tokenStorage = $this->getMockBuilder("Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage")->disableOriginalConstructor()->getMock();
         $mongo = $this->getMockBuilder("Doctrine\Bundle\MongoDBBundle\ManagerRegistry")->disableOriginalConstructor()->getMock();
         $repository = $this->getMockBuilder("Doctrine\ODM\MongoDB\DocumentRepository")->disableOriginalConstructor()->getMock();
         $router = $this->getMock("Symfony\Component\Routing\RouterInterface");
+        $queryBuilder = $this->getMockBuilder("Doctrine\ODM\MongoDB\QueryBuilder")->setMethods(array('field', 'equals', 'getQuery', 'getSingleResult'))->getMock();
 
         $container->expects($this->at(0))
             ->method("get")
@@ -88,19 +97,44 @@ class DefaultControllerTest extends WebTestCase
             ->with($this->equalTo('ROLE_USER'))
             ->will($this->returnValue(false));
 
-        $textnodeId = "55f5ab3708985c4b188b4577";
+        $queryBuilder->expects($this->at(0))
+            ->method('field')
+            ->with('topic.id')
+            ->will($this->returnSelf());
 
-        $textnode = new Textnode();
-        $textnode->setId($textnodeId);
-        $textnode->setTopicId("55d2b934658f5cc23c3c986c");
-        $textnode->setType(Textnode::TYPE_INTRODUCTION);
-        $textnode->setStatus(Textnode::STATUS_ACTIVE);
-        $textnode->setText("Lorem ipsum dolor sit amet.");
+        $queryBuilder->expects($this->at(1))
+            ->method('equals')
+            ->will($this->returnSelf());
+
+        $queryBuilder->expects($this->at(2))
+            ->method('field')
+            ->with('status')
+            ->will($this->returnSelf());
+
+        $queryBuilder->expects($this->at(3))
+            ->method('equals')
+            ->will($this->returnSelf());
+
+        $queryBuilder->expects($this->at(4))
+            ->method('field')
+            ->with('access')
+            ->will($this->returnSelf());
+
+        $queryBuilder->expects($this->at(5))
+            ->method('equals')
+            ->will($this->returnSelf());
+
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnSelf());
+
+        $queryBuilder->expects($this->once())
+            ->method('getSingleResult')
+            ->will($this->returnValue($textnode));
 
         $repository->expects($this->once())
-            ->method("findBy")
-            ->with(array("topicId" => "55d2b934658f5cc23c3c986c", "status" => Textnode::STATUS_ACTIVE, "type" => Textnode::TYPE_INTRODUCTION))
-            ->will($this->returnValue(array($textnode)));
+            ->method("createQueryBuilder")
+            ->will($this->returnValue($queryBuilder));
 
         $container->expects($this->at(3))
             ->method("get")
@@ -108,8 +142,8 @@ class DefaultControllerTest extends WebTestCase
             ->will($this->returnValue($router));
         $router->expects($this->once())
             ->method("generate")
-            ->with("text", array('textnodeId' => $textnodeId))
-            ->will($this->returnValue("text/".$textnodeId));
+            ->with("text", array('textnodeId' => $textnode->getId()))
+            ->will($this->returnValue("text/".$textnode->getId()));
 
         $controller = new DefaultController();
         $controller->setContainer($container);
@@ -118,7 +152,7 @@ class DefaultControllerTest extends WebTestCase
 
         $this->assertEquals('Symfony\Component\HttpFoundation\RedirectResponse', get_class($result));
         $this->assertEquals('302', $result->getStatusCode());
-        $this->assertEquals('text/'.$textnodeId, $result->getTargetUrl());
+        $this->assertEquals('text/'.$textnode->getId(), $result->getTargetUrl());
     }
 
     /** @todo Implement testReadTopicWithLogin(). */
@@ -177,7 +211,7 @@ class DefaultControllerTest extends WebTestCase
             ->will($this->returnValue($template));
         $template->expects($this->once())
             ->method("renderResponse")
-            ->with("default/read.html.twig", array("textnodeText" => "Lorem ipsum dolor sit amet."))
+            ->with("default/read.html.twig", array("textnode" => $textnode))
             ->will($this->returnValue('renderresponse'));
 
         $controller = new DefaultController();

@@ -65,19 +65,28 @@ class TextnodeTest extends WebTestCase
         $this->assertNull($this->textnode->getId());
     }
 
+    /**
+     * tests the created
+     */
     public function testCreated()
     {
         $this->textnode->setCreated('2015-01-01 01:02:03');
         $this->assertEquals('2015-01-01 01:02:03', $this->textnode->getCreated());
     }
 
-    public function testLicensee()
+    /**
+     * tests the licensee ID
+     */
+    public function testLicenseeId()
     {
-        $licensee = new Licensee();
-        $this->textnode->setLicensee($licensee);
-        $this->assertEquals($licensee, $this->textnode->getLicensee());
+        $licenseeId = 'asd23fasdf';
+        $this->textnode->setLicenseeId($licenseeId);
+        $this->assertEquals($licenseeId, $this->textnode->getLicenseeId());
     }
 
+    /**
+     * tests the metadata
+     */
     public function testMetadata()
     {
         $metadata = array('story' => 'xyz');
@@ -85,6 +94,9 @@ class TextnodeTest extends WebTestCase
         $this->assertEquals($metadata, $this->textnode->getMetadata());
     }
 
+    /**
+     * tests the status
+     */
     public function testStatus()
     {
         $status = 1;
@@ -92,6 +104,9 @@ class TextnodeTest extends WebTestCase
         $this->assertEquals($status, $this->textnode->getStatus());
     }
 
+    /**
+     * tests the text
+     */
     public function testText()
     {
         $text = 'Lorem Ipsum';
@@ -99,14 +114,19 @@ class TextnodeTest extends WebTestCase
         $this->assertEquals($text, $this->textnode->getText());
     }
 
-    public function testTopic()
+    /**
+     * tests the topicId
+     */
+    public function testTopicId()
     {
-        $topic = new Topic();
-        $this->textnode->setTopic($topic);
-        $this->assertEquals($topic, $this->textnode->getTopic());
-        $this->assertInstanceOf('\DembeloMain\Document\Topic', $this->textnode->getTopic());
+        $topicId = 'asd23123';
+        $this->textnode->setTopicId($topicId);
+        $this->assertEquals($topicId, $this->textnode->getTopicId());
     }
 
+    /**
+     * tests the access
+     */
     public function testAccess()
     {
         $this->textnode->setAccess(false);
