@@ -47,13 +47,11 @@ Mit einem beliebigen Webserver und einem aktuellen PHP (>5.3.9) kann man Dembelo
 5. Lasse das Document Root des Webservers auf das dembelo/www/web/-Verzeichnis verweisen
 6. Rufe je nach Konfiguration Dembelo im Browser auf
 
-## 
-
 ## Datenbank einrichten
 Über die Konsole kann man nun einen Admin- und einen "normalen" Benutzer anlegen, sowie ein paar Dummydaten erzeugen:
 
 ```
-php app/console dembelo:install
+php app/console dembelo:install --purge-db --with-dummy-data
 ```
 
 ## Links
