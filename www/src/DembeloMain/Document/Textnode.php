@@ -1,6 +1,6 @@
 <?php
 
-/* Copyright (C) 2015 Michael Giesler
+/* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
  *
@@ -33,9 +33,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Textnode
 {
-
     const STATUS_INACTIVE = 0;
     const STATUS_ACTIVE = 1;
+
+    const HITCH_STATUS_INACTIVE = 0;
+    const HITCH_STATUS_ACTIVE = 1;
 
     /**
      * @MongoDB\Id
@@ -76,6 +78,11 @@ class Textnode
      * @MongoDB\ObjectId
      */
     protected $licenseeId;
+
+    /**
+     * @MongoDB\Hash
+     */
+    protected $hitches = array();
 
     /**
      * gets the timestamp of creation
@@ -227,5 +234,145 @@ class Textnode
     public function getAccess()
     {
         return $this->access;
+    }
+
+
+    /**
+     * Counts the number of hitches within the collection.
+     *
+     * @return Number of hitches within the collection.
+     */
+    public function getHitchCount()
+    {
+        return count($this->hitches);
+    }
+
+    /**
+     * Gets the hitch which is stored in the collection at the
+     *     specified index.
+     *
+     * @param int $hitchIndex
+     *
+     * @return array|null Null, if the $hitchIndex doesn't specify
+     *     an element within the collection.
+     */
+    public function getHitch($hitchIndex)
+    {
+        if ($hitchIndex < 0 || $hitchIndex >= count($this->hitches)) {
+            return null;
+        }
+
+        return $this->hitches[$hitchIndex];
+    }
+
+    /**
+     * Appends a hitch at the end of the collection.
+     *
+     * @param array $hitch
+     *
+     * @return true|false False, if $hitch doesn't contain all
+     *     associative array elements which form a hitch, or if
+     *     no "textnodeId" is set within $hitch, or if "status"
+     *     within $hitch doesn't contain a valid value.
+     */
+    public function appendHitch(array $hitch)
+    {
+        if (array_key_exists("textnodeId", $hitch) !== true) {
+            return false;
+        }
+
+        if (array_key_exists("description", $hitch) !== true) {
+            return false;
+        }
+
+        if (array_key_exists("status", $hitch) !== true) {
+            return false;
+        }
+
+        if ($hitch['status'] !== Textnode::HITCH_STATUS_INACTIVE &&
+            $hitch['status'] !== Textnode::HITCH_STATUS_ACTIVE) {
+            return false;
+        }
+
+        if (is_null($hitch['textnodeId']) === true) {
+            return false;
+        }
+
+        $this->hitches[count($this->hitches)] = $hitch;
+
+        return true;
+    }
+
+    /**
+     * Overwrites the hitch which is stored in the collection at the
+     *     specified index.
+     *
+     * @param int   $hitchIndex
+     * @param array $hitch
+     *
+     * @return true|false False, if the $hitchIndex doesn't specify
+     *     an element within the collection, or if $hitch doesn't
+     *     contain all associative array elements which form a hitch,
+     *     or if no "textnodeId" is set within $hitch, or if "status"
+     *     within $hitch doesn't contain a valid value.
+     */
+    public function setHitch($hitchIndex, array $hitch)
+    {
+        if ($hitchIndex < 0 || $hitchIndex >= count($this->hitches)) {
+            return false;
+        }
+
+        if (array_key_exists("textnodeId", $hitch) !== true) {
+            return false;
+        }
+
+        if (array_key_exists("description", $hitch) !== true) {
+            return false;
+        }
+
+        if (array_key_exists("status", $hitch) !== true) {
+            return false;
+        }
+
+        if ($hitch['status'] !== Textnode::HITCH_STATUS_INACTIVE &&
+            $hitch['status'] !== Textnode::HITCH_STATUS_ACTIVE) {
+            return false;
+        }
+
+        if (is_null($hitch['textnodeId']) === true) {
+            return false;
+        }
+
+        $this->hitches[$hitchIndex] = $hitch;
+
+        return true;
+    }
+
+    /**
+     * Removes the hitch which is stored in the collection at the
+     *     specified index. Reordering of the hitch collection will
+     *     take place, former collection indexes might become invalid
+     *     by calling removeHitch().
+     *
+     * @param int $hitchIndex
+     *
+     * @return true|false False, if the collection is already empty or
+     *     the $hitchIndex doesn't specify an element within the collection.
+     */
+    public function removeHitch($hitchIndex)
+    {
+        $hitchCount = count($this->hitches);
+
+        if ($hitchCount <= 0) {
+            return false;
+        }
+
+        if ($hitchIndex < 0 || $hitchIndex >= $hitchCount) {
+            return false;
+        }
+
+        array_splice($this->hitches, $hitchIndex, 1);
+
+        return true;
     }
 }

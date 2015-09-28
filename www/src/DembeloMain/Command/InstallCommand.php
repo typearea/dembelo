@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2015 Michael Giesler
+/* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
  *
@@ -139,6 +139,9 @@ class InstallCommand extends ContainerAwareCommand
 
         $this->createTextnodes($mongo, $dm);
         $output->writeln("Textnodes installed...");
+
+        $this->createHitches($mongo, $dm);
+        $output->writeln("Hitches installed...");
 
         $dm->flush();
 
@@ -333,7 +336,36 @@ class InstallCommand extends ContainerAwareCommand
             $textnode->setAccess($textnodeDatum['access']);
             $textnode->setMetadata($textnodeDatum['metadata']);
             $dm->persist($textnode);
+            $this->dummyData['textnodes'][] = $textnode;
+        }
+    }
+
+    private function createHitches(ManagerRegistry $mongo, DocumentManager $dm)
+    {
+        if (isset($this->dummyData['textnodes']) !== true) {
+            return;
         }
 
+        if (count($this->dummyData['textnodes']) < 3) {
+            return;
+        }
+
+        if ($this->dummyData['textnodes'][0]->getHitchCount() >= 2) {
+            return;
+        }
+
+        $hitch = array();
+        $hitch['textnodeId'] = $this->dummyData['textnodes'][1]->getId();
+        $hitch['description'] = "Mehr Lorem.";
+        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $this->dummyData['textnodes'][0]->appendHitch($hitch);
+        $dm->persist($this->dummyData['textnodes'][0]);
+
+        $hitch = array();
+        $hitch['textnodeId'] = $this->dummyData['textnodes'][2]->getId();
+        $hitch['description'] = "Mehr Ipsum.";
+        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $this->dummyData['textnodes'][0]->appendHitch($hitch);
+        $dm->persist($this->dummyData['textnodes'][0]);
     }
 }
