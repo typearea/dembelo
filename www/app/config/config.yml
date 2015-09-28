@@ -60,9 +60,18 @@ assetic:
         glyphicons-halflings-regular-ttf:
             inputs: '%kernel.root_dir%/../vendor/twbs/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.ttf'
             output: 'css/fonts/bootstrap/glyphicons-halflings-regular.ttf'
-        linlibertine-regular:
-            inputs: '@DembeloMain/Resources/public/fonts/LinLibertine/LinLibertine_'
-            output: 'css/fonts/linlibertine/'
+        linlibertine-regular-woff:
+            inputs: '@DembeloMain/Resources/public/fonts/LinLibertine/LinLibertine_R.woff'
+            output: 'css/fonts/linlibertine/LinLibertine_R.woff'
+        linlibertine-regular-otf:
+            inputs: '@DembeloMain/Resources/public/fonts/LinLibertine/LinLibertine_R.otf'
+            output: 'css/fonts/linlibertine/LinLibertine_R.otf'
+        linlibertine-regular-svg:
+            inputs: '@DembeloMain/Resources/public/fonts/LinLibertine/LinLibertine_R.svg'
+            output: 'css/fonts/linlibertine/LinLibertine_R.svg'
+        linlibertine-regular-ttf:
+            inputs: '@DembeloMain/Resources/public/fonts/LinLibertine/LinLibertine_Rah.ttf'
+            output: 'css/fonts/linlibertine/LinLibertine_Rah.ttf'
 
 # Doctrine Configuration
 doctrine_mongodb:
