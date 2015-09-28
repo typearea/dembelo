@@ -13,12 +13,13 @@ Verfügung gestellt, um Autoren dabei zu unterstützen, Texte für dieses neue F
 System einzupflegen.
 
 Dembelo ist freie Software lizenziert unter der GNU Affero General Public License 3 und jeder späteren
-Version der Lizenz, so wie diese von der Free Software Foundation herausgegeben wurden.
+Version der Lizenz, so wie diese von der Free Software Foundation herausgegeben werden.
 
 ## Installation
 * [INSTALL.md](https://github.com/typearea/dembelo/blob/master/INSTALL.md)
 
 ## Links
+* [Webseite des Projekts](http://dembelo.de)
 * [Dembelo-Git-Repository](http://github.com:typearea)
 
 ## Dank an:
