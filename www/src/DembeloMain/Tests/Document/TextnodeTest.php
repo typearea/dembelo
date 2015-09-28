@@ -279,8 +279,7 @@ class TextnodeTest extends WebTestCase
 
             if ($i < Textnode::HITCHES_MAXIMUM_COUNT) {
                 $this->assertTrue($this->textnode->appendHitch($hitch));
-            }
-            else {
+            } else {
                 $this->assertFalse($this->textnode->appendHitch($hitch));
             }
         }
