@@ -179,12 +179,18 @@ class DefaultControllerTest extends WebTestCase
             ->with($this->equalTo('DembeloMain:Textnode'))
             ->will($this->returnValue($repository));
 
+        $hitch = array();
+        $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
+        $hitch['description'] = "Continue.";
+        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+
         $textnodeId = "55f5ab3708985c4b188b4577";
 
         $textnode = new Textnode();
         $textnode->setId($textnodeId);
         $textnode->setStatus(Textnode::STATUS_ACTIVE);
         $textnode->setText("Lorem ipsum dolor sit amet.");
+        $textnode->appendHitch($hitch);
 
         $repository->expects($this->once())
             ->method("findBy")
