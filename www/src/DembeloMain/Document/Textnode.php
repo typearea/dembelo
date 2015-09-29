@@ -39,6 +39,8 @@ class Textnode
     const HITCH_STATUS_INACTIVE = 0;
     const HITCH_STATUS_ACTIVE = 1;
 
+    const HITCHES_MAXIMUM_COUNT = 8;
+
     /**
      * @MongoDB\Id
      */
@@ -273,10 +275,17 @@ class Textnode
      * @return true|false False, if $hitch doesn't contain all
      *     associative array elements which form a hitch, or if
      *     no "textnodeId" is set within $hitch, or if "status"
-     *     within $hitch doesn't contain a valid value.
+     *     within $hitch doesn't contain a valid value, or if
+     *     there are already HITCHES_MAXIMUM_COUNT hitches present.
      */
     public function appendHitch(array $hitch)
     {
+        $hitchCount = count($this->hitches);
+
+        if ($hitchCount >= Textnode::HITCHES_MAXIMUM_COUNT) {
+            return false;
+        }
+
         if (array_key_exists("textnodeId", $hitch) !== true) {
             return false;
         }
@@ -298,7 +307,7 @@ class Textnode
             return false;
         }
 
-        $this->hitches[count($this->hitches)] = $hitch;
+        $this->hitches[$hitchCount] = $hitch;
 
         return true;
     }
