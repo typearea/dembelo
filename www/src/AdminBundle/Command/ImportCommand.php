@@ -46,7 +46,9 @@ class ImportCommand extends ContainerAwareCommand
     protected $topicId = null;
     protected $twineRelevant = false;
     protected $twineStartnodeId = -1;
+    protected $twineTextnodeName = null;
     protected $twineText = false;
+    protected $textnodeMapping = null;
     protected $accessSet = false;
 
 
@@ -257,6 +259,7 @@ class ImportCommand extends ContainerAwareCommand
 
             $this->twineStartnodeId = $attrs['startnode'];
             $this->topicId = $twineStoryName[0];
+            $this->textnodeMapping = array();
             $this->twineRelevant = true;
 
         } elseif ($this->twineRelevant === true && $name === "tw-passagedata") {
@@ -271,6 +274,16 @@ class ImportCommand extends ContainerAwareCommand
             if (is_numeric($attrs['pid']) !== true) {
                 throw new \Exception("<error>There is a '".$name."' in the Twine archive file '".$this->twineArchivePath."' which hasn't a numeric value in its 'pid' attribute ('".$attrs['pid']."' was found instead).</error>");
             }
+
+            if (isset($attrs['name']) !== true) {
+                throw new \Exception("<error>There is a '".$name."' in the Twine archive file '".$this->twineArchivePath."' which is missing its 'name' attribute.</error>");
+            }
+
+            if (array_key_exists($attrs['name'], $this->textnodeMapping) === true) {
+                throw new \Exception("<error>There is a '".$name."' in the Twine archive file '".$this->twineArchivePath."' which has a 'name' attribute with value '".$attrs['name']."'. This value is used more than once, while it must be unique.</error>");
+            }
+
+            $this->twineTextnodeName = $attrs['name'];
 
             $this->textnode = new Textnode();
             $this->textnode->setStatus(Textnode::STATUS_ACTIVE);
@@ -302,11 +315,91 @@ class ImportCommand extends ContainerAwareCommand
     private function endElement($parser, $name)
     {
         if ($name === "tw-storydata") {
+            foreach ($this->textnodeMapping as $twineName => $dembeloId) {
+                $textnode = $this->dm->find("DembeloMain:Textnode", $dembeloId);
+
+                if (is_null($textnode) === true) {
+                    throw new \Exception("<error>The Dembelo Textnode with Id '".$dembeloId."' doesn't exist, but should by now.</error>");
+                }
+
+                $textnodeText = $textnode->getText();
+                $startPos = strpos($textnodeText, "[[", 0);
+
+                if ($startPos !== false) {
+                    $textnodeTextNew = substr($textnodeText, 0, $startPos);
+                    $endPos = 0;
+
+                    while ($startPos !== false) {
+                        $endPos = strpos($textnodeText, "]]", $startPos + strlen("[["));
+
+                        if ($endPos === false) {
+                            throw new \Exception("<error>The Twine archive file '".$this->twineArchivePath."' has a textnode named '".$twineName."' which contains a malformed link that starts with '[[' but has no corresponding ']]'.</error>");
+                        }
+
+                        $linkReference = null;
+                        $linkCaption = null;
+                        $link = substr($textnodeText, $startPos + strlen("[["), $endPos - ($startPos + strlen("[[")));
+
+                        if (strpos($link, "->") !== false) {
+                            $linkReference = explode("->", $link, 2);
+                            $linkCaption = $linkReference[0];
+                            $linkReference = $linkReference[1];
+                        } elseif (strpos($link, "<-") !== false) {
+                            $linkReference = explode("<-", $link, 2);
+                            $linkCaption = $linkReference[1];
+                            $linkReference = $linkReference[0];
+                        } else {
+                            $linkReference = $link;
+                            $linkCaption = $link;
+                        }
+
+                        if (array_key_exists($linkReference, $this->textnodeMapping) !== true) {
+                            throw new \Exception("<error>There is a textnode in the Twine archive file '".$this->twineArchivePath."' which references another textnode named '".$linkCaption."', but this textnode doesn't exist within the same story.</error>");
+                        }
+
+                        if ($textnode->getHitchCount() >= Textnode::HITCHES_MAXIMUM_COUNT) {
+                            throw new \Exception("<error>There is a textnode named '".$twineName."' in the Twine archive file '".$this->twineArchivePath."' which has more than ".Textnode::HITCHES_MAXIMUM_COUNT." links.</error>");
+                        }
+
+                        $hitch = array();
+                        $hitch['description'] = $linkCaption;
+                        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+
+                        if ($linkReference !== null) {
+                            $hitch['textnodeId'] = $this->textnodeMapping[$linkReference];
+                        } else {
+                            $hitch['textnodeId'] = $this->textnodeMapping[$linkCaption];
+                        }
+
+                        if ($textnode->appendHitch($hitch) !== true) {
+                            throw new \Exception("<error>Failed to append hitch for the textnode named '".$twineName."' from the Twine archive file '".$this->twineArchivePath."'.</error>");
+                        }
+
+                        $endPos += strlen("]]");
+                        $startPos = strpos($textnodeText, "[[", $endPos);
+
+                        if ($startPos !== false) {
+                            $textnodeTextNew .= substr($textnodeText, $endPos, $startPos - $endPos);
+                        } else {
+                            $textnodeTextNew .= substr($textnodeText, $endPos);
+                        }
+                    }
+
+                    $textnode->setText($textnodeTextNew);
+                }
+            }
+
+            /** @todo Check if there are textnodes which can't be reached. */
+
             $this->twineRelevant = false;
             $this->twineStartnodeId = -1;
+            $this->textnodeMapping = null;
             $this->accessSet = false;
         } elseif ($this->twineRelevant === true && $name === "tw-passagedata") {
             $this->dm->persist($this->textnode);
+
+            $this->textnodeMapping[$this->twineTextnodeName] = $this->textnode->getId();
+            $this->twineTextnodeName = null;
 
             $this->output->writeln("Created Dembelo Textnode with Id '".$this->textnode->getId()."'.");
 
