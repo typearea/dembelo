@@ -31,6 +31,7 @@ use Symfony\Component\HttpFoundation\Request;
 use DembeloMain\Document\Topic;
 use DembeloMain\Document\Story;
 use DembeloMain\Document\Textnode;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class DefaultController
@@ -186,5 +187,40 @@ class DefaultController extends Controller
         $textnode = $textnodes[0];
 
         return $this->render('default/read.html.twig', array('textnode' => $textnode));
+    }
+
+    /**
+     * @Route("/paywall/{textnodeId}/{hitchIndex}", name="paywall")
+     *
+     * @param string $textnodeId Textnode ID from URL
+     * @param string $hitchIndex hitch index
+     *
+     * @return string
+     */
+    public function paywallAction($textnodeId, $hitchIndex)
+    {
+        $mongo = $this->get('doctrine_mongodb');
+
+        $repository = $mongo->getRepository('DembeloMain:Textnode');
+        $textnodes = $repository->findBy(
+            array(
+                'id' => new \MongoId($textnodeId),
+                'status' => Textnode::STATUS_ACTIVE,
+            )
+        );
+
+        if (empty($textnodes)) {
+            throw $this->createNotFoundException('No Textnode with ID \''.$textnodeId.'\' found.');
+        }
+
+        $textnode = $textnodes[0];
+        $hitch = $textnode->getHitch($hitchIndex);
+
+        $output = array(
+            'url' => $this->generateUrl('text', array(
+                'textnodeId' => $hitch['textnodeId']
+            ))
+        );
+        return new Response(\json_encode($output));
     }
 }
