@@ -217,10 +217,14 @@ class DefaultController extends Controller
         $hitch = $textnode->getHitch($hitchIndex);
 
         $output = array(
-            'url' => $this->generateUrl('text', array(
-                'textnodeId' => $hitch['textnodeId']
-            ))
+            'url' => $this->generateUrl(
+                'text',
+                array(
+                    'textnodeId' => $hitch['textnodeId'],
+                )
+            ),
         );
+
         return new Response(\json_encode($output));
     }
 }
