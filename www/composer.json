@@ -19,7 +19,8 @@
         "incenteev/composer-parameter-handler": "~2.0",
         "doctrine/mongodb-odm": "1.0.*@dev",
         "doctrine/mongodb-odm-bundle": "3.0.*",
-        "twbs/bootstrap-sass": "3.3.5"
+        "twbs/bootstrap-sass": "3.3.5",
+        "twig/twig": "^1.22"
 
     },
     "require-dev": {
