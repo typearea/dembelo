@@ -29,8 +29,8 @@
                 return false;
             });
 
-            $('#modalPaywall').on('hide.bs.modal', function (event) {
-                var button = $(event.target).find('.btn-primary'),
+            $('#modalPaywall .btn-primary').click(function (event) {
+                var button = event.target,
                     url = $(button).attr('data-url'),
                     data = {};
 
