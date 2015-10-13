@@ -83,6 +83,7 @@ body {
 
 #row4 > div {
     height: 100%;
+    overflow: hidden;
 }
 
 .navbar-collapse.collapse {
@@ -105,7 +106,7 @@ body {
     margin-left: 0;
 }
 
-#row1 > div {
+#row1 > div, #row4 > div{
   padding-left: 0;
   padding-right: 0;
 }
@@ -117,6 +118,15 @@ body {
 
 #carousel-bookmark, .carousel-inner, .carousel-inner > .item {
   height: inherit;
+}
+
+.ad-text {
+	 bottom: 4%;
+    color: white;
+    font-weight: bold;
+    position: absolute;
+    right: 8%;
+    text-shadow: 0.1em 0.1em 0.5em #333;
 }
 
 @font-face {
