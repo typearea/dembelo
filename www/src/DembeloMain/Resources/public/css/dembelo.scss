@@ -59,6 +59,8 @@ body {
     overflow: hidden;
     height: 100%;
     padding: 0;
+    outline: 2px solid white;
+    outline-offset: -4px;
 }
 
 #row1 {
@@ -104,8 +106,8 @@ body {
 }
 
 #row1 > div {
-  padding-left: 0px;
-  padding-right: 0px;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 #shadow {
