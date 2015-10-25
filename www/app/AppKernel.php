@@ -19,6 +19,7 @@ class AppKernel extends Kernel
             new Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle(),
             new DembeloMain\DembeloMain(),
             new AdminBundle\AdminBundle(),
+            new DataManagementDomainBundle\DataManagementDomainBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
