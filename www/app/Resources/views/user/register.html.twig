@@ -24,8 +24,10 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 <div class="container-fluid">
     <div id="row1" class="row ">
         <div class="col-xs-12">
-            <h1>Registrierungsformular</h1>
-            Da wir uns in einer geschlossenen Betaphase befinden, ist eine Registrierung noch nicht möglich.
+            <h1>Registrierung</h1>
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            {{ form_end(form) }}
         </div>
     </div>
 </div>

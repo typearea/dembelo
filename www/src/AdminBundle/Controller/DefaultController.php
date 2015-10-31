@@ -81,6 +81,10 @@ class DefaultController extends Controller
             $obj->email = $user->getEmail();
             $obj->roles = join(', ', $user->getRoles());
             $obj->licenseeId = $user->getLicenseeId();
+            $obj->gender = $user->getGender();
+            $obj->status = $user->getStatus();
+            $obj->source = $user->getSource();
+            $obj->reason = $user->getReason();
             $output[] = $obj;
         }
 
@@ -131,6 +135,7 @@ class DefaultController extends Controller
         $licensees = $repository->findBy(array('name' => new \MongoRegex('/'.$searchString.'/')), null, 10);
 
         $output = array();
+        /* @var $licensee \DembeloMain\Document\Licensee */
         foreach ($licensees as $licensee) {
             $output[] = array(
                 'id' => $licensee->getId(),
@@ -155,7 +160,7 @@ class DefaultController extends Controller
         $users = $repository->findAll();
 
         $output = array();
-        /* @var $user \DembeloMain\Document\User */
+        /* @var $user \DembeloMain\Document\Topic */
         foreach ($users as $user) {
             $obj = new StdClass();
             $obj->id = $user->getId();
@@ -180,7 +185,7 @@ class DefaultController extends Controller
         $users = $repository->findAll();
 
         $output = array();
-        /* @var $user \DembeloMain\Document\User */
+        /* @var $user \DembeloMain\Document\Story */
         foreach ($users as $user) {
             $obj = new StdClass();
             $obj->id = $user->getId();

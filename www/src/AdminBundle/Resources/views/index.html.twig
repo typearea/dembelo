@@ -65,6 +65,10 @@
                                                         {view: "text", name: "email", label: "Email", validate:webix.rules.isEmail},
                                                         {view: "combo", id: "userformrole", name: "roles", label: "Rolle", options: [{id:"ROLE_ADMIN", value: "Admin"}, {id:"ROLE_USER", value: "Benutzer"}, {id:"ROLE_LICENSEE", value: "Lizenznehmer"}], validate:webix.rules.isNotEmpty},
                                                         {view: "combo", id: "userformlicensee", name: "licenseeId", label: "Lizenznehmer", suggest: paths.adminLicenceeSuggest, disabled: true},
+                                                        {view: "combo", id: "userformgender", name: "gender", label: "Geschlecht", options: [{id: 'm', value: 'männlich'},{ id: 'f', value: 'weiblich'}]},
+                                                        {view: "combo", id: "userformstatus", name: "status", label: "Status", options: [{id: '0', value: 'nicht aktiviert'},{ id: '1', value: 'aktiviert'}], validate:webix.rules.isNotEmpty},
+                                                        {view: "textarea", id: "userformsource", name: "source", label: "Quelle"},
+                                                        {view: "textarea", id: "userformreason", name: "reason", label: "Grund"},
                                                         {view: "text", name: "password", type:"password", label:"Passwort"},
                                                         {view: "button", value:"Speichern", click:"dembeloAdmin.formsave('user')" }
                                                     ]

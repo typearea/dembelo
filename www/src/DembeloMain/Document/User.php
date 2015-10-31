@@ -73,6 +73,26 @@ class User implements UserInterface, \Serializable
     protected $currentTextnode;
 
     /**
+     * @MongoDB\String
+     */
+    protected $gender;
+
+    /**
+     * @MongoDB\String
+     */
+    protected $source;
+
+    /**
+     * @MongoDB\String
+     */
+    protected $reason;
+
+    /**
+     * @MongoDB\Bool
+     */
+    protected $status;
+
+    /**
      * gets the mongodb id
      *
      * @return string
@@ -257,5 +277,55 @@ class User implements UserInterface, \Serializable
     public function getLicenseeId()
     {
         return $this->licenseeId;
+    }
+
+    /**
+     * sets the gender
+     *
+     * @param string $gender Gender
+     */
+    public function setGender($gender)
+    {
+        $this->gender = $gender;
+    }
+
+    /**
+     * gets the gender
+     *
+     * @return string
+     */
+    public function getGender()
+    {
+        return $this->gender;
+    }
+
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    public function setSource($source)
+    {
+        $this->source = $source;
+    }
+
+    public function getReason()
+    {
+        return $this->reason;
+    }
+
+    public function setReason($reason)
+    {
+        $this->reason = $reason;
+    }
+
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    public function setStatus($status)
+    {
+        $this->status = $status;
     }
 }

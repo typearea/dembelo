@@ -79,15 +79,30 @@ class UserController extends Controller
     }
 
     /**
-     * @Route("/register", name="register")
+     * @Route("/registration", name="register")
      *
      * @return string
      */
-    public function registerAction()
+    public function registrationAction()
     {
+        $user = new User();
+        $form = $this->createFormBuilder($user)
+            ->add('email', 'email')
+            ->add('password', 'password', array('label' => 'Passwort'))
+            ->add('gender', 'choice', array(
+                'choices'  => array('m' => 'männlich', 'f' => 'weiblich'),
+                'label' => 'Geschlecht'
+                ))
+            ->add('source', 'text', array('label' => 'Wo hast du von Dembelo erfahren?'))
+            ->add('reason', 'textarea', array('label' => 'Wieso möchtest du an der geschlossenen Beta teilnehmen?'))
+            ->add('save', 'submit', array('label' => 'Registrierung anfordern'))
+            ->getForm();
+
         return $this->render(
             'user/register.html.twig',
-            array()
+            array(
+                'form' => $form->createView()
+            )
         );
     }
 }
