@@ -81,27 +81,59 @@ class UserController extends Controller
     /**
      * @Route("/registration", name="register")
      *
+     * @param Request $request request object
+     *
      * @return string
      */
-    public function registrationAction()
+    public function registrationAction(Request $request)
     {
         $user = new User();
+        $user->setRoles(['ROLE_USER']);
+        $user->setStatus(0);
         $form = $this->createFormBuilder($user)
             ->add('email', 'email')
             ->add('password', 'password', array('label' => 'Passwort'))
             ->add('gender', 'choice', array(
                 'choices'  => array('m' => 'männlich', 'f' => 'weiblich'),
-                'label' => 'Geschlecht'
+                'label' => 'Geschlecht',
+                'required' => false
                 ))
-            ->add('source', 'text', array('label' => 'Wo hast du von Dembelo erfahren?'))
-            ->add('reason', 'textarea', array('label' => 'Wieso möchtest du an der geschlossenen Beta teilnehmen?'))
+            ->add('source', 'text', array('label' => 'Wo hast du von Dembelo erfahren?', 'required' => false))
+            ->add('reason', 'textarea', array('label' => 'Wieso möchtest du an der geschlossenen Beta teilnehmen?', 'required' => false))
             ->add('save', 'submit', array('label' => 'Registrierung anfordern'))
             ->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $mongo = $this->get('doctrine_mongodb');
+            $dm = $mongo->getManager();
+            $encoder = $this->get('security.password_encoder');
+            $password = $encoder->encodePassword($user, $user->getPassword());
+            $user->setPassword($password);
+            $dm->persist($user);
+            $dm->flush();
+            return $this->redirectToRoute('registration_success');
+        }
 
         return $this->render(
             'user/register.html.twig',
             array(
                 'form' => $form->createView()
+            )
+        );
+    }
+
+    /**
+     * @Route("/registrationSuccess", name="registration_success")
+     *
+     * @return string
+     */
+    public function registrationsuccessAction()
+    {
+        return $this->render(
+            'user/registrationSuccess.html.twig',
+            array(
             )
         );
     }

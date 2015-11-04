@@ -80,7 +80,7 @@ class DefaultController extends Controller
             $obj->id = $user->getId();
             $obj->email = $user->getEmail();
             $obj->roles = join(', ', $user->getRoles());
-            $obj->licenseeId = $user->getLicenseeId();
+            $obj->licenseeId = is_null($user->getLicenseeId()) ? '' : $user->getLicenseeId();
             $obj->gender = $user->getGender();
             $obj->status = $user->getStatus();
             $obj->source = $user->getSource();

@@ -89,6 +89,7 @@ class User implements UserInterface, \Serializable
 
     /**
      * @MongoDB\Int
+     * @Assert\NotBlank()
      */
     protected $status;
 
