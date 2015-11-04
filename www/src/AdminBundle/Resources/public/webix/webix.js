@@ -1,7 +1,7 @@
 /*
 @license
 webix UI v.2.5.0
-This software is allowed to use under GPL or you need to obtain Commercial License 
+This software is allowed to use under GPL or you need to obtain Commercial License
  to use it in non-GPL project. Please contact sales@webix.com for details
 */
 window.webix||(webix={}),webix.version="2.5.0",webix.codebase="./",webix.name="core",webix.clone=function(t){var e=webix.clone.a;return e.prototype=t,new e},webix.clone.a=function(){},webix.extend=function(t,e,i){if(t.b)return webix.PowerArray.insertAt.call(t.b,e,1),t;for(var s in e)(!t[s]||i)&&(t[s]=e[s]);

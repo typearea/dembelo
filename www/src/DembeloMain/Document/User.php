@@ -88,7 +88,7 @@ class User implements UserInterface, \Serializable
     protected $reason;
 
     /**
-     * @MongoDB\Bool
+     * @MongoDB\Int
      */
     protected $status;
 
