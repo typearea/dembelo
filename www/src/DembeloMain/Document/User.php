@@ -94,6 +94,11 @@ class User implements UserInterface, \Serializable
     protected $status;
 
     /**
+     * @MongoDB\String
+     */
+    protected $activationHash;
+
+    /**
      * gets the mongodb id
      *
      * @return string
@@ -328,5 +333,15 @@ class User implements UserInterface, \Serializable
     public function setStatus($status)
     {
         $this->status = $status;
+    }
+
+    public function getActivationHash()
+    {
+        return $this->activationHash;
+    }
+
+    public function setActivationHash($hash)
+    {
+        $this->activationHash = $hash;
     }
 }

@@ -82,7 +82,7 @@ class DefaultController extends Controller
             $obj->roles = join(', ', $user->getRoles());
             $obj->licenseeId = is_null($user->getLicenseeId()) ? '' : $user->getLicenseeId();
             $obj->gender = $user->getGender();
-            $obj->status = $user->getStatus();
+            $obj->status = (String)$user->getStatus();
             $obj->source = $user->getSource();
             $obj->reason = $user->getReason();
             $output[] = $obj;
@@ -288,5 +288,33 @@ class DefaultController extends Controller
 
         return new Response(\json_encode(array('error' => false)));
 
+    }
+
+    /**
+     * @Route("/useractivationmail", name="admin_user_activation_mail")
+     *
+     * @param Request $request
+     * @return String
+     */
+    public function useractivationmailAction(Request $request)
+    {
+        $userId = $request->request->get('userId');
+
+        /* @var $mongo \Doctrine\Bundle\MongoDBBundle\ManagerRegistry */
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $dm \Doctrine\ODM\MongoDB\DocumentManager*/
+        $dm = $mongo->getManager();
+
+        $repository = $mongo->getRepository('DembeloMain:User');
+
+        /* @var $user \DembeloMain\Document\User */
+        $user = $repository->find($userId);
+        $output = array('email' => $user->getEmail());
+        $user->setActivationHash(sha1($user->getEmail() . $user->getPassword() . \mktime()));
+
+        $dm->persist($user);
+        $dm->flush();
+
+        return new Response(\json_encode($output));
     }
 }
