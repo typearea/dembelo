@@ -309,12 +309,26 @@ class DefaultController extends Controller
 
         /* @var $user \DembeloMain\Document\User */
         $user = $repository->find($userId);
-        $output = array('email' => $user->getEmail());
-        $user->setActivationHash(sha1($user->getEmail() . $user->getPassword() . \mktime()));
+        $user->setActivationHash(sha1($user->getEmail() . $user->getPassword() . \time()));
 
         $dm->persist($user);
         $dm->flush();
 
-        return new Response(\json_encode($output));
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Dembelo - Bestätigung der Email-Adresse')
+            ->setFrom('noreply@dembelo.de')
+            ->setTo($user->getEmail())
+            ->setBody(
+                $this->renderView(
+                // app/Resources/views/Emails/registration.html.twig
+                    'AdminBundle::Emails/registration.txt.twig',
+                    array('hash' => $user->getActivationHash())
+                ),
+                'text/html'
+            );
+
+        $this->get('mailer')->send($message);
+
+        return new Response(\json_encode(['error' => false]));
     }
 }

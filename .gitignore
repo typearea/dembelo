@@ -2,3 +2,4 @@
 .vagrant
 *.sublime-project
 *.sublime-workspace
+www/app/spool

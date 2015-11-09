@@ -137,4 +137,29 @@ class UserController extends Controller
             )
         );
     }
+
+    /**
+     * @Route("/activation/{hash}", name="emailactivation")
+     *
+     * @param string $hash activation hash
+     *
+     * @return string
+     */
+    public function activateemailAction($hash)
+    {
+        $mongo = $this->get('doctrine_mongodb');
+        $repository = $mongo->getRepository('DembeloMain:User');
+        $dm = $mongo->getManager();
+        $user = $repository->findOneByActivationHash($hash);
+        $user->setActivationHash('');
+        $user->setStatus(1);
+        $dm->persist($user);
+        $dm->flush();
+
+        return $this->render(
+            'user/activationSuccess.html.twig',
+            array(
+            )
+        );
+    }
 }
