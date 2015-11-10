@@ -63,15 +63,32 @@ class DefaultController extends Controller
     /**
      * @Route("/users", name="admin_users")
      *
+     * @param Request $request
      * @return String
      */
-    public function usersAction()
+    public function usersAction(Request $request)
     {
         $mongo = $this->get('doctrine_mongodb');
         /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
         $repository = $mongo->getRepository('DembeloMain:User');
 
-        $users = $repository->findAll();
+        $filters = $request->query->get('filter');
+
+        $query = $repository->createQueryBuilder();
+        if (!is_null($filters)) {
+            foreach ($filters AS $field => $value) {
+                if (empty($value)) {
+                    continue;
+                }
+                if ($field === 'status') {
+                    $value = $value === 'aktiv' ? 1 : 0;
+                    $query->field($field)->equals($value);
+                } else {
+                    $query->field($field)->equals(new \MongoRegex('/.*' . $value . '.*/i'));
+                }
+            }
+        }
+        $users = $query->getQuery()->execute();
 
         $output = array();
         /* @var $user \DembeloMain\Document\User */
