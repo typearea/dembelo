@@ -29,6 +29,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique as MongoDBUnique;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
 /**
  * Class User
@@ -36,7 +37,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @MongoDB\Document
  * @MongoDBUnique(fields="email")
  */
-class User implements UserInterface, \Serializable
+class User implements UserInterface, \Serializable, AdvancedUserInterface
 {
     /**
      * @MongoDB\Id
@@ -343,5 +344,25 @@ class User implements UserInterface, \Serializable
     public function setActivationHash($hash)
     {
         $this->activationHash = $hash;
+    }
+
+    public function isAccountNonExpired()
+    {
+        return true;
+    }
+
+    public function isAccountNonLocked()
+    {
+        return true;
+    }
+
+    public function isCredentialsNonExpired()
+    {
+        return true;
+    }
+
+    public function isEnabled()
+    {
+        return $this->status === 1;
     }
 }

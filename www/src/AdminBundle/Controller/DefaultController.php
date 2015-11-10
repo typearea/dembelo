@@ -82,7 +82,7 @@ class DefaultController extends Controller
             $obj->roles = join(', ', $user->getRoles());
             $obj->licenseeId = is_null($user->getLicenseeId()) ? '' : $user->getLicenseeId();
             $obj->gender = $user->getGender();
-            $obj->status = (String)$user->getStatus();
+            $obj->status = $user->getStatus() === 0 ? 'inaktiv' : 'aktiv';
             $obj->source = $user->getSource();
             $obj->reason = $user->getReason();
             $output[] = $obj;
@@ -236,11 +236,14 @@ class DefaultController extends Controller
             } elseif ($param == 'password') {
                 $encoder = $this->get('security.password_encoder');
                 $value = $encoder->encodePassword($item, $value);
+            } elseif ($param == 'licenseeId' && $value === '') {
+                $value = null;
             }
             $method = 'set'.ucfirst($param);
             $item->$method($value);
         }
-        $dm->persist($item);
+        //var_dump($item);die();
+        //$dm->persist($item);
         $dm->flush();
 
         $output = array(

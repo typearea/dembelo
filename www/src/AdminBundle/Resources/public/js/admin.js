@@ -49,7 +49,7 @@ dembeloAdmin = (function () {
                 }
             });
             $$('userformstatus').attachEvent('onChange', function (newValue) {
-                if (newValue === '0') {
+                if (newValue === 'inaktiv') {
                     $$('userformactivation').enable();
                 } else {
                     $$('userformactivation').disable();
