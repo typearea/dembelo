@@ -96,7 +96,7 @@ class UserController extends Controller
             ->add('gender', 'choice', array(
                 'choices'  => array('m' => 'männlich', 'f' => 'weiblich'),
                 'label' => 'Geschlecht',
-                'required' => false
+                'required' => false,
                 ))
             ->add('source', 'text', array('label' => 'Wo hast du von Dembelo erfahren?', 'required' => false))
             ->add('reason', 'textarea', array('label' => 'Wieso möchtest du an der geschlossenen Beta teilnehmen?', 'required' => false))
@@ -113,14 +113,13 @@ class UserController extends Controller
             $user->setPassword($password);
             $dm->persist($user);
             $dm->flush();
+
             return $this->redirectToRoute('registration_success');
         }
 
         return $this->render(
             'user/register.html.twig',
-            array(
-                'form' => $form->createView()
-            )
+            array('form' => $form->createView())
         );
     }
 
@@ -133,8 +132,7 @@ class UserController extends Controller
     {
         return $this->render(
             'user/registrationSuccess.html.twig',
-            array(
-            )
+            array()
         );
     }
 
@@ -158,8 +156,7 @@ class UserController extends Controller
 
         return $this->render(
             'user/activationSuccess.html.twig',
-            array(
-            )
+            array()
         );
     }
 }

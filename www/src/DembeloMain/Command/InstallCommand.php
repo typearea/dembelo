@@ -122,7 +122,8 @@ class InstallCommand extends ContainerAwareCommand
                 'gender' => 'm',
                 'status' => 1,
                 'source' => '',
-                'reason' => ''),
+                'reason' => '',
+                ),
         );
 
         $this->installUsers($users, $mongo, $dm);
@@ -188,7 +189,7 @@ class InstallCommand extends ContainerAwareCommand
                 'gender' => 'm',
                 'status' => 1,
                 'source' => '',
-                'reason' => ''
+                'reason' => '',
             ),
             array(
                 'email' => 'licensee@dembelo.tld',
@@ -197,7 +198,7 @@ class InstallCommand extends ContainerAwareCommand
                 'gender' => 'm',
                 'status' => 1,
                 'source' => '',
-                'reason' => ''
+                'reason' => '',
             ),
         );
 

@@ -76,7 +76,7 @@ class DefaultController extends Controller
 
         $query = $repository->createQueryBuilder();
         if (!is_null($filters)) {
-            foreach ($filters AS $field => $value) {
+            foreach ($filters as $field => $value) {
                 if (empty($value)) {
                     continue;
                 }
@@ -84,7 +84,7 @@ class DefaultController extends Controller
                     $value = $value === 'aktiv' ? 1 : 0;
                     $query->field($field)->equals($value);
                 } else {
-                    $query->field($field)->equals(new \MongoRegex('/.*' . $value . '.*/i'));
+                    $query->field($field)->equals(new \MongoRegex('/.*'.$value.'.*/i'));
                 }
             }
         }
@@ -329,7 +329,7 @@ class DefaultController extends Controller
 
         /* @var $user \DembeloMain\Document\User */
         $user = $repository->find($userId);
-        $user->setActivationHash(sha1($user->getEmail() . $user->getPassword() . \time()));
+        $user->setActivationHash(sha1($user->getEmail().$user->getPassword().\time()));
 
         $dm->persist($user);
         $dm->flush();
@@ -340,7 +340,7 @@ class DefaultController extends Controller
             ->setTo($user->getEmail())
             ->setBody(
                 $this->renderView(
-                // app/Resources/views/Emails/registration.html.twig
+                    // app/Resources/views/Emails/registration.html.twig
                     'AdminBundle::Emails/registration.txt.twig',
                     array('hash' => $user->getActivationHash())
                 ),

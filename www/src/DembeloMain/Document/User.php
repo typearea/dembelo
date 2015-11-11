@@ -306,61 +306,120 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
         return $this->gender;
     }
 
+    /**
+     * gets the source from where the user came to this site
+     *
+     * @return String
+     */
     public function getSource()
     {
         return $this->source;
     }
 
+    /**
+     * sets the source from where the user came to this site
+     *
+     * @param String $source
+     */
     public function setSource($source)
     {
         $this->source = $source;
     }
 
+    /**
+     * gets the reason for registration
+     *
+     * @return String
+     */
     public function getReason()
     {
         return $this->reason;
     }
 
+    /**
+     * sets the reason for registration
+     *
+     * @param String $reason
+     */
     public function setReason($reason)
     {
         $this->reason = $reason;
     }
 
+    /**
+     * gets status
+     *
+     * @return integer
+     */
     public function getStatus()
     {
         return $this->status;
     }
 
+    /**
+     * sets status
+     *
+     * @param integer $status status
+     */
     public function setStatus($status)
     {
         $this->status = $status;
     }
 
+    /**
+     * gets activation hash
+     *
+     * @return mixed
+     */
     public function getActivationHash()
     {
         return $this->activationHash;
     }
 
+    /**
+     * sets activation hash
+     *
+     * @param String $hash activation hash
+     */
     public function setActivationHash($hash)
     {
         $this->activationHash = $hash;
     }
 
+    /**
+     * checks if account is not expired
+     *
+     * @return bool
+     */
     public function isAccountNonExpired()
     {
         return true;
     }
 
+    /**
+     * checks if account is not locked
+     *
+     * @return bool
+     */
     public function isAccountNonLocked()
     {
         return true;
     }
 
+    /**
+     * checks if credentials are not expired
+     * @return bool
+     */
     public function isCredentialsNonExpired()
     {
         return true;
     }
 
+    /**
+     * checks if enabled
+     *
+     * @return bool
+     */
     public function isEnabled()
     {
         return $this->status === 1;
