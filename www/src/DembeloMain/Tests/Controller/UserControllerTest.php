@@ -109,9 +109,9 @@ class UserControllerTest extends WebTestCase
     public function testRegisterActionHttpStatusCode()
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', '/register');
+        $crawler = $client->request('GET', '/registration');
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertTrue($crawler->filter('html:contains("Registrierungsformular")')->count() > 0);
+        $this->assertTrue($crawler->filter('html:contains("Registrierung")')->count() > 0);
     }
 
     /**
@@ -119,8 +119,9 @@ class UserControllerTest extends WebTestCase
      */
     public function testRegisterActionResponse()
     {
+        $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
         $mock = $this->getMockBuilder('foobar')
-            ->setMethods(array('get', 'renderResponse'))
+            ->setMethods(array('get', 'renderResponse', 'createBuilder', 'add', 'getForm', 'handleRequest', 'isValid', 'getManager', 'createView'))
             ->getMock();
         $container = $this->getMock("Symfony\Component\DependencyInjection\ContainerInterface");
         $container->expects($this->any())
@@ -128,10 +129,32 @@ class UserControllerTest extends WebTestCase
             ->will($this->returnValue($mock));
         $mock->expects($this->once())
             ->method('renderResponse')
-            ->with('user/register.html.twig', array());
+            ->with('user/register.html.twig', array('form' => 'createViewReturnValue'));
+        $mock->expects($this->any())
+            ->method('createBuilder')
+            ->with('form', $this->isInstanceOf('DembeloMain\Document\User'))
+            ->will($this->returnSelf());
+        $mock->expects($this->any())
+            ->method('add')
+            ->will($this->returnSelf());
+        $mock->expects($this->any())
+            ->method('getForm')
+            ->will($this->returnSelf());
+        $mock->expects($this->any())
+            ->method('handleRequest')
+            ->will($this->returnSelf());
+        $mock->expects($this->any())
+            ->method('isValid')
+            ->will($this->returnValue(false));
+        $mock->expects($this->any())
+            ->method('getManager')
+            ->will($this->returnSelf());
+        $mock->expects($this->any())
+            ->method('createView')
+            ->will($this->returnValue('createViewReturnValue'));
 
         $controller = new UserController();
         $controller->setContainer($container);
-        $controller->registerAction();
+        $controller->registrationAction($request);
     }
 }
