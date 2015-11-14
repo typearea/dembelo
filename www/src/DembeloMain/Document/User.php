@@ -29,6 +29,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique as MongoDBUnique;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
 /**
  * Class User
@@ -36,7 +37,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @MongoDB\Document
  * @MongoDBUnique(fields="email")
  */
-class User implements UserInterface, \Serializable
+class User implements UserInterface, \Serializable, AdvancedUserInterface
 {
     /**
      * @MongoDB\Id
@@ -71,6 +72,32 @@ class User implements UserInterface, \Serializable
      * @MongoDB\ObjectId
      */
     protected $currentTextnode;
+
+    /**
+     * @MongoDB\String
+     */
+    protected $gender;
+
+    /**
+     * @MongoDB\String
+     */
+    protected $source;
+
+    /**
+     * @MongoDB\String
+     */
+    protected $reason;
+
+    /**
+     * @MongoDB\Int
+     * @Assert\NotBlank()
+     */
+    protected $status;
+
+    /**
+     * @MongoDB\String
+     */
+    protected $activationHash;
 
     /**
      * gets the mongodb id
@@ -257,5 +284,144 @@ class User implements UserInterface, \Serializable
     public function getLicenseeId()
     {
         return $this->licenseeId;
+    }
+
+    /**
+     * sets the gender
+     *
+     * @param string $gender Gender
+     */
+    public function setGender($gender)
+    {
+        $this->gender = $gender;
+    }
+
+    /**
+     * gets the gender
+     *
+     * @return string
+     */
+    public function getGender()
+    {
+        return $this->gender;
+    }
+
+    /**
+     * gets the source from where the user came to this site
+     *
+     * @return String
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * sets the source from where the user came to this site
+     *
+     * @param String $source
+     */
+    public function setSource($source)
+    {
+        $this->source = $source;
+    }
+
+    /**
+     * gets the reason for registration
+     *
+     * @return String
+     */
+    public function getReason()
+    {
+        return $this->reason;
+    }
+
+    /**
+     * sets the reason for registration
+     *
+     * @param String $reason
+     */
+    public function setReason($reason)
+    {
+        $this->reason = $reason;
+    }
+
+    /**
+     * gets status
+     *
+     * @return integer
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * sets status
+     *
+     * @param integer $status status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    /**
+     * gets activation hash
+     *
+     * @return mixed
+     */
+    public function getActivationHash()
+    {
+        return $this->activationHash;
+    }
+
+    /**
+     * sets activation hash
+     *
+     * @param String $hash activation hash
+     */
+    public function setActivationHash($hash)
+    {
+        $this->activationHash = $hash;
+    }
+
+    /**
+     * checks if account is not expired
+     *
+     * @return bool
+     */
+    public function isAccountNonExpired()
+    {
+        return true;
+    }
+
+    /**
+     * checks if account is not locked
+     *
+     * @return bool
+     */
+    public function isAccountNonLocked()
+    {
+        return true;
+    }
+
+    /**
+     * checks if credentials are not expired
+     * @return bool
+     */
+    public function isCredentialsNonExpired()
+    {
+        return true;
+    }
+
+    /**
+     * checks if enabled
+     *
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return $this->status === 1;
     }
 }

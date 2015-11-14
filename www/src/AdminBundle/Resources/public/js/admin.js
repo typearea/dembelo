@@ -48,6 +48,13 @@ dembeloAdmin = (function () {
                     $$('userformlicensee').disable()
                 }
             });
+            $$('userformstatus').attachEvent('onChange', function (newValue) {
+                if (newValue === 'inaktiv') {
+                    $$('userformactivation').enable();
+                } else {
+                    $$('userformactivation').disable();
+                }
+            });
 
             $$('licenseeform').bind($$('licenseegrid'));
         },
@@ -138,7 +145,29 @@ dembeloAdmin = (function () {
                 }
             ]
             };
+        },
+
+        sendActivationMail: function () {
+            var userId = $$('usergrid').getSelectedId().id;
+
+            webix.ajax().post(paths.adminUserActivationMail, {userId: userId}, function (text) {
+                var params = JSON.parse(text);
+                if (params['error'] === false) {
+                    webix.modalbox({
+                        title: "Aktivierungsmail versandt",
+                        buttons: ["Ok"],
+                        text: "Die Email zur Aktivierung wurde erfolgreich versandt."
+                    });
+                } else {
+                    webix.modalbox({
+                        title: "Fehler",
+                        buttons: ["Ok"],
+                        text: "Der Mailversandt ist leider fehlgeschlagen..."
+                    });
+                }
+            });
         }
+
     };
 
 }());

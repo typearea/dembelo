@@ -63,15 +63,32 @@ class DefaultController extends Controller
     /**
      * @Route("/users", name="admin_users")
      *
+     * @param Request $request
      * @return String
      */
-    public function usersAction()
+    public function usersAction(Request $request)
     {
         $mongo = $this->get('doctrine_mongodb');
         /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
         $repository = $mongo->getRepository('DembeloMain:User');
 
-        $users = $repository->findAll();
+        $filters = $request->query->get('filter');
+
+        $query = $repository->createQueryBuilder();
+        if (!is_null($filters)) {
+            foreach ($filters as $field => $value) {
+                if (empty($value)) {
+                    continue;
+                }
+                if ($field === 'status') {
+                    $value = $value === 'aktiv' ? 1 : 0;
+                    $query->field($field)->equals($value);
+                } else {
+                    $query->field($field)->equals(new \MongoRegex('/.*'.$value.'.*/i'));
+                }
+            }
+        }
+        $users = $query->getQuery()->execute();
 
         $output = array();
         /* @var $user \DembeloMain\Document\User */
@@ -80,7 +97,11 @@ class DefaultController extends Controller
             $obj->id = $user->getId();
             $obj->email = $user->getEmail();
             $obj->roles = join(', ', $user->getRoles());
-            $obj->licenseeId = $user->getLicenseeId();
+            $obj->licenseeId = is_null($user->getLicenseeId()) ? '' : $user->getLicenseeId();
+            $obj->gender = $user->getGender();
+            $obj->status = $user->getStatus() === 0 ? 'inaktiv' : 'aktiv';
+            $obj->source = $user->getSource();
+            $obj->reason = $user->getReason();
             $output[] = $obj;
         }
 
@@ -131,6 +152,7 @@ class DefaultController extends Controller
         $licensees = $repository->findBy(array('name' => new \MongoRegex('/'.$searchString.'/')), null, 10);
 
         $output = array();
+        /* @var $licensee \DembeloMain\Document\Licensee */
         foreach ($licensees as $licensee) {
             $output[] = array(
                 'id' => $licensee->getId(),
@@ -155,7 +177,7 @@ class DefaultController extends Controller
         $users = $repository->findAll();
 
         $output = array();
-        /* @var $user \DembeloMain\Document\User */
+        /* @var $user \DembeloMain\Document\Topic */
         foreach ($users as $user) {
             $obj = new StdClass();
             $obj->id = $user->getId();
@@ -180,7 +202,7 @@ class DefaultController extends Controller
         $users = $repository->findAll();
 
         $output = array();
-        /* @var $user \DembeloMain\Document\User */
+        /* @var $user \DembeloMain\Document\Story */
         foreach ($users as $user) {
             $obj = new StdClass();
             $obj->id = $user->getId();
@@ -231,11 +253,14 @@ class DefaultController extends Controller
             } elseif ($param == 'password') {
                 $encoder = $this->get('security.password_encoder');
                 $value = $encoder->encodePassword($item, $value);
+            } elseif ($param == 'licenseeId' && $value === '') {
+                $value = null;
             }
             $method = 'set'.ucfirst($param);
             $item->$method($value);
         }
-        $dm->persist($item);
+        //var_dump($item);die();
+        //$dm->persist($item);
         $dm->flush();
 
         $output = array(
@@ -283,5 +308,47 @@ class DefaultController extends Controller
 
         return new Response(\json_encode(array('error' => false)));
 
+    }
+
+    /**
+     * @Route("/useractivationmail", name="admin_user_activation_mail")
+     *
+     * @param Request $request
+     * @return String
+     */
+    public function useractivationmailAction(Request $request)
+    {
+        $userId = $request->request->get('userId');
+
+        /* @var $mongo \Doctrine\Bundle\MongoDBBundle\ManagerRegistry */
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $dm \Doctrine\ODM\MongoDB\DocumentManager*/
+        $dm = $mongo->getManager();
+
+        $repository = $mongo->getRepository('DembeloMain:User');
+
+        /* @var $user \DembeloMain\Document\User */
+        $user = $repository->find($userId);
+        $user->setActivationHash(sha1($user->getEmail().$user->getPassword().\time()));
+
+        $dm->persist($user);
+        $dm->flush();
+
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Dembelo - Bestätigung der Email-Adresse')
+            ->setFrom('noreply@dembelo.de')
+            ->setTo($user->getEmail())
+            ->setBody(
+                $this->renderView(
+                    // app/Resources/views/Emails/registration.html.twig
+                    'AdminBundle::Emails/registration.txt.twig',
+                    array('hash' => $user->getActivationHash())
+                ),
+                'text/html'
+            );
+
+        $this->get('mailer')->send($message);
+
+        return new Response(\json_encode(['error' => false]));
     }
 }

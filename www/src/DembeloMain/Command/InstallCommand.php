@@ -115,7 +115,15 @@ class InstallCommand extends ContainerAwareCommand
         $dm = $mongo->getManager();
 
         $users = array(
-            array('email' => 'admin@dembelo.tld', 'password' => 'dembelo', 'roles' => array('ROLE_ADMIN')),
+            array(
+                'email' => 'admin@dembelo.tld',
+                'password' => 'dembelo',
+                'roles' => array('ROLE_ADMIN'),
+                'gender' => 'm',
+                'status' => 1,
+                'source' => '',
+                'reason' => '',
+                ),
         );
 
         $this->installUsers($users, $mongo, $dm);
@@ -174,8 +182,24 @@ class InstallCommand extends ContainerAwareCommand
     private function createUsers(ManagerRegistry $mongo, DocumentManager $dm)
     {
         $users = array(
-            array('email' => 'reader@dembelo.tld', 'password' => 'dembelo', 'roles' => array('ROLE_USER')),
-            array('email' => 'licensee@dembelo.tld', 'password' => 'dembelo', 'roles' => array('ROLE_LICENSEE')),
+            array(
+                'email' => 'reader@dembelo.tld',
+                'password' => 'dembelo',
+                'roles' => array('ROLE_USER'),
+                'gender' => 'm',
+                'status' => 1,
+                'source' => '',
+                'reason' => '',
+            ),
+            array(
+                'email' => 'licensee@dembelo.tld',
+                'password' => 'dembelo',
+                'roles' => array('ROLE_LICENSEE'),
+                'gender' => 'm',
+                'status' => 1,
+                'source' => '',
+                'reason' => '',
+            ),
         );
 
         $this->installUsers($users, $mongo, $dm);
@@ -201,6 +225,10 @@ class InstallCommand extends ContainerAwareCommand
                 $password = $encoder->encodePassword($user, $userData['password']);
                 $user->setPassword($password);
                 $user->setRoles($userData['roles']);
+                $user->setGender($userData['gender']);
+                $user->setSource($userData['source']);
+                $user->setReason($userData['reason']);
+                $user->setStatus($userData['status']);
 
                 if (in_array('ROLE_LICENSEE', $userData['roles'])) {
                     $user->setLicenseeId($this->dummyData['licensees'][0]->getId());

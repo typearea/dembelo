@@ -55,16 +55,33 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testUserAction()
     {
+        $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
+        $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
+        $queryMock = $this->getMock('foobar', array('execute', 'getQuery'));
+        $postArray = array();
+        $postMock->expects($this->once())
+            ->method("get")
+            ->will($this->returnValue($postArray));
+        $request->query = $postMock;
+
+        $queryMock->expects($this->once())
+            ->method("getQuery")
+            ->will($this->returnSelf());
+
+        $queryMock->expects($this->once())
+            ->method("execute")
+            ->will($this->returnValue(array()));
+
         $this->loadMongoContainer();
         $this->repository->expects($this->once())
-            ->method("findAll")
-            ->will($this->returnValue(array()));
+            ->method("createQueryBuilder")
+            ->will($this->returnValue($queryMock));
 
         $controller = new DefaultController();
         $controller->setContainer($this->container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->usersAction();
+        $response = $controller->usersAction($request);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
         $this->assertJsonStringEqualsJsonString('[]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
@@ -75,7 +92,25 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testUserActionWithUsers()
     {
+        $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
+        $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
+        $queryMock = $this->getMock('foobar', array('execute', 'getQuery'));
+        $postArray = array();
+        $postMock->expects($this->once())
+            ->method("get")
+            ->will($this->returnValue($postArray));
+        $request->query = $postMock;
+
+        $queryMock->expects($this->once())
+            ->method("getQuery")
+            ->will($this->returnSelf());
+
         $this->loadMongoContainer();
+
+        $this->repository->expects($this->once())
+            ->method("createQueryBuilder")
+            ->will($this->returnValue($queryMock));
+
         $user1 = new User();
         $user1->setEmail('email1');
         $user1->setId('id1');
@@ -91,18 +126,18 @@ class DefaultControllerTest extends WebTestCase
             $user1,
             $user2,
         );
-        $this->repository->expects($this->once())
-            ->method("findAll")
-            ->will($this->returnValue($userArray));
 
+        $queryMock->expects($this->once())
+            ->method("execute")
+            ->will($this->returnValue($userArray));
 
         $controller = new DefaultController();
         $controller->setContainer($this->container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->usersAction();
+        $response = $controller->usersAction($request);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-        $this->assertJsonStringEqualsJsonString('[{"id":"id1","email":"email1","roles":"ROLE_ADMIN","licenseeId":"lic1"},{"id":"id2","email":"email2","roles":"ROLE_USER","licenseeId":"lic2"}]', $response->getContent());
+        $this->assertJsonStringEqualsJsonString('[{"id":"id1","gender":null,"email":"email1","roles":"ROLE_ADMIN","licenseeId":"lic1","status":"aktiv","source":null,"reason":null},{"id":"id2","email":"email2","roles":"ROLE_USER","licenseeId":"lic2","status":"aktiv","source":null,"reason":null,"gender":null}]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
     }
 
