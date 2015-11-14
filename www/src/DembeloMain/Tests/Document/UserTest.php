@@ -46,46 +46,18 @@ class UserTest extends WebTestCase
         $this->user = new User();
     }
 
-    /**
-     * tests getId()
-     */
-    public function testGetIdShouldBeEqualSetId()
+    public function testGenericMethods()
     {
-        $this->user->setId('testid');
-        $this->assertEquals('testid', $this->user->getId());
-    }
+        $properties = array('id', 'email', 'licenseeId', 'currentTextnode', 'gender', 'source', 'reason', 'password', 'status', 'activationHash');
 
-    /**
-     * tests getId()
-     */
-    public function testGetIdShouldBeNullWhenNotSet()
-    {
-        $this->assertNull($this->user->getId());
-    }
-
-    /**
-     * tests getEmail
-     */
-    public function testGetEmailShouldBeEqualSetEmail()
-    {
-        $this->user->setEmail('test');
-        $this->assertEquals('test', $this->user->getEmail());
-    }
-
-    /**
-     * tests GetEmail when not set
-     */
-    public function testGetEmailShouldBeNullWhenNotSet()
-    {
-        $this->assertNull($this->user->getEmail());
-    }
-
-    /**
-     * tests getUsername when not set
-     */
-    public function testGetUserNameShouldBeNullWhenNotSet()
-    {
-        $this->assertNull($this->user->getUsername());
+        foreach ($properties as $property) {
+            $getter = 'get' . ucfirst($property);
+            $setter = 'set' . ucfirst($property);
+            $string = tempnam($property, 'hrz');
+            $this->assertNull($this->user->$getter());
+            $this->user->$setter($string);
+            $this->assertEquals($string, $this->user->$getter());
+        }
     }
 
     /**
@@ -95,15 +67,6 @@ class UserTest extends WebTestCase
     {
         $this->user->setEmail('test');
         $this->assertEquals('test', $this->user->getUsername());
-    }
-
-    /**
-     * tests getPassword()
-     */
-    public function testGetPasswordShouldBeEqualSetPassword()
-    {
-        $this->user->setPassword('test');
-        $this->assertEquals('test', $this->user->getPassword());
     }
 
     /**
@@ -166,19 +129,52 @@ class UserTest extends WebTestCase
     }
 
     /**
-     * tests getLicenseeId()
+     * tests isAccountNonExpired
      */
-    public function testGetLicenseeIdShouldBeNullIfNotSet()
+    public function testIsAccountNonExpired()
     {
-        $this->assertNull($this->user->getLicenseeId());
+        $this->assertTrue($this->user->isAccountNonExpired());
     }
 
     /**
-     * tests setLicenseeId()
+     * tests isAccountNonLocked
      */
-    public function testGetLicenseeIdShouldBeEqualSetLicenseeId()
+    public function testIsAccountNonLocked()
     {
-        $this->user->setLicenseeId('test');
-        $this->assertEquals('test', $this->user->getLicenseeId());
+        $this->assertTrue($this->user->isAccountNonLocked());
+    }
+
+    /**
+     * tests isCredentialsNonExpired
+     */
+    public function testIsCredentialsNonExpired()
+    {
+        $this->assertTrue($this->user->isCredentialsNonExpired());
+    }
+
+    /**
+     * tests isEnabled for not set status
+     */
+    public function testIsEnabledDefault()
+    {
+        $this->assertFalse($this->user->isEnabled());
+    }
+
+    /**
+     * tests isEnabled for status = 0
+     */
+    public function testIsEnabledForStatusZero()
+    {
+        $this->user->setStatus(0);
+        $this->assertFalse($this->user->isEnabled());
+    }
+
+    /**
+     * tests isEnabled for status = 1
+     */
+    public function testIsEnabledForStatusOne()
+    {
+        $this->user->setStatus(1);
+        $this->assertTrue($this->user->isEnabled());
     }
 }

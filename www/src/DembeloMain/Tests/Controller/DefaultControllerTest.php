@@ -229,4 +229,29 @@ class DefaultControllerTest extends WebTestCase
     }
 
     /** @todo Implement testReadTextnodeWithLogin(). */
+
+    public function xtestPaywallAction()
+    {
+        $textnodeId = 'textnode1';
+        $hitchIndex = 123;
+        $container = $this->getMock("Symfony\Component\DependencyInjection\ContainerInterface");
+        $repository = $this->getMockBuilder("Doctrine\ODM\MongoDB\DocumentRepository")->disableOriginalConstructor()->getMock();
+        $service = $this->getMockBuilder("Doctrine\Bundle\MongoDBBundle\ManagerRegistry")->disableOriginalConstructor()->getMock();
+        $container->expects($this->once())
+            ->method("get")
+            ->with($this->equalTo('doctrine_mongodb'))
+            ->will($this->returnValue($service));
+        $service->expects($this->once())
+            ->method("getRepository")
+            ->with($this->equalTo('DembeloMain:Textnode'))
+            ->will($this->returnValue($repository));
+
+        $controller = new DefaultController();
+        $controller->setContainer($container);
+
+        $response = $controller->paywallAction($textnodeId, $hitchIndex);
+        $json = $response->getContent();
+        $this->assertJson($json);
+        $json = json_decode($json);
+    }
 }
