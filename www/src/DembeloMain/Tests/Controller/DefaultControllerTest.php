@@ -229,7 +229,6 @@ class DefaultControllerTest extends WebTestCase
     }
 
     /** @todo Implement testReadTextnodeWithLogin(). */
-
     public function xtestPaywallAction()
     {
         $textnodeId = 'textnode1';

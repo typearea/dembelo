@@ -46,13 +46,16 @@ class UserTest extends WebTestCase
         $this->user = new User();
     }
 
+    /**
+     * a generic test for all class properties
+     */
     public function testGenericMethods()
     {
         $properties = array('id', 'email', 'licenseeId', 'currentTextnode', 'gender', 'source', 'reason', 'password', 'status', 'activationHash');
 
         foreach ($properties as $property) {
-            $getter = 'get' . ucfirst($property);
-            $setter = 'set' . ucfirst($property);
+            $getter = 'get'.ucfirst($property);
+            $setter = 'set'.ucfirst($property);
             $string = tempnam($property, 'hrz');
             $this->assertNull($this->user->$getter());
             $this->user->$setter($string);
