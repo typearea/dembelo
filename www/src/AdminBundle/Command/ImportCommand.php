@@ -28,7 +28,6 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use DembeloMain\Document\Textnode;
 
@@ -67,22 +66,19 @@ class ImportCommand extends ContainerAwareCommand
                 InputArgument::REQUIRED,
                 'The path of the Twine archive file.'
             )
-            ->addOption(
+            ->addArgument(
                 'licensee-name',
-                'l',
-                InputOption::VALUE_REQUIRED,
+                InputArgument::REQUIRED,
                 'The name of the licensee to which the imported textnodes belong to.'
             )
-            ->addOption(
+            ->addArgument(
                 'metadata-author',
-                'a',
-                InputOption::VALUE_REQUIRED,
+                InputArgument::REQUIRED,
                 'The author of all the stories in the Twine archive file (will end up as metadata).'
             )
-            ->addOption(
+            ->addArgument(
                 'metadata-publisher',
-                'p',
-                InputOption::VALUE_REQUIRED,
+                InputArgument::REQUIRED,
                 'The publisher of all the stories in the Twine archive file (will end up as metadata).'
             );
     }
@@ -97,15 +93,15 @@ class ImportCommand extends ContainerAwareCommand
         $repositoryLicensee = $this->mongo->getRepository('DembeloMain:Licensee');
 
         $this->licensee = $repositoryLicensee->createQueryBuilder()
-            ->field('name')->equals($input->getOption('licensee-name'))
+            ->field('name')->equals($input->getArgument('licensee-name'))
             ->getQuery()->getSingleResult();
 
         if (is_null($this->licensee)) {
-            throw new \Exception("<error>A Licensee named '".$input->getOption('licensee-name')."' doesn't exist.</error>");
+            throw new \Exception("<error>A Licensee named '".$input->getArgument('licensee-name')."' doesn't exist.</error>");
         }
 
-        $this->author = $input->getOption('metadata-author');
-        $this->publisher = $input->getOption('metadata-publisher');
+        $this->author = $input->getArgument('metadata-author');
+        $this->publisher = $input->getArgument('metadata-publisher');
 
         $this->licensee = $this->licensee->getId();
 
