@@ -88,11 +88,13 @@ class ImportCommand extends ContainerAwareCommand
         $styleWarning = new OutputFormatterStyle('black', 'yellow');
         $output->getFormatter()->setStyle('warning', $styleWarning);
 
-
         $this->mongo = $this->getContainer()->get('doctrine_mongodb');
         $this->dm = $this->mongo->getManager();
+        $repositoryLicensee = $this->mongo->getRepository('DembeloMain:Licensee');
 
-        $this->licensee = $this->getContainer()->get('licensee_repository')->findByName($input->getArgument('licensee-name'));
+        $this->licensee = $repositoryLicensee->createQueryBuilder()
+            ->field('name')->equals($input->getArgument('licensee-name'))
+            ->getQuery()->getSingleResult();
 
         if (is_null($this->licensee)) {
             throw new \Exception("<error>A Licensee named '".$input->getArgument('licensee-name')."' doesn't exist.</error>");

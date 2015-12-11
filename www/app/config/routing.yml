@@ -1,7 +1,3 @@
-data_management_domain:
-    resource: "@DataManagementDomainBundle/"
-    prefix:   /
-
 app:
     resource: "@DembeloMain/Controller/"
     type:     annotation
