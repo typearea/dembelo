@@ -104,6 +104,57 @@ class ImportCommand extends ContainerAwareCommand
             );
     }
 
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->output = $output;
+        $this->prepare($input);
+
+        if (file_exists($this->twineArchivePath) !== true) {
+            $this->output->writeln("<error>Parameter 'twine-archive-file': File '".$this->twineArchivePath."' doesn't exist.</error>");
+
+            return -1;
+        }
+
+        if (is_readable($this->twineArchivePath) !== true) {
+            $this->output->writeln("<error>Parameter 'twine-archive-file': File '".$this->twineArchivePath."' isn't readable.</error>");
+
+            return -1;
+        }
+
+        $fileHandler = fopen($this->twineArchivePath, "rb");
+
+        if ($fileHandler === false) {
+            $this->output->writeln("<error>Couldn't open file '".$this->twineArchivePath."'.</error>");
+
+            return -1;
+        }
+
+        $xmlParser = xml_parser_create("UTF-8");
+
+        try {
+            $this->checkTwineFile($fileHandler);
+
+            if (!$this->initParser($xmlParser, $fileHandler)) {
+                return 1;
+            }
+
+            $this->dm->flush();
+
+        } catch (\Exception $ex) {
+            $output->writeln($ex->getMessage());
+
+            xml_parser_free($xmlParser);
+
+            if (fclose($fileHandler) === false) {
+                $this->output->writeln("<warning>Couldn't close file '".$this->twineArchivePath."'.</warning>");
+            }
+
+            return -1;
+        }
+
+        return 0;
+    }
+
     private function checkTwineFile($fileHandler)
     {
         $magicString = "<tw-storydata ";
@@ -235,58 +286,6 @@ class ImportCommand extends ContainerAwareCommand
         }
 
         return true;
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $this->output = $output;
-        $this->prepare($input);
-
-        if (file_exists($this->twineArchivePath) !== true) {
-            $this->output->writeln("<error>Parameter 'twine-archive-file': File '".$this->twineArchivePath."' doesn't exist.</error>");
-
-            return -1;
-        }
-
-        if (is_readable($this->twineArchivePath) !== true) {
-            $this->output->writeln("<error>Parameter 'twine-archive-file': File '".$this->twineArchivePath."' isn't readable.</error>");
-
-            return -1;
-        }
-
-        $fileHandler = fopen($this->twineArchivePath, "rb");
-
-        if ($fileHandler === false) {
-            $this->output->writeln("<error>Couldn't open file '".$this->twineArchivePath."'.</error>");
-
-            return -1;
-        }
-
-        $xmlParser = xml_parser_create("UTF-8");
-
-        try {
-
-            $this->checkTwineFile($fileHandler);
-
-            if (!$this->initParser($xmlParser, $fileHandler)) {
-                return 1;
-            }
-
-            $this->dm->flush();
-
-        } catch (\Exception $ex) {
-            $output->writeln($ex->getMessage());
-
-            xml_parser_free($xmlParser);
-
-            if (fclose($fileHandler) === false) {
-                $this->output->writeln("<warning>Couldn't close file '".$this->twineArchivePath."'.</warning>");
-            }
-
-            return -1;
-        }
-
-        return 0;
     }
 
     private function startElementStoryData($name, $attrs)
