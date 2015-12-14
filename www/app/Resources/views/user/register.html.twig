@@ -24,8 +24,17 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 <div class="container-fluid">
     <div id="row1" class="row ">
         <div class="col-xs-12">
-            <h1>Registrierungsformular</h1>
-            Da wir uns in einer geschlossenen Betaphase befinden, ist eine Registrierung noch nicht möglich.
+            <h1>Registrierung</h1>
+            <div class="alert alert-info" role="alert">
+                Ab dem 14.12.2015 startet die geschlossene Beta von <em>"waszulesen.de"</em>. Die bis dahin
+                registrierten Testleser bekommen ca. 70 Textknoten aus dem <em>"Steine im Weste"</em>-Projekt zu lesen,
+                angeordnet in einem hierarchischen und in einem ungeordneten Netzwerk. Die Texte entstehen im Rahmen von
+                <em>"NaNoWriMo"</em>, werden daher Rohfassungen sein. Der Zweck der Beta besteht darin, das Verhalten
+                von Lesern in vernetzten Inhalten zu beobachten und zu testen.
+            </div>
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            {{ form_end(form) }}
         </div>
     </div>
 </div>

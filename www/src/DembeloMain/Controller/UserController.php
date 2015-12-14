@@ -79,14 +79,83 @@ class UserController extends Controller
     }
 
     /**
-     * @Route("/register", name="register")
+     * @Route("/registration", name="register")
+     *
+     * @param Request $request request object
      *
      * @return string
      */
-    public function registerAction()
+    public function registrationAction(Request $request)
     {
+        $user = new User();
+        $user->setRoles(['ROLE_USER']);
+        $user->setStatus(0);
+        $form = $this->createFormBuilder($user)
+            ->add('email', 'email')
+            ->add('password', 'password', array('label' => 'Passwort'))
+            ->add('gender', 'choice', array(
+                'choices'  => array('m' => 'männlich', 'f' => 'weiblich'),
+                'label' => 'Geschlecht',
+                'required' => false,
+                ))
+            ->add('source', 'text', array('label' => 'Wo hast du von Dembelo erfahren?', 'required' => false))
+            ->add('reason', 'textarea', array('label' => 'Wieso möchtest du an der geschlossenen Beta teilnehmen?', 'required' => false))
+            ->add('save', 'submit', array('label' => 'Registrierung anfordern'))
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $mongo = $this->get('doctrine_mongodb');
+            $dm = $mongo->getManager();
+            $encoder = $this->get('security.password_encoder');
+            $password = $encoder->encodePassword($user, $user->getPassword());
+            $user->setPassword($password);
+            $dm->persist($user);
+            $dm->flush();
+
+            return $this->redirectToRoute('registration_success');
+        }
+
         return $this->render(
             'user/register.html.twig',
+            array('form' => $form->createView())
+        );
+    }
+
+    /**
+     * @Route("/registrationSuccess", name="registration_success")
+     *
+     * @return string
+     */
+    public function registrationsuccessAction()
+    {
+        return $this->render(
+            'user/registrationSuccess.html.twig',
+            array()
+        );
+    }
+
+    /**
+     * @Route("/activation/{hash}", name="emailactivation")
+     *
+     * @param string $hash activation hash
+     *
+     * @return string
+     */
+    public function activateemailAction($hash)
+    {
+        $mongo = $this->get('doctrine_mongodb');
+        $repository = $mongo->getRepository('DembeloMain:User');
+        $dm = $mongo->getManager();
+        $user = $repository->findOneByActivationHash($hash);
+        $user->setActivationHash('');
+        $user->setStatus(1);
+        $dm->persist($user);
+        $dm->flush();
+
+        return $this->render(
+            'user/activationSuccess.html.twig',
             array()
         );
     }
