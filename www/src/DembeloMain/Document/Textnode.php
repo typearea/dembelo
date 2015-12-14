@@ -221,7 +221,8 @@ class Textnode
     /**
      * sets the access parameter
      *
-     * @param bool $access
+     * @param bool $access true if this Textnode is a start textnode
+     *     from which a reading path begins.
      */
     public function setAccess($access)
     {
@@ -231,7 +232,8 @@ class Textnode
     /**
      * gets the access parameter
      *
-     * @return bool
+     * @return bool true|false true, if this Textnode is a start textnode
+     *     from which a reading path begins.
      */
     public function getAccess()
     {
