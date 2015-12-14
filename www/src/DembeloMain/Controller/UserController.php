@@ -97,7 +97,7 @@ class UserController extends Controller
                 'choices'  => array('m' => 'männlich', 'f' => 'weiblich'),
                 'label' => 'Geschlecht',
                 'required' => false,
-                ))
+            ))
             ->add('source', 'text', array('label' => 'Wo hast du von Dembelo erfahren?', 'required' => false))
             ->add('reason', 'textarea', array('label' => 'Wieso möchtest du an der geschlossenen Beta teilnehmen?', 'required' => false))
             ->add('save', 'submit', array('label' => 'Registrierung anfordern'))
