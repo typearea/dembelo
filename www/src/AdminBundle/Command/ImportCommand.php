@@ -157,7 +157,8 @@ class ImportCommand extends ContainerAwareCommand
         return 0;
     }
 
-    private function extractTwineFile($file) {
+    private function extractTwineFile($file)
+    {
         $extractedFile = $file.'.extracted';
 
         $fileHandle = fopen($file, 'r');
@@ -167,7 +168,7 @@ class ImportCommand extends ContainerAwareCommand
         }
         $writing = false;
         $matches = array();
-        while(($row = fgets($fileHandle)) !== false) {
+        while (($row = fgets($fileHandle)) !== false) {
             if ($writing) {
                 if (preg_match('(^.*</tw-storydata>)', $row, $matches)) {
                     fputs($extractedFileHandle, $matches[0]);
