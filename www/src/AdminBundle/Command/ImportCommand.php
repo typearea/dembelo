@@ -121,7 +121,9 @@ class ImportCommand extends ContainerAwareCommand
             return -1;
         }
 
-        $fileHandler = fopen($this->twineArchivePath, "rb");
+        $this->extractTwineFile($this->twineArchivePath);
+
+        $fileHandler = fopen($this->twineArchivePath.'.extracted', "rb");
 
         if ($fileHandler === false) {
             $this->output->writeln("<error>Couldn't open file '".$this->twineArchivePath."'.</error>");
@@ -155,12 +157,43 @@ class ImportCommand extends ContainerAwareCommand
         return 0;
     }
 
+    private function extractTwineFile($file) {
+        $extractedFile = $file.'.extracted';
+
+        $fileHandle = fopen($file, 'r');
+        $extractedFileHandle = fopen($extractedFile, 'w');
+        if ($fileHandle === false) {
+            throw new \Exception("<error>Failed to read data from file '".$this->twineArchivePath."'.</error>");
+        }
+        $writing = false;
+        $matches = array();
+        while(($row = fgets($fileHandle)) !== false) {
+            if ($writing) {
+                if (preg_match('(^.*</tw-storydata>)', $row, $matches)) {
+                    fputs($extractedFileHandle, $matches[0]);
+                    break;
+                }
+                fputs($extractedFileHandle, $row);
+            } else {
+                if (preg_match('(<tw-storydata.*$)', $row, $matches)) {
+                    fputs($extractedFileHandle, $matches[0]);
+                    $writing = true;
+                }
+            }
+
+        }
+
+        fclose($fileHandle);
+        fclose($extractedFileHandle);
+
+    }
+
     private function checkTwineFile($fileHandler)
     {
         $magicString = "<tw-storydata ";
         $magicStringLength = strlen($magicString);
 
-        $peekData = @fread($fileHandler, 1024);
+        $peekData = fread($fileHandler, 1024);
 
         if ($peekData === false) {
             throw new \Exception("<error>Failed to read data from file '".$this->twineArchivePath."'.</error>");
@@ -313,7 +346,7 @@ class ImportCommand extends ContainerAwareCommand
         $twineStory = explode("-->", $attrs['name'], 2);
 
         if (count($twineStory) !== 2) {
-            throw new \Exception("<error>There is a '".$name."' in the Twine archive file '".$this->twineArchivePath."' which has an incomplete 'name' attribute. Twine stories must use the naming schema '?->story name', where '?' is an existing Dembelo Topic Id. Instead, '".$attrs['name']."' was found.</error>");
+            throw new \Exception("<error>There is a '".$name."' in the Twine archive file '".$this->twineArchivePath."' which has an incomplete 'name' attribute. Twine stories must use the naming schema '?-->story name', where '?' is an existing Dembelo Topic Id. Instead, '".$attrs['name']."' was found.</error>");
         }
 
         $this->topicId = $twineStory[0];
