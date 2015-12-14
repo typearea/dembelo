@@ -392,9 +392,13 @@ class ImportCommand extends ContainerAwareCommand
         $this->textnode->setCreated(date('Y-m-d H:i:s'));
         $this->textnode->setTopicId($this->topicId);
         $this->textnode->setLicenseeId($this->licensee);
-        $this->textnode->setMetadata(array('Titel' => $this->twineTextnodeName,
-            'Autor' => $this->author,
-            'Verlag' => $this->publisher, ));
+        $this->textnode->setMetadata(
+            array(
+                'Titel' => $this->twineTextnodeName,
+                'Autor' => $this->author,
+                'Verlag' => $this->publisher,
+            )
+        );
 
         if ($attrs['pid'] == $this->twineStartnodeId) {
             if ($this->accessSet !== true) {
