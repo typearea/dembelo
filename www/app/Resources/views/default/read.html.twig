@@ -27,7 +27,7 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 {% block body %}
 
 <div class="read">
-{{ textnode.text | raw }}
+{{ hyphenated | raw }}
 </div>
 
 {% set hitchCount = textnode.getHitchCount() %}

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3617403cabb8b0982c986e4954fe7053",
-    "content-hash": "2a9f62842400dc97c9f1d6113e9373f7",
+    "hash": "47d50a87204d0d111e807cad56677f28",
+    "content-hash": "359f6e6a87629e93755b005ace0d4204",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -764,7 +764,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/mongodb-odm/zipball/c3933ad5eb0c23e7262f60efa1ad12605484bf48",
+                "url": "https://api.github.com/repos/doctrine/mongodb-odm/zipball/c0c7220de7aad8638e0389508e401cc4da245f2a",
                 "reference": "c3933ad5eb0c23e7262f60efa1ad12605484bf48",
                 "shasum": ""
             },
@@ -1905,6 +1905,50 @@
                 "templating"
             ],
             "time": "2015-09-22 13:59:32"
+        },
+        {
+            "name": "webrocker/hyphenator",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webrocker/hyphenator.git",
+                "reference": "7978ca8f178858f5a4a25d45079172e7d2c368f7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webrocker/hyphenator/zipball/7978ca8f178858f5a4a25d45079172e7d2c368f7",
+                "reference": "7978ca8f178858f5a4a25d45079172e7d2c368f7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Hyphenator": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "New BSD"
+            ],
+            "authors": [
+                {
+                    "name": "Marco Fischer",
+                    "email": "mfischer@web-rocker.de",
+                    "homepage": "http://web-rocker.de",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Hyphenator is a cache-enabled PHP port of the JavaScript Hyphenator.js by Mathias Nater.",
+            "homepage": "https://github.com/webrocker/hyphenator",
+            "keywords": [
+                "hyphenate",
+                "hyphenation",
+                "hyphenator"
+            ],
+            "time": "2012-08-21 19:29:18"
         }
     ],
     "packages-dev": [
@@ -2978,6 +3022,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "doctrine/mongodb-odm": 20,
+        "webrocker/hyphenator": 20,
         "apoutchika/loremipsum-bundle": 20
     },
     "prefer-stable": false,

@@ -32,6 +32,7 @@ use DembeloMain\Document\Topic;
 use DembeloMain\Document\Story;
 use DembeloMain\Document\Textnode;
 use Symfony\Component\HttpFoundation\Response;
+use Hyphenator\Core as Hyphenator;
 
 /**
  * Class DefaultController
@@ -186,7 +187,17 @@ class DefaultController extends Controller
 
         $textnode = $textnodes[0];
 
-        return $this->render('default/read.html.twig', array('textnode' => $textnode));
+        $hyphenator = new Hyphenator();
+        $hyphenator->registerPatterns('de');
+        $hyphenator->setHyphen('&shy;');
+
+        return $this->render(
+            'default/read.html.twig',
+            array(
+                'textnode' => $textnode,
+                'hyphenated' => $hyphenator->hyphenate($textnode->getText())
+            )
+        );
     }
 
     /**
