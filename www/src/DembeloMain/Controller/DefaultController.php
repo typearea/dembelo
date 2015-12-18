@@ -195,7 +195,7 @@ class DefaultController extends Controller
             'default/read.html.twig',
             array(
                 'textnode' => $textnode,
-                'hyphenated' => $hyphenator->hyphenate($textnode->getText())
+                'hyphenated' => $hyphenator->hyphenate($textnode->getText()),
             )
         );
     }
