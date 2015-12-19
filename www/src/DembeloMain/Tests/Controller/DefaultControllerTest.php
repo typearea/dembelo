@@ -55,10 +55,9 @@ class DefaultControllerTest extends WebTestCase
      */
 
     /**
-     * Tests how the first textnode of a topic gets found based on the topic ID
-     *     without an active user session.
+     * Tests how the first textnode of a topic gets found based on the topic ID.
      */
-    public function testReadTopicWithoutLogin()
+    public function testReadTopic()
     {
         $textnode = new Textnode();
         $textnode->setId("55f5ab3708985c4b188b4577");
@@ -68,22 +67,12 @@ class DefaultControllerTest extends WebTestCase
         $textnode->setText("Lorem ipsum dolor sit amet.");
 
         $container = $this->getMock("Symfony\Component\DependencyInjection\ContainerInterface");
-        $authorizationChecker = $this->getMockBuilder('foobar')->setMethods(array('isGranted'))->getMock();
-        $tokenStorage = $this->getMockBuilder("Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage")->disableOriginalConstructor()->getMock();
         $mongo = $this->getMockBuilder("Doctrine\Bundle\MongoDBBundle\ManagerRegistry")->disableOriginalConstructor()->getMock();
         $repository = $this->getMockBuilder("Doctrine\ODM\MongoDB\DocumentRepository")->disableOriginalConstructor()->getMock();
         $router = $this->getMock("Symfony\Component\Routing\RouterInterface");
         $queryBuilder = $this->getMockBuilder("Doctrine\ODM\MongoDB\QueryBuilder")->setMethods(array('field', 'equals', 'getQuery', 'getSingleResult'))->getMock();
 
         $container->expects($this->at(0))
-            ->method("get")
-            ->with($this->equalTo('security.authorization_checker'))
-            ->will($this->returnValue($authorizationChecker));
-        $container->expects($this->at(1))
-            ->method("get")
-            ->with($this->equalTo('security.token_storage'))
-            ->will($this->returnValue($tokenStorage));
-        $container->expects($this->at(2))
             ->method("get")
             ->with($this->equalTo('doctrine_mongodb'))
             ->will($this->returnValue($mongo));
@@ -92,42 +81,30 @@ class DefaultControllerTest extends WebTestCase
             ->with($this->equalTo('DembeloMain:Textnode'))
             ->will($this->returnValue($repository));
 
-        $authorizationChecker->expects($this->once())
-            ->method('isGranted')
-            ->with($this->equalTo('ROLE_USER'))
-            ->will($this->returnValue(false));
-
         $queryBuilder->expects($this->at(0))
             ->method('field')
             ->with('topicId')
             ->will($this->returnSelf());
-
         $queryBuilder->expects($this->at(1))
             ->method('equals')
             ->will($this->returnSelf());
-
         $queryBuilder->expects($this->at(2))
             ->method('field')
             ->with('status')
             ->will($this->returnSelf());
-
         $queryBuilder->expects($this->at(3))
             ->method('equals')
             ->will($this->returnSelf());
-
         $queryBuilder->expects($this->at(4))
             ->method('field')
             ->with('access')
             ->will($this->returnSelf());
-
         $queryBuilder->expects($this->at(5))
             ->method('equals')
             ->will($this->returnSelf());
-
         $queryBuilder->expects($this->once())
             ->method('getQuery')
             ->will($this->returnSelf());
-
         $queryBuilder->expects($this->once())
             ->method('getSingleResult')
             ->will($this->returnValue($textnode));
@@ -136,7 +113,7 @@ class DefaultControllerTest extends WebTestCase
             ->method("createQueryBuilder")
             ->will($this->returnValue($queryBuilder));
 
-        $container->expects($this->at(3))
+        $container->expects($this->at(1))
             ->method("get")
             ->with($this->equalTo('router'))
             ->will($this->returnValue($router));
@@ -154,8 +131,6 @@ class DefaultControllerTest extends WebTestCase
         $this->assertEquals('302', $result->getStatusCode());
         $this->assertEquals('text/'.$textnode->getId(), $result->getTargetUrl());
     }
-
-    /** @todo Implement testReadTopicWithLogin(). */
 
     /**
      * Tests the action of reading a textnode without an active

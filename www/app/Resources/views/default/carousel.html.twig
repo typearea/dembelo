@@ -1,3 +1,23 @@
+{#
+Copyright (C) 2015 Tina Giesler, Stephan Kreutzer
+
+This file is part of Dembelo.
+
+Dembelo is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Dembelo is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License 3 for more details.
+
+You should have received a copy of the GNU Affero General Public License 3
+along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
+#}
+
+
 <div id="carousel-bookmark" class="carousel slide" data-ride="carousel">
   <!-- Positionsanzeiger -->
   <ol class="carousel-indicators">
@@ -9,27 +29,81 @@
   <!-- Verpackung für die Elemente -->
   <div class="carousel-inner" role="listbox">
     <div class="item active">
+      {% if bookmarks[0] is defined %}
+        {% if bookmarks[0].id %}
+          <a href="{{ path('text', {'textnodeId': bookmarks[0].id}) }}">
+        {% endif %}
+      {% endif %}
       {% image '@DembeloMain/Resources/public/images/lesezeichen01.jpg' %}
       <img src="{{ asset_url }}" alt="Lesezeichen 1" />
       {% endimage %}
+      {% if bookmarks[0] is defined %}
+        {% if bookmarks[0].id %}
+          </a>
+        {% endif %}
+      {% endif %}
       <div class="carousel-caption">
-        Dein erstes Lesezeichen
+        {% if bookmarks[0] is defined %}
+          {% if bookmarks[0].metadata['Titel'] %}
+            {{ bookmarks[0].metadata['Titel'] | raw }}
+          {% else %}
+            Lesezeichen 1
+          {% endif %}
+        {% else %}
+          Dein erstes Lesezeichen
+        {% endif %}
       </div>
     </div>
     <div class="item">
+      {% if bookmarks[1] is defined %}
+        {% if bookmarks[1].id %}
+          <a href="{{ path('text', {'textnodeId': bookmarks[1].id}) }}">
+        {% endif %}
+      {% endif %}
       {% image '@DembeloMain/Resources/public/images/lesezeichen02.jpg' %}
       <img src="{{ asset_url }}" alt="Lesezeichen 2" />
       {% endimage %}
+      {% if bookmarks[1] is defined %}
+        {% if bookmarks[1].id %}
+          </a>
+        {% endif %}
+      {% endif %}
       <div class="carousel-caption">
-        Dein zweites Lesezeichen
+        {% if bookmarks[1] is defined %}
+          {% if bookmarks[1].metadata['Titel'] %}
+            {{ bookmarks[1].metadata['Titel'] | raw }}
+          {% else %}
+            Lesezeichen 2
+          {% endif %}
+        {% else %}
+          Dein zweites Lesezeichen
+        {% endif %}
       </div>
     </div>
     <div class="item">
+      {% if bookmarks[2] is defined %}
+        {% if bookmarks[2].id %}
+          <a href="{{ path('text', {'textnodeId': bookmarks[2].id}) }}">
+        {% endif %}
+      {% endif %}
       {% image '@DembeloMain/Resources/public/images/lesezeichen03.jpg' %}
       <img src="{{ asset_url }}" alt="Lesezeichen 3" />
       {% endimage %}
+      {% if bookmarks[2] is defined %}
+        {% if bookmarks[2].id %}
+          </a>
+        {% endif %}
+      {% endif %}
       <div class="carousel-caption">
-        Dein drittes Lesezeichen
+        {% if bookmarks[2] is defined %}
+          {% if bookmarks[2].metadata['Titel'] %}
+            {{ bookmarks[2].metadata['Titel'] | raw }}
+          {% else %}
+            Lesezeichen 3
+          {% endif %}
+        {% else %}
+          Dein drittes Lesezeichen
+        {% endif %}
       </div>
     </div>
   </div>

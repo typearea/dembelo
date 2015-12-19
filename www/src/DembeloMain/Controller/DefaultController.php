@@ -58,19 +58,23 @@ class DefaultController extends Controller
         /* @var $tokenStorage Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage */
         $tokenStorage = $this->get('security.token_storage');
 
+        $arguments = array();
+
         if ($authorizationChecker->isGranted('ROLE_USER')) {
             $user = $tokenStorage->getToken()->getUser();
 
             $textnodeId = $user->getCurrentTextnode();
 
             if (!is_null($textnodeId)) {
-                /**
-                 * @todo Redirect to textnode, if the user browsed the index page directly (without
-                 *     navigating to the index page via the menu) with an active user session resulting
-                 *     from the "remember me" (cookie based) option. If the latter case isn't identified
-                 *     correctly, the index page may always redirect to a textnode and wouldn't be
-                 *     browsable any more.
-                 */
+                $repository = $mongo->getRepository('DembeloMain:Textnode');
+                $textnodes = $repository->findBy(array(
+                    'id' => new \MongoId($textnodeId),
+                    'status' => Textnode::STATUS_ACTIVE,
+                ));
+
+                if (!empty($textnodes)) {
+                    $arguments['bookmarks'] = array($textnodes[0]);
+                }
             }
         }
 
@@ -78,10 +82,10 @@ class DefaultController extends Controller
         $topics = $repository->findByStatus(Topic::STATUS_ACTIVE);
 
         if (!empty($topics)) {
-            return $this->render('default/index.html.twig', array('topics' => $topics));
+            $arguments['topics'] = $topics;
         }
 
-        return $this->render('default/index.html.twig');
+        return $this->render('default/index.html.twig', $arguments);
     }
 
     /**
@@ -93,46 +97,7 @@ class DefaultController extends Controller
      */
     public function readTopicAction($topicId)
     {
-        $textnodes = null;
-
-        /* @var $authorizationChecker \Symfony\Component\Security\Core\Authorization\AuthorizationChecker */
-        $authorizationChecker = $this->get('security.authorization_checker');
-        /* @var $tokenStorage Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage */
-        $tokenStorage = $this->get('security.token_storage');
         $mongo = $this->get('doctrine_mongodb');
-
-        if ($authorizationChecker->isGranted('ROLE_USER')) {
-            $user = $tokenStorage->getToken()->getUser();
-
-            $textnodeId = $user->getCurrentTextnode();
-
-            if (is_null($textnodeId)) {
-                $repository = $mongo->getRepository('DembeloMain:Textnode');
-                $textnode = $repository->createQueryBuilder()
-                    ->field('topicId')->equals(new \MongoId($topicId))
-                    ->field('status')->equals(Textnode::STATUS_ACTIVE)
-                    ->field('access')->equals(true)
-                    ->getQuery()->getSingleResult();
-
-                if (is_null($textnode)) {
-                    throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found, while the user was logged in, but without current textnode ID set.');
-                }
-
-                return $this->redirectToRoute('text', array('textnodeId' => $textnode->getId()));
-            } else {
-                $repository = $mongo->getRepository('DembeloMain:Textnode');
-                $textnodes = $repository->findBy(array(
-                    'id' => new \MongoId($textnodeId),
-                    'status' => Textnode::STATUS_ACTIVE,
-                ));
-
-                if (empty($textnodes)) {
-                    throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found, while the user was logged in with the current textnode ID \''.$textnodeId.'\' set.');
-                }
-
-                return $this->redirectToRoute('text', array('textnodeId' => $textnodes[0]->getId()));
-            }
-        }
 
         $repository = $mongo->getRepository('DembeloMain:Textnode');
         $textnode = $repository->createQueryBuilder()
@@ -142,7 +107,7 @@ class DefaultController extends Controller
             ->getQuery()->getSingleResult();
 
         if (is_null($textnode)) {
-            throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found, while the user wasn\'t logged in.');
+            throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found.');
         }
 
         return $this->redirectToRoute('text', array('textnodeId' => $textnode->getId()));
