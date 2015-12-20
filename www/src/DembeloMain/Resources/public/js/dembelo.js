@@ -43,12 +43,14 @@
     );
 
     function resizeImages() {
+        setTimeout(function () {
         $('#main-page img').each(
             function () {
                 resizeImage(this);
 
             }
         );
+        }, 200);
     }
 
     function resizeImage(imageElement) {
