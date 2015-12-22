@@ -78,10 +78,10 @@ class DefaultController extends Controller
         $topics = $repository->findByStatus(Topic::STATUS_ACTIVE);
 
         if (!empty($topics)) {
-            return $this->render('default/index.html.twig', array('topics' => $topics));
+            return $this->render('DembeloMain::default/index.html.twig', array('topics' => $topics));
         }
 
-        return $this->render('default/index.html.twig');
+        return $this->render('DembeloMain::default/index.html.twig');
     }
 
     /**
@@ -192,7 +192,7 @@ class DefaultController extends Controller
         $hyphenator->setHyphen('&shy;');
 
         return $this->render(
-            'default/read.html.twig',
+            'DembeloMain::default/read.html.twig',
             array(
                 'textnode' => $textnode,
                 'hyphenated' => $hyphenator->hyphenate($textnode->getText()),
