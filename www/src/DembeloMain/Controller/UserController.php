@@ -60,7 +60,7 @@ class UserController extends Controller
 
 
         return $this->render(
-            'user/login.html.twig',
+            'DembeloMain::user/login.html.twig',
             array(
                 'error' => $error,
                 'form' => $form->createView(),
@@ -118,7 +118,7 @@ class UserController extends Controller
         }
 
         return $this->render(
-            'user/register.html.twig',
+            'DembeloMain::user/register.html.twig',
             array('form' => $form->createView())
         );
     }
@@ -131,7 +131,7 @@ class UserController extends Controller
     public function registrationsuccessAction()
     {
         return $this->render(
-            'user/registrationSuccess.html.twig',
+            'DembeloMain::user/registrationSuccess.html.twig',
             array()
         );
     }
@@ -155,7 +155,7 @@ class UserController extends Controller
         $dm->flush();
 
         return $this->render(
-            'user/activationSuccess.html.twig',
+            'DembeloMain::user/activationSuccess.html.twig',
             array()
         );
     }

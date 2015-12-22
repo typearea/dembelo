@@ -82,7 +82,7 @@ class UserControllerTest extends WebTestCase
             ->will($this->returnValue($authErr));
         $mock->expects($this->once())
             ->method('renderResponse')
-            ->with('user/login.html.twig', array('error' => $authErr, 'form' => $formView));
+            ->with('DembeloMain::user/login.html.twig', array('error' => $authErr, 'form' => $formView));
         $mock->expects($this->once())
             ->method('generate')
             ->will($this->returnValue($loginUrl));
@@ -129,7 +129,7 @@ class UserControllerTest extends WebTestCase
             ->will($this->returnValue($mock));
         $mock->expects($this->once())
             ->method('renderResponse')
-            ->with('user/register.html.twig', array('form' => 'createViewReturnValue'));
+            ->with('DembeloMain::user/register.html.twig', array('form' => 'createViewReturnValue'));
         $mock->expects($this->any())
             ->method('createBuilder')
             ->with('form', $this->isInstanceOf('DembeloMain\Document\User'))

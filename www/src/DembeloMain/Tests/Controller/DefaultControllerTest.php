@@ -217,7 +217,7 @@ class DefaultControllerTest extends WebTestCase
             ->will($this->returnValue($template));
         $template->expects($this->once())
             ->method("renderResponse")
-            ->with("default/read.html.twig", array("textnode" => $textnode, 'hyphenated' => 'Lo&shy;rem ip&shy;sum do&shy;lor sit amet.'))
+            ->with("DembeloMain::default/read.html.twig", array("textnode" => $textnode, 'hyphenated' => 'Lo&shy;rem ip&shy;sum do&shy;lor sit amet.'))
             ->will($this->returnValue('renderresponse'));
 
         $controller = new DefaultController();

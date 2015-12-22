@@ -18,7 +18,7 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 #}
 
 
-{% extends 'base.html.twig' %}
+{% extends 'DembeloMain::base.html.twig' %}
 
 {% block skipcssclass %}{% endblock %}
 
@@ -39,8 +39,8 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
   </ul>
 {% endif %}
 
-{{ include('default/read.metadata.html.twig') }}
+{{ include('DembeloMain::default/read.metadata.html.twig') }}
 
-{{ include('default/paywall.html.twig', {'dialogId': 'modalPaywall'}) }}
+{{ include('DembeloMain::default/paywall.html.twig', {'dialogId': 'modalPaywall'}) }}
 
 {% endblock %}
