@@ -102,8 +102,8 @@ class DefaultController extends Controller
             $obj->status = $user->getStatus() === 0 ? 'inaktiv' : 'aktiv';
             $obj->source = $user->getSource();
             $obj->reason = $user->getReason();
-            $obj->created = $user->getMetadata()['created'];
-            $obj->updated = $user->getMetadata()['updated'];
+            $obj->created = date('Y-m-d H:i:s', $user->getMetadata()['created']);
+            $obj->updated = date('Y-m-d H:i:s', $user->getMetadata()['updated']);
             $output[] = $obj;
         }
 
@@ -259,7 +259,9 @@ class DefaultController extends Controller
                 $value = null;
             }
             $method = 'set'.ucfirst($param);
-            $item->$method($value);
+            if (method_exists($item, $method)) {
+                $item->$method($value);
+            }
         }
         //var_dump($item);die();
         if (method_exists($item, 'setMetadata')) {
