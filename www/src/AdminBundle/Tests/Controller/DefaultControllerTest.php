@@ -137,7 +137,7 @@ class DefaultControllerTest extends WebTestCase
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $controller->usersAction($request);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-        $this->assertJsonStringEqualsJsonString('[{"id":"id1","gender":null,"email":"email1","roles":"ROLE_ADMIN","licenseeId":"lic1","status":"aktiv","source":null,"reason":null,"created":"' . date('Y-m-d H:i:s', 0) . '","updated":"' . date('Y-m-d H:i:s', 0) . '"},{"id":"id2","email":"email2","roles":"ROLE_USER","licenseeId":"lic2","status":"aktiv","source":null,"reason":null,"gender":null,"created":"' . date('Y-m-d H:i:s', 0) . '","updated":"' . date('Y-m-d H:i:s', 0) . '"}]', $response->getContent());
+        $this->assertJsonStringEqualsJsonString('[{"id":"id1","gender":null,"email":"email1","roles":"ROLE_ADMIN","licenseeId":"lic1","status":"aktiv","source":null,"reason":null,"created":"'.date('Y-m-d H:i:s', 0).'","updated":"'.date('Y-m-d H:i:s', 0).'"},{"id":"id2","email":"email2","roles":"ROLE_USER","licenseeId":"lic2","status":"aktiv","source":null,"reason":null,"gender":null,"created":"'.date('Y-m-d H:i:s', 0).'","updated":"'.date('Y-m-d H:i:s', 0).'"}]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
     }
 
