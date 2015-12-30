@@ -111,6 +111,8 @@ class UserController extends Controller
             $encoder = $this->get('security.password_encoder');
             $password = $encoder->encodePassword($user, $user->getPassword());
             $user->setPassword($password);
+            $user->setMetadata('created', time());
+            $user->setMetadata('updated', time());
             $dm->persist($user);
             $dm->flush();
 

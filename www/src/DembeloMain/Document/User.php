@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique as MongoDBUnique;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Exception;
 
 /**
  * Class User
@@ -98,6 +99,11 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
      * @MongoDB\String
      */
     protected $activationHash;
+
+    /**
+     * @MongoDB\Hash
+     */
+    protected $metadata;
 
     /**
      * gets the mongodb id
@@ -423,5 +429,32 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
     public function isEnabled()
     {
         return $this->status === 1;
+    }
+
+    /**
+     * gets the metadata
+     * @return Array
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * sets the metadata
+     * @param Array|string $metadata
+     * @param string       $value
+     *
+     * @throws Exception
+     */
+    public function setMetadata($metadata, $value = null)
+    {
+        if (is_array($metadata) && is_null($value)) {
+            $this->metadata = $metadata;
+        } elseif (is_string($metadata) && !is_null($value)) {
+            $this->metadata[$metadata] = $value;
+        } else {
+            throw new Exception('invalid data');
+        }
     }
 }

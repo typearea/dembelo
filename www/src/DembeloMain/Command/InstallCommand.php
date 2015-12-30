@@ -123,7 +123,8 @@ class InstallCommand extends ContainerAwareCommand
                 'status' => 1,
                 'source' => '',
                 'reason' => '',
-                ),
+                'metadata' => array('created' => time(), 'updated' => time()),
+            ),
         );
 
         $this->installUsers($users, $mongo, $dm);
@@ -190,6 +191,7 @@ class InstallCommand extends ContainerAwareCommand
                 'status' => 1,
                 'source' => '',
                 'reason' => '',
+                'metadata' => array('created' => time(), 'updated' => time()),
             ),
             array(
                 'email' => 'licensee@dembelo.tld',
@@ -199,6 +201,7 @@ class InstallCommand extends ContainerAwareCommand
                 'status' => 1,
                 'source' => '',
                 'reason' => '',
+                'metadata' => array('created' => time(), 'updated' => time()),
             ),
         );
 
@@ -229,6 +232,7 @@ class InstallCommand extends ContainerAwareCommand
                 $user->setSource($userData['source']);
                 $user->setReason($userData['reason']);
                 $user->setStatus($userData['status']);
+                $user->setMetadata($userData['metadata']);
 
                 if (in_array('ROLE_LICENSEE', $userData['roles'])) {
                     $user->setLicenseeId($this->dummyData['licensees'][0]->getId());
