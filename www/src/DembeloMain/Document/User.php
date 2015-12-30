@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique as MongoDBUnique;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Exception;
 
 /**
  * Class User
@@ -452,7 +453,8 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
             $this->metadata = $metadata;
         } elseif (is_string($metadata) && !is_null($value)) {
             $this->metadata[$metadata] = $value;
+        } else {
+            throw new Exception('invalid data');
         }
-        throw new Exception('invalid data');
     }
 }
