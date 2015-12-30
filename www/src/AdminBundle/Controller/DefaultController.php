@@ -102,6 +102,8 @@ class DefaultController extends Controller
             $obj->status = $user->getStatus() === 0 ? 'inaktiv' : 'aktiv';
             $obj->source = $user->getSource();
             $obj->reason = $user->getReason();
+            $obj->created = $user->getMetadata()['created'];
+            $obj->updated = $user->getMetadata()['updated'];
             $output[] = $obj;
         }
 
@@ -260,7 +262,10 @@ class DefaultController extends Controller
             $item->$method($value);
         }
         //var_dump($item);die();
-        //$dm->persist($item);
+        if (method_exists($item, 'setMetadata')) {
+            $item->setMetadata('updated', time());
+        }
+        $dm->persist($item);
         $dm->flush();
 
         $output = array(

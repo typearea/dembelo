@@ -100,6 +100,11 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
     protected $activationHash;
 
     /**
+     * @MongoDB\Hash
+     */
+    protected $metadata;
+
+    /**
      * gets the mongodb id
      *
      * @return string
@@ -423,5 +428,31 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
     public function isEnabled()
     {
         return $this->status === 1;
+    }
+
+    /**
+     * gets the metadata
+     * @return Array
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * sets the metadata
+     * @param Array|string $metadata
+     * @param string       $value
+     *
+     * @throws Exception
+     */
+    public function setMetadata($metadata, $value = null)
+    {
+        if (is_array($metadata) && is_null($value)) {
+            $this->metadata = $metadata;
+        } elseif (is_string($metadata) && !is_null($value)) {
+            $this->metadata[$metadata] = $value;
+        }
+        throw new Exception('invalid data');
     }
 }
