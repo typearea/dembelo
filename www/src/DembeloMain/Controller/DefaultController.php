@@ -29,10 +29,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use DembeloMain\Document\Topic;
-use DembeloMain\Document\Story;
 use DembeloMain\Document\Textnode;
 use Symfony\Component\HttpFoundation\Response;
 use Hyphenator\Core as Hyphenator;
+use DembeloMain\Document\Readpath;
 
 /**
  * Class DefaultController
@@ -182,6 +182,27 @@ class DefaultController extends Controller
             $dm = $mongo->getManager();
             $user->setCurrentTextnode($textnodeId);
             $dm->persist($user);
+
+            $oldReadpathItem = $dm->createQueryBuilder('DembeloMain:Readpath')
+                ->field('userId')->equals(new \MongoId($user->getId()))
+                ->sort('timestamp', 'desc')
+                ->getQuery()
+                ->getSingleResult();
+
+            if (is_null($oldReadpathItem) || $oldReadpathItem->getTextnodeId() !== $textnodeId) {
+                $readpath = new Readpath();
+                $readpath->setUserId($user->getId());
+                $readpath->setTextnodeId($textnodeId);
+                $readpath->setTimestamp(new \MongoDate(time()));
+                if (!is_null($oldReadpathItem)) {
+                    $readpath->setPreviousTextnodeId($oldReadpathItem->getTextnodeId());
+                }
+                $dm->persist($readpath);
+            } else {
+                $oldReadpathItem->setTimestamp(time());
+                $dm->persist($oldReadpathItem);
+            }
+
             $dm->flush();
         }
 
