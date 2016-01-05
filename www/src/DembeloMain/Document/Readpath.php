@@ -25,11 +25,11 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Class ReadPath
+ * Class Readpath
  *
  * @MongoDB\Document
  */
-class ReadPath
+class Readpath
 {
 
     /**
