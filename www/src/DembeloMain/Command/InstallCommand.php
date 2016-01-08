@@ -86,7 +86,7 @@ class InstallCommand extends ContainerAwareCommand
     {
         $collectionClasses = array(
             'DembeloMain\Document\Licensee',
-            'DembeloMain\Document\ReadPath',
+            'DembeloMain\Document\Readpath',
             'DembeloMain\Document\Textnode',
             'DembeloMain\Document\Topic',
             'DembeloMain\Document\User',
