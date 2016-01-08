@@ -28,3 +28,6 @@ service php5-fpm restart
 
 cd /vagrant/www
 composer install
+
+app/console assetic:dump
+app/console cache:warmup
