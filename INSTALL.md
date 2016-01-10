@@ -65,3 +65,8 @@ php app/console dembelo:install --purge-db --with-dummy-data
 ## Deployment
 * den Cache leeren: `php app/console cache:clear --env=prod`
 * Assets erstellen: `php app/console assetic:dump --env=prod`
+
+## Problembehebung
+### ausreichend Arbeitsspeicher
+Falls composer abbricht, kann dies an mangelndem Arbeitsspeicher liegen.
+Swap kann nachträglich mittels dieser Anleitung angelegt werden: https://getcomposer.org/doc/articles/troubleshooting.md#proc-open-fork-failed-errors
