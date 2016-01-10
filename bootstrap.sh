@@ -31,3 +31,5 @@ composer install
 
 app/console assetic:dump
 app/console cache:warmup
+
+vendor/squizlabs/php_codesniffer/scripts/phpcs --config-set installed_paths www/vendor/escapestudios/symfony2-coding-standard
