@@ -1,23 +1,24 @@
 {
     "name": "typearea/dembelo",
-    "license": "GPL",
+    "license": "AGPL",
     "type": "project",
+    "description": "Dembelo ist Software für das granulierte und vernetzte Lesen neuer Unterhaltungsliteratur, der ein netztypischer, verzweigter Aufbau zugrundeliegt.",
     "autoload": {
         "psr-4": { "": "src/", "SymfonyStandard\\": "app/SymfonyStandard/" }
     },
     "require": {
         "php": ">=5.3.9",
-        "symfony/symfony": "2.7.*",
+        "symfony/symfony": "2.8.*",
         "doctrine/orm": "~2.2,>=2.2.3,<2.5",
         "doctrine/dbal": "<2.5",
         "doctrine/doctrine-bundle": "~1.4",
-        "symfony/assetic-bundle": "~2.3",
+        "symfony/assetic-bundle": "2.7.*",
         "symfony/swiftmailer-bundle": "~2.3",
         "symfony/monolog-bundle": "~2.4",
         "sensio/distribution-bundle": "~4.0",
         "sensio/framework-extra-bundle": "~3.0,>=3.0.2",
         "incenteev/composer-parameter-handler": "~2.0",
-        "doctrine/mongodb-odm": "1.0.*@dev",
+        "doctrine/mongodb-odm": "1.0.*",
         "doctrine/mongodb-odm-bundle": "3.0.*",
         "twbs/bootstrap-sass": "3.3.5",
         "twig/twig": "^1.22",

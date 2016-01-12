@@ -38,7 +38,7 @@ security:
                 default_target_path: mainpage
                 username_parameter:  form[_username]
                 password_parameter:  form[password]
-                intention:           authenticate
+                # intention:           authenticate
 
             # activate different ways to authenticate
 
