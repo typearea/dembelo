@@ -62,7 +62,7 @@ class UserControllerTest extends WebTestCase
             ->will($this->returnValue($mock));
         $mock->expects($this->any())
             ->method('createBuilder')
-            ->with('form', $this->isInstanceOf('DembeloMain\Document\User'))
+            ->with('Symfony\Component\Form\Extension\Core\Type\FormType', $this->isInstanceOf('DembeloMain\Document\User'))
             ->will($this->returnSelf());
         $mock->expects($this->any())
             ->method('setAction')
@@ -86,6 +86,10 @@ class UserControllerTest extends WebTestCase
         $mock->expects($this->once())
             ->method('generate')
             ->will($this->returnValue($loginUrl));
+        $container->expects($this->any())
+            ->method('has')
+            ->with('templating')
+            ->will($this->returnValue(true));
 
         $controller = new UserController();
         $controller->setContainer($container);
@@ -132,7 +136,7 @@ class UserControllerTest extends WebTestCase
             ->with('DembeloMain::user/register.html.twig', array('form' => 'createViewReturnValue'));
         $mock->expects($this->any())
             ->method('createBuilder')
-            ->with('form', $this->isInstanceOf('DembeloMain\Document\User'))
+            ->with('Symfony\Component\Form\Extension\Core\Type\FormType', $this->isInstanceOf('DembeloMain\Document\User'))
             ->will($this->returnSelf());
         $mock->expects($this->any())
             ->method('add')
@@ -152,6 +156,10 @@ class UserControllerTest extends WebTestCase
         $mock->expects($this->any())
             ->method('createView')
             ->will($this->returnValue('createViewReturnValue'));
+        $container->expects($this->any())
+            ->method('has')
+            ->with('templating')
+            ->will($this->returnValue(true));
 
         $controller = new UserController();
         $controller->setContainer($container);

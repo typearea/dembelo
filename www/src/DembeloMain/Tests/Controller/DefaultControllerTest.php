@@ -211,10 +211,14 @@ class DefaultControllerTest extends WebTestCase
             ->with($this->equalTo('ROLE_USER'))
             ->will($this->returnValue(false));
 
-        $container->expects($this->at(3))
+        $container->expects($this->at(4))
             ->method("get")
             ->with("templating")
             ->will($this->returnValue($template));
+        $container->expects($this->any())
+            ->method("has")
+            ->with('templating')
+            ->will($this->returnValue(true));
         $template->expects($this->once())
             ->method("renderResponse")
             ->with("DembeloMain::default/read.html.twig", array("textnode" => $textnode, 'hyphenated' => 'Lo&shy;rem ip&shy;sum do&shy;lor sit amet.'))
