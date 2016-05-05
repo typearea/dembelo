@@ -20,7 +20,8 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 
 {% extends 'DembeloMain::base.html.twig' %}
 
-{% block skipcssclass %}{% endblock %}
+{% block textnavclass %}{% endblock %}
+{% block textnavlink %}{{ path('reload')}}{% endblock %}
 
 {% block bodyid %}content-page{% endblock %}
 

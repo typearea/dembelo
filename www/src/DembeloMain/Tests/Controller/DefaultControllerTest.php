@@ -87,7 +87,7 @@ class DefaultControllerTest extends WebTestCase
             ->method("get")
             ->with($this->equalTo('doctrine_mongodb'))
             ->will($this->returnValue($mongo));
-        $mongo->expects($this->once())
+        $mongo->expects($this->never())
             ->method("getRepository")
             ->with($this->equalTo('DembeloMain:Textnode'))
             ->will($this->returnValue($repository));
@@ -97,42 +97,24 @@ class DefaultControllerTest extends WebTestCase
             ->with($this->equalTo('ROLE_USER'))
             ->will($this->returnValue(false));
 
-        $queryBuilder->expects($this->at(0))
+        $queryBuilder->expects($this->never())
             ->method('field')
             ->with('topicId')
             ->will($this->returnSelf());
 
-        $queryBuilder->expects($this->at(1))
+        $queryBuilder->expects($this->never())
             ->method('equals')
             ->will($this->returnSelf());
 
-        $queryBuilder->expects($this->at(2))
-            ->method('field')
-            ->with('status')
-            ->will($this->returnSelf());
-
-        $queryBuilder->expects($this->at(3))
-            ->method('equals')
-            ->will($this->returnSelf());
-
-        $queryBuilder->expects($this->at(4))
-            ->method('field')
-            ->with('access')
-            ->will($this->returnSelf());
-
-        $queryBuilder->expects($this->at(5))
-            ->method('equals')
-            ->will($this->returnSelf());
-
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects($this->never())
             ->method('getQuery')
             ->will($this->returnSelf());
 
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects($this->never())
             ->method('getSingleResult')
             ->will($this->returnValue($textnode));
 
-        $repository->expects($this->once())
+        $repository->expects($this->never())
             ->method("createQueryBuilder")
             ->will($this->returnValue($queryBuilder));
 
@@ -142,7 +124,7 @@ class DefaultControllerTest extends WebTestCase
             ->will($this->returnValue($router));
         $router->expects($this->once())
             ->method("generate")
-            ->with("text", array('textnodeId' => $textnode->getId()))
+            ->with("login_route", array())
             ->will($this->returnValue("text/".$textnode->getId()));
 
         $controller = new DefaultController();
@@ -169,67 +151,33 @@ class DefaultControllerTest extends WebTestCase
         $authorizationChecker = $this->getMockBuilder('foobar')->setMethods(array('isGranted'))->getMock();
         $tokenStorage = $this->getMockBuilder("Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage")->disableOriginalConstructor()->getMock();
         $template = $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
+        $router = $this->getMockBuilder('\Symfony\Bundle\FrameworkBundle\Routing\Router')->disableOriginalConstructor()->getMock();
+
+        $router->expects($this->once())
+            ->method("generate")
+            ->with("login_route", array())
+            ->will($this->returnValue("renderresponse"));
+
+        $textnodeId = 'asdaisliajslidj';
 
         $container->expects($this->at(0))
-            ->method("get")
-            ->with($this->equalTo('doctrine_mongodb'))
-            ->will($this->returnValue($mongo));
-        $mongo->expects($this->once())
-            ->method("getRepository")
-            ->with($this->equalTo('DembeloMain:Textnode'))
-            ->will($this->returnValue($repository));
-
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $textnodeId = "55f5ab3708985c4b188b4577";
-
-        $textnode = new Textnode();
-        $textnode->setId($textnodeId);
-        $textnode->setStatus(Textnode::STATUS_ACTIVE);
-        $textnode->setText("Lorem ipsum dolor sit amet.");
-        $textnode->appendHitch($hitch);
-
-        $repository->expects($this->once())
-            ->method("findBy")
-            ->with(array('id' => new \MongoId($textnodeId), 'status' => Textnode::STATUS_ACTIVE))
-            ->will($this->returnValue(array($textnode)));
-
-        $container->expects($this->at(1))
-            ->method("get")
+            ->method('get')
             ->with($this->equalTo('security.authorization_checker'))
             ->will($this->returnValue($authorizationChecker));
-        $container->expects($this->at(2))
-            ->method("get")
-            ->with($this->equalTo('security.token_storage'))
-            ->will($this->returnValue($tokenStorage));
 
-        $authorizationChecker->expects($this->once())
-            ->method('isGranted')
-            ->with($this->equalTo('ROLE_USER'))
-            ->will($this->returnValue(false));
-
-        $container->expects($this->at(4))
-            ->method("get")
-            ->with("templating")
-            ->will($this->returnValue($template));
-        $container->expects($this->any())
-            ->method("has")
-            ->with('templating')
-            ->will($this->returnValue(true));
-        $template->expects($this->once())
-            ->method("renderResponse")
-            ->with("DembeloMain::default/read.html.twig", array("textnode" => $textnode, 'hyphenated' => 'Lo&shy;rem ip&shy;sum do&shy;lor sit amet.'))
-            ->will($this->returnValue('renderresponse'));
+        $container->expects($this->at(1))
+            ->method('get')
+            ->with($this->equalTo('router'))
+            ->will($this->returnValue($router));
 
         $controller = new DefaultController();
         $controller->setContainer($container);
 
         $result = $controller->readTextnodeAction($textnodeId);
 
-        $this->assertEquals('renderresponse', $result);
+        $this->assertEquals('Symfony\Component\HttpFoundation\RedirectResponse', get_class($result));
+        $this->assertEquals('302', $result->getStatusCode());
+        $this->assertEquals('renderresponse', $result->getTargetUrl());
     }
 
     /** @todo Implement testReadTextnodeWithLogin(). */

@@ -50,7 +50,7 @@
         <nav class="navbar">
 	  <div class="btn-group btn-group-justified" role="group" aria-label="...">
 	    <div class="btn-group" role="group">
-	      <a href="#" class="btn btn-default {% block skipcssclass %}disabled{% endblock %}"><span class="glyphicon glyphicon-repeat"></span></a>
+	      <a href="{% block textnavlink  %}#{% endblock %}" class="btn btn-default {% block textnavclass %}disabled{% endblock %}"><span class="glyphicon glyphicon-repeat"></span></a>
 	    </div>
 	    <div class="btn-group" role="group">
 	      {% block infohomelink %}<a href="{{ path('mainpage') }}" class="btn btn-default"><span class="glyphicon glyphicon-home"></span></a>{% endblock %}

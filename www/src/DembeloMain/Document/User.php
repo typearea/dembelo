@@ -106,6 +106,11 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
     protected $metadata;
 
     /**
+     * @MongoDB\ObjectId
+     */
+    protected $lastTopicId;
+
+    /**
      * gets the mongodb id
      *
      * @return string
@@ -456,5 +461,22 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
         } else {
             throw new Exception('invalid data');
         }
+    }
+
+    /**
+     * sets the last topic id this user selected
+     *
+     * @param string $lastTopicId
+     */
+    public function setLastTopicId($lastTopicId) {
+        $this->lastTopicId = $lastTopicId;
+    }
+
+    /**
+     * gets the last topic id this user selected
+     * @return string
+     */
+    public function getLastTopicId() {
+        return $this->lastTopicId;
     }
 }
