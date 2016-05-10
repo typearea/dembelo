@@ -242,7 +242,6 @@ class InstallCommand extends ContainerAwareCommand
             }
 
             $this->dummyData['users'][] = $user;
-
         }
     }
 

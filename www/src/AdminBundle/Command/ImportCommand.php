@@ -141,7 +141,6 @@ class ImportCommand extends ContainerAwareCommand
             }
 
             $this->dm->flush();
-
         } catch (\Exception $ex) {
             $output->writeln($ex->getMessage());
 
@@ -181,7 +180,6 @@ class ImportCommand extends ContainerAwareCommand
                     $writing = true;
                 }
             }
-
         }
 
         fclose($fileHandle);
@@ -228,7 +226,6 @@ class ImportCommand extends ContainerAwareCommand
             }
 
             return true;
-
         }
 
         throw new \Exception("<error>File '".$this->twineArchivePath."' doesn't seem to be a Twine archive file.</error>");
@@ -299,7 +296,6 @@ class ImportCommand extends ContainerAwareCommand
 
                 throw new \Exception("<error>Error #".$errorCode.": '".$errorDescription."' occurred while parsing the Twine archive file '".$this->twineArchivePath."' in line ".$errorRowNumber.", character ".$errorColumnNumber." (at byte index ".$errorByteIndex.").</error>");
             }
-
         } while (feof($fileHandler) === false);
 
         if (xml_parse($xmlParser, "\n</tw-archive>\n", true) !== 1) {
@@ -586,7 +582,6 @@ class ImportCommand extends ContainerAwareCommand
 
                 $textnodeTextNew .= $textnodeText[$i];
                 $consumed = 0;
-
             }
 
             $textnodeTextNew .= "</p>";
