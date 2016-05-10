@@ -253,7 +253,8 @@ class DefaultController extends Controller
      *       if not access node, them jump to another access node
      *       if no other access node available, then jump to homepage
      */
-    public function reloadAction() {
+    public function reloadAction()
+    {
         $mongo = $this->get('doctrine_mongodb');
 
         /* @var $authorizationChecker \Symfony\Component\Security\Core\Authorization\AuthorizationChecker */

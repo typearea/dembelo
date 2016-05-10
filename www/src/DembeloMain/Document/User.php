@@ -468,7 +468,8 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
      *
      * @param string $lastTopicId
      */
-    public function setLastTopicId($lastTopicId) {
+    public function setLastTopicId($lastTopicId)
+    {
         $this->lastTopicId = $lastTopicId;
     }
 
@@ -476,7 +477,8 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
      * gets the last topic id this user selected
      * @return string
      */
-    public function getLastTopicId() {
+    public function getLastTopicId()
+    {
         return $this->lastTopicId;
     }
 }
