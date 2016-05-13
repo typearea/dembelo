@@ -30,7 +30,7 @@ security:
 
         default:
             anonymous: ~
-            http_basic: ~
+            # http_basic: ~
             provider: mongo_provider
             form_login:
                 login_path: /login
