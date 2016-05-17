@@ -53,7 +53,7 @@
                                                             columns: [
                                                                 {id: 'email', header: ['Email', {content: 'serverFilter'}], fillspace: true},
                                                                 {id: 'status', header: ['Status', {content: 'serverSelectFilter'}]},
-                                                                {id: 'roles', header: 'Rolle', format:function(value){ switch(value){case 'ROLE_ADMIN': return 'Admin';case 'ROLE_LICENSEE': return 'Lizenznehmer';} return 'Benutzer';}}
+                                                                {id: 'roles', header: 'Rolle', format:function(value){ switch(value){case 'ROLE_ADMIN': return 'Admin';case 'ROLE_LICENSEE': return 'Lizenznehmer';} return 'Leser';}}
                                                             ]
                                                         }
                                                     ]
@@ -78,7 +78,7 @@
                                                                         {view: "label", label: "Aktualisiert", width: 80},
                                                                         {view: "label", id: "userformcreated", name: "updated"},
                                                                     ]},
-                                                                    {view: "combo", id: "userformrole", name: "roles", label: "Rolle", options: [{id:"ROLE_ADMIN", value: "Admin"}, {id:"ROLE_USER", value: "Benutzer"}, {id:"ROLE_LICENSEE", value: "Lizenznehmer"}], validate:webix.rules.isNotEmpty},
+                                                                    {view: "combo", id: "userformrole", name: "roles", label: "Rolle", options: [{id:"ROLE_ADMIN", value: "Admin"}, {id:"ROLE_USER", value: "Leser"}, {id:"ROLE_LICENSEE", value: "Lizenznehmer"}], validate:webix.rules.isNotEmpty},
                                                                     {view: "combo", id: "userformlicensee", name: "licenseeId", label: "Lizenznehmer", suggest: paths.adminLicenceeSuggest, disabled: true},
                                                                     {view: "combo", id: "userformgender", name: "gender", label: "Geschlecht", options: [{id: 'm', value: 'männlich'},{ id: 'f', value: 'weiblich'}]},
                                                                     {view: "combo", id: "userformstatus", name: "status", label: "Status", options: ['inaktiv', 'aktiv'], validate:webix.rules.isNotEmpty},
