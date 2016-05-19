@@ -3,3 +3,4 @@
 - #149: Groß- und Kleinschreibung geht durcheinander
 - #147: app.php per Default und app_dev.php unterbinden
 - #150: Schriftgröße hochsetzen
+- #130: Umstellung auf https mit einem selbstsignierten Zertifikat
