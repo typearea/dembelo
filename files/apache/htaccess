@@ -1,5 +1,7 @@
 Options -MultiViews
 RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ app.php [QSA,L]
 RewriteRule ^app_dev.php / [R=301,L]
