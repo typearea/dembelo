@@ -4,3 +4,4 @@
 - #147: app.php per Default und app_dev.php unterbinden
 - #150: Schriftgröße hochsetzen
 - #130: Umstellung auf https mit einem selbstsignierten Zertifikat
+- #151: Themenfeldname in title-Attribut auf den Kacheln der Startseite
