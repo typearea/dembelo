@@ -5,8 +5,10 @@
         <small>von {{ textnode.getMetadata.Autor }} aus {{ textnode.getMetadata.Verlag }}</small>
     </h2>
     <div class="pull-right">
-        {% image '@DembeloMain/Resources/public/images/cc-by-sa.png' %}
-            <img src="{{ asset_url }}" alt="Creative Commons BY-SA 4.0 International" />
-        {% endimage %}
+        <a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-sa/3.0/de/">
+            {% image '@DembeloMain/Resources/public/images/cc-by-sa.png' %}
+                <img src="{{ asset_url }}" alt="Creative Commons Lizenzvertrag" />
+            {% endimage %}
+        </a>
     </div>
 </div>
