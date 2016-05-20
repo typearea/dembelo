@@ -285,4 +285,14 @@ class DefaultController extends Controller
         return $this->redirectToRoute('text', array('textnodeId' => $textnode->getId()));
 
     }
+
+    /**
+     * @Route("/imprint", name="imprint")
+     *
+     * @return string
+     */
+    public function imprintAction()
+    {
+        return $this->render('DembeloMain::default/imprint.html.twig');
+    }
 }
