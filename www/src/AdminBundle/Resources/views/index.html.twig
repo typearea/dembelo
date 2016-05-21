@@ -52,7 +52,7 @@
                                                             datatype: "json",
                                                             columns: [
                                                                 {id: 'email', header: ['Email', {content: 'serverFilter'}], fillspace: true},
-                                                                {id: 'status', header: ['Status', {content: 'serverSelectFilter'}]},
+                                                                {id: 'status', header: ['Status', {content: 'serverSelectFilter'}], format: function (value) { if (value === 0) return 'inaktiv'; else return 'aktiv';}},
                                                                 {id: 'roles', header: 'Rolle', format:function(value){ switch(value){case 'ROLE_ADMIN': return 'Admin';case 'ROLE_LICENSEE': return 'Lizenznehmer';} return 'Leser';}}
                                                             ]
                                                         }
@@ -81,7 +81,7 @@
                                                                     {view: "combo", id: "userformrole", name: "roles", label: "Rolle", options: [{id:"ROLE_ADMIN", value: "Admin"}, {id:"ROLE_USER", value: "Leser"}, {id:"ROLE_LICENSEE", value: "Lizenznehmer"}], validate:webix.rules.isNotEmpty},
                                                                     {view: "combo", id: "userformlicensee", name: "licenseeId", label: "Lizenznehmer", suggest: paths.adminLicenceeSuggest, disabled: true},
                                                                     {view: "combo", id: "userformgender", name: "gender", label: "Geschlecht", options: [{id: 'm', value: 'männlich'},{ id: 'f', value: 'weiblich'}]},
-                                                                    {view: "combo", id: "userformstatus", name: "status", label: "Status", options: ['inaktiv', 'aktiv'], validate:webix.rules.isNotEmpty},
+                                                                    {view: "combo", id: "userformstatus", name: "status", label: "Status", options: [{id: '0', value: 'inaktiv'}, {id: '1', value: 'aktiv'}], validate:webix.rules.isNotEmpty},
                                                                     {view: "textarea", id: "userformsource", name: "source", label: "Quelle", height: 100},
                                                                     {view: "textarea", id: "userformreason", name: "reason", label: "Grund", height: 100},
                                                                     {view: "text", name: "password", type:"password", label:"Passwort"},

@@ -77,12 +77,12 @@ class DefaultController extends Controller
         $query = $repository->createQueryBuilder();
         if (!is_null($filters)) {
             foreach ($filters as $field => $value) {
-                if (empty($value)) {
+                if (empty($value) && $value !== '0') {
                     continue;
                 }
                 if ($field === 'status') {
-                    $value = $value === 'aktiv' ? 1 : 0;
-                    $query->field($field)->equals($value);
+                    //$value = $value === 'aktiv' ? 1 : 0;
+                    $query->field($field)->equals((int)$value);
                 } else {
                     $query->field($field)->equals(new \MongoRegex('/.*'.$value.'.*/i'));
                 }
@@ -99,7 +99,7 @@ class DefaultController extends Controller
             $obj->roles = join(', ', $user->getRoles());
             $obj->licenseeId = is_null($user->getLicenseeId()) ? '' : $user->getLicenseeId();
             $obj->gender = $user->getGender();
-            $obj->status = $user->getStatus() === 0 ? 'inaktiv' : 'aktiv';
+            $obj->status = $user->getStatus(); // === 0 ? 'inaktiv' : 'aktiv';
             $obj->source = $user->getSource();
             $obj->reason = $user->getReason();
             $obj->created = date('Y-m-d H:i:s', $user->getMetadata()['created']);
