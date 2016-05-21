@@ -82,7 +82,7 @@ class DefaultController extends Controller
                 }
                 if ($field === 'status') {
                     //$value = $value === 'aktiv' ? 1 : 0;
-                    $query->field($field)->equals((int)$value);
+                    $query->field($field)->equals((int) $value);
                 } else {
                     $query->field($field)->equals(new \MongoRegex('/.*'.$value.'.*/i'));
                 }
