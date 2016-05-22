@@ -1,6 +1,8 @@
 <div class="well clearfix">
-    <p class="text-muted">Das war:</p>
-    <h2>
+    <p id="readmetadatabutton" class="text-muted pull-left">Metadaten
+        <span id="readmetadataarrow" class="glyphicon glyphicon-menu-down"></span>
+    </p>
+    <h2 id="readmetadatatext" class="hidden">
         {{ textnode.getMetadata.Titel }} <br />
         <small>von {{ textnode.getMetadata.Autor }} aus {{ textnode.getMetadata.Verlag }}</small>
     </h2>

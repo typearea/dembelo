@@ -39,6 +39,21 @@
                 });
             });
 
+            $('#readmetadatabutton').on('click', function () {
+                if ($('#readmetadataarrow').hasClass('glyphicon-menu-down')) {
+                    $('#readmetadataarrow').removeClass('glyphicon-menu-down');
+                    $('#readmetadataarrow').addClass('glyphicon-menu-up');
+                    $('#readmetadatatext').removeClass('hidden');
+                    $(this).removeClass('pull-left');
+                } else {
+                    $('#readmetadataarrow').removeClass('glyphicon-menu-up');
+                    $('#readmetadataarrow').addClass('glyphicon-menu-down');
+                    $('#readmetadatatext').addClass('hidden');
+                    $(this).addClass('pull-left');
+                }
+
+            });
+
         }
     );
 
