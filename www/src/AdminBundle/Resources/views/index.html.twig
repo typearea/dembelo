@@ -15,7 +15,8 @@
                 adminFormDel: "{{ path('admin_formdel') }}",
                 adminLicenceeSuggest: "{{ path('admin_licensee_suggest') }}",
                 adminUserActivationMail: "{{ path('admin_user_activation_mail') }}",
-                adminImportfileUploader: "{{ path('admin_upload_file') }}"
+                adminImportfileUploader: "{{ path('admin_upload_file') }}",
+                adminTextnodes: "{{ path('admin_textnodes') }}"
             };
 
         webix.ui({
@@ -194,6 +195,32 @@
                                                 }
                                             ]
 
+                                        },
+                                        {
+                                            id: "textnodestuff",
+                                            cols: [
+                                                {
+                                                    rows: [
+                                                        dembeloAdmin.getToolbar('textnode'),
+                                                        {
+                                                            id: "textnodegrid",
+                                                            view: "datatable",
+                                                            autoConfig: true,
+                                                            select: true,
+                                                            datatype: "json"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    view: "form",
+                                                    id: "textnodeform",
+                                                    gravity: 0.5,
+                                                    elements: [
+                                                        {view: "text", name: "name", label: "Name", validate:webix.rules.isNotEmpty},
+                                                        {view: "button", value:"Speichern", click:"dembeloAdmin.formsave('textnode')" }
+                                                    ]
+                                                }
+                                            ]
                                         }
                                     ]
                                 }

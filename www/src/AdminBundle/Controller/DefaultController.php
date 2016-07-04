@@ -54,6 +54,7 @@ class DefaultController extends Controller
             ['id' => "3", 'type' => "folder", 'value' => "Themenfelder", 'css' => "folder_music"],
             ['id' => "4", 'type' => "folder", 'value' => "Geschichten", 'css' => "folder_music"],
             ['id' => "5", 'type' => "folder", 'value' => "Importe", 'css' => "folder_music"],
+            ['id' => "6", 'type' => "folder", 'value' => "Textknoten", 'css' => "folder_music"],
         ];
 
         $jsonEncoder = new JsonEncoder();
@@ -226,7 +227,7 @@ class DefaultController extends Controller
     {
         $params = $request->request->all();
 
-        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'story', 'importfile'))) {
+        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'story', 'importfile', 'textnode'))) {
             return new Response(\json_encode(array('error' => true)));
         }
         $formtype = ucfirst($params['formtype']);
@@ -414,6 +415,34 @@ class DefaultController extends Controller
         $output['orgname'] = $file['name'];
 
         $output['status'] = 'server';
+
+        return new Response(\json_encode($output));
+    }
+
+    /**
+     * @Route("/textnodes", name="admin_textnodes")
+     *
+     * @return Response
+     */
+    public function textnodesAction(Request $request)
+    {
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Textnode');
+
+        $textnodes = $repository->findAll();
+
+        $output = array();
+        /* @var $user \DembeloMain\Document\Story */
+        foreach ($textnodes as $textnode) {
+            $obj = new StdClass();
+            $obj->id = $textnode->getId();
+            $obj->created = $textnode->getCreated()->format('d.m.Y, H:i:s');
+            $obj->status = $textnode->getStatus() ? 'aktiv' : 'inaktiv';
+            $obj->access = $textnode->getAccess();
+            $obj->licenseeId = $textnode->getLicenseeId();
+            $output[] = $obj;
+        }
 
         return new Response(\json_encode($output));
     }

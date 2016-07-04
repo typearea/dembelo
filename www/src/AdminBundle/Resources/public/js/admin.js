@@ -37,6 +37,9 @@ dembeloAdmin = (function () {
                 } else if (id === "5") {
                     $$('importfilegrid').load(paths.adminImportfiles);
                     $$('importfilestuff').show();
+                } else if (id === "6") {
+                    $$('textnodegrid').load(paths.adminTextnodes);
+                    $$('textnodestuff').show();
                 }
             });
 
