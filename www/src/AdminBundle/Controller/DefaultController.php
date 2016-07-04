@@ -52,7 +52,8 @@ class DefaultController extends Controller
             ['id' => "1", 'type' => "folder", 'value' => "Benutzer", 'css' => "folder_music"],
             ['id' => "2", 'type' => "folder", 'value' => "Lizenznehmer", 'css' => "folder_music"],
             ['id' => "3", 'type' => "folder", 'value' => "Themenfelder", 'css' => "folder_music"],
-            ['id' => "4s", 'type' => "folder", 'value' => "Geschichten", 'css' => "folder_music"],
+            ['id' => "4", 'type' => "folder", 'value' => "Geschichten", 'css' => "folder_music"],
+            ['id' => "5", 'type' => "folder", 'value' => "Importe", 'css' => "folder_music"],
         ];
 
         $jsonEncoder = new JsonEncoder();
@@ -225,7 +226,7 @@ class DefaultController extends Controller
     {
         $params = $request->request->all();
 
-        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'story'))) {
+        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'story', 'importfile'))) {
             return new Response(\json_encode(array('error' => true)));
         }
         $formtype = ucfirst($params['formtype']);
@@ -357,5 +358,63 @@ class DefaultController extends Controller
         $this->get('mailer')->send($message);
 
         return new Response(\json_encode(['error' => false]));
+    }
+
+    /**
+     * @Route("/importfiles", name="admin_importfiles")
+     *
+     * @return Response
+     */
+    public function importfilesAction(Request $request)
+    {
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Importfile');
+
+        $importfiles = $repository->findAll();
+
+        $output = array();
+        /* @var $user \DembeloMain\Document\Story */
+        foreach ($importfiles as $importfile) {
+            $obj = new StdClass();
+            $obj->id = $importfile->getId();
+            $obj->name = $importfile->getName();
+            $obj->author = $importfile->getAuthor();
+            $obj->publisher = $importfile->getPublisher();
+            $obj->imported = $importfile->getImported();
+            $output[] = $obj;
+        }
+
+        return new Response(\json_encode($output));
+    }
+
+    /**
+     * @Route("/uploadimportfile", name="admin_upload_file")
+     *
+     * @return Response
+     */
+    public function uploadImportfileAction()
+    {
+        $output = array();
+
+        $file = $_FILES['upload'];
+
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            $output['status'] = 'error';
+            return new Response(\json_encode($output));
+        }
+
+        $directory = $this->container->getParameter('twine_directory');
+
+        $filename = md5(uniqid() . $file['name']);
+
+        move_uploaded_file($file["tmp_name"], $directory . $filename);
+
+        $output['filename'] = $filename;
+        $output['orgname'] = $file['name'];
+
+        $output['status'] = 'server';
+
+        return new Response(\json_encode($output));
     }
 }

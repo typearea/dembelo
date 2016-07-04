@@ -12,3 +12,5 @@
 /web/css/
 /web/images/
 /web/js/
+/uploads/twine/*
+!uploads/twine/.gitkeep

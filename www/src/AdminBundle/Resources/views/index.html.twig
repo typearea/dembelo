@@ -5,16 +5,18 @@
     <script type="text/javascript" charset="utf-8">
 
         var mainMenuData = {{ mainMenuData|raw }},
-                paths = {
-                    adminUsers: "{{ path('admin_users') }}",
-                    adminLicensees: "{{ path('admin_licensees') }}",
-                    adminTopics: "{{ path('admin_topics') }}",
-                    adminStories: "{{ path('admin_stories') }}",
-                    adminFormSave: "{{ path('admin_formsave') }}",
-                    adminFormDel: "{{ path('admin_formdel') }}",
-                    adminLicenceeSuggest: "{{ path('admin_licensee_suggest') }}",
-                    adminUserActivationMail: "{{ path('admin_user_activation_mail') }}"
-                };
+            paths = {
+                adminUsers: "{{ path('admin_users') }}",
+                adminLicensees: "{{ path('admin_licensees') }}",
+                adminTopics: "{{ path('admin_topics') }}",
+                adminStories: "{{ path('admin_stories') }}",
+                adminImportfiles: "{{ path('admin_importfiles') }}",
+                adminFormSave: "{{ path('admin_formsave') }}",
+                adminFormDel: "{{ path('admin_formdel') }}",
+                adminLicenceeSuggest: "{{ path('admin_licensee_suggest') }}",
+                adminUserActivationMail: "{{ path('admin_user_activation_mail') }}",
+                adminImportfileUploader: "{{ path('admin_upload_file') }}"
+            };
 
         webix.ui({
             rows: [
@@ -133,6 +135,65 @@
                                             autoConfig: true,
                                             select: true,
                                             datatype: "json"
+                                        },
+                                        {
+                                            id: "importfilestuff",
+                                            cols: [
+                                                {
+                                                    rows: [
+                                                        dembeloAdmin.getToolbar('importfile'),
+                                                        {
+                                                            id: "importfilegrid",
+                                                            view: "datatable",
+                                                            autoConfig: true,
+                                                            select: true,
+                                                            datatype: "json",
+                                                            columns: [
+                                                                {id: 'name', header: 'Name', fillspace: true},
+                                                                {id: 'author', header: 'Autor'},
+                                                                {id: 'publisher', header: 'Verlag'},
+                                                                {id: 'imported', header: 'Importiert'}
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {view: "resizer"},
+                                                {
+                                                    view: "scrollview",
+                                                    scroll: "y",
+                                                    body: {
+                                                        rows: [
+                                                            {
+                                                                view: "form",
+                                                                id: "importfileform",
+                                                                gravity: 0.5,
+                                                                elements: [
+                                                                    {view: "text", name: "name", label: "Name"},
+                                                                    {view: "text", name: "author", label: "Autor"},
+                                                                    {view: "text", name: "publisher", label: "Verlag"},
+                                                                    {
+                                                                        view:"uploader",
+                                                                        id: "uploadfile",
+                                                                        value:"Dateiauswahl",
+                                                                        link:"uploadfilelist",
+                                                                        upload: paths.adminImportfileUploader,
+                                                                        multiple: false
+                                                                    },
+                                                                    {
+                                                                        view:"list",
+                                                                        id:"uploadfilelist",
+                                                                        type:"uploader",
+                                                                        autoheight:true,
+                                                                        borderless:true
+                                                                    },
+                                                                    {view: "button", value:"Speichern", click:"dembeloAdmin.formsave('importfile')" }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+
                                         }
                                     ]
                                 }

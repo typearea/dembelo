@@ -22,18 +22,21 @@ dembeloAdmin = (function () {
     return {
         init: function () {
             $$("mainnav").attachEvent("onAfterSelect", function (id){
-                if (id == 1) {
+                if (id === "1") {
                     $$('usergrid').load(paths.adminUsers);
                     $$('userstuff').show();
-                } else if (id == 2) {
+                } else if (id === "2") {
                     $$('licenseegrid').load(paths.adminLicensees);
                     $$('licenseestuff').show();
-                } else if (id == 3) {
+                } else if (id === "3") {
                     $$('topicgrid').load(paths.adminTopics);
                     $$('topicgrid').show();
-                } else if (id == 4) {
+                } else if (id === "4") {
                     $$('storygrid').load(paths.adminStories);
                     $$('storygrid').show();
+                } else if (id === "5") {
+                    $$('importfilegrid').load(paths.adminImportfiles);
+                    $$('importfilestuff').show();
                 }
             });
 
@@ -57,6 +60,7 @@ dembeloAdmin = (function () {
             });
 
             $$('licenseeform').bind($$('licenseegrid'));
+            $$('importfileform').bind($$('importfilegrid'));
         },
         formsave: function (type) {
             var id = type + "form",
@@ -115,7 +119,10 @@ dembeloAdmin = (function () {
 
         getToolbar: function(type) {
 
-            var clickString;
+            var clickString, toolbar = {
+                    view: "toolbar",
+                    cols: []
+                };
 
             switch(type) {
                 case 'user':
@@ -124,27 +131,30 @@ dembeloAdmin = (function () {
                 case 'licensee':
                     clickString = "$$('licenseegrid').add({id: 'new', name: ''})";
                     break;
+                case 'importfile':
+                    clickString = "$$('importfilegrid').add({id: 'new', name: ''})";
+                    break;
             }
 
-            return {
-                view: "toolbar",
-                    cols: [
-                {
-                    id: "newBtn" + type,
-                    view: "button",
-                    value: "Neu",
-                    type: "form",
-                    click: clickString
-                },
-                {
+            toolbar.cols.push({
+                id: "newBtn" + type,
+                view: "button",
+                value: "Neu",
+                type: "form",
+                click: clickString
+            });
+
+            if (type !== 'importfile') {
+                toolbar.cols.push({
                     id: "deleteBtn" + type,
                     view: "button",
                     value: "Löschen",
                     type: "danger",
                     click: "dembeloAdmin.delItem('" + type + "')"
-                }
-            ]
-            };
+                });
+            }
+
+            return toolbar;
         },
 
         sendActivationMail: function () {
