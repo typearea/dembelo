@@ -419,6 +419,19 @@ class DefaultController extends Controller
         return new Response(\json_encode($output));
     }
 
+    private function buildLicenseeIndex(\Doctrine\Bundle\MongoDBBundle\ManagerRegistry $mongo)
+    {
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Licensee');
+        $licensees = $repository->findAll();
+        $index = [];
+        foreach ($licensees AS $licensee) {
+            $index[$licensee->getID()] = $licensee->getName();
+        }
+
+        return $index;
+    }
+
     /**
      * @Route("/textnodes", name="admin_textnodes")
      *
@@ -432,15 +445,18 @@ class DefaultController extends Controller
 
         $textnodes = $repository->findAll();
 
+        $licenseeIndex = $this->buildLicenseeIndex($mongo);
+
         $output = array();
-        /* @var $user \DembeloMain\Document\Story */
+        /* @var $user \DembeloMain\Document\Textnode */
         foreach ($textnodes as $textnode) {
             $obj = new StdClass();
             $obj->id = $textnode->getId();
             $obj->created = $textnode->getCreated()->format('d.m.Y, H:i:s');
             $obj->status = $textnode->getStatus() ? 'aktiv' : 'inaktiv';
             $obj->access = $textnode->getAccess();
-            $obj->licenseeId = $textnode->getLicenseeId();
+            $obj->licensee = $licenseeIndex[$textnode->getLicenseeId()];
+            $obj->beginning = substr(htmlentities(strip_tags($textnode->getText())), 0, 200) . "...";
             $output[] = $obj;
         }
 

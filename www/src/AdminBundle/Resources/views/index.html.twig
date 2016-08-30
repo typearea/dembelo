@@ -201,7 +201,6 @@
                                             cols: [
                                                 {
                                                     rows: [
-                                                        dembeloAdmin.getToolbar('textnode'),
                                                         {
                                                             id: "textnodegrid",
                                                             view: "datatable",
@@ -216,8 +215,12 @@
                                                     id: "textnodeform",
                                                     gravity: 0.5,
                                                     elements: [
-                                                        {view: "text", name: "name", label: "Name", validate:webix.rules.isNotEmpty},
-                                                        {view: "button", value:"Speichern", click:"dembeloAdmin.formsave('textnode')" }
+                                                        {view: "text", name: "id", label: "ID", disabled: true},
+                                                        {view: "text", name: "created", label: "angelegt", disabled: true},
+                                                        {view: "text", name: "status", label: "Status", disabled: true},
+                                                        {view: "text", name: "access", label: "Access-Knoten", disabled: true},
+                                                        {view: "text", name: "licensee", label: "Lizenznehmer", disabled: true},
+                                                        {view: "textarea", name: "beginning", label: "Textanfang", height: 200, disabled: true}
                                                     ]
                                                 }
                                             ]
