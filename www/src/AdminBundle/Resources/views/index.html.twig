@@ -16,7 +16,8 @@
                 adminLicenceeSuggest: "{{ path('admin_licensee_suggest') }}",
                 adminUserActivationMail: "{{ path('admin_user_activation_mail') }}",
                 adminImportfileUploader: "{{ path('admin_upload_file') }}",
-                adminTextnodes: "{{ path('admin_textnodes') }}"
+                adminTextnodes: "{{ path('admin_textnodes') }}",
+                adminImport: "{{ path('admin_import') }}"
             };
 
         webix.ui({
@@ -172,6 +173,8 @@
                                                                     {view: "text", name: "name", label: "Name"},
                                                                     {view: "text", name: "author", label: "Autor"},
                                                                     {view: "text", name: "publisher", label: "Verlag"},
+                                                                    {view: "combo", id: "userformlicensee", name: "licenseeId", label: "Lizenznehmer", suggest: paths.adminLicenceeSuggest},
+                                                                    {view: "text", name: "orgname", label: "Datei", disabled: true},
                                                                     {
                                                                         view:"uploader",
                                                                         id: "uploadfile",
@@ -187,7 +190,8 @@
                                                                         autoheight:true,
                                                                         borderless:true
                                                                     },
-                                                                    {view: "button", value:"Speichern", click:"dembeloAdmin.formsave('importfile')" }
+                                                                    {view: "button", value:"Speichern", click:"dembeloAdmin.formsave('importfile')" },
+                                                                    {view: "button", value:"Importieren", click:"dembeloAdmin.import()" }
                                                                 ]
                                                             }
                                                         ]
@@ -206,7 +210,13 @@
                                                             view: "datatable",
                                                             autoConfig: true,
                                                             select: true,
-                                                            datatype: "json"
+                                                            datatype: "json",
+                                                            columns: [
+                                                                {id: 'created', header: 'angelegt'},
+                                                                {id: 'status', header: 'Status'},
+                                                                {id: 'beginning', header: 'Text', fillspace: true},
+                                                                {id: 'importfile', header: 'Importdatei'}
+                                                            ]
                                                         }
                                                     ]
                                                 },
@@ -220,6 +230,7 @@
                                                         {view: "text", name: "status", label: "Status", disabled: true},
                                                         {view: "text", name: "access", label: "Access-Knoten", disabled: true},
                                                         {view: "text", name: "licensee", label: "Lizenznehmer", disabled: true},
+                                                        {view: "text", name: "importfile", label: "Importdatei", disabled: true},
                                                         {view: "textarea", name: "beginning", label: "Textanfang", height: 200, disabled: true}
                                                     ]
                                                 }

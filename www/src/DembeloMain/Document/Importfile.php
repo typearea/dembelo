@@ -66,6 +66,16 @@ class Importfile
     protected $publisher;
 
     /**
+     * @MongoDB\String
+     */
+    protected $orgname;
+
+    /**
+     * @MongoDB\String
+     */
+    protected $filename;
+
+    /**
      * gets the mongodb id
      *
      * @return string
@@ -171,5 +181,37 @@ class Importfile
     public function setPublisher($publisher)
     {
         $this->publisher = $publisher;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrgname()
+    {
+        return $this->orgname;
+    }
+
+    /**
+     * @param string $orgname
+     */
+    public function setOrgname($orgname)
+    {
+        $this->orgname = $orgname;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFilename()
+    {
+        return $this->filename;
+    }
+
+    /**
+     * @param string $filename
+     */
+    public function setFilename($filename)
+    {
+        $this->filename = $filename;
     }
 }

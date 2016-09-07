@@ -62,6 +62,10 @@ dembeloAdmin = (function () {
                 }
             });
 
+            $$('uploadfile').attachEvent("onUploadComplete", function(response) {
+                $$('importfileform').setValues(response, true);
+            });
+
             $$('licenseeform').bind($$('licenseegrid'));
             $$('importfileform').bind($$('importfilegrid'));
             $$('textnodeform').bind($$('textnodegrid'));
@@ -176,7 +180,28 @@ dembeloAdmin = (function () {
                     webix.modalbox({
                         title: "Fehler",
                         buttons: ["Ok"],
-                        text: "Der Mailversandt ist leider fehlgeschlagen..."
+                        text: "Der Mailversand ist leider fehlgeschlagen..."
+                    });
+                }
+            });
+        },
+
+        import: function () {
+            var importfileId = $$('importfilegrid').getSelectedId().id;
+
+            webix.ajax().post(paths.adminImport, {importfileId: importfileId}, function (text) {
+                var params = JSON.parse(text);
+                if (params['error'] === false) {
+                    webix.modalbox({
+                        title: "Datei importiert",
+                        buttons: ["Ok"],
+                        text: "Die Datei wurde erfolgreich importiert."
+                    });
+                } else {
+                    webix.modalbox({
+                        title: "Fehler",
+                        buttons: ["Ok"],
+                        text: "Der Import ist leider fehlgeschlagen..."
                     });
                 }
             });

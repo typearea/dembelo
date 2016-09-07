@@ -25,6 +25,7 @@
 
 namespace AdminBundle\Controller;
 
+use DembeloMain\Document\Importfile;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -218,6 +219,32 @@ class DefaultController extends Controller
     }
 
     /**
+     * saves temporary file to final place
+     *
+     * @param Importfile $item importfile instance
+     * @param string $filename filename hash
+     * @param string $orgname original name
+     */
+    private function saveFile(Importfile $item, $filename, $orgname)
+    {
+        if (empty($filename) || empty($orgname)) {
+            return;
+        }
+
+        $directory = $this->container->getParameter('twine_directory');
+        $finalDirectory = $directory . $item->getLicenseeId() . '/';
+        if (!is_dir($finalDirectory)) {
+            mkdir($finalDirectory);
+        }
+        $finalName = $finalDirectory . $item->getId();
+        $file = $directory . $filename;
+        rename($file, $finalName);
+
+        $item->setOrgname($orgname);
+        $item->setFilename($finalName);
+    }
+
+    /**
      * @Route("/save", name="admin_formsave")
      *
      * @param Request $request
@@ -248,8 +275,9 @@ class DefaultController extends Controller
                 return new Response(\json_encode(array('error' => true)));
             }
         }
+
         foreach ($params as $param => $value) {
-            if (in_array($param, array('id', 'formtype'))) {
+            if (in_array($param, array('id', 'formtype', 'filename', 'orgname'))) {
                 continue;
             }
             if ($param == 'password' && empty($value)) {
@@ -258,6 +286,8 @@ class DefaultController extends Controller
                 $encoder = $this->get('security.password_encoder');
                 $value = $encoder->encodePassword($item, $value);
             } elseif ($param == 'licenseeId' && $value === '') {
+                $value = null;
+            } elseif ($param === 'imported' && $value === '') {
                 $value = null;
             }
             $method = 'set'.ucfirst($param);
@@ -271,6 +301,12 @@ class DefaultController extends Controller
         }
         $dm->persist($item);
         $dm->flush();
+
+        if ($formtype == 'Importfile' && array_key_exists('filename', $params)) {
+            $this->saveFile($item, $params['filename'], $params['orgname']);
+            $dm->persist($item);
+            $dm->flush();
+        }
 
         $output = array(
             'error' => false,
@@ -375,7 +411,7 @@ class DefaultController extends Controller
         $importfiles = $repository->findAll();
 
         $output = array();
-        /* @var $user \DembeloMain\Document\Story */
+        /* @var $importfile \DembeloMain\Document\Importfile */
         foreach ($importfiles as $importfile) {
             $obj = new StdClass();
             $obj->id = $importfile->getId();
@@ -383,6 +419,8 @@ class DefaultController extends Controller
             $obj->author = $importfile->getAuthor();
             $obj->publisher = $importfile->getPublisher();
             $obj->imported = $importfile->getImported();
+            $obj->orgname = $importfile->getOrgname();
+            $obj->licenseeId = $importfile->getLicenseeId();
             $output[] = $obj;
         }
 
@@ -432,6 +470,19 @@ class DefaultController extends Controller
         return $index;
     }
 
+    private function buildImportfileIndex(\Doctrine\Bundle\MongoDBBundle\ManagerRegistry $mongo)
+    {
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Importfile');
+        $importfiles = $repository->findAll();
+        $index = [];
+        foreach ($importfiles AS $importfile) {
+            $index[$importfile->getID()] = $importfile->getName();
+        }
+
+        return $index;
+    }
+
     /**
      * @Route("/textnodes", name="admin_textnodes")
      *
@@ -446,6 +497,7 @@ class DefaultController extends Controller
         $textnodes = $repository->findAll();
 
         $licenseeIndex = $this->buildLicenseeIndex($mongo);
+        $importfileIndex = $this->buildImportfileIndex($mongo);
 
         $output = array();
         /* @var $user \DembeloMain\Document\Textnode */
@@ -456,10 +508,23 @@ class DefaultController extends Controller
             $obj->status = $textnode->getStatus() ? 'aktiv' : 'inaktiv';
             $obj->access = $textnode->getAccess();
             $obj->licensee = $licenseeIndex[$textnode->getLicenseeId()];
+            $obj->importfile = isset($importfileIndex[$textnode->getImportfileId()]) ? $importfileIndex[$textnode->getImportfileId()] : 'unbekannt';
             $obj->beginning = substr(htmlentities(strip_tags($textnode->getText())), 0, 200) . "...";
             $output[] = $obj;
         }
 
         return new Response(\json_encode($output));
+    }
+
+    /**
+     * @Route("/import", name="admin_import")
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function importAction(Request $request)
+    {
+
     }
 }
