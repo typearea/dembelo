@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/typearea/dembelo.png?label=ready&title=Ready)](https://waffle.io/typearea/dembelo)
 # Dembelo
 
 [![Build Status](https://travis-ci.org/typearea/dembelo.svg?branch=master)](https://travis-ci.org/typearea/dembelo)
