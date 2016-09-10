@@ -1,0 +1,7 @@
+{% extends 'DembeloMain::base.html.twig' %}
+
+{% block body %}
+    {% for textNode in textNodes %}
+        {{ textNode.id }}
+    {% endfor %}
+{% endblock %}
