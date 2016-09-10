@@ -33,6 +33,7 @@ use DembeloMain\Document\Textnode;
 use Symfony\Component\HttpFoundation\Response;
 use Hyphenator\Core as Hyphenator;
 use DembeloMain\Document\Readpath;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 /**
  * Class DefaultController
@@ -97,7 +98,7 @@ class DefaultController extends Controller
 
         /* @var $authorizationChecker \Symfony\Component\Security\Core\Authorization\AuthorizationChecker */
         $authorizationChecker = $this->get('security.authorization_checker');
-        /* @var $tokenStorage Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage */
+        /* @var $tokenStorage TokenStorage */
         $tokenStorage = $this->get('security.token_storage');
         $mongo = $this->get('doctrine_mongodb');
 
@@ -155,7 +156,7 @@ class DefaultController extends Controller
 
         /* @var $authorizationChecker \Symfony\Component\Security\Core\Authorization\AuthorizationChecker */
         $authorizationChecker = $this->get('security.authorization_checker');
-        /* @var $tokenStorage Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage */
+        /* @var $tokenStorage TokenStorage */
         $tokenStorage = $this->get('security.token_storage');
 
         if (!$authorizationChecker->isGranted('ROLE_USER')) {
@@ -259,7 +260,7 @@ class DefaultController extends Controller
 
         /* @var $authorizationChecker \Symfony\Component\Security\Core\Authorization\AuthorizationChecker */
         $authorizationChecker = $this->get('security.authorization_checker');
-        /* @var $tokenStorage Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage */
+        /* @var $tokenStorage TokenStorage */
         $tokenStorage = $this->get('security.token_storage');
         if (!$authorizationChecker->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('login_route');
