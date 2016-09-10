@@ -13,8 +13,7 @@ services:
         arguments: ["@templating","@app.textNode_repository"]
 
     app.textNode_repository:
-        class: DembeloMain\Model\Repository\InMemoryTextNodeRepository
-#        class: DembeloMain\Model\Repository\DoctrineODMTextNodeRepository
-#        factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
-#        arguments:
-#            - DembeloMain\Document\Textnode
+        class: DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository
+        factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
+        arguments:
+            - DembeloMain\Document\Textnode

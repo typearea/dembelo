@@ -1,11 +1,12 @@
 <?php
 
-namespace DembeloMain\Model\Repository;
+namespace DembeloMain\Model\Repository\Doctrine\ODM;
 
 use DembeloMain\Document\Textnode;
+use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 
-class DoctrineODMTextNodeRepository extends DocumentRepository implements TextNodeRepositoryInterface
+class TextNodeRepository extends DocumentRepository implements TextNodeRepositoryInterface
 {
 
     /**

@@ -1,11 +1,11 @@
 <?php
 
-namespace DembeloMain\Tests\Model\Repository;
+namespace DembeloMain\Tests\Model\Repository\Doctrine\ODM;
 
 use DembeloMain\Document\Textnode;
-use DembeloMain\Model\Repository\DoctrineODMTextNodeRepository;
+use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
 
-class DoctrineODMTextNodeRepositoryTest extends AbstractDoctrineODMRepositoryTest
+class TextNodeRepositoryTest extends AbstractRepositoryTest
 {
     public function testSave()
     {
@@ -13,7 +13,7 @@ class DoctrineODMTextNodeRepositoryTest extends AbstractDoctrineODMRepositoryTes
         $class = $this->getClassMock();
         $uow = $this->getUnitOfWorkMock();
 
-        $repository = new DoctrineODMTextNodeRepository($dm, $uow, $class);
+        $repository = new TextNodeRepository($dm, $uow, $class);
         $textNode = new Textnode();
         $textNode = $repository->save($textNode);
 

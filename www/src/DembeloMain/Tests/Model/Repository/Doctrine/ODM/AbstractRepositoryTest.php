@@ -1,12 +1,12 @@
 <?php
 
-namespace DembeloMain\Tests\Model\Repository;
+namespace DembeloMain\Tests\Model\Repository\Doctrine\ODM;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\UnitOfWork;
 
-abstract class AbstractDoctrineODMRepositoryTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractRepositoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|DocumentManager
