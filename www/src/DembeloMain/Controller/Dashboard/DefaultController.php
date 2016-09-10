@@ -3,6 +3,7 @@
 namespace DembeloMain\Controller\Dashboard;
 
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
@@ -10,13 +11,13 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 class DefaultController extends Controller
 {
     /** @var TextNodeRepositoryInterface */
-    private $textNodeRepository;
+    private $topicRepository;
     private $templating;
 
-    public function __construct(EngineInterface $templating, TextNodeRepositoryInterface $textNodeRepository)
+    public function __construct(EngineInterface $templating, TopicRepositoryInterface $topicRepository)
     {
         $this->templating = $templating;
-        $this->textNodeRepository = $textNodeRepository;
+        $this->topicRepository = $topicRepository;
     }
 
     /**
@@ -24,10 +25,9 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-        $textNodes = $this->textNodeRepository->findAll();
         return $this->templating->renderResponse(
             'DembeloMain::dashboard/index.html.twig',
-            array('textNodes' => $textNodes)
+            array('topics' => $this->topicRepository->findByStatusActive())
         );
     }
 }

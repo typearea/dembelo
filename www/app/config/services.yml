@@ -10,7 +10,13 @@ services:
 
     app.controller_dashboard:
         class: DembeloMain\Controller\Dashboard\DefaultController
-        arguments: ["@templating","@app.model_repository_textNode"]
+        arguments: ["@templating","@app.model_repository_topic"]
+
+    app.model_repository_topic:
+        class: DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository
+        factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
+        arguments:
+            - DembeloMain\Document\Topic
 
     app.model_repository_textNode:
         class: DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository

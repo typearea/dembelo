@@ -4,6 +4,7 @@ namespace DembeloMain\Tests\Model\Repository\Doctrine\ODM;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Doctrine\ODM\MongoDB\Persisters\DocumentPersister;
 use Doctrine\ODM\MongoDB\UnitOfWork;
 
 abstract class AbstractRepositoryTest extends \PHPUnit_Framework_TestCase
@@ -30,5 +31,13 @@ abstract class AbstractRepositoryTest extends \PHPUnit_Framework_TestCase
     protected function getUnitOfWorkMock()
     {
         return $this->getMockBuilder(UnitOfWork::class)->disableOriginalConstructor()->getMock();
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|DocumentPersister
+     */
+    protected function getDocumentPersisterMock()
+    {
+        return $this->getMockBuilder(DocumentPersister::class)->disableOriginalConstructor()->getMock();
     }
 }
