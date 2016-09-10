@@ -8,11 +8,11 @@ services:
 #        class: DembeloMain\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
 
-    app.dashboard_controller:
+    app.controller_dashboard:
         class: DembeloMain\Controller\Dashboard\DefaultController
-        arguments: ["@templating","@app.textNode_repository"]
+        arguments: ["@templating","@app.model_repository_textNode"]
 
-    app.textNode_repository:
+    app.model_repository_textNode:
         class: DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository
         factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
         arguments:
