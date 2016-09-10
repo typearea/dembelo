@@ -94,7 +94,6 @@ class UserControllerTest extends WebTestCase
         $controller = new UserController();
         $controller->setContainer($container);
         $controller->loginAction();
-
     }
 
     /**

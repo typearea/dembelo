@@ -184,7 +184,6 @@ class ImportCommand extends ContainerAwareCommand
 
         fclose($fileHandle);
         fclose($extractedFileHandle);
-
     }
 
     private function checkTwineFile($fileHandler)
@@ -255,7 +254,6 @@ class ImportCommand extends ContainerAwareCommand
         $this->licensee = $licensee->getId();
 
         $this->twineArchivePath = $input->getArgument('twine-archive-file');
-
     }
 
     private function initParser($xmlParser, $fileHandler)

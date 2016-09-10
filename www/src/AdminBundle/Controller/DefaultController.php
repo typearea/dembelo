@@ -276,7 +276,6 @@ class DefaultController extends Controller
         );
 
         return new Response(\json_encode($output));
-
     }
 
     /**
@@ -314,7 +313,6 @@ class DefaultController extends Controller
         $dm->flush();
 
         return new Response(\json_encode(array('error' => false)));
-
     }
 
     /**
