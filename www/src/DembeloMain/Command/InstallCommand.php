@@ -79,7 +79,6 @@ class InstallCommand extends ContainerAwareCommand
             $this->installDummyData($output);
             $output->writeln("<info>Dummy data installed</info>");
         }
-
     }
 
     protected function purgeDB()
@@ -99,7 +98,6 @@ class InstallCommand extends ContainerAwareCommand
             $collection = $dm->getDocumentCollection($collectionClass);
             $collection->remove(array());
         }
-
     }
 
     protected function installDefaultUsers(OutputInterface $output)
@@ -153,7 +151,6 @@ class InstallCommand extends ContainerAwareCommand
         $output->writeln("Hitches installed...");
 
         $dm->flush();
-
     }
 
     private function createLicensees(ManagerRegistry $mongo, DocumentManager $dm)
@@ -177,7 +174,6 @@ class InstallCommand extends ContainerAwareCommand
             }
             $this->dummyData['licensees'][] = $licensee;
         }
-
     }
 
     private function createUsers(ManagerRegistry $mongo, DocumentManager $dm)
@@ -206,7 +202,6 @@ class InstallCommand extends ContainerAwareCommand
         );
 
         $this->installUsers($users, $mongo, $dm);
-
     }
 
     private function installUsers(array $users, ManagerRegistry $mongo, DocumentManager $dm)
@@ -272,7 +267,6 @@ class InstallCommand extends ContainerAwareCommand
             }
             $this->dummyData['topics'][] = $topic;
         }
-
     }
 
     private function createTextnodes(ManagerRegistry $mongo, DocumentManager $dm)
