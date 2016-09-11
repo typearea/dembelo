@@ -18,6 +18,12 @@ services:
         arguments:
             - DembeloMain\Document\Topic
 
+    app.model_repository_story:
+        class: DembeloMain\Model\Repository\Doctrine\ODM\StoryRepository
+        factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
+        arguments:
+            - DembeloMain\Document\Story
+
     app.model_repository_textNode:
         class: DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository
         factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
