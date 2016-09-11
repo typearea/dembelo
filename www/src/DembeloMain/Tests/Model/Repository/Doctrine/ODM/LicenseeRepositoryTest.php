@@ -21,8 +21,7 @@ class LicenseeRepositoryTest extends AbstractRepositoryTest
         $uow = $this->getUnitOfWorkMock();
 
         $repository = new LicenseeRepository($dm, $uow, $class);
-        $licensee = new Licensee();
-        $licensee = $repository->save($licensee);
+        $licensee = $repository->save(new Licensee());
 
         $this->assertInstanceOf(Licensee::class, $licensee);
     }

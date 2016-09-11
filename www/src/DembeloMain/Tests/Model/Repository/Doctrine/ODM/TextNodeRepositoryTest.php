@@ -21,8 +21,7 @@ class TextNodeRepositoryTest extends AbstractRepositoryTest
         $uow = $this->getUnitOfWorkMock();
 
         $repository = new TextNodeRepository($dm, $uow, $class);
-        $textNode = new Textnode();
-        $textNode = $repository->save($textNode);
+        $textNode = $repository->save(new Textnode());
 
         $this->assertInstanceOf(Textnode::class, $textNode);
     }

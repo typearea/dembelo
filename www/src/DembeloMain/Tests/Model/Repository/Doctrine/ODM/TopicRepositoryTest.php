@@ -22,8 +22,7 @@ class TopicRepositoryTest extends AbstractRepositoryTest
         $uow = $this->getUnitOfWorkMock();
 
         $repository = new TopicRepository($dm, $uow, $class);
-        $topic = new Topic();
-        $topic = $repository->save($topic);
+        $topic = $repository->save(new Topic());
 
         $this->assertInstanceOf(Topic::class, $topic);
     }

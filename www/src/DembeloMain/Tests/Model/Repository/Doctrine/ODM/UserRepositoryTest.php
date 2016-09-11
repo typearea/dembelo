@@ -21,8 +21,7 @@ class UserRepositoryTest extends AbstractRepositoryTest
         $uow = $this->getUnitOfWorkMock();
 
         $repository = new UserRepository($dm, $uow, $class);
-        $user = new User();
-        $user = $repository->save($user);
+        $user = $repository->save(new User());
 
         $this->assertInstanceOf(User::class, $user);
     }

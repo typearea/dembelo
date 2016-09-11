@@ -21,8 +21,7 @@ class StoryRepositoryTest extends AbstractRepositoryTest
         $uow = $this->getUnitOfWorkMock();
 
         $repository = new StoryRepository($dm, $uow, $class);
-        $story = new Story();
-        $story = $repository->save($story);
+        $story = $repository->save(new Story());
 
         $this->assertInstanceOf(Story::class, $story);
     }
