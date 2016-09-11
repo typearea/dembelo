@@ -495,6 +495,5 @@ class DefaultControllerTest extends WebTestCase
             ->method("getRepository")
             ->with($this->equalTo('DembeloMain:User'))
             ->will($this->returnValue($this->repository));
-
     }
 }
