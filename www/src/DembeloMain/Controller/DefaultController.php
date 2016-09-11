@@ -283,7 +283,6 @@ class DefaultController extends Controller
             ->getQuery()->getSingleResult();
 
         return $this->redirectToRoute('text', array('textnodeId' => $textnode->getId()));
-
     }
 
     /**
