@@ -16,7 +16,7 @@ class StoryRepository extends DocumentRepository implements StoryRepositoryInter
     /**
      * Save story
      * @param Story $story
-     * @return story
+     * @return Story
      */
     public function save(Story $story)
     {
