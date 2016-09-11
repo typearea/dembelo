@@ -4,12 +4,16 @@ namespace DembeloMain\Model\Repository;
 
 use DembeloMain\Document\Topic;
 
+/**
+ * Interface TopicRepositoryInterface
+ * @package DembeloMain\Model\Repository
+ */
 interface TopicRepositoryInterface
 {
 
     /**
      * Find a topic by id
-     * @param $id
+     * @param string $id
      * @return Topic
      */
     public function find($id);

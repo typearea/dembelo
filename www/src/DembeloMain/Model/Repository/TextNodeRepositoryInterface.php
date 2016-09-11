@@ -4,11 +4,15 @@ namespace DembeloMain\Model\Repository;
 
 use DembeloMain\Document\Textnode;
 
+/**
+ * Interface TextNodeRepositoryInterface
+ * @package DembeloMain\Model\Repository
+ */
 interface TextNodeRepositoryInterface
 {
     /**
      * Find a text node by id
-     * @param $id
+     * @param string $id
      * @return Textnode
      */
     public function find($id);

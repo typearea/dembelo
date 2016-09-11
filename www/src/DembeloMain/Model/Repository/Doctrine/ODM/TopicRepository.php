@@ -2,22 +2,27 @@
 
 namespace DembeloMain\Model\Repository\Doctrine\ODM;
 
-use DembeloMain\Document\Textnode;
 use DembeloMain\Document\Topic;
-use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 
+/**
+ * Class TopicRepository
+ * @package DembeloMain\Model\Repository\Doctrine\ODM
+ */
 class TopicRepository extends DocumentRepository implements TopicRepositoryInterface
 {
 
     /**
-     * @inheritdoc
+     * Save topic
+     * @param Topic $topic
+     * @return Topic
      */
     public function save(Topic $topic)
     {
         $this->dm->persist($topic);
         $this->dm->flush();
+
         return $topic;
     }
 

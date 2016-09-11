@@ -8,12 +8,21 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
+/**
+ * Class DefaultController
+ * @package DembeloMain\Controller\Dashboard
+ */
 class DefaultController extends Controller
 {
     /** @var TextNodeRepositoryInterface */
     private $topicRepository;
     private $templating;
 
+    /**
+     * DefaultController constructor.
+     * @param EngineInterface $templating
+     * @param TopicRepositoryInterface $topicRepository
+     */
     public function __construct(EngineInterface $templating, TopicRepositoryInterface $topicRepository)
     {
         $this->templating = $templating;
@@ -22,6 +31,7 @@ class DefaultController extends Controller
 
     /**
      * @Route("/dashboard", name="dashboard")
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction()
     {

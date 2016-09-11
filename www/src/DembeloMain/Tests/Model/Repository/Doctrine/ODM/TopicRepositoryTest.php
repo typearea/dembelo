@@ -6,8 +6,15 @@ use DembeloMain\Document\Topic;
 use DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository;
 use Doctrine\MongoDB\ArrayIterator;
 
+/**
+ * Class TopicRepositoryTest
+ * @package DembeloMain\Tests\Model\Repository\Doctrine\ODM
+ */
 class TopicRepositoryTest extends AbstractRepositoryTest
 {
+    /**
+     * Test save
+     */
     public function testSave()
     {
         $dm = $this->getDocumentManagerMock();
@@ -21,6 +28,9 @@ class TopicRepositoryTest extends AbstractRepositoryTest
         $this->assertInstanceOf(Topic::class, $topic);
     }
 
+    /**
+     * Test find topics with status active
+     */
     public function testFindByStatusActive()
     {
         $dm = $this->getDocumentManagerMock();

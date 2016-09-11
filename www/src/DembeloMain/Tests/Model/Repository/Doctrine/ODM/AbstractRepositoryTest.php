@@ -7,6 +7,10 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Persisters\DocumentPersister;
 use Doctrine\ODM\MongoDB\UnitOfWork;
 
+/**
+ * Class AbstractRepositoryTest
+ * @package DembeloMain\Tests\Model\Repository\Doctrine\ODM
+ */
 abstract class AbstractRepositoryTest extends \PHPUnit_Framework_TestCase
 {
     /**

@@ -5,8 +5,15 @@ namespace DembeloMain\Tests\Model\Repository\Doctrine\ODM;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
 
+/**
+ * Class TextNodeRepositoryTest
+ * @package DembeloMain\Tests\Model\Repository\Doctrine\ODM
+ */
 class TextNodeRepositoryTest extends AbstractRepositoryTest
 {
+    /**
+     * Test save
+     */
     public function testSave()
     {
         $dm = $this->getDocumentManagerMock();
