@@ -20,8 +20,8 @@ class DefaultController extends Controller
 
     /**
      * DefaultController constructor.
-     * @param EngineInterface           $templating
-     * @param TopicRepositoryInterface  $topicRepository
+     * @param EngineInterface          $templating
+     * @param TopicRepositoryInterface $topicRepository
      */
     public function __construct(EngineInterface $templating, TopicRepositoryInterface $topicRepository)
     {
