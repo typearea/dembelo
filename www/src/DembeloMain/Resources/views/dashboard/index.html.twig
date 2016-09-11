@@ -13,11 +13,11 @@
         </div>
 
         <div id="row3" class="row">
-            {% for topic in topics %}
-                <div class="topic col-xs-3">
-                    <a href="{{ path('themenfeld', {'topicId': topic.id}) }}">
+            {% for licensee in topics %}
+                <div class="licensee col-xs-3">
+                    <a href="{{ path('themenfeld', {'topicId': licensee.id}) }}">
                         {% image '@DembeloMain/Resources/public/images/bg02.jpg' %}
-                        <img src="{{ asset_url }}" alt="{{ topic.name }}" title="{{ topic.name }}"/>
+                        <img src="{{ asset_url }}" alt="{{ licensee.name }}" title="{{ licensee.name }}"/>
                         {% endimage %}
                     </a>
                 </div>
