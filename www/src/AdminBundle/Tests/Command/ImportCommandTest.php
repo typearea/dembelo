@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2016 Michael Giesler
  *
  * This file is part of Dembelo.
@@ -22,6 +21,18 @@
  * @package AdminBundle
  */
 
+namespace AdminBundle\Command;
+
+function is_readable($filename)
+{
+    return \strpos($filename, 'readable') !== false;
+}
+
+function file_exists($filename)
+{
+    return \strpos($filename, 'exists') !== false;
+}
+
 namespace AdminBundle\Tests\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -34,34 +45,171 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class ImportCommandTest extends KernelTestCase
 {
+    private $mockObjects;
+    private $command;
+    private $commandTester;
+
+    protected function setUp()
+    {
+        self::bootKernel();
+        $application = new Application(self::$kernel);
+        $application->add(new ImportCommand());
+        $this->command = $application->find('dembelo:import');
+        $this->commandTester = new CommandTester($this->command);
+        $this->mockObjects = $this->getMockObjects();
+        $this->command->setContainer($this->mockObjects['container']);
+    }
+
     /**
      * tests the execute method
      */
     public function testExecute()
     {
-        self::bootKernel();
-        $application = new Application(self::$kernel);
+        $this->mockObjects['importTwine']->expects($this->once())
+            ->method('run');
 
-        $application->add(new ImportCommand());
-
-        $mockContainer = null;
-
-        $command = $application->find('dembelo:import');
-        $command->setContainer($mockContainer);
-        $commandTester = new CommandTester($command);
-
-        $commandTester->execute(array(
-            'command'  => $command->getName(),
-            'twine-archive-file' => 'somefile.html',
+        $returnValue = $this->commandTester->execute(array(
+            'command'  => $this->command->getName(),
+            'twine-archive-file' => 'somefile_readable_exists.html',
             '--licensee-name' => 'somelicensee',
             '--metadata-author' => 'someauthor',
             '--metadata-publisher' => 'somepublisher'
-
         ));
 
         // the output of the command in the console
-        $output = $commandTester->getDisplay();
-        $this->assertContains('Username: Wouter', $output);
+        $output = $this->commandTester->getDisplay();
+        $this->assertEquals('', $output);
+        $this->assertEquals(0, $returnValue);
+    }
 
+    public function testExecuteWithUnreadableFile()
+    {
+        $this->mockObjects['importTwine']->expects($this->never())
+            ->method('run');
+
+        $returnValue = $this->commandTester->execute(array(
+            'command'  => $this->command->getName(),
+            'twine-archive-file' => 'somefile_exists.html',
+            '--licensee-name' => 'somelicensee',
+            '--metadata-author' => 'someauthor',
+            '--metadata-publisher' => 'somepublisher'
+        ));
+
+        // the output of the command in the console
+        $output = $this->commandTester->getDisplay();
+        $this->assertContains('isn\'t readable', $output);
+        $this->assertEquals(-1, $returnValue);
+    }
+
+    public function testExecuteWithFileNotExisting()
+    {
+        $this->mockObjects['importTwine']->expects($this->never())
+            ->method('run');
+
+        $returnValue = $this->commandTester->execute(array(
+            'command'  => $this->command->getName(),
+            'twine-archive-file' => 'somefile_readable.html',
+            '--licensee-name' => 'somelicensee',
+            '--metadata-author' => 'someauthor',
+            '--metadata-publisher' => 'somepublisher'
+        ));
+
+        // the output of the command in the console
+        $output = $this->commandTester->getDisplay();
+        $this->assertContains('doesn\'t exist', $output);
+        $this->assertEquals(-1, $returnValue);
+    }
+
+    /**
+     *
+     */
+    public function testExecuteWithExeptionInImportTwine()
+    {
+        $this->mockObjects['importTwine']->expects($this->once())
+            ->method('run')
+            ->will($this->throwException(new \Exception('dummy Exception')));
+
+        $this->mockObjects['importTwine']->expects($this->once())
+            ->method('parserFree');
+
+        $returnValue = $this->commandTester->execute(array(
+            'command'  => $this->command->getName(),
+            'twine-archive-file' => 'somefile_exists_readable.html',
+            '--licensee-name' => 'somelicensee',
+            '--metadata-author' => 'someauthor',
+            '--metadata-publisher' => 'somepublisher'
+        ));
+
+        // the output of the command in the console
+        $output = $this->commandTester->getDisplay();
+        $this->assertContains('dummy Exception', $output);
+        $this->assertEquals(-1, $returnValue);
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testExecuteWithLicenseeNotFound()
+    {
+        $this->mockObjects['importTwine']->expects($this->never())
+            ->method('run');
+
+        $returnValue = $this->commandTester->execute(array(
+            'command'  => $this->command->getName(),
+            'twine-archive-file' => 'somefile_exists_readable.html',
+            '--licensee-name' => 'somelicensee2',
+            '--metadata-author' => 'someauthor',
+            '--metadata-publisher' => 'somepublisher'
+        ));
+
+        // the output of the command in the console
+        $output = $this->commandTester->getDisplay();
+        $this->assertContains('dummy Exception', $output);
+        $this->assertEquals(-1, $returnValue);
+        $this->expectException(\Exception::class);
+    }
+
+    private function getMockObjects()
+    {
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+
+        $service = $this->getMockBuilder('Doctrine\Bundle\MongoDBBundle\ManagerRegistry')->disableOriginalConstructor()->getMock();
+        $repositoryLicensee = $this->getMock('repositoryLicenseeMock', ['findOneByName']);
+        $importTwine = $this->getMockBuilder('AdminBundle\Model\ImportTwine')->disableOriginalConstructor()->setMethods(['run', 'parserFree'])->getMock();
+        $dm = $this->getMock('dmMock', ['flush']);
+
+        $container->expects($this->at(0))
+            ->method("get")
+            ->with($this->equalTo('admin.import.twine'))
+            ->will($this->returnValue($importTwine));
+        $container->expects($this->at(1))
+            ->method("get")
+            ->with($this->equalTo('doctrine_mongodb'))
+            ->will($this->returnValue($service));
+        $service->expects($this->any())
+            ->method("getRepository")
+            ->with($this->equalTo('DembeloMain:Licensee'))
+            ->will($this->returnValue($repositoryLicensee));
+        $service->expects($this->any())
+            ->method("getManager")
+            ->will($this->returnValue($dm));
+        $repositoryLicensee->expects($this->any())
+            ->method('findOneByName')
+            ->will($this->returnCallback([$this, 'findOneByNameCallback']));
+
+        return [
+            'container' => $container,
+            'service' => $service,
+            'repositoryLicensee' => $repositoryLicensee,
+            'importTwine' => $importTwine,
+            'dm' => $dm
+        ];
+    }
+
+    public function findOneByNameCallback($arg) {
+        if ($arg === 'somelicensee') {
+            return $this->getMockBuilder('DembeloMain\Document\Licensee')->disableOriginalConstructor()->getMock();
+        }
+        return null;
     }
 }

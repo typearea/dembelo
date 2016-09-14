@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2015 Stephan Kreutzer
+/* Copyright (C) 2015, 2016 Stephan Kreutzer, Michael Giesler
  *
  * This file is part of Dembelo.
  *
@@ -113,7 +113,7 @@ class ImportCommand extends ContainerAwareCommand
 
             $this->dm->flush();
         } catch (\Exception $ex) {
-            $output->writeln('<error'.$ex->getMessage().'</error>');
+            $output->writeln('<error>'.$ex->getMessage().'</error>');
 
             $importTwine->parserFree();
 
