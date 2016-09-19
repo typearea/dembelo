@@ -65,8 +65,11 @@ class ImportCommandTest extends KernelTestCase
      */
     public function testExecute()
     {
+        $licenseeId = 'licenseeId';
+
         $this->mockObjects['importTwine']->expects($this->once())
-            ->method('run');
+            ->method('run')
+            ->with('somefile_readable_exists.html', $licenseeId, 'someauthor', 'somepublisher');
 
         $returnValue = $this->commandTester->execute(array(
             'command'  => $this->command->getName(),
@@ -127,6 +130,7 @@ class ImportCommandTest extends KernelTestCase
     {
         $this->mockObjects['importTwine']->expects($this->once())
             ->method('run')
+            ->with('somefile_readable_exists.html', 'licenseeId', 'someauthor', 'somepublisher')
             ->will($this->throwException(new \Exception('dummy Exception')));
 
         $this->mockObjects['importTwine']->expects($this->once())
@@ -134,7 +138,7 @@ class ImportCommandTest extends KernelTestCase
 
         $returnValue = $this->commandTester->execute(array(
             'command'  => $this->command->getName(),
-            'twine-archive-file' => 'somefile_exists_readable.html',
+            'twine-archive-file' => 'somefile_readable_exists.html',
             '--licensee-name' => 'somelicensee',
             '--metadata-author' => 'someauthor',
             '--metadata-publisher' => 'somepublisher'
@@ -208,7 +212,11 @@ class ImportCommandTest extends KernelTestCase
 
     public function findOneByNameCallback($arg) {
         if ($arg === 'somelicensee') {
-            return $this->getMockBuilder('DembeloMain\Document\Licensee')->disableOriginalConstructor()->getMock();
+            $licenseeMock = $this->getMockBuilder('DembeloMain\Document\Licensee')->disableOriginalConstructor()->getMock();
+            $licenseeMock->expects($this->once())
+                ->method('getId')
+                ->will($this->returnValue('licenseeId'));
+            return $licenseeMock;
         }
         return null;
     }

@@ -23,12 +23,13 @@
  */
 
 
-namespace AdminBundle;
+namespace AdminBundle\Model;
 
 
 use DembeloMain\Document\Textnode;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Exception;
+use phpDocumentor\Reflection\DocBlock\Tags\Method;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ImportTwine
@@ -39,6 +40,8 @@ class ImportTwine
     private $xmlParser;
 
     private $twineArchivePath;
+
+    private $mongo;
 
     /**
      * @var \Doctrine\ODM\MongoDB\DocumentManager
@@ -71,20 +74,24 @@ class ImportTwine
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        $this->mongo = $this->container->get('doctrine_mongodb');
+        $this->dm = $this->mongo->getManager();
     }
 
     public function run($twineArchivePath, $licenseeId, $author, $publisher)
     {
+        $this->twineArchivePath = $twineArchivePath;
+
         $this->licenseeId = $licenseeId;
         $this->author = $author;
         $this->publisher = $publisher;
 
-        $twineArchivePathExtracted = $this->extractTwineFile($twineArchivePath);
+        $twineArchivePathExtracted = $this->extractTwineFile();
 
         $fileHandler = fopen($twineArchivePathExtracted, "rb");
 
         if ($fileHandler === false) {
-            throw new Exception("Couldn't open file '" . $twineArchivePath . "'");
+            throw new Exception("Couldn't open file '" . $this->twineArchivePath . "'");
         }
 
         $this->xmlParser = xml_parser_create("UTF-8");
@@ -103,11 +110,11 @@ class ImportTwine
         xml_parser_free($this->xmlParser);
     }
 
-    private function extractTwineFile($file)
+    private function extractTwineFile()
     {
-        $extractedFile = $file.'.extracted';
+        $extractedFile = $this->twineArchivePath.'.extracted';
 
-        $fileHandle = fopen($file, 'r');
+        $fileHandle = fopen($this->twineArchivePath, 'r');
         $extractedFileHandle = fopen($extractedFile, 'w');
         if ($fileHandle === false) {
             throw new Exception("Failed to read data from file '".$this->twineArchivePath."'.");
@@ -149,7 +156,7 @@ class ImportTwine
         $peekDataLength = strlen($peekData);
 
         if ($peekDataLength <= 0) {
-            throw new Exception("<warning>File '".$this->twineArchivePath."' seems to be empty.</warning>");
+            throw new Exception("File '".$this->twineArchivePath."' seems to be empty.");
         }
 
         for ($i = 0; $i < $peekDataLength; $i++) {
@@ -207,7 +214,6 @@ class ImportTwine
             if ($buffer === false) {
                 break;
             }
-
             if (xml_parse($this->xmlParser, $buffer, false) !== 1) {
                 $errorCode = xml_get_error_code($this->xmlParser);
                 $errorDescription = xml_error_string($errorCode);

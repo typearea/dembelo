@@ -5,7 +5,7 @@ parameters:
 
 services:
     admin.import.twine:
-        class: AdminBundle\ImportTwine
+        class: AdminBundle\Model\ImportTwine
         arguments: ['@service_container']
 #    service_name:
 #        class: DembeloMain\Directory\ClassName
