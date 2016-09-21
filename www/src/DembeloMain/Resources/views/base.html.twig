@@ -53,7 +53,8 @@
 	      <a href="{% block textnavlink  %}#{% endblock %}" class="btn btn-default {% block textnavclass %}disabled{% endblock %}"><span class="glyphicon glyphicon-repeat"></span></a>
 	    </div>
 	    <div class="btn-group" role="group">
-	      {% block infohomelink %}<a href="{{ path('mainpage') }}" class="btn btn-default"><span class="glyphicon glyphicon-home"></span></a>{% endblock %}
+            {% block infohomelink %}<a href="{{ path('dashboard') }}" class="btn btn-default">
+                    <span class="glyphicon glyphicon-home"></span></a>{% endblock %}
 	    </div>
 	    <div class="btn-group" role="group">
 	      <a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
