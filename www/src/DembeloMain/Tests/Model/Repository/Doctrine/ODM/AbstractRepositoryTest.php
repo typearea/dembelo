@@ -20,6 +20,7 @@
 
 namespace DembeloMain\Tests\Model\Repository\Doctrine\ODM;
 
+use DembeloMain\Model\Repository\Doctrine\ODM\AbstractRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Persisters\DocumentPersister;
@@ -32,19 +33,22 @@ use Doctrine\ODM\MongoDB\UnitOfWork;
 abstract class AbstractRepositoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * Test save
+     */
+    public function testSave()
+    {
+        $repository = $this->getAbstractRepositoryMock();
+        $object = new \stdClass();
+        $user = $repository->save($object);
+        $this->assertSame($object, $user);
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|DocumentManager
      */
     protected function getDocumentManagerMock()
     {
         return $this->getMockBuilder(DocumentManager::class)->disableOriginalConstructor()->getMock();
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
-     */
-    protected function getClassMock()
-    {
-        return $this->getMockBuilder(ClassMetadata::class)->disableOriginalConstructor()->getMock();
     }
 
     /**
@@ -56,10 +60,29 @@ abstract class AbstractRepositoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ClassMetadata
+     */
+    protected function getClassMock()
+    {
+        return $this->getMockBuilder(ClassMetadata::class)->disableOriginalConstructor()->getMock();
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|DocumentPersister
      */
     protected function getDocumentPersisterMock()
     {
         return $this->getMockBuilder(DocumentPersister::class)->disableOriginalConstructor()->getMock();
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|AbstractRepository
+     */
+    private function getAbstractRepositoryMock()
+    {
+        return $this->getMockForAbstractClass(
+            AbstractRepository::class,
+            array($this->getDocumentManagerMock(), $this->getUnitOfWorkMock(), $this->getClassMock())
+        );
     }
 }

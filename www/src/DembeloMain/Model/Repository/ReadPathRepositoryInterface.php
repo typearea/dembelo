@@ -46,5 +46,5 @@ interface ReadPathRepositoryInterface
      * @param Readpath $readPath
      * @return Readpath
      */
-    public function save(Readpath $readPath);
+    public function save($readPath);
 }

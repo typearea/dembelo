@@ -46,5 +46,5 @@ interface TextNodeRepositoryInterface
      * @param Textnode $textNode
      * @return Textnode
      */
-    public function save(Textnode $textNode);
+    public function save($textNode);
 }

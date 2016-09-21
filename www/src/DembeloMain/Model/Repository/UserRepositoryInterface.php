@@ -53,5 +53,5 @@ interface UserRepositoryInterface
      * @param User $user
      * @return User
      */
-    public function save(User $user);
+    public function save($user);
 }

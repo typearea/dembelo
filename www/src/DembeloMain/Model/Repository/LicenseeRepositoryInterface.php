@@ -46,5 +46,5 @@ interface LicenseeRepositoryInterface
      * @param Licensee $licensee
      * @return Licensee
      */
-    public function save(Licensee $licensee);
+    public function save($licensee);
 }

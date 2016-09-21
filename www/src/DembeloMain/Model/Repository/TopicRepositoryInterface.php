@@ -53,5 +53,5 @@ interface TopicRepositoryInterface
      * @param Topic $topic
      * @return Topic
      */
-    public function save(Topic $topic);
+    public function save($topic);
 }

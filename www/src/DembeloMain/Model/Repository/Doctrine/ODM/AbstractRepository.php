@@ -20,13 +20,24 @@
 
 namespace DembeloMain\Model\Repository\Doctrine\ODM;
 
-use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use Doctrine\ODM\MongoDB\DocumentRepository;
 
 /**
- * Class TextNodeRepository
+ * Class AbstractRepository
  * @package DembeloMain\Model\Repository\Doctrine\ODM
  */
-class TextNodeRepository extends AbstractRepository implements TextNodeRepositoryInterface
+abstract class AbstractRepository extends DocumentRepository
 {
+    /**
+     * Save object
+     * @param object $object
+     * @return object
+     */
+    public function save($object)
+    {
+        $this->dm->persist($object);
+        $this->dm->flush();
 
+        return $object;
+    }
 }
