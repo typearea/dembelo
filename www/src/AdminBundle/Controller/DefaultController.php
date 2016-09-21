@@ -25,6 +25,7 @@
 
 namespace AdminBundle\Controller;
 
+use AdminBundle\Model\ImportTwine;
 use DembeloMain\Document\Importfile;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -523,6 +524,24 @@ class DefaultController extends Controller
      */
     public function importAction(Request $request)
     {
+        $importfileId = $request->get('importfileid');
 
+        /* @var $mongo \Doctrine\Bundle\MongoDBBundle\ManagerRegistry */
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $dm \Doctrine\ODM\MongoDB\DocumentManager*/
+        $dm = $mongo->getManager();
+
+        $repository = $mongo->getRepository('DembeloMain:Importfile');
+
+        /* @var $importfile \DembeloMain\Document\Importfile */
+        $importfile = $repository->find($importfileId);
+        $importer = new ImportTwine($this->container);
+        $returnValue = $importer->run($importfile->getFilename(), $importfile->getLicenseeId(), $importfile->getAuthor(), $importfile->getPublisher());
+
+        $output = [
+            'success' => true,
+        ];
+
+        return new Response(json_encode($output));
     }
 }
