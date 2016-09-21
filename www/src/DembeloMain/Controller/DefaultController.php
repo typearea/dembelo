@@ -25,65 +25,18 @@
 
 namespace DembeloMain\Controller;
 
+use DembeloMain\Document\Readpath;
+use DembeloMain\Document\Textnode;
+use Hyphenator\Core as Hyphenator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use DembeloMain\Document\Topic;
-use DembeloMain\Document\Textnode;
 use Symfony\Component\HttpFoundation\Response;
-use Hyphenator\Core as Hyphenator;
-use DembeloMain\Document\Readpath;
 
 /**
  * Class DefaultController
  */
 class DefaultController extends Controller
 {
-    /**
-     * @Route("/", name="mainpage")
-     *
-     * @return string
-     */
-    public function indexAction()
-    {
-        $mongo = $this->get('doctrine_mongodb');
-        $connection = $mongo->getConnection();
-
-        if (!$connection->getMongo()) {
-            $connection->connect();
-        }
-
-        /* @var $authorizationChecker \Symfony\Component\Security\Core\Authorization\AuthorizationChecker */
-        $authorizationChecker = $this->get('security.authorization_checker');
-        /* @var $tokenStorage Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage */
-        $tokenStorage = $this->get('security.token_storage');
-
-        if ($authorizationChecker->isGranted('ROLE_USER')) {
-            $user = $tokenStorage->getToken()->getUser();
-
-            $textnodeId = $user->getCurrentTextnode();
-
-            if (!is_null($textnodeId)) {
-                /**
-                 * @todo Redirect to textnode, if the user browsed the index page directly (without
-                 *     navigating to the index page via the menu) with an active user session resulting
-                 *     from the "remember me" (cookie based) option. If the latter case isn't identified
-                 *     correctly, the index page may always redirect to a textnode and wouldn't be
-                 *     browsable any more.
-                 */
-            }
-        }
-
-        $repository = $mongo->getRepository('DembeloMain:Topic');
-        $topics = $repository->findByStatus(Topic::STATUS_ACTIVE);
-
-        if (!empty($topics)) {
-            return $this->render('DembeloMain::default/index.html.twig', array('topics' => $topics));
-        }
-
-        return $this->render('DembeloMain::default/index.html.twig');
-    }
-
     /**
      * @Route("/themenfeld/{topicId}", name="themenfeld")
      *

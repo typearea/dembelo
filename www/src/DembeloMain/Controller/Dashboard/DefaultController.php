@@ -48,7 +48,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/dashboard", name="dashboard")
+     * @Route("/", name="dashboard")
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction()

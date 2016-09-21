@@ -11,5 +11,5 @@ logout:
     path: /logout
 
 dashboard:
-    path:     /dashboard
+    path:     /
     defaults: { _controller: app.controller_dashboard:indexAction }
