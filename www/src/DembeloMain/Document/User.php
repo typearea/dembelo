@@ -25,18 +25,19 @@
 
 namespace DembeloMain\Document;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique as MongoDBUnique;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Exception;
+use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class User
  *
  * @MongoDB\Document
  * @MongoDBUnique(fields="email")
+ * @MongoDB\Document(repositoryClass="\DembeloMain\Model\Repository\Doctrine\ODM\UserRepository")
  */
 class User implements UserInterface, \Serializable, AdvancedUserInterface
 {

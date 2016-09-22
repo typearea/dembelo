@@ -1,0 +1,57 @@
+{#
+Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
+
+This file is part of Dembelo.
+
+Dembelo is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Dembelo is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License 3 for more details.
+
+You should have received a copy of the GNU Affero General Public License 3
+along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
+#}
+
+{% extends 'DembeloMain::base.html.twig' %}
+
+{% block bodyid %}main-page{% endblock %}
+
+{% block infohomelink %}
+    <a href="#" class="btn btn-default" data-toggle="modal" data-target="#modalInfo"><span class="glyphicon glyphicon-info-sign"></span></a>
+{% endblock %}
+
+{% block body %}
+    <div id="mainpagecontainer" class="container-fluid">
+        <div id="row1" class="row ">
+            <div class="col-xs-12 bg-bookmark">{{ include('DembeloMain::default/carousel.html.twig', {}) }}</div>
+        </div>
+
+        <div id="row3" class="row">
+            {% for licensee in topics %}
+                <div class="licensee col-xs-3">
+                    <a href="{{ path('themenfeld', {'topicId': licensee.id}) }}">
+                        {% image '@DembeloMain/Resources/public/images/bg02.jpg' %}
+                        <img src="{{ asset_url }}" alt="{{ licensee.name }}" title="{{ licensee.name }}"/>
+                        {% endimage %}
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+        <div id="row4" class="row ">
+            <div class="col-xs-12">
+                <a href="https://github.com/typearea/dembelo" target="_blank">
+                    {% image '@DembeloMain/Resources/public/images/werbegrafik.png' %}
+                    <img src="{{ asset_url }}"/>
+                    {% endimage %}
+                    <p class="ad-text">Entwickle mit! Besuche Dembelo auf Github.</p>
+                </a>
+            </div>
+        </div>
+    </div>
+    {{ include('DembeloMain::info.html.twig', {'dialogId': 'modalInfo'}) }}
+{% endblock %}

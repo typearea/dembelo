@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Class Readpath
  *
  * @MongoDB\Document
+ * @MongoDB\Document(repositoryClass="\DembeloMain\Model\Repository\Doctrine\ODM\ReadPathRepository")
  */
 class Readpath
 {

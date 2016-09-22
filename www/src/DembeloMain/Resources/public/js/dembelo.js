@@ -6,19 +6,7 @@
 
             $(window).resize(
                 function () {
-                    resizeImages();
                     resizeMainPage()
-                }
-            );
-            $("img").one(
-                "load", function () {
-                    resizeImage(this);
-                }
-            ).each(
-                function () {
-                    if (this.complete) {
-                        $(this).load();
-                    }
                 }
             );
 
@@ -57,35 +45,6 @@
         }
     );
 
-    function resizeImages() {
-        setTimeout(function () {
-        $('#main-page img').each(
-            function () {
-                resizeImage(this);
-
-            }
-        );
-        }, 200);
-    }
-
-    function resizeImage(imageElement) {
-        var imageHeight = imageElement.naturalHeight,
-            imageWidth = imageElement.naturalWidth,
-            divHeight = parseInt($(imageElement).closest('div').css('height')),
-            divWidth = parseInt($(imageElement).closest('div').css('width'));
-
-        if (imageHeight / imageWidth < divHeight / divWidth) { // Querformat
-            if (imageHeight > divHeight) {
-                $(imageElement).css('height', divHeight + 'px');
-                $(imageElement).css('width', '');
-            }
-        } else { // Hochformat
-            if (imageWidth > divWidth) {
-                $(imageElement).css('width', divWidth + 'px');
-                $(imageElement).css('height', '');
-            }
-        }
-    }
 
     function resizeMainPage() {
 
@@ -103,3 +62,11 @@
 
     }
 })();
+
+$(document).ready(function() {
+    $('.col-xs-3 img').each(function() {
+        if ($(this).height() > $(this).width()) {
+            $(this).addClass('portrait');
+        }
+    });
+});

@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Class Textnode
  *
  * @MongoDB\Document
+ * @MongoDB\Document(repositoryClass="\DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository")
  */
 class Textnode
 {
