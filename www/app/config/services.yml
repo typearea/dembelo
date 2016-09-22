@@ -7,3 +7,43 @@ services:
 #    service_name:
 #        class: DembeloMain\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+
+    app.controller_dashboard:
+        class: DembeloMain\Controller\Dashboard\DefaultController
+        arguments: ["@templating","@app.model_repository_topic"]
+
+    app.model_repository_topic:
+        class: DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository
+        factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
+        arguments:
+            - DembeloMain\Document\Topic
+
+    app.model_repository_story:
+        class: DembeloMain\Model\Repository\Doctrine\ODM\StoryRepository
+        factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
+        arguments:
+            - DembeloMain\Document\Story
+
+    app.model_repository_textNode:
+        class: DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository
+        factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
+        arguments:
+            - DembeloMain\Document\Textnode
+
+    app.model_repository_read_path:
+        class: DembeloMain\Model\Repository\Doctrine\ODM\ReadPathRepository
+        factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
+        arguments:
+            - DembeloMain\Document\Readpath
+
+    app.model_repository_licensee:
+        class: DembeloMain\Model\Repository\Doctrine\ODM\LicenseeRepository
+        factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
+        arguments:
+            - DembeloMain\Document\Licensee
+
+    app.model_repository_user:
+        class: DembeloMain\Model\Repository\Doctrine\ODM\UserRepository
+        factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
+        arguments:
+            - DembeloMain\Document\User
