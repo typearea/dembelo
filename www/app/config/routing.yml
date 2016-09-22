@@ -10,6 +10,6 @@ admin:
 logout:
     path: /logout
 
-dashboard:
+mainpage:
     path:     /
     defaults: { _controller: app.controller_dashboard:indexAction }
