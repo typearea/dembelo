@@ -32,6 +32,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Class Importfile
  *
  * @MongoDB\Document
+ * @MongoDB\Document(repositoryClass="\DembeloMain\Model\Repository\Doctrine\ODM\ImportfileRepository")
  */
 class Importfile
 {
