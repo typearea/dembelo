@@ -30,21 +30,6 @@ use DembeloMain\Model\Repository\Doctrine\ODM\UserRepository;
 class UserRepositoryTest extends AbstractRepositoryTest
 {
     /**
-     * Test save
-     */
-    public function testSave()
-    {
-        $dm = $this->getDocumentManagerMock();
-        $class = $this->getClassMock();
-        $uow = $this->getUnitOfWorkMock();
-
-        $repository = new UserRepository($dm, $uow, $class);
-        $user = $repository->save(new User());
-
-        $this->assertInstanceOf(User::class, $user);
-    }
-
-    /**
      * Test find user by email
      */
     public function testFindByStatusActive()

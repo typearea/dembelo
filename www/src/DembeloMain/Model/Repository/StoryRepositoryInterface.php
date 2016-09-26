@@ -46,5 +46,5 @@ interface StoryRepositoryInterface
      * @param Story $story
      * @return Story
      */
-    public function save(Story $story);
+    public function save($story);
 }

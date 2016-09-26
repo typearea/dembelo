@@ -30,20 +30,6 @@ use Doctrine\MongoDB\ArrayIterator;
  */
 class TopicRepositoryTest extends AbstractRepositoryTest
 {
-    /**
-     * Test save
-     */
-    public function testSave()
-    {
-        $dm = $this->getDocumentManagerMock();
-        $class = $this->getClassMock();
-        $uow = $this->getUnitOfWorkMock();
-
-        $repository = new TopicRepository($dm, $uow, $class);
-        $topic = $repository->save(new Topic());
-
-        $this->assertInstanceOf(Topic::class, $topic);
-    }
 
     /**
      * Test find topics with status active
