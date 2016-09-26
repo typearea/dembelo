@@ -1,94 +1,57 @@
 <!DOCTYPE html>
 <html lang="de">
-    <head>
-        <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        {% set titleBlock = block('title') %}
-        <title>was zu lesen{% if titleBlock is not empty %} - {{ titleBlock|raw }}{% endif %}</title>
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}"/>
+    {% set titleBlock = block('title') %}
+    <title>was zu lesen{% if titleBlock is not empty %} - {{ titleBlock|raw }}{% endif %}</title>
 
-        {% block stylesheets %}
-            <!-- Bootstrap -->
-            <!-- Latest compiled and minified CSS -->
-            <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" -->
-
-            <!-- Optional theme -->
-            <!-- link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" -->
-
-            {% stylesheets
-                '@DembeloMain/Resources/public/css/dembelo.scss'
-                filter='sass' output='css/compiled/app.css' %}
-                <link rel="stylesheet" href="{{ asset_url }}">
-            {% endstylesheets %}
-
-        {% endblock %}
-
-        {% block javascripts %}
-            <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-
-
-            <!-- Latest compiled and minified JavaScript -->
-            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-
-            <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-            <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-            <!--[if lt IE 9]>
-                <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-                <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-            <![endif]-->
-
-            {% javascripts '@DembeloMain/Resources/public/js/*' %}
-                <script src="{{ asset_url }}"></script>
-            {% endjavascripts %}
-
-        {% endblock %}
-
-        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
-    </head>
-    <body id="{% block bodyid %}{% endblock %}">
-      <div id="shadow">
-        <nav class="navbar">
-	  <div class="btn-group btn-group-justified" role="group" aria-label="...">
-	    <div class="btn-group" role="group">
-	      <a href="{% block textnavlink  %}#{% endblock %}" class="btn btn-default {% block textnavclass %}disabled{% endblock %}"><span class="glyphicon glyphicon-repeat"></span></a>
-	    </div>
-	    <div class="btn-group" role="group">
-            {% block infohomelink %}<a href="{{ path('mainpage') }}" class="btn btn-default">
-                    <span class="glyphicon glyphicon-home"></span></a>{% endblock %}
-	    </div>
-	    <div class="btn-group" role="group">
-	      <a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
-		<ul class="dropdown-menu">
-		    {% if is_granted('ROLE_USER') %}
-		      <li><a href="{{ path('logout') }}">Ausloggen</a></li>
-		    {% else %}
-		      <li><a href="{{ path('login_route') }}">Einloggen</a></li>
-		      <li><a href="{{ path('register') }}">Registrieren</a></li>
-		    {% endif %}
-		</ul>
-	    </div>
-	  </div>
-        </nav>
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('vendor/Ionicons/css/ionicons.min.css') }}">
+        {% stylesheets '@DembeloMain/Resources/public/css/dembelo.scss'filter='sass' output='css/compiled/app.css' %}
+        <link rel="stylesheet" href="{{ asset_url }}">
+        {% endstylesheets %}
+    {% endblock %}
+</head>
+<body id="{% block bodyid %}{% endblock %}">
+{% block toolbar %}{% endblock %}
+{% include "@DembeloMain/partials/navigation.html.twig" %}
+<main>
+    <div class="container">
         {% block body %}{% endblock %}
-        <div class="navbar">
-	   <p class="navbar-text"><a href="{{ path('imprint') }}" class="navbar-link">Impressum</a> | <a href="#" class="navbar-link">Blog</a></p>
-        </div>
-      </div>
-      <!-- Piwik -->
-      <script type="text/javascript">
-          var _paq = _paq || [];
-          _paq.push(['trackPageView']);
-          _paq.push(['enableLinkTracking']);
-          (function() {
-              var u="{{ piwik_host }}";
-              _paq.push(['setTrackerUrl', u+'piwik.php']);
-              _paq.push(['setSiteId', {{ piwik_id }}]);
-              var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-              g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-          })();
-      </script>
-      <noscript><p><img src="{{ piwik_host }}piwik.php?idsite={{ piwik_id }}" style="border:0;" alt="" /></p></noscript>
-      <!-- End Piwik Code -->
-    </body>
+    </div>
+</main>
+{% block javascripts %}
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    {% javascripts '@DembeloMain/Resources/public/js/*' %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+<!-- Piwik -->
+<script type="text/javascript">
+    var _paq = _paq || [];
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function () {
+        var u = "{{ piwik_host }}";
+        _paq.push(['setTrackerUrl', u + 'piwik.php']);
+        _paq.push(['setSiteId', {{ piwik_id }}]);
+        var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+        g.type = 'text/javascript';
+        g.async = true;
+        g.defer = true;
+        g.src = u + 'piwik.js';
+        s.parentNode.insertBefore(g, s);
+    })();
+</script>
+<noscript><p><img src="{{ piwik_host }}piwik.php?idsite={{ piwik_id }}" style="border:0;" alt=""/></p></noscript>
+<!-- End Piwik Code -->
+</body>
 </html>

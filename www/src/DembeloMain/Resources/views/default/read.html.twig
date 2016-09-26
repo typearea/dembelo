@@ -21,27 +21,30 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 {% extends 'DembeloMain::base.html.twig' %}
 
 {% block textnavclass %}{% endblock %}
-{% block textnavlink %}{{ path('reload')}}{% endblock %}
+{% block textnavlink %}{{ path('reload') }}{% endblock %}
 
 {% block bodyid %}content-page{% endblock %}
 
 {% block body %}
+    <div class="twelve columns">
+        <div class="read">
+            {{ hyphenated | raw }}
+        </div>
+    </div>
 
-<div class="read">
-{{ hyphenated | raw }}
-</div>
+    {% set hitchCount = textnode.getHitchCount() %}
+    {% if hitchCount > 0 %}
+        <ul class="hitches">
+            {% for hitchIndex in 0..hitchCount-1 %}
+                <li class="hitch">
+                    <a href="#" class="hitch-link" data-url="{{ path('paywall', {textnodeId: textnode.id, hitchIndex: hitchIndex}) }}">{{ textnode.getHitch(hitchIndex).description }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
-{% set hitchCount = textnode.getHitchCount() %}
-{% if hitchCount > 0 %}
-  <ul class="hitches">
-    {% for hitchIndex in 0..hitchCount-1 %}
-      <li class="hitch"><a href="#" class="hitch-link" data-url="{{ path('paywall', {textnodeId: textnode.id, hitchIndex: hitchIndex}) }}">{{ textnode.getHitch(hitchIndex).description }}</a></li>
-    {% endfor %}
-  </ul>
-{% endif %}
+    {{ include('DembeloMain::default/read.metadata.html.twig') }}
 
-{{ include('DembeloMain::default/read.metadata.html.twig') }}
-
-{{ include('DembeloMain::default/paywall.html.twig', {'dialogId': 'modalPaywall'}) }}
+    {{ include('DembeloMain::default/paywall.html.twig', {'dialogId': 'modalPaywall'}) }}
 
 {% endblock %}

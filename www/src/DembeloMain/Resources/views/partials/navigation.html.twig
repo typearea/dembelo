@@ -1,0 +1,10 @@
+<div id="navigation">
+    <ul>
+        {% if is_granted('ROLE_USER') %}
+            <li><a href="{{ path('logout') }}">Ausloggen</a></li>
+        {% else %}
+            <li><a href="{{ path('login_route') }}">Einloggen</a></li>
+            <li><a href="{{ path('register') }}">Registrieren</a></li>
+        {% endif %}
+    </ul>
+</div>

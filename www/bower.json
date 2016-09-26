@@ -18,6 +18,7 @@
     "tests"
   ],
   "dependencies": {
-    "skeleton": "^2.0.4"
+    "skeleton-sass": "^3.0.0",
+    "Ionicons": "ionicons#^2.0.1"
   }
 }
