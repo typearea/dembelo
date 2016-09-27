@@ -74,6 +74,7 @@ function fseek()
 namespace AdminBundle\Tests\Model;
 
 use AdminBundle\Model\ImportTwine;
+use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -98,13 +99,14 @@ class ImportTwineTest extends WebTestCase {
     public function testRunWithFopenIsFalse()
     {
         $mockObjects = $this->getMockObjects();
-        $twineArchivePath = 'somefilename';
-        $licenseeId = 'somelicenseeId';
-        $author = 'someAuthor';
-        $publisher = 'somePublisher';
+        $importfile = new Importfile();
+        $importfile->setFilename('somefilename');
+        $importfile->setLicenseeId('somelicenseeId');
+        $importfile->setAuthor('someAuthor');
+        $importfile->setPublisher('somePublisher');
 
         $importTwine = new ImportTwine($mockObjects['container']);
-        $importTwine->run($twineArchivePath, $licenseeId, $author, $publisher);
+        $importTwine->run($importfile);
     }
 
     /**
@@ -114,13 +116,14 @@ class ImportTwineTest extends WebTestCase {
     public function testRunWithFreadReturnFalse()
     {
         $mockObjects = $this->getMockObjects();
-        $twineArchivePath = 'somefilename_readable';
-        $licenseeId = 'somelicenseeId';
-        $author = 'someAuthor';
-        $publisher = 'somePublisher';
+        $importfile = new Importfile();
+        $importfile->setFilename('somefilename_readable');
+        $importfile->setLicenseeId('somelicenseeId');
+        $importfile->setAuthor('someAuthor');
+        $importfile->setPublisher('somePublisher');
 
         $importTwine = new ImportTwine($mockObjects['container']);
-        $importTwine->run($twineArchivePath, $licenseeId, $author, $publisher);
+        $importTwine->run($importfile);
         $mockObjects['dm']->expects($this->never())
             ->method('persist');
         $mockObjects['dm']->expects($this->never())
@@ -134,14 +137,16 @@ class ImportTwineTest extends WebTestCase {
     public function testRunWithWrongFileFormat()
     {
         $mockObjects = $this->getMockObjects();
-        $twineArchivePath = 'somefilename_readable';
-        $licenseeId = 'somelicenseeId';
-        $author = 'someAuthor';
-        $publisher = 'somePublisher';
+        $importfile = new Importfile();
+        $importfile->setFilename('somefilename_readable');
+        $importfile->setLicenseeId('somelicenseeId');
+        $importfile->setAuthor('someAuthor');
+        $importfile->setPublisher('somePublisher');
+
         self::$freadStack = ['erste Zeile', 'zweite Zeile'];
 
         $importTwine = new ImportTwine($mockObjects['container']);
-        $importTwine->run($twineArchivePath, $licenseeId, $author, $publisher);
+        $importTwine->run($importfile);
         $mockObjects['dm']->expects($this->never())
             ->method('persist');
         $mockObjects['dm']->expects($this->never())
@@ -155,14 +160,16 @@ class ImportTwineTest extends WebTestCase {
     public function testRunWithEmptyFirstLine()
     {
         $mockObjects = $this->getMockObjects();
-        $twineArchivePath = 'somefilename_readable';
-        $licenseeId = 'somelicenseeId';
-        $author = 'someAuthor';
-        $publisher = 'somePublisher';
+        $importfile = new Importfile();
+        $importfile->setFilename('somefilename_readable');
+        $importfile->setLicenseeId('somelicenseeId');
+        $importfile->setAuthor('someAuthor');
+        $importfile->setPublisher('somePublisher');
+
         self::$freadStack = [''];
 
         $importTwine = new ImportTwine($mockObjects['container']);
-        $importTwine->run($twineArchivePath, $licenseeId, $author, $publisher);
+        $importTwine->run($importfile);
         $mockObjects['dm']->expects($this->never())
             ->method('persist');
         $mockObjects['dm']->expects($this->never())
@@ -172,14 +179,16 @@ class ImportTwineTest extends WebTestCase {
     public function testRunWithCorrectButIncompleteData()
     {
         $mockObjects = $this->getMockObjects();
-        $twineArchivePath = 'somefilename_readable';
-        $licenseeId = 'somelicenseeId';
-        $author = 'someAuthor';
-        $publisher = 'somePublisher';
+        $importfile = new Importfile();
+        $importfile->setFilename('somefilename_readable');
+        $importfile->setLicenseeId('somelicenseeId');
+        $importfile->setAuthor('someAuthor');
+        $importfile->setPublisher('somePublisher');
+
         self::$freadStack = ['<tw-storydata hurz>', 'zweite Zeile'];
 
         $importTwine = new ImportTwine($mockObjects['container']);
-        $retVal = $importTwine->run($twineArchivePath, $licenseeId, $author, $publisher);
+        $retVal = $importTwine->run($importfile);
         $this->assertTrue($retVal);
         $mockObjects['dm']->expects($this->never())
             ->method('persist');
@@ -190,10 +199,12 @@ class ImportTwineTest extends WebTestCase {
     public function testRunButNoTextnodeIsWritten()
     {
         $mockObjects = $this->getMockObjects();
-        $twineArchivePath = 'somefilename_readable';
-        $licenseeId = 'somelicenseeId';
-        $author = 'someAuthor';
-        $publisher = 'somePublisher';
+        $importfile = new Importfile();
+        $importfile->setFilename('somefilename_readable');
+        $importfile->setLicenseeId('somelicenseeId');
+        $importfile->setAuthor('someAuthor');
+        $importfile->setPublisher('somePublisher');
+
         self::$freadStack = [
             '<tw-storydata ',
             '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>' . "\n",
@@ -209,7 +220,7 @@ class ImportTwineTest extends WebTestCase {
             ->will($this->returnValue(true));
 
         $importTwine = new ImportTwine($mockObjects['container']);
-        $retVal = $importTwine->run($twineArchivePath, $licenseeId, $author, $publisher);
+        $retVal = $importTwine->run($importfile);
         $this->assertTrue($retVal);
         $mockObjects['dm']->expects($this->never())
             ->method('persist');
@@ -222,10 +233,12 @@ class ImportTwineTest extends WebTestCase {
     public function testRunWithSingleNodeWithText()
     {
         $mockObjects = $this->getMockObjects();
-        $twineArchivePath = 'somefilename_readable';
-        $licenseeId = 'somelicenseeId';
-        $author = 'someAuthor';
-        $publisher = 'somePublisher';
+        $importfile = new Importfile();
+        $importfile->setFilename('somefilename_readable');
+        $importfile->setLicenseeId('somelicenseeId');
+        $importfile->setAuthor('someAuthor');
+        $importfile->setPublisher('somePublisher');
+
         self::$freadStack = [
             '<tw-storydata ',
             '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>' . "\n",
@@ -250,7 +263,7 @@ class ImportTwineTest extends WebTestCase {
             ->method('flush');
 
         $importTwine = new ImportTwine($mockObjects['container']);
-        $retVal = $importTwine->run($twineArchivePath, $licenseeId, $author, $publisher);
+        $retVal = $importTwine->run($importfile);
         $this->assertTrue($retVal);
 
         $this->assertEquals($expectedFputsStack, self::$fputsStack);
@@ -263,10 +276,12 @@ class ImportTwineTest extends WebTestCase {
     public function testRunWithUnfinishedLinkTag()
     {
         $mockObjects = $this->getMockObjects();
-        $twineArchivePath = 'somefilename_readable';
-        $licenseeId = 'somelicenseeId';
-        $author = 'someAuthor';
-        $publisher = 'somePublisher';
+        $importfile = new Importfile();
+        $importfile->setFilename('somefilename_readable');
+        $importfile->setLicenseeId('somelicenseeId');
+        $importfile->setAuthor('someAuthor');
+        $importfile->setPublisher('somePublisher');
+
         self::$freadStack = [
             '<tw-storydata ',
             '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>' . "\n",
@@ -295,7 +310,7 @@ class ImportTwineTest extends WebTestCase {
             ->will($this->returnValue('Ein [[kapputter Link'));
 
         $importTwine = new ImportTwine($mockObjects['container']);
-        $retVal = $importTwine->run($twineArchivePath, $licenseeId, $author, $publisher);
+        $retVal = $importTwine->run($importfile);
         $this->assertTrue($retVal);
 
         $this->assertEquals($expectedFputsStack, self::$fputsStack);

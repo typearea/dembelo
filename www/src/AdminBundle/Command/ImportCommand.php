@@ -24,6 +24,7 @@
 
 namespace AdminBundle\Command;
 
+use DembeloMain\Document\Importfile;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -109,9 +110,19 @@ class ImportCommand extends ContainerAwareCommand
 
         try {
 
-            $importTwine->run($this->twineArchivePath, $this->licenseeId, $this->author, $this->publisher);
+            $importfile = new Importfile();
+            $importfile->setFilename($this->twineArchivePath);
+            $importfile->setLicenseeId($this->licenseeId);
+            $importfile->setAuthor($this->author);
+            $importfile->setPublisher($this->publisher);
+
+            $this->dm->persist($importfile);
+            $this->dm->flush();
+
+            $importTwine->run($importfile);
 
             $this->dm->flush();
+
         } catch (\Exception $ex) {
             $output->writeln('<error>'.$ex->getMessage().'</error>');
 

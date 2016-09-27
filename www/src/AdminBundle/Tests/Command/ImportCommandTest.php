@@ -65,11 +65,14 @@ class ImportCommandTest extends KernelTestCase
      */
     public function testExecute()
     {
-        $licenseeId = 'licenseeId';
-
         $this->mockObjects['importTwine']->expects($this->once())
             ->method('run')
-            ->with('somefile_readable_exists.html', $licenseeId, 'someauthor', 'somepublisher');
+            ->will($this->returnCallback(function ($importfile) {
+                return $importfile->getFilename() === 'somefile_readable_exists.html'
+                    && $importfile->getLicenseeId() === 'licenseeId'
+                    && $importfile->getAuthor() === 'someauthor'
+                    && $importfile->getPublisher() === 'somepublisher';
+            }));
 
         $returnValue = $this->commandTester->execute(array(
             'command'  => $this->command->getName(),
@@ -130,7 +133,12 @@ class ImportCommandTest extends KernelTestCase
     {
         $this->mockObjects['importTwine']->expects($this->once())
             ->method('run')
-            ->with('somefile_readable_exists.html', 'licenseeId', 'someauthor', 'somepublisher')
+            ->will($this->returnCallback(function ($importfile) {
+                return $importfile->getFilename() === 'somefile_readable_exists.html'
+                    && $importfile->getLicenseeId() === 'licenseeId'
+                    && $importfile->getAuthor() === 'someauthor'
+                    && $importfile->getPublisher() === 'somepublisher';
+            }))
             ->will($this->throwException(new \Exception('dummy Exception')));
 
         $this->mockObjects['importTwine']->expects($this->once())
@@ -180,7 +188,7 @@ class ImportCommandTest extends KernelTestCase
         $service = $this->getMockBuilder('Doctrine\Bundle\MongoDBBundle\ManagerRegistry')->disableOriginalConstructor()->getMock();
         $repositoryLicensee = $this->getMock('repositoryLicenseeMock', ['findOneByName']);
         $importTwine = $this->getMockBuilder('AdminBundle\Model\ImportTwine')->disableOriginalConstructor()->setMethods(['run', 'parserFree'])->getMock();
-        $dm = $this->getMock('dmMock', ['flush']);
+        $dm = $this->getMock('dmMock', ['flush', 'persist']);
 
         $container->expects($this->at(0))
             ->method("get")

@@ -524,7 +524,7 @@ class DefaultController extends Controller
      */
     public function importAction(Request $request)
     {
-        $importfileId = $request->get('importfileid');
+        $importfileId = $request->get('importfileId');
 
         /* @var $mongo \Doctrine\Bundle\MongoDBBundle\ManagerRegistry */
         $mongo = $this->get('doctrine_mongodb');
@@ -536,10 +536,13 @@ class DefaultController extends Controller
         /* @var $importfile \DembeloMain\Document\Importfile */
         $importfile = $repository->find($importfileId);
         $importer = new ImportTwine($this->container);
-        $returnValue = $importer->run($importfile->getFilename(), $importfile->getLicenseeId(), $importfile->getAuthor(), $importfile->getPublisher());
+        $returnValue = $importer->run($importfile);
+
+        $dm->flush();
 
         $output = [
             'success' => true,
+            'returnValue' => $returnValue
         ];
 
         return new Response(json_encode($output));
