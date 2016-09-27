@@ -21,13 +21,23 @@
  * @package AdminBundle
  */
 
+// @codingStandardsIgnoreStart
+
 namespace AdminBundle\Command;
 
+/**
+ * @param string $filename
+ * @return bool
+ */
 function is_readable($filename)
 {
     return \strpos($filename, 'readable') !== false;
 }
 
+/**
+ * @param string $filename
+ * @return bool
+ */
 function file_exists($filename)
 {
     return \strpos($filename, 'exists') !== false;
@@ -39,6 +49,8 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use AdminBundle\Command\ImportCommand;
 use Symfony\Component\Console\Tester\CommandTester;
+
+// @codingStandardsIgnoreEnd
 
 /**
  * Class ImportCommandTest
@@ -69,17 +81,17 @@ class ImportCommandTest extends KernelTestCase
             ->method('run')
             ->will($this->returnCallback(function ($importfile) {
                 return $importfile->getFilename() === 'somefile_readable_exists.html'
-                    && $importfile->getLicenseeId() === 'licenseeId'
-                    && $importfile->getAuthor() === 'someauthor'
-                    && $importfile->getPublisher() === 'somepublisher';
+                && $importfile->getLicenseeId() === 'licenseeId'
+                && $importfile->getAuthor() === 'someauthor'
+                && $importfile->getPublisher() === 'somepublisher';
             }));
 
         $returnValue = $this->commandTester->execute(array(
-            'command'  => $this->command->getName(),
+            'command' => $this->command->getName(),
             'twine-archive-file' => 'somefile_readable_exists.html',
             '--licensee-name' => 'somelicensee',
             '--metadata-author' => 'someauthor',
-            '--metadata-publisher' => 'somepublisher'
+            '--metadata-publisher' => 'somepublisher',
         ));
 
         // the output of the command in the console
@@ -88,17 +100,20 @@ class ImportCommandTest extends KernelTestCase
         $this->assertEquals(0, $returnValue);
     }
 
+    /**
+     * tests execute method with unreadable file
+     */
     public function testExecuteWithUnreadableFile()
     {
         $this->mockObjects['importTwine']->expects($this->never())
             ->method('run');
 
         $returnValue = $this->commandTester->execute(array(
-            'command'  => $this->command->getName(),
+            'command' => $this->command->getName(),
             'twine-archive-file' => 'somefile_exists.html',
             '--licensee-name' => 'somelicensee',
             '--metadata-author' => 'someauthor',
-            '--metadata-publisher' => 'somepublisher'
+            '--metadata-publisher' => 'somepublisher',
         ));
 
         // the output of the command in the console
@@ -107,17 +122,20 @@ class ImportCommandTest extends KernelTestCase
         $this->assertEquals(-1, $returnValue);
     }
 
+    /**
+     * tests execute() method with non existing file
+     */
     public function testExecuteWithFileNotExisting()
     {
         $this->mockObjects['importTwine']->expects($this->never())
             ->method('run');
 
         $returnValue = $this->commandTester->execute(array(
-            'command'  => $this->command->getName(),
+            'command' => $this->command->getName(),
             'twine-archive-file' => 'somefile_readable.html',
             '--licensee-name' => 'somelicensee',
             '--metadata-author' => 'someauthor',
-            '--metadata-publisher' => 'somepublisher'
+            '--metadata-publisher' => 'somepublisher',
         ));
 
         // the output of the command in the console
@@ -127,7 +145,7 @@ class ImportCommandTest extends KernelTestCase
     }
 
     /**
-     *
+     * tests execute() method with exception thrown by importTwine
      */
     public function testExecuteWithExeptionInImportTwine()
     {
@@ -135,9 +153,9 @@ class ImportCommandTest extends KernelTestCase
             ->method('run')
             ->will($this->returnCallback(function ($importfile) {
                 return $importfile->getFilename() === 'somefile_readable_exists.html'
-                    && $importfile->getLicenseeId() === 'licenseeId'
-                    && $importfile->getAuthor() === 'someauthor'
-                    && $importfile->getPublisher() === 'somepublisher';
+                && $importfile->getLicenseeId() === 'licenseeId'
+                && $importfile->getAuthor() === 'someauthor'
+                && $importfile->getPublisher() === 'somepublisher';
             }))
             ->will($this->throwException(new \Exception('dummy Exception')));
 
@@ -145,11 +163,11 @@ class ImportCommandTest extends KernelTestCase
             ->method('parserFree');
 
         $returnValue = $this->commandTester->execute(array(
-            'command'  => $this->command->getName(),
+            'command' => $this->command->getName(),
             'twine-archive-file' => 'somefile_readable_exists.html',
             '--licensee-name' => 'somelicensee',
             '--metadata-author' => 'someauthor',
-            '--metadata-publisher' => 'somepublisher'
+            '--metadata-publisher' => 'somepublisher',
         ));
 
         // the output of the command in the console
@@ -167,11 +185,11 @@ class ImportCommandTest extends KernelTestCase
             ->method('run');
 
         $returnValue = $this->commandTester->execute(array(
-            'command'  => $this->command->getName(),
+            'command' => $this->command->getName(),
             'twine-archive-file' => 'somefile_exists_readable.html',
             '--licensee-name' => 'somelicensee2',
             '--metadata-author' => 'someauthor',
-            '--metadata-publisher' => 'somepublisher'
+            '--metadata-publisher' => 'somepublisher',
         ));
 
         // the output of the command in the console
@@ -179,6 +197,26 @@ class ImportCommandTest extends KernelTestCase
         $this->assertContains('dummy Exception', $output);
         $this->assertEquals(-1, $returnValue);
         $this->expectException(\Exception::class);
+    }
+
+    /**
+     * method for returnCallback()
+     *
+     * @param string $arg
+     * @return null|\PHPUnit_Framework_MockObject_MockObject
+     */
+    public function findOneByNameCallback($arg)
+    {
+        if ($arg === 'somelicensee') {
+            $licenseeMock = $this->getMockBuilder('DembeloMain\Document\Licensee')->disableOriginalConstructor()->getMock();
+            $licenseeMock->expects($this->once())
+                ->method('getId')
+                ->will($this->returnValue('licenseeId'));
+
+            return $licenseeMock;
+        }
+
+        return null;
     }
 
     private function getMockObjects()
@@ -214,18 +252,7 @@ class ImportCommandTest extends KernelTestCase
             'service' => $service,
             'repositoryLicensee' => $repositoryLicensee,
             'importTwine' => $importTwine,
-            'dm' => $dm
+            'dm' => $dm,
         ];
-    }
-
-    public function findOneByNameCallback($arg) {
-        if ($arg === 'somelicensee') {
-            $licenseeMock = $this->getMockBuilder('DembeloMain\Document\Licensee')->disableOriginalConstructor()->getMock();
-            $licenseeMock->expects($this->once())
-                ->method('getId')
-                ->will($this->returnValue('licenseeId'));
-            return $licenseeMock;
-        }
-        return null;
     }
 }

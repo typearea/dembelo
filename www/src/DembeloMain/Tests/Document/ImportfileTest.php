@@ -43,6 +43,9 @@ class ImportfileTest extends WebTestCase
         $this->importfile = new Importfile();
     }
 
+    /**
+     * tests (get|set)Id
+     */
     public function testId()
     {
         $this->assertNull($this->importfile->getId());
@@ -50,6 +53,9 @@ class ImportfileTest extends WebTestCase
         $this->assertEquals('someId', $this->importfile->getId());
     }
 
+    /**
+     * tests (get|set)Name
+     */
     public function testName()
     {
         $this->assertNull($this->importfile->getName());
@@ -57,6 +63,9 @@ class ImportfileTest extends WebTestCase
         $this->assertEquals('someName', $this->importfile->getName());
     }
 
+    /**
+     * tests (get|set)LicenseeId
+     */
     public function testLicenseeId()
     {
         $this->assertNull($this->importfile->getLicenseeId());
@@ -64,6 +73,9 @@ class ImportfileTest extends WebTestCase
         $this->assertEquals('someLicenseeId', $this->importfile->getLicenseeId());
     }
 
+    /**
+     * tests (get|set)Imported
+     */
     public function testImported()
     {
         $this->assertNull($this->importfile->getImported());
@@ -71,6 +83,9 @@ class ImportfileTest extends WebTestCase
         $this->assertEquals('someImported', $this->importfile->getImported());
     }
 
+    /**
+     * tests (get|set)Author
+     */
     public function testAuthor()
     {
         $this->assertNull($this->importfile->getAuthor());
@@ -78,6 +93,9 @@ class ImportfileTest extends WebTestCase
         $this->assertEquals('someAuthor', $this->importfile->getAuthor());
     }
 
+    /**
+     * tests (get|set)Publisher
+     */
     public function testPublisher()
     {
         $this->assertNull($this->importfile->getPublisher());
@@ -85,6 +103,9 @@ class ImportfileTest extends WebTestCase
         $this->assertEquals('somePublisher', $this->importfile->getPublisher());
     }
 
+    /**
+     * tests (get|set)Orgname
+     */
     public function testOrgname()
     {
         $this->assertNull($this->importfile->getOrgname());
@@ -92,6 +113,9 @@ class ImportfileTest extends WebTestCase
         $this->assertEquals('someOrgname', $this->importfile->getOrgname());
     }
 
+    /**
+     * tests (get|set)Filename
+     */
     public function testFilename()
     {
         $this->assertNull($this->importfile->getFilename());

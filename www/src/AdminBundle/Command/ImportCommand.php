@@ -109,7 +109,6 @@ class ImportCommand extends ContainerAwareCommand
         }
 
         try {
-
             $importfile = new Importfile();
             $importfile->setFilename($this->twineArchivePath);
             $importfile->setLicenseeId($this->licenseeId);
@@ -122,7 +121,6 @@ class ImportCommand extends ContainerAwareCommand
             $importTwine->run($importfile);
 
             $this->dm->flush();
-
         } catch (\Exception $ex) {
             $output->writeln('<error>'.$ex->getMessage().'</error>');
 

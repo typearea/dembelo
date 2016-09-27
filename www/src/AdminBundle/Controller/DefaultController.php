@@ -18,7 +18,6 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * @package AdminBundle
  */
@@ -220,32 +219,6 @@ class DefaultController extends Controller
     }
 
     /**
-     * saves temporary file to final place
-     *
-     * @param Importfile $item importfile instance
-     * @param string $filename filename hash
-     * @param string $orgname original name
-     */
-    private function saveFile(Importfile $item, $filename, $orgname)
-    {
-        if (empty($filename) || empty($orgname)) {
-            return;
-        }
-
-        $directory = $this->container->getParameter('twine_directory');
-        $finalDirectory = $directory . $item->getLicenseeId() . '/';
-        if (!is_dir($finalDirectory)) {
-            mkdir($finalDirectory);
-        }
-        $finalName = $finalDirectory . $item->getId();
-        $file = $directory . $filename;
-        rename($file, $finalName);
-
-        $item->setOrgname($orgname);
-        $item->setFilename($finalName);
-    }
-
-    /**
      * @Route("/save", name="admin_formsave")
      *
      * @param Request $request
@@ -401,7 +374,7 @@ class DefaultController extends Controller
      *
      * @return Response
      */
-    public function importfilesAction(Request $request)
+    public function importfilesAction()
     {
         $mongo = $this->get('doctrine_mongodb');
         /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
@@ -439,14 +412,15 @@ class DefaultController extends Controller
 
         if ($file['error'] !== UPLOAD_ERR_OK) {
             $output['status'] = 'error';
+
             return new Response(\json_encode($output));
         }
 
         $directory = $this->container->getParameter('twine_directory');
 
-        $filename = md5(uniqid() . $file['name']);
+        $filename = md5(uniqid().$file['name']);
 
-        move_uploaded_file($file["tmp_name"], $directory . $filename);
+        move_uploaded_file($file["tmp_name"], $directory.$filename);
 
         $output['filename'] = $filename;
         $output['orgname'] = $file['name'];
@@ -456,38 +430,12 @@ class DefaultController extends Controller
         return new Response(\json_encode($output));
     }
 
-    private function buildLicenseeIndex(\Doctrine\Bundle\MongoDBBundle\ManagerRegistry $mongo)
-    {
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:Licensee');
-        $licensees = $repository->findAll();
-        $index = [];
-        foreach ($licensees AS $licensee) {
-            $index[$licensee->getID()] = $licensee->getName();
-        }
-
-        return $index;
-    }
-
-    private function buildImportfileIndex(\Doctrine\Bundle\MongoDBBundle\ManagerRegistry $mongo)
-    {
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:Importfile');
-        $importfiles = $repository->findAll();
-        $index = [];
-        foreach ($importfiles AS $importfile) {
-            $index[$importfile->getID()] = $importfile->getName();
-        }
-
-        return $index;
-    }
-
     /**
      * @Route("/textnodes", name="admin_textnodes")
      *
      * @return Response
      */
-    public function textnodesAction(Request $request)
+    public function textnodesAction()
     {
         $mongo = $this->get('doctrine_mongodb');
         /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
@@ -508,7 +456,7 @@ class DefaultController extends Controller
             $obj->access = $textnode->getAccess();
             $obj->licensee = $licenseeIndex[$textnode->getLicenseeId()];
             $obj->importfile = isset($importfileIndex[$textnode->getImportfileId()]) ? $importfileIndex[$textnode->getImportfileId()] : 'unbekannt';
-            $obj->beginning = substr(htmlentities(strip_tags($textnode->getText())), 0, 200) . "...";
+            $obj->beginning = substr(htmlentities(strip_tags($textnode->getText())), 0, 200)."...";
             $output[] = $obj;
         }
 
@@ -542,9 +490,61 @@ class DefaultController extends Controller
 
         $output = [
             'success' => true,
-            'returnValue' => $returnValue
+            'returnValue' => $returnValue,
         ];
 
         return new Response(json_encode($output));
+    }
+
+    /**
+     * saves temporary file to final place
+     *
+     * @param Importfile $item importfile instance
+     * @param string $filename filename hash
+     * @param string $orgname original name
+     */
+    private function saveFile(Importfile $item, $filename, $orgname)
+    {
+        if (empty($filename) || empty($orgname)) {
+            return;
+        }
+
+        $directory = $this->container->getParameter('twine_directory');
+        $finalDirectory = $directory.$item->getLicenseeId().'/';
+        if (!is_dir($finalDirectory)) {
+            mkdir($finalDirectory);
+        }
+        $finalName = $finalDirectory.$item->getId();
+        $file = $directory.$filename;
+        rename($file, $finalName);
+
+        $item->setOrgname($orgname);
+        $item->setFilename($finalName);
+    }
+
+    private function buildLicenseeIndex(\Doctrine\Bundle\MongoDBBundle\ManagerRegistry $mongo)
+    {
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Licensee');
+        $licensees = $repository->findAll();
+        $index = [];
+        foreach ($licensees as $licensee) {
+            $index[$licensee->getID()] = $licensee->getName();
+        }
+
+        return $index;
+    }
+
+    private function buildImportfileIndex(\Doctrine\Bundle\MongoDBBundle\ManagerRegistry $mongo)
+    {
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Importfile');
+        $importfiles = $repository->findAll();
+        $index = [];
+        foreach ($importfiles as $importfile) {
+            $index[$importfile->getID()] = $importfile->getName();
+        }
+
+        return $index;
     }
 }

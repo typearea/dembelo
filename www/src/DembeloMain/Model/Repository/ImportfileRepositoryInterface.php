@@ -32,5 +32,5 @@ interface ImportfileRepositoryInterface
      * @param Importfile $importfile
      * @return Importfile
      */
-    public function save($licensee);
+    public function save($importfile);
 }

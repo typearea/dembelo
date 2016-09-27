@@ -22,9 +22,7 @@
  * @package AdminBundle
  */
 
-
 namespace AdminBundle\Model;
-
 
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
@@ -33,6 +31,10 @@ use Exception;
 use phpDocumentor\Reflection\DocBlock\Tags\Method;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Class ImportTwine
+ * @package AdminBundle\Model
+ */
 class ImportTwine
 {
     /** @var ContainerInterface */
@@ -71,6 +73,10 @@ class ImportTwine
 
     private $textnodeMapping;
 
+    /**
+     * ImportTwine constructor.
+     * @param ContainerInterface $container
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -78,6 +84,13 @@ class ImportTwine
         $this->dm = $this->mongo->getManager();
     }
 
+    /**
+     * main method, starts the import process
+     *
+     * @param Importfile $importfile
+     * @return bool
+     * @throws Exception
+     */
     public function run(Importfile $importfile)
     {
         $this->importfile = $importfile;
@@ -87,7 +100,7 @@ class ImportTwine
         $fileHandler = fopen($filenameExtracted, "rb");
 
         if ($fileHandler === false) {
-            throw new Exception("Couldn't open file '" . $this->importfile->getFilename() . "'");
+            throw new Exception("Couldn't open file '".$this->importfile->getFilename()."'");
         }
 
         $this->xmlParser = xml_parser_create("UTF-8");
@@ -101,6 +114,9 @@ class ImportTwine
         return true;
     }
 
+    /**
+     * destroys the parser object
+     */
     public function parserFree()
     {
         xml_parser_free($this->xmlParser);
@@ -528,6 +544,13 @@ class ImportTwine
         $this->textnode = null;
     }
 
+    /**
+     * xml_parse method
+     *
+     * @param $parser
+     * @param string $name
+     * @throws Exception
+     */
     private function endElement($parser, $name)
     {
         if ($name === "tw-storydata") {

@@ -17,22 +17,29 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * @package AdminBundle\Test
  */
 
+// @codingStandardsIgnoreStart
 namespace AdminBundle\Model;
 
 use AdminBundle\Tests\Model\ImportTwineTest;
 
+/**
+ * mock function
+ *
+ * @param string $filename
+ * @return bool
+ */
 function fopen($filename)
 {
     return strpos($filename, 'readable') !== false;
 }
 
 /**
- * used in extractTwineFile() and once in checkTwineFile and in initParser()
+ * mock function
+ *
  * @return bool|mixed
  */
 function fgets()
@@ -40,32 +47,57 @@ function fgets()
     if (empty(ImportTwineTest::$fgetsStack)) {
         return false;
     }
+
     return array_shift(ImportTwineTest::$fgetsStack);
 }
 
+/**
+ * mock function
+ *
+ * @param Resource $handle
+ * @param string   $string
+ */
 function fputs($handle, $string)
 {
     ImportTwineTest::$fputsStack[] = $string;
 }
 
+/**
+ * mock function
+ */
 function fclose()
 {
-
 }
 
+/**
+ * mock function
+ *
+ * @return bool|mixed
+ */
 function fread()
 {
     if (empty(ImportTwineTest::$freadStack)) {
         return false;
     }
+
     return array_shift(ImportTwineTest::$freadStack);
 }
 
+/**
+ * mock function
+ *
+ * @return bool
+ */
 function feof()
 {
     return empty(ImportTwineTest::$freadStack);
 }
 
+/**
+ * mock function
+ *
+ * @return int
+ */
 function fseek()
 {
     return 0;
@@ -79,13 +111,23 @@ use DembeloMain\Document\Textnode;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
 
-class ImportTwineTest extends WebTestCase {
+// @codingStandardsIgnoreEnd
+
+/**
+ * Class ImportTwineTest
+ * @package AdminBundle\Tests\Model
+ */
+class ImportTwineTest extends WebTestCase
+{
 
     public static $freadStack = [];
     public static $fgetsStack = [];
     public static $fputsStack = [];
     private $mocks;
 
+    /**
+     * resets some variables
+     */
     public function setUp()
     {
         self::$freadStack = self::$fgetsStack = self::$fputsStack = [];
@@ -176,6 +218,11 @@ class ImportTwineTest extends WebTestCase {
             ->method('flush');
     }
 
+    /**
+     * tests the run method with correct but incomplete data
+     *
+     * @throws \Exception
+     */
     public function testRunWithCorrectButIncompleteData()
     {
         $mockObjects = $this->getMockObjects();
@@ -196,6 +243,11 @@ class ImportTwineTest extends WebTestCase {
             ->method('flush');
     }
 
+    /**
+     * tests the run method when no textnode is written
+     *
+     * @throws \Exception
+     */
     public function testRunButNoTextnodeIsWritten()
     {
         $mockObjects = $this->getMockObjects();
@@ -207,10 +259,10 @@ class ImportTwineTest extends WebTestCase {
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>' . "\n",
-            '<script role="script" id="twine-user-script" type="text/twine-javascript">' . "\n",
+            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript">'."\n",
             '</script><tw-passagedata pid="1" name="someNodeName" tags="Freigegeben" position="104,30">lorem impsum',
-            'lorem impsum</tw-passagedata></tw-storydata>'
+            'lorem impsum</tw-passagedata></tw-storydata>',
         ];
         self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
         $expectedFputsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
@@ -230,6 +282,11 @@ class ImportTwineTest extends WebTestCase {
         $this->assertEquals($expectedFputsStack, self::$fputsStack);
     }
 
+    /**
+     * tests the run method with a single node containing text
+     *
+     * @throws \Exception
+     */
     public function testRunWithSingleNodeWithText()
     {
         $mockObjects = $this->getMockObjects();
@@ -241,10 +298,10 @@ class ImportTwineTest extends WebTestCase {
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>' . "\n",
-            '<script role="script" id="twine-user-script" type="text/twine-javascript">' . "\n",
+            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript">'."\n",
             '</script><tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben" position="104,30">lorem ipsum',
-            'lorem ipsum</tw-passagedata></tw-storydata>'
+            'lorem ipsum</tw-passagedata></tw-storydata>',
         ];
         self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
         $expectedFputsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
@@ -284,10 +341,10 @@ class ImportTwineTest extends WebTestCase {
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>' . "\n",
-            '<script role="script" id="twine-user-script" type="text/twine-javascript">' . "\n",
+            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript">'."\n",
             '</script><tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben" position="104,30">lorem ipsum',
-            'lorem ipsum</tw-passagedata></tw-storydata>'
+            'lorem ipsum</tw-passagedata></tw-storydata>',
         ];
         self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
         $expectedFputsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
@@ -317,9 +374,10 @@ class ImportTwineTest extends WebTestCase {
     }
 
     /**
-     * @group current
-     * @ssexpectedException Exception
-     * @ssexpectedExceptionMessage The Twine archive file 'somefilename_readable' has a textnode named 'someNodeName1' which contains a malformed link that starts with '[[' but has no corresponding ']]'.
+     * still doesn't work
+     *
+     * @expectedException Exception
+     * @expectedExceptionMessage The Twine archive file 'somefilename_readable' has a textnode named 'someNodeName1' which contains a malformed link that starts with '[[' but has no corresponding ']]'.
      */
     public function xtestRun()
     {
@@ -330,10 +388,10 @@ class ImportTwineTest extends WebTestCase {
         $publisher = 'somePublisher';
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>' . "\n",
-            '<script role="script" id="twine-user-script" type="text/twine-javascript">' . "\n",
+            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript">'."\n",
             '</script><tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben" position="104,30">lorem ipsum',
-            'lorem ipsum</tw-passagedata></tw-storydata>'
+            'lorem ipsum</tw-passagedata></tw-storydata>',
         ];
         self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
         $expectedFputsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
@@ -362,6 +420,54 @@ class ImportTwineTest extends WebTestCase {
         $this->assertEquals($expectedFputsStack, self::$fputsStack);
     }
 
+    /**
+     * callback method for a returnCallback()
+     *
+     * @param string $arg
+     * @return null|\PHPUnit_Framework_MockObject_MockObject
+     */
+    public function findOneByNameCallback($arg)
+    {
+        if ($arg === 'somelicensee') {
+            $licenseeMock = $this->getMockBuilder('DembeloMain\Document\Licensee')->disableOriginalConstructor()->getMock();
+            $licenseeMock->expects($this->once())
+                ->method('getId')
+                ->will($this->returnValue('licenseeId'));
+
+            return $licenseeMock;
+        }
+
+        return null;
+    }
+
+    /**
+     * callback method for a returnCallback()
+     *
+     * @param string $arg
+     * @return mixed
+     */
+    public function mongoGetRepositoryCallback($arg)
+    {
+        if ($arg === 'DembeloMain:Topic') {
+            if (!isset($this->mocks['DembeloMain:Topic'])) {
+                $this->mocks['DembeloMain:Topic'] = $this->getMock('repositoryTopicMock', ['findOneByName', 'find']);
+            }
+
+            return $this->mocks['DembeloMain:Topic'];
+        } elseif ($arg === 'DembeloMain:Textnode') {
+            if (!isset($this->mocks['DembeloMain:Textnode'])) {
+                $this->mocks['DembeloMain:Textnode'] = $this->getMock('repositoryTextnode', ['createQueryBuilder', 'field', 'equals', 'getQuery']);
+            }
+
+            return $this->mocks['DembeloMain:Textnode'];
+        }
+    }
+
+    /**
+     * builds all mock objects
+     *
+     * @return array
+     */
     private function getMockObjects()
     {
         $container = $this->getMockBuilder(Container::class)->disableOriginalConstructor()->setMethods(['get'])->getMock();
@@ -396,36 +502,7 @@ class ImportTwineTest extends WebTestCase {
             'importTwine' => $importTwine,
             'dm' => $dm,
             'textnode' => $textnode,
-            'repositoryTopic' => $this->mongoGetRepositoryCallback('DembeloMain:Topic')
+            'repositoryTopic' => $this->mongoGetRepositoryCallback('DembeloMain:Topic'),
         ];
     }
-
-    public function findOneByNameCallback($arg)
-    {
-        if ($arg === 'somelicensee') {
-            $licenseeMock = $this->getMockBuilder('DembeloMain\Document\Licensee')->disableOriginalConstructor()->getMock();
-            $licenseeMock->expects($this->once())
-                ->method('getId')
-                ->will($this->returnValue('licenseeId'));
-            return $licenseeMock;
-        }
-        return null;
-    }
-
-    public function mongoGetRepositoryCallback($arg)
-    {
-        if ($arg === 'DembeloMain:Topic') {
-            if (!isset($this->mocks['DembeloMain:Topic'])) {
-                $this->mocks['DembeloMain:Topic'] = $this->getMock('repositoryTopicMock', ['findOneByName', 'find']);
-            }
-
-            return $this->mocks['DembeloMain:Topic'];
-        } else if ($arg === 'DembeloMain:Textnode') {
-            if (!isset($this->mocks['DembeloMain:Textnode'])) {
-                $this->mocks['DembeloMain:Textnode'] = $this->getMock('repositoryTextnode', ['createQueryBuilder', 'field', 'equals', 'getQuery']);
-            }
-            return $this->mocks['DembeloMain:Textnode'];
-        }
-    }
-
 }
