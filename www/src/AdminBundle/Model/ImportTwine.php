@@ -76,7 +76,7 @@ class ImportTwine
     /**
      * ImportTwine constructor.
      * @param TextnodeRepositoryInterface $textnodeRepository
-     * @param TopicRepositoryInterface $topicRepository
+     * @param TopicRepositoryInterface    $topicRepository
      */
     public function __construct(TextNodeRepositoryInterface $textnodeRepository, TopicRepositoryInterface $topicRepository)
     {
