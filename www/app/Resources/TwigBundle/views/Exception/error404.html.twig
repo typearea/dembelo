@@ -1,0 +1,11 @@
+{% extends 'DembeloMain::base.html.twig' %}
+{% block title %}404 Seite nicht gefunden{% endblock %}
+
+{% block body %}
+    <h1>Seite nicht gefunden</h1>
+
+    <p>
+        Die angeforderte Seite konnte leider nicht gefunden werden. Bitte überprüfen Sie die URL auf Tippfehler oder kehren Sie zur
+        <a href="{{ path('mainpage') }}">Startseite</a> zurück.
+    </p>
+{% endblock %}
