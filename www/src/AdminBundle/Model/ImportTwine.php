@@ -26,6 +26,8 @@ namespace AdminBundle\Model;
 
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
+use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Exception;
 use phpDocumentor\Reflection\DocBlock\Tags\Method;
@@ -40,19 +42,17 @@ class ImportTwine
     /** @var ContainerInterface */
     private $container;
 
+    /**
+     * @var TextnodeRepositoryInterface
+     */
+    private $textnodeRepository;
+
+    /**
+     * @var TopicRepositoryInterface
+     */
+    private $topicRepository;
+
     private $xmlParser;
-
-    private $mongo;
-
-    /**
-     * @var \Doctrine\ODM\MongoDB\DocumentManager
-     */
-    private $dm = null;
-
-    /**
-     * @var DocumentRepository
-     */
-    private $repositoryTopic = null;
 
     /**
      * @var Importfile
@@ -75,13 +75,13 @@ class ImportTwine
 
     /**
      * ImportTwine constructor.
-     * @param ContainerInterface $container
+     * @param TextnodeRepositoryInterface $textnodeRepository
+     * @param TopicRepositoryInterface $topicRepository
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(TextNodeRepositoryInterface $textnodeRepository, TopicRepositoryInterface $topicRepository)
     {
-        $this->container = $container;
-        $this->mongo = $this->container->get('doctrine_mongodb');
-        $this->dm = $this->mongo->getManager();
+        $this->textnodeRepository = $textnodeRepository;
+        $this->topicRepository = $topicRepository;
     }
 
     /**
@@ -210,8 +210,6 @@ class ImportTwine
             throw new Exception("Couldn't register character data event handler for the XML parser.");
         }
 
-        $this->repositoryTopic = $this->container->get('doctrine_mongodb')->getRepository('DembeloMain:Topic');
-
         /** @todo This should be part of the Twine export. */
         if (xml_parse($this->xmlParser, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<tw-archive>\n", false) !== 1) {
             $errorCode = xml_get_error_code($this->xmlParser);
@@ -280,7 +278,7 @@ class ImportTwine
 
         $this->topicId = $twineStory[0];
 
-        $topic = $this->repositoryTopic->find($this->topicId);
+        $topic = $this->topicRepository->find($this->topicId);
 
         if (is_null($topic)) {
             throw new Exception("The Dembelo Topic with Id '".$this->topicId."', referenced by Twine story '".$attrs['name']."' in the Twine archive file '".$this->importfile->getFilename()."', doesn't exist.");
@@ -362,7 +360,7 @@ class ImportTwine
     private function endElementStoryData($name)
     {
         foreach ($this->textnodeMapping as $twineName => $dembeloId) {
-            $textnode = $this->dm->find("DembeloMain:Textnode", $dembeloId);
+            $textnode = $this->topicRepository->find($dembeloId);
 
             if (is_null($textnode) === true) {
                 throw new Exception("The Dembelo Textnode with Id '".$dembeloId."' doesn't exist, but should by now.");
@@ -394,14 +392,10 @@ class ImportTwine
                             throw new Exception("The Twine archive file '".$this->importfile->getFilename()."' contains a '".$name."' with the invalid element '[[".$content[0]."-->".$content[1]."]]'.");
                         }
 
-                        /**
-                         * @var $repositoryTextnode DocumentRepository
-                         */
-                        $repositoryTextnode = $this->container->get('doctrine_mongodb')->getRepository('DembeloMain:Textnode');
-
-                        $externalTextnode = $repositoryTextnode->createQueryBuilder()
-                            ->field('id')->equals(new \MongoId($content[1]))
-                            ->getQuery()->getSingleResult();
+                        $externalTextnode = $this->textnodeRepository->createQueryBuilder()
+                        //    ->field('id')->equals(new \MongoId($content[1]))
+                        //    ->getQuery()->getSingleResult();
+                            ->find($content[1]);
 
                         if (is_null($externalTextnode)) {
                             throw new Exception("There is a textnode named '".$twineName."' in the Twine archive file '".$this->importfile->getFilename()."' which references the external Dembelo Textnode '".$content[1]."', but a Dembelo Textnode with such an Id doesn't exist.");
@@ -535,7 +529,7 @@ class ImportTwine
 
     private function endElementPassageData()
     {
-        $this->dm->persist($this->textnode);
+        $this->textnodeRepository->save($this->textnode);
 
         $this->textnodeMapping[$this->twineTextnodeName] = $this->textnode->getId();
         $this->twineTextnodeName = null;
