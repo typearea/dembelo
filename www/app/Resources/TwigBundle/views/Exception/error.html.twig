@@ -1,0 +1,13 @@
+{% extends 'DembeloMain::base.html.twig' %}
+{% block title %}
+    Fehler: {{ status_text }}
+{% endblock %}
+{% block body %}
+    <h1>Es ist ein Fehler aufgetreten</h1>
+    <h2>"{{ status_code }} {{ status_text }}".</h2>
+
+    <div>
+        Leider ist ein unerwarteter Fehler ist aufgetreten. Wir entschuldigen die Umstände und beheben umgehend das Problem.
+        Bitte versuchen Sie es später erneut.
+    </div>
+{% endblock %}
