@@ -1,8 +1,22 @@
 body#dashboard {
   .genres {
     .cover {
+      width: calc((100% - #{$base-gutter-width} * (#{$dashboard-cover-cols} - 1)) / #{$dashboard-cover-cols});
+      float: left;
+      margin-right: $base-gutter-width;
+      margin-bottom: $base-gutter-width;
+
+      &:nth-of-type(#{$dashboard-cover-cols}n) {
+        margin-right: 0;
+      }
+
+      &:nth-last-child(-n+#{$dashboard-cover-cols}) {
+        margin-bottom: 0;
+      }
+
       a {
         img {
+          display: block;
           width: 100%;
           max-width: 100%;
           max-height: 100%;

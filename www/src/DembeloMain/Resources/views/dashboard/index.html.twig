@@ -25,16 +25,14 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
     <div class="genres">
         <div class="row">
             {% for licensee in topics %}
-                <div class="three columns">
-                    <div class="cover">
+                <div class="cover">
                     <a href="{{ path('themenfeld', {'topicId': licensee.id}) }}">
                         {% image '@DembeloMain/Resources/public/images/bg02.jpg' %}
                         <img src="{{ asset_url }}" alt="{{ licensee.name }}" title="{{ licensee.name }}"/>
                         {% endimage %}
                     </a>
                 </div>
-            </div>
             {% endfor %}
-    </div>
+        </div>
     </div>
 {% endblock %}

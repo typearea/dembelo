@@ -6,7 +6,7 @@
 // Skeleton Sass core loader
 @import "../../../../../web/vendor/skeleton-sass/skeleton/core/config";
 // import default theme variables
-@import "../../../../../web/vendor/skeleton-sass/skeleton/themes/fresh/vars";
+@import "variables/skeleton";
 // theme base styles
 @import "../../../../../web/vendor/skeleton-sass/skeleton/themes/fresh/base";
 // theme grid styles
@@ -14,7 +14,9 @@
 /**
 * Dembelo Styles
 */
-@import "variables";
+// import variables
+@import "variables/dashboard";
+// import layout
 @import "layout";
 @import "form";
 @import "dashboard";
