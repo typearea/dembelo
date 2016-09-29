@@ -1,3 +1,30 @@
 #navigation {
   display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  background-color: $nav-background;
+  height: 100%;
+  width: 50%;
+
+  .logo {
+    height: 50px;
+    margin-bottom: 10px;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0 20px;
+    list-style: none;
+    li {
+      margin: 0;
+      padding: 0;
+      a {
+        color: $nav-link-color;
+        text-decoration: none;
+        font-size: 16px;
+      }
+    }
+  }
 }

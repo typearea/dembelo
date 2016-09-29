@@ -2,6 +2,10 @@ var Navigation = function () {
     var isVisible = false;
     var element = document.getElementById('navigation');
 
+    document.body.addEventListener('click', function (evt) {
+        // hide navigation
+    });
+
     return {
         show: function () {
             isVisible = true;

@@ -15,7 +15,9 @@
 * Dembelo Styles
 */
 // import variables
+@import "fonts";
 @import "variables/dashboard";
+@import "variables/layout/navigation";
 // import layout
 @import "layout";
 @import "layout/toolbar";
