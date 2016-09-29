@@ -1,19 +1,27 @@
 var Navigation = function () {
     var isVisible = false;
-    var element = document.getElementById('navigation');
+    var navigationElement = document.getElementById('navigation');
+    var toggleElement = document.getElementById('menu-icon');
 
-    document.body.addEventListener('click', function (evt) {
-        // hide navigation
+    toggleElement.addEventListener('click', function () {
+        Navigation.toggle();
+    });
+
+    document.addEventListener('click', function (evt) {
+        if (isVisible && !navigationElement.contains(evt.target) && !toggleElement.contains(evt.target)) {
+            Navigation.hide();
+        }
     });
 
     return {
         show: function () {
             isVisible = true;
-            element.style.display = 'block';
+            // navigationElement.style.display = 'block';
+            navigationElement.classList.add('show');
         },
         hide: function () {
             isVisible = false;
-            element.style.display = 'none';
+            navigationElement.classList.remove('show');
         },
         toggle: function () {
             if (!isVisible) {
