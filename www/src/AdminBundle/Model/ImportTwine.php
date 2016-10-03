@@ -360,7 +360,7 @@ class ImportTwine
     private function endElementStoryData($name)
     {
         foreach ($this->textnodeMapping as $twineName => $dembeloId) {
-            $textnode = $this->topicRepository->find($dembeloId);
+            $textnode = $this->textnodeRepository->find($dembeloId);
 
             if (is_null($textnode) === true) {
                 throw new Exception("The Dembelo Textnode with Id '".$dembeloId."' doesn't exist, but should by now.");

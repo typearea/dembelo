@@ -47,4 +47,11 @@ interface TextNodeRepositoryInterface
      * @return Textnode
      */
     public function save($textNode);
+
+    /**
+     * finds all textnodes of an importfile
+     * @param string $importfileId
+     * @return Textnode[]
+     */
+    public function findByImportfileId($importfileId);
 }

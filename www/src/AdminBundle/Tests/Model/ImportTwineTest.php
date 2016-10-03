@@ -280,8 +280,8 @@ class ImportTwineTest extends WebTestCase
         self::$freadStack = [
             '<tw-storydata ',
             '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
-            '<script role="script" id="twine-user-script" type="text/twine-javascript">'."\n",
-            '</script><tw-passagedata pid="1" name="someNodeName" tags="Freigegeben" position="104,30">lorem impsum',
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName" tags="Freigegeben" position="104,30">lorem impsum',
             'lorem impsum</tw-passagedata></tw-storydata>',
         ];
         self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
@@ -289,9 +289,13 @@ class ImportTwineTest extends WebTestCase
 
         $textnode = new Textnode();
 
-        $topicRepository->expects($this->any())
+        $textnodeRepository->expects($this->any())
             ->method('find')
             ->will($this->returnValue($textnode));
+
+        $topicRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue(true));
 
         $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
         $retVal = $importTwine->run($importfile);
@@ -321,8 +325,8 @@ class ImportTwineTest extends WebTestCase
         self::$freadStack = [
             '<tw-storydata ',
             '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
-            '<script role="script" id="twine-user-script" type="text/twine-javascript">'."\n",
-            '</script><tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben" position="104,30">lorem ipsum',
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben" position="104,30">lorem ipsum',
             'lorem ipsum</tw-passagedata></tw-storydata>',
         ];
         self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
@@ -330,9 +334,13 @@ class ImportTwineTest extends WebTestCase
 
         $textnode = new Textnode();
 
-        $topicRepository->expects($this->any())
+        $textnodeRepository->expects($this->any())
             ->method('find')
             ->will($this->returnValue($textnode));
+
+        $topicRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue(true));
 
         $textnodeRepository->expects($this->once())
             ->method('save')
@@ -366,8 +374,8 @@ class ImportTwineTest extends WebTestCase
         self::$freadStack = [
             '<tw-storydata ',
             '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
-            '<script role="script" id="twine-user-script" type="text/twine-javascript">'."\n",
-            '</script><tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben" position="104,30">lorem ipsum',
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben" position="104,30">lorem ipsum',
             'lorem ipsum</tw-passagedata></tw-storydata>',
         ];
         self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
@@ -377,6 +385,10 @@ class ImportTwineTest extends WebTestCase
         $textnode->setText('ein [[kaputter Link');
 
         $topicRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue(true));
+
+        $textnodeRepository->expects($this->any())
             ->method('find')
             ->will($this->returnValue($textnode));
 
@@ -410,8 +422,8 @@ class ImportTwineTest extends WebTestCase
         self::$freadStack = [
             '<tw-storydata ',
             '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
-            '<script role="script" id="twine-user-script" type="text/twine-javascript">'."\n",
-            '</script><tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben" position="104,30">lorem ipsum',
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben" position="104,30">lorem ipsum',
             'lorem ipsum</tw-passagedata></tw-storydata>',
         ];
         self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
@@ -474,11 +486,13 @@ class ImportTwineTest extends WebTestCase
 
             return $this->mocks['DembeloMain:Topic'];
         }
+
+        return false;
     }
 
     private function getTextnodeRepositoryMock()
     {
-        return $this->getMockBuilder(TextNodeRepository::class)->disableOriginalConstructor()->setMethods(['createQueryBuilder', 'field', 'equals', 'getQuery', 'save'])->getMock();
+        return $this->getMockBuilder(TextNodeRepository::class)->disableOriginalConstructor()->setMethods(['createQueryBuilder', 'field', 'equals', 'getQuery', 'save', 'find'])->getMock();
     }
 
     private function getTopicRepositoryMock()

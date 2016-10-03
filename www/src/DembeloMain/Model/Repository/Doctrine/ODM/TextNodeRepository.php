@@ -21,6 +21,7 @@
 namespace DembeloMain\Model\Repository\Doctrine\ODM;
 
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use MongoId;
 
 /**
  * Class TextNodeRepository
@@ -28,5 +29,14 @@ use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
  */
 class TextNodeRepository extends AbstractRepository implements TextNodeRepositoryInterface
 {
-
+    /**
+     * finds textnodes by importfileId
+     *
+     * @param string $importfileId
+     * @return array
+     */
+    public function findByImportfileId($importfileId)
+    {
+        return $this->findBy(array('importfileId' => new MongoId($importfileId)));
+    }
 }

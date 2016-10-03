@@ -479,11 +479,18 @@ class DefaultController extends Controller
         /* @var $dm \Doctrine\ODM\MongoDB\DocumentManager*/
         $dm = $mongo->getManager();
 
+        $textnodeRepository = $mongo->getRepository('DembeloMain:Textnode');
+        $textnodes = $textnodeRepository->findByImportfileId($importfileId);
+        foreach ($textnodes as $textnode) {
+            $dm->remove($textnode);
+        }
+        $dm->flush();
+
         $repository = $mongo->getRepository('DembeloMain:Importfile');
 
         /* @var $importfile \DembeloMain\Document\Importfile */
         $importfile = $repository->find($importfileId);
-        $importer = new ImportTwine($this->container);
+        $importer = $this->get('admin.import.twine');
         $returnValue = $importer->run($importfile);
 
         $dm->flush();
