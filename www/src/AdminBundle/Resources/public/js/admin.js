@@ -86,6 +86,11 @@ dembeloAdmin = (function () {
                     if (params['newId']) {
                         $$(type + 'grid').getSelectedItem().id = params['newId'];
                     }
+                    webix.modalbox({
+                        title: "Gespeichert",
+                        buttons: ["Ok"],
+                        text: "Der Datensatz wurde erfolgreich gespeichert..."
+                    });
                 } else {
                     webix.modalbox({
                         title: "Fehler",
@@ -191,7 +196,7 @@ dembeloAdmin = (function () {
 
             webix.ajax().post(paths.adminImport, {importfileId: importfileId}, function (text) {
                 var params = JSON.parse(text);
-                if (params['error'] === false) {
+                if (params['success'] === true && params['returnValue'] === true) {
                     webix.modalbox({
                         title: "Datei importiert",
                         buttons: ["Ok"],
