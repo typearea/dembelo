@@ -19,6 +19,13 @@
 /*global paths*/
 dembeloAdmin = (function () {
 
+    function hasNewRow(dataTableId) {
+        var newRows = $$(dataTableId).find(function (obj) {
+            return obj.id === 'new';
+        });
+        return newRows.length > 0;
+    }
+
     return {
         init: function () {
             $$("mainnav").attachEvent("onAfterSelect", function (id){
@@ -140,10 +147,7 @@ dembeloAdmin = (function () {
             switch(type) {
                 case 'user':
                     clickFunction = function () {
-                        var newRows = $$('usergrid').find(function (obj) {
-                            return obj.id === 'new';
-                        });
-                        if (newRows.length > 0) {
+                        if (hasNewRow('usergrid')) {
                             return;
                         }
                         $$('usergrid').add({id: 'new', email: '', roles: 'ROLE_USER'});
@@ -152,10 +156,7 @@ dembeloAdmin = (function () {
                     break;
                 case 'licensee':
                     clickFunction = function () {
-                        var newRows = $$('licenseegrid').find(function (obj) {
-                            return obj.id === 'new';
-                        });
-                        if (newRows.length > 0) {
+                        if (hasNewRow('licenseegrid')) {
                             return;
                         }
                         $$('licenseegrid').add({id: 'new', name: ''});
@@ -164,10 +165,7 @@ dembeloAdmin = (function () {
                     break;
                 case 'importfile':
                     clickFunction = function () {
-                        var newRows = $$('importfilegrid').find(function (obj) {
-                            return obj.id === 'new';
-                        });
-                        if (newRows.length > 0) {
+                        if (hasNewRow('importfilegrid')) {
                             return;
                         }
                         $$('importfilegrid').add({id: 'new', name: ''});
