@@ -132,20 +132,47 @@ dembeloAdmin = (function () {
 
         getToolbar: function(type) {
 
-            var clickString, toolbar = {
+            var clickFunction, toolbar = {
                     view: "toolbar",
                     cols: []
                 };
 
             switch(type) {
                 case 'user':
-                    clickString = "$$('usergrid').add({id: 'new', email: '', roles: 'ROLE_USER'})";
+                    clickFunction = function () {
+                        var newRows = $$('usergrid').find(function (obj) {
+                            return obj.id === 'new';
+                        });
+                        if (newRows.length > 0) {
+                            return;
+                        }
+                        $$('usergrid').add({id: 'new', email: '', roles: 'ROLE_USER'});
+                        $$('usergrid').select('new');
+                    };
                     break;
                 case 'licensee':
-                    clickString = "$$('licenseegrid').add({id: 'new', name: ''})";
+                    clickFunction = function () {
+                        var newRows = $$('licenseegrid').find(function (obj) {
+                            return obj.id === 'new';
+                        });
+                        if (newRows.length > 0) {
+                            return;
+                        }
+                        $$('licenseegrid').add({id: 'new', name: ''});
+                        $$('licenseegrid').select('new');
+                    };
                     break;
                 case 'importfile':
-                    clickString = "$$('importfilegrid').add({id: 'new', name: ''})";
+                    clickFunction = function () {
+                        var newRows = $$('importfilegrid').find(function (obj) {
+                            return obj.id === 'new';
+                        });
+                        if (newRows.length > 0) {
+                            return;
+                        }
+                        $$('importfilegrid').add({id: 'new', name: ''});
+                        $$('importfilegrid').select('new');
+                    };
                     break;
             }
 
@@ -154,7 +181,7 @@ dembeloAdmin = (function () {
                 view: "button",
                 value: "Neu",
                 type: "form",
-                click: clickString
+                click: clickFunction
             });
 
             if (type !== 'importfile') {
