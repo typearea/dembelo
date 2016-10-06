@@ -95,6 +95,10 @@ class ImportTwine
     {
         $this->importfile = $importfile;
 
+        if (is_null($this->importfile->getLicenseeId())) {
+            throw new Exception('no licensee available');
+        }
+
         $filenameExtracted = $this->extractTwineFile();
 
         $fileHandler = fopen($filenameExtracted, "rb");
@@ -124,6 +128,10 @@ class ImportTwine
 
     private function extractTwineFile()
     {
+        if (is_null($this->importfile->getFilename())) {
+            throw new Exception('no filename available');
+        }
+
         $extractedFile = $this->importfile->getFilename().'.extracted';
 
         $fileHandle = fopen($this->importfile->getFilename(), 'r');

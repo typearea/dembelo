@@ -407,6 +407,46 @@ class ImportTwineTest extends WebTestCase
     }
 
     /**
+     * check if exception is thrown when no licensee is available
+     *
+     * @expectedException Exception
+     * @expectedExceptionMessage no licensee available
+     */
+    public function testRunWithExceptionWhenNoLicenseeIsAvailable()
+    {
+        $textnodeRepository = $this->getTextnodeRepositoryMock();
+        $topicRepository = $this->getTopicRepositoryMock();
+
+        $importfile = new Importfile();
+        $importfile->setFilename('somefilename_readable');
+        $importfile->setAuthor('someAuthor');
+        $importfile->setPublisher('somePublisher');
+
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $retVal = $importTwine->run($importfile);
+    }
+
+    /**
+     * check if exception is thrown when no licensee is available
+     *
+     * @expectedException Exception
+     * @expectedExceptionMessage no filename available
+     */
+    public function testRunWithExceptionWhenNoFilenameIsAvailable()
+    {
+        $textnodeRepository = $this->getTextnodeRepositoryMock();
+        $topicRepository = $this->getTopicRepositoryMock();
+
+        $importfile = new Importfile();
+        $importfile->setLicenseeId('somelicenseeId');
+        $importfile->setAuthor('someAuthor');
+        $importfile->setPublisher('somePublisher');
+
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $retVal = $importTwine->run($importfile);
+    }
+
+    /**
      * still doesn't work
      *
      * @expectedException Exception

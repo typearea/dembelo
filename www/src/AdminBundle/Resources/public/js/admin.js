@@ -231,7 +231,7 @@ dembeloAdmin = (function () {
                     webix.modalbox({
                         title: "Fehler",
                         buttons: ["Ok"],
-                        text: "Der Import ist leider fehlgeschlagen..."
+                        text: "Fehler: " + params['message']
                     });
                 }
             });

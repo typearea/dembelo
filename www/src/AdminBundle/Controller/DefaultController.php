@@ -491,14 +491,20 @@ class DefaultController extends Controller
         /* @var $importfile \DembeloMain\Document\Importfile */
         $importfile = $repository->find($importfileId);
         $importer = $this->get('admin.import.twine');
-        $returnValue = $importer->run($importfile);
+        try {
+            $returnValue = $importer->run($importfile);
 
-        $dm->flush();
-
-        $output = [
-            'success' => true,
-            'returnValue' => $returnValue,
-        ];
+            $dm->flush();
+            $output = [
+                'success' => true,
+                'returnValue' => $returnValue,
+            ];
+        } catch(\Exception $e) {
+            $output = [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ];
+        }
 
         return new Response(json_encode($output));
     }
