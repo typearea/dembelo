@@ -7,8 +7,17 @@
 body {
   font-family: 'Open Sans', sans-serif;
   padding-top: 56px;
-}
 
-main {
-  padding-top: 20px;
+  &.nav-active {
+    header, main {
+      transform: translateX($nav-width);
+    }
+  }
+
+  header, main {
+    transition: transform 0.3s ease;
+  }
+  main {
+    padding-top: 20px;
+  }
 }

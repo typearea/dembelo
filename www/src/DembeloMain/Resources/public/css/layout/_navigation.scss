@@ -5,7 +5,7 @@
   z-index: 999;
   background-color: $nav-background;
   height: 100%;
-  width: 50%;
+  width: $nav-width;
   overflow-y: auto;
   transform: translateX(-100%);
   transition: transform 0.3s ease-in-out;

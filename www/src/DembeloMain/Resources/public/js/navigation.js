@@ -16,11 +16,12 @@ var Navigation = function () {
     return {
         show: function () {
             isVisible = true;
-            // navigationElement.style.display = 'block';
+            document.body.classList.add('nav-active');
             navigationElement.classList.add('show');
         },
         hide: function () {
             isVisible = false;
+            document.body.classList.remove('nav-active');
             navigationElement.classList.remove('show');
         },
         toggle: function () {
