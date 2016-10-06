@@ -1,175 +1,27 @@
-/* hier muessen unsere Bootstrap-Variablen stehen */
-
-$body-bg:                #8D7966;
-$brand-primary:		 #005F6B;
-
-/* Buttons */
-$btn-default-color:      #333;
-$btn-default-bg:         #D8C8B8;
-$btn-default-border:     #8D7966;
-$btn-link-disabled-color:#F8F1E9;
-
-/* dropdown */
-$dropdown-bg:		#F8F1E9;
-$component-active-color:#F8F1E9;
-$dropdown-link-hover-bg:#D8C8B8;
-
-$dropdown-divider-bg:   #F8F1E9;
-
-/* wells */
-$well-bg:               #f8f1e9;
-
-
-@import '../../../../../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap';
-@import '../../../../../vendor/twbs/bootstrap-sass/assets/stylesheets/bootstrap/theme';
-
-html, body, .container-fluid {
-    height: 100%;
-}
-
-.navbar {
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 5px;
-    margin-top: 5px;
-}
-
-body {
-     padding: 1%;
-    /*background-color: #8D7966;*/
-}
-
-@media screen and (orientation: landscape) {
-    body {
-        padding-left: 25%;
-        padding-right: 25%;
-    }
-}
-
-@media (min-width: 1024px) {
-    .container-fluid, .navbar {
-        max-width: 1024px;
-    }
-}
-
-/*.row {
-    height: 25%;
-}*/
-
-#row1 {
-    padding-bottom: 5px;
-    height:20%
-}
-
-#row1 > div {
-    height: 100%;
-}
-
-#row2, #row3 {
-  height:30%;
-}
-
-#row4 {
-    padding-top: 5px;
-    height:20%
-}
-
-#row4 > div {
-    height: 100%;
-    overflow: hidden;
-}
-
-.navbar-collapse.collapse {
-    display: block!important;
-}
-
-.navbar-nav>li, .navbar-nav {
-    float: left !important;
-}
-
-.navbar-nav.navbar-right:last-child {
-    margin-right: -15px !important;
-}
-
-.navbar-right {
-    float: right!important;
-}
-
-.container > .navbar-header {
-    margin-left: 0;
-}
-
-#row1 > div, #row4 > div{
-  padding-left: 0;
-  padding-right: 0;
-}
-
-#shadow {
-  padding:1% 10%;
-  background-color: #F8F1E9;
-}
-
-#carousel-bookmark, .carousel-inner, .carousel-inner > .item {
-  height: inherit;
-}
-
-.ad-text {
-	 bottom: 4%;
-    color: white;
-    font-weight: bold;
-    position: absolute;
-    right: 8%;
-    text-shadow: 0.1em 0.1em 0.5em #333;
-}
-
-@font-face {
-  font-family: 'Linux Libertine'; /* normal */
-  src: url('/css/fonts/linlibertine/LinLibertine_R.woff') format('woff'),
-      url('/css/fonts/linlibertine/LinLibertine_R.otf') format('opentype'),
-      url('/css/fonts/linlibertine/LinLibertine_R.svg#LinuxLibertineORegular') format('svg'),
-      url('/css/fonts/linlibertine/LinLibertine_Rah.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-div.read {
-  font-family: 'Linux Libertine';
-  text-align: justify;
-  font-size: 16px;
-}
-
-.readmetadatabutton {
-  cursor: pointer;
-}
-
-#mainpagecontainer {
-  .col-xs-3 {
-    height: 100%;
-    overflow: hidden;
-    padding: 0;
-    margin: 0;
-
-    a {
-      width: 200px;
-      height: 200px;
-      overflow: hidden;
-      position: relative;
-      display: block;
-
-      img {
-        position:absolute;
-        left: -100%;
-        right: -100%;
-        top: -100%;
-        bottom: -100%;
-        margin: auto;
-        width: auto;
-        height: 100%;
-        &.portrait {
-          width: 100%;
-          height: auto;
-        }
-      }
-    }
-  }
-}
+/**
+* Skeleton Styles
+*/
+// import normalize-scss
+@import "../../../../../web/vendor/normalize-scss/sass/normalize/import-now";
+// Skeleton Sass core loader
+@import "../../../../../web/vendor/skeleton-sass/skeleton/core/config";
+// import default theme variables
+@import "variables/skeleton";
+// theme base styles
+@import "../../../../../web/vendor/skeleton-sass/skeleton/themes/fresh/base";
+// theme grid styles
+@import "../../../../../web/vendor/skeleton-sass/skeleton/themes/fresh/skeleton";
+/**
+* Dembelo Styles
+*/
+// import variables
+@import "fonts";
+@import "variables/dashboard";
+@import "variables/layout/navigation";
+@import "variables/form";
+// import layout
+@import "layout";
+@import "layout/toolbar";
+@import "layout/navigation";
+@import "form";
+@import "dashboard";

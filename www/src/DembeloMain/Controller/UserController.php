@@ -27,8 +27,10 @@ namespace DembeloMain\Controller;
 
 use DembeloMain\Document\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class DefaultController
@@ -53,9 +55,21 @@ class UserController extends Controller
 
         $form = $this->createFormBuilder($user)
             ->setAction($this->generateUrl('login_check'))
-            ->add('_username', 'email', array('label' => 'Email'))
-            ->add('password', 'password', array('label' => 'Passwort'))
-            ->add('save', 'submit', array('label' => 'Einloggen', 'attr' => array('class' => 'btn btn-primary')))
+            ->add(
+                '_username',
+                EmailType::class,
+                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'E-Mail'))
+            )
+            ->add(
+                'password',
+                'password',
+                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'Passwort'))
+            )
+            ->add(
+                'save',
+                SubmitType::class,
+                array('label' => 'Anmelden', 'attr' => array('class' => 'button button-primary u-full-width'))
+            )
             ->getForm();
 
 
