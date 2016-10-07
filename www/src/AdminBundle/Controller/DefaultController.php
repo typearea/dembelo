@@ -499,7 +499,7 @@ class DefaultController extends Controller
                 'success' => true,
                 'returnValue' => $returnValue,
             ];
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $output = [
                 'success' => false,
                 'message' => $e->getMessage(),
