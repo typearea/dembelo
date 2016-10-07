@@ -190,8 +190,8 @@
                                                                         autoheight:true,
                                                                         borderless:true
                                                                     },
-                                                                    {view: "button", value:"Speichern", click:"dembeloAdmin.formsave('importfile')" },
-                                                                    {view: "button", value:"Importieren", click:"dembeloAdmin.import()" }
+                                                                    {view: "button", id: "importfileSaveButton", value:"Speichern", click:"dembeloAdmin.formsave('importfile')", disabled: true },
+                                                                    {view: "button", id: "importfileImportButton", value:"Importieren", click:"dembeloAdmin.import()", disabled: true}
                                                                 ]
                                                             }
                                                         ]

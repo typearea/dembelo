@@ -26,6 +26,21 @@ dembeloAdmin = (function () {
         return newRows.length > 0;
     }
 
+    function importfileCheckActions() {
+        var values = $$('importfileform').getValues();
+        if (values.name !== '' && values.licenseeId !== '') {
+            $$("importfileSaveButton").enable();
+            if (values.id !== 'new') {
+                $$("importfileImportButton").enable();
+            } else {
+                $$("importfileImportButton").disable();
+            }
+        } else {
+            $$("importfileSaveButton").disable();
+            $$("importfileImportButton").disable();
+        }
+    }
+
     return {
         init: function () {
             $$("mainnav").attachEvent("onAfterSelect", function (id){
@@ -72,6 +87,9 @@ dembeloAdmin = (function () {
             $$('uploadfile').attachEvent("onUploadComplete", function(response) {
                 $$('importfileform').setValues(response, true);
             });
+
+            $$('importfileform').attachEvent('onChange', importfileCheckActions);
+            $$('importfileform').attachEvent('onValues', importfileCheckActions);
 
             $$('licenseeform').bind($$('licenseegrid'));
             $$('importfileform').bind($$('importfilegrid'));
