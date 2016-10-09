@@ -13,6 +13,7 @@ script:
 - phpunit -c www/app/
 install:
 - composer --working-dir="www" install
+- IF [ "$MONGOEXTENSION" = "mongo.so" ] THEN composer remove "alcaeus/mongo-php-adapter"; fi
 - pyrus install pear/PHP_CodeSniffer
 - phpenv rehash
 matrix:
