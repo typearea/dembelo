@@ -94,7 +94,7 @@ class DefaultControllerTest extends WebTestCase
     {
         $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
         $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
-        $queryMock = $this->getMockBuilder('foobar')->setMethods(['execute','getQuery'])->getMock();
+        $queryMock = $this->getMockBuilder('foobar')->setMethods(['execute', 'getQuery'])->getMock();
         $postArray = array();
         $postMock->expects($this->once())
             ->method("get")
