@@ -3,6 +3,8 @@ php:
 - 5.6
 - 7
 before_install:
+- export MONGOEXTENSION="mongodb.so"
+- if [[ ${TRAVIS_PHP_VERSION:0:1} == "5" ]]; then export MONGOEXTENSION="mongo.so"; fi
 - echo "extension =" $MONGOEXTENSION >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 services:
   - mongodb
@@ -15,9 +17,3 @@ install:
 - if [[ $MONGOEXTENSION == "mongo.so" ]]; then composer --working-dir="www" remove alcaeus/mongo-php-adapter mongodb/mongodb; fi
 - composer --working-dir="www" install
 - phpenv rehash
-matrix:
-  include:
-    - php: 5.6
-      env: MONGOEXTENSION="mongo.so"
-    - php: 7
-      env: MONGOEXTENSION="mongodb.so"
