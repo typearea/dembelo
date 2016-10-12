@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-/usr/bin/add-apt-repository ppa:ondrej/php5
 apt-get update
-apt-get -y install git curl vim ruby php5-fpm php5-cli php5-dev php5-gd php5-curl php-apc php5-mcrypt php5-xdebug php5-memcache php5-intl php5-tidy php5-imap php5-imagick php5-fpm mongodb nginx imagemagick libsasl2-dev libssl-dev libsslcommon2-dev pkg-config
+apt-get -y install git curl vim ruby php5-fpm php5-cli php5-dev php5-gd php5-curl php-apc php5-mcrypt php5-xdebug php5-memcache php5-intl php5-tidy php5-imap php5-imagick php5-fpm mongodb nginx imagemagick libsasl2-dev pkg-config
 
 mkdir -p /etc/php5/cli/
 mkdir -p /etc/php5/fpm/
@@ -14,9 +13,7 @@ cp /vagrant/files/php/fpm/pool.d/www.conf /etc/php5/fpm/pool.d/www.conf
 curl -s http://getcomposer.org/installer | php -- --install-dir=/usr/bin && mv /usr/bin/composer.phar /usr/bin/composer
 composer self-update
 
-# mongo is deprecated, but mongodb is still not supported by doctrine
-# /usr/bin/pecl install --force mongodb
-/usr/bin/pecl install --force mongo
+/usr/bin/pecl install --force mongodb
 
 gem install sass
 

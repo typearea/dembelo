@@ -1,20 +1,19 @@
 language: php
 php:
-- 7
 - 5.6
-- 5.5
+- 7
 before_install:
-- echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+- export MONGOEXTENSION="mongodb.so"
+- if [[ ${TRAVIS_PHP_VERSION:0:1} == "5" ]]; then export MONGOEXTENSION="mongo.so"; fi
+- echo "extension =" $MONGOEXTENSION >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 services:
   - mongodb
 script:
-- phpcs --config-set installed_paths www/vendor/escapestudios/symfony2-coding-standard
-- phpcs --standard=symfony2 www/src
-- phpunit -c www/app/
+- ./www/bin/phpcs --config-set installed_paths www/vendor/escapestudios/symfony2-coding-standard
+- ./www/bin/phpcs --standard=symfony2 www/src
+- ls -l www/vendor/symfony/symfony/src/Symfony/Bundle/FrameworkBundle/Test/WebTestCase.php
+- ./www/bin/phpunit -c www/app/
 install:
+- if [[ $MONGOEXTENSION == "mongo.so" ]]; then composer --working-dir="www" remove alcaeus/mongo-php-adapter mongodb/mongodb; fi
 - composer --working-dir="www" install
-- pyrus install pear/PHP_CodeSniffer
 - phpenv rehash
-matrix:
-  allow_failures:
-    - php: 7
