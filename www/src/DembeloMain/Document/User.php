@@ -47,14 +47,14 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
     protected $id;
 
     /**
-     * @MongoDB\String
+     * @MongoDB\Field(type="string")
      * @Assert\NotBlank()
      * @Assert\Email()
      */
     protected $email;
 
     /**
-     * @MongoDB\String
+     * @MongoDB\Field(type="string")
      * @Assert\NotBlank()
      */
     protected $password;
@@ -76,28 +76,28 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
     protected $currentTextnode;
 
     /**
-     * @MongoDB\String
+     * @MongoDB\Field(type="string")
      */
     protected $gender;
 
     /**
-     * @MongoDB\String
+     * @MongoDB\Field(type="string")
      */
     protected $source;
 
     /**
-     * @MongoDB\String
+     * @MongoDB\Field(type="string")
      */
     protected $reason;
 
     /**
-     * @MongoDB\Int
+     * @MongoDB\Field(type="int")
      * @Assert\NotBlank()
      */
     protected $status;
 
     /**
-     * @MongoDB\String
+     * @MongoDB\Field(type="string")
      */
     protected $activationHash;
 

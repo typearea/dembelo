@@ -57,7 +57,7 @@ class DefaultControllerTest extends WebTestCase
     {
         $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
         $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
-        $queryMock = $this->getMock('foobar', array('execute', 'getQuery'));
+        $queryMock = $this->getMockBuilder('foobar')->setMethods(array('execute', 'getQuery'))->getMock();
         $postArray = array();
         $postMock->expects($this->once())
             ->method("get")
@@ -94,7 +94,7 @@ class DefaultControllerTest extends WebTestCase
     {
         $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
         $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
-        $queryMock = $this->getMock('foobar', array('execute', 'getQuery'));
+        $queryMock = $this->getMockBuilder('foobar')->setMethods(['execute', 'getQuery'])->getMock();
         $postArray = array();
         $postMock->expects($this->once())
             ->method("get")
@@ -477,7 +477,7 @@ class DefaultControllerTest extends WebTestCase
      */
     private function loadMockedContainer()
     {
-        $this->container = $this->getMock("Symfony\Component\DependencyInjection\ContainerInterface");
+        $this->container = $this->createMock("Symfony\Component\DependencyInjection\ContainerInterface");
     }
 
     /**

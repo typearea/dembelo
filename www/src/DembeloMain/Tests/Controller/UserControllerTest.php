@@ -56,7 +56,7 @@ class UserControllerTest extends WebTestCase
         $mock = $this->getMockBuilder('foobar')
             ->setMethods(array('get', 'getLastAuthenticationError', 'getLastUsername', 'createBuilder', 'setAction', 'generate', 'add', 'getForm', 'createView', 'renderResponse'))
             ->getMock();
-        $container = $this->getMock("Symfony\Component\DependencyInjection\ContainerInterface");
+        $container = $this->getMockBuilder("Symfony\Component\DependencyInjection\ContainerInterface")->getMock();
         $container->expects($this->any())
             ->method("get")
             ->will($this->returnValue($mock));
@@ -126,7 +126,7 @@ class UserControllerTest extends WebTestCase
         $mock = $this->getMockBuilder('foobar')
             ->setMethods(array('get', 'renderResponse', 'createBuilder', 'add', 'getForm', 'handleRequest', 'isValid', 'getManager', 'createView'))
             ->getMock();
-        $container = $this->getMock("Symfony\Component\DependencyInjection\ContainerInterface");
+        $container = $this->getMockBuilder("Symfony\Component\DependencyInjection\ContainerInterface")->getMock();
         $container->expects($this->any())
             ->method("get")
             ->will($this->returnValue($mock));
