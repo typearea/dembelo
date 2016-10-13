@@ -550,10 +550,10 @@ class ImportTwineTest extends WebTestCase
         $container = $this->getMockBuilder(Container::class)->disableOriginalConstructor()->setMethods(['get'])->getMock();
 
         $mongoMock = $this->getMockBuilder('Doctrine\Bundle\MongoDBBundle\ManagerRegistry')->disableOriginalConstructor()->setMethods(['getRepository', 'getManager'])->getMock();
-        $repositoryLicensee = $this->getMock('repositoryLicenseeMock', ['findOneByName', 'find']);
+        $repositoryLicensee = $this->getMockBuilder('repositoryLicenseeMock')->setMethods(['findOneByName', 'find'])->getMock();
         $importTwine = $this->getMockBuilder('AdminBundle\Model\ImportTwine')->disableOriginalConstructor()->setMethods(['run', 'parserFree'])->getMock();
-        $dm = $this->getMock('dmMock', ['flush', 'persist', 'find']);
-        $textnode = $this->getMock('DembeloMain\Document\Textnode');
+        $dm = $this->getMockBuilder('dmMock')->setMethods(['flush', 'persist', 'find'])->getMock();
+        $textnode = $this->getMockBuilder('DembeloMain\Document\Textnode')->getMock();
         $container->expects($this->any())
             ->method("get")
             ->with($this->equalTo('doctrine_mongodb'))
