@@ -146,12 +146,7 @@ class ImportTwineTest extends WebTestCase
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
 
-        $mockObjects = $this->getMockObjects();
-        $importfile = new Importfile();
-        $importfile->setFilename('somefilename');
-        $importfile->setLicenseeId('somelicenseeId');
-        $importfile->setAuthor('someAuthor');
-        $importfile->setPublisher('somePublisher');
+        $importfile = $this->getDummyImportfile(['filename' => 'somefilename']);
 
         $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
         $importTwine->run($importfile);
@@ -166,18 +161,13 @@ class ImportTwineTest extends WebTestCase
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
 
-        $mockObjects = $this->getMockObjects();
-        $importfile = new Importfile();
-        $importfile->setFilename('somefilename_readable');
-        $importfile->setLicenseeId('somelicenseeId');
-        $importfile->setAuthor('someAuthor');
-        $importfile->setPublisher('somePublisher');
-
+        $dm = $this->getDmMock();
+        $importfile = $this->getDummyImportfile();
         $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
         $importTwine->run($importfile);
-        $mockObjects['dm']->expects($this->never())
+        $dm->expects($this->never())
             ->method('persist');
-        $mockObjects['dm']->expects($this->never())
+        $dm->expects($this->never())
             ->method('flush');
     }
 
@@ -190,20 +180,16 @@ class ImportTwineTest extends WebTestCase
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
 
-        $mockObjects = $this->getMockObjects();
-        $importfile = new Importfile();
-        $importfile->setFilename('somefilename_readable');
-        $importfile->setLicenseeId('somelicenseeId');
-        $importfile->setAuthor('someAuthor');
-        $importfile->setPublisher('somePublisher');
+        $dm = $this->getDmMock();
+        $importfile = $this->getDummyImportfile();
 
         self::$freadStack = ['erste Zeile', 'zweite Zeile'];
 
         $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
         $importTwine->run($importfile);
-        $mockObjects['dm']->expects($this->never())
+        $dm->expects($this->never())
             ->method('persist');
-        $mockObjects['dm']->expects($this->never())
+        $dm->expects($this->never())
             ->method('flush');
     }
 
@@ -216,20 +202,16 @@ class ImportTwineTest extends WebTestCase
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
 
-        $mockObjects = $this->getMockObjects();
-        $importfile = new Importfile();
-        $importfile->setFilename('somefilename_readable');
-        $importfile->setLicenseeId('somelicenseeId');
-        $importfile->setAuthor('someAuthor');
-        $importfile->setPublisher('somePublisher');
+        $dm = $this->getDmMock();
+        $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [''];
 
         $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
         $importTwine->run($importfile);
-        $mockObjects['dm']->expects($this->never())
+        $dm->expects($this->never())
             ->method('persist');
-        $mockObjects['dm']->expects($this->never())
+        $dm->expects($this->never())
             ->method('flush');
     }
 
@@ -243,21 +225,17 @@ class ImportTwineTest extends WebTestCase
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
 
-        $mockObjects = $this->getMockObjects();
-        $importfile = new Importfile();
-        $importfile->setFilename('somefilename_readable');
-        $importfile->setLicenseeId('somelicenseeId');
-        $importfile->setAuthor('someAuthor');
-        $importfile->setPublisher('somePublisher');
+        $dm = $this->getDmMock();
+        $importfile = $this->getDummyImportfile();
 
         self::$freadStack = ['<tw-storydata hurz>', 'zweite Zeile'];
 
         $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
         $retVal = $importTwine->run($importfile);
         $this->assertTrue($retVal);
-        $mockObjects['dm']->expects($this->never())
+        $dm->expects($this->never())
             ->method('persist');
-        $mockObjects['dm']->expects($this->never())
+        $dm->expects($this->never())
             ->method('flush');
     }
 
@@ -271,17 +249,13 @@ class ImportTwineTest extends WebTestCase
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
 
-        $importfile = new Importfile();
-        $importfile->setFilename('somefilename_readable');
-        $importfile->setLicenseeId('somelicenseeId');
-        $importfile->setAuthor('someAuthor');
-        $importfile->setPublisher('somePublisher');
+        $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
             '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
-            '<tw-passagedata pid="1" name="someNodeName" tags="Freigegeben" position="104,30">lorem impsum',
+            '<tw-passagedata pid="1" name="someNodeName" tags="Freigegeben ID:foobar" position="104,30">lorem impsum',
             'lorem impsum</tw-passagedata></tw-storydata>',
         ];
         self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
@@ -292,6 +266,10 @@ class ImportTwineTest extends WebTestCase
         $textnodeRepository->expects($this->any())
             ->method('find')
             ->will($this->returnValue($textnode));
+
+        $textnodeRepository->expects($this->any())
+            ->method('findByTwineId')
+            ->will($this->returnValue(null));
 
         $topicRepository->expects($this->any())
             ->method('find')
@@ -316,17 +294,13 @@ class ImportTwineTest extends WebTestCase
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
 
-        $importfile = new Importfile();
-        $importfile->setFilename('somefilename_readable');
-        $importfile->setLicenseeId('somelicenseeId');
-        $importfile->setAuthor('someAuthor');
-        $importfile->setPublisher('somePublisher');
+        $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
             '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
-            '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben" position="104,30">lorem ipsum',
+            '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben ID:foobar" position="104,30">lorem ipsum',
             'lorem ipsum</tw-passagedata></tw-storydata>',
         ];
         self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
@@ -365,17 +339,13 @@ class ImportTwineTest extends WebTestCase
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
 
-        $importfile = new Importfile();
-        $importfile->setFilename('somefilename_readable');
-        $importfile->setLicenseeId('somelicenseeId');
-        $importfile->setAuthor('someAuthor');
-        $importfile->setPublisher('somePublisher');
+        $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
             '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
-            '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben" position="104,30">lorem ipsum',
+            '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben ID:foobar" position="104,30">lorem ipsum',
             'lorem ipsum</tw-passagedata></tw-storydata>',
         ];
         self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
@@ -417,10 +387,7 @@ class ImportTwineTest extends WebTestCase
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
 
-        $importfile = new Importfile();
-        $importfile->setFilename('somefilename_readable');
-        $importfile->setAuthor('someAuthor');
-        $importfile->setPublisher('somePublisher');
+        $importfile = $this->getDummyImportfile(['licenseeId' => null]);
 
         $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
         $retVal = $importTwine->run($importfile);
@@ -437,28 +404,23 @@ class ImportTwineTest extends WebTestCase
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
 
-        $importfile = new Importfile();
-        $importfile->setLicenseeId('somelicenseeId');
-        $importfile->setAuthor('someAuthor');
-        $importfile->setPublisher('somePublisher');
+        $importfile = $this->getDummyImportfile(['filename' => null]);
 
         $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
-        $retVal = $importTwine->run($importfile);
+        $importTwine->run($importfile);
     }
 
     /**
-     * still doesn't work
-     *
      * @expectedException Exception
-     * @expectedExceptionMessage The Twine archive file 'somefilename_readable' has a textnode named 'someNodeName1' which contains a malformed link that starts with '[[' but has no corresponding ']]'.
+     * @expectedExceptionMessage no ID given for Textnode "someNodeName1"
      */
-    public function xtestRun()
+    public function testRunWithTextnodeWithoutTwineID()
     {
-        $mockObjects = $this->getMockObjects();
-        $twineArchivePath = 'somefilename_readable';
-        $licenseeId = 'somelicenseeId';
-        $author = 'someAuthor';
-        $publisher = 'somePublisher';
+        $textnodeRepository = $this->getTextnodeRepositoryMock();
+        $topicRepository = $this->getTopicRepositoryMock();
+
+        $importfile = $this->getDummyImportfile();
+
         self::$freadStack = [
             '<tw-storydata ',
             '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
@@ -466,73 +428,63 @@ class ImportTwineTest extends WebTestCase
             '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben" position="104,30">lorem ipsum',
             'lorem ipsum</tw-passagedata></tw-storydata>',
         ];
-        self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
-        $expectedFputsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
 
-        $mockObjects['repositoryTopic']->expects($this->once())
+        self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
+
+        $textnode = new Textnode();
+
+        $textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode));
+
+        $topicRepository->expects($this->any())
             ->method('find')
             ->will($this->returnValue(true));
 
-        $mockObjects['dm']->expects($this->once())
-            ->method('persist')
-            ->with($this->callback(function ($textnode) {
-                return $textnode instanceof Textnode
-                && $textnode->getText() === "lorem ipsumlorem ipsum";
-            }));
+        $textnodeRepository->expects($this->never())
+            ->method('save');
 
-        $mockObjects['textnode']->expects($this->once())
-            ->method('getText')
-            ->will($this->returnValue('A [[working->hurz]] link'));
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine->run($importfile);
 
-        $importTwine = new ImportTwine();
-        $retVal = $importTwine->run($twineArchivePath, $licenseeId, $author, $publisher);
-        $this->assertTrue($retVal);
-
-        $this->assertEquals($expectedFputsStack, self::$fputsStack);
     }
-
-    /**
-     * callback method for a returnCallback()
-     *
-     * @param string $arg
-     * @return null|\PHPUnit_Framework_MockObject_MockObject
-     */
-    public function findOneByNameCallback($arg)
+    
+    private function getDummyImportfile(array $data = [])
     {
-        if ($arg === 'somelicensee') {
-            $licenseeMock = $this->getMockBuilder('DembeloMain\Document\Licensee')->disableOriginalConstructor()->getMock();
-            $licenseeMock->expects($this->once())
-                ->method('getId')
-                ->will($this->returnValue('licenseeId'));
+        $default = [
+            'filename'   => 'somefilename_readable',
+            'licenseeId' => 'somelicenseeId',
+            'author'     => 'someAuthor',
+            'publisher'  => 'somePublisher',
+            'id'         => 'someImportFileId',
+        ];
 
-            return $licenseeMock;
+        $importfileData = array_merge($default, $data);
+
+
+        $importfile = new Importfile();
+        if (!is_null($importfileData['filename'])) {
+            $importfile->setFilename($importfileData['filename']);
+        }
+        if (!is_null($importfileData['licenseeId'])) {
+            $importfile->setLicenseeId($importfileData['licenseeId']);
+        }
+        if (!is_null($importfileData['author'])) {
+            $importfile->setAuthor($importfileData['author']);
+        }
+        if (!is_null($importfileData['publisher'])) {
+            $importfile->setPublisher($importfileData['publisher']);
+        }
+        if (!is_null($importfileData['id'])) {
+            $importfile->setId($importfileData['id']);
         }
 
-        return null;
-    }
-
-    /**
-     * callback method for a returnCallback()
-     *
-     * @param string $arg
-     * @return mixed
-     */
-    public function mongoGetRepositoryCallback($arg)
-    {
-        if ($arg === 'DembeloMain:Topic') {
-            if (!isset($this->mocks['DembeloMain:Topic'])) {
-                $this->mocks['DembeloMain:Topic'] = $this->getMock('repositoryTopicMock', ['findOneByName', 'find']);
-            }
-
-            return $this->mocks['DembeloMain:Topic'];
-        }
-
-        return false;
+        return $importfile;
     }
 
     private function getTextnodeRepositoryMock()
     {
-        return $this->getMockBuilder(TextNodeRepository::class)->disableOriginalConstructor()->setMethods(['createQueryBuilder', 'field', 'equals', 'getQuery', 'save', 'find'])->getMock();
+        return $this->getMockBuilder(TextNodeRepository::class)->disableOriginalConstructor()->setMethods(['createQueryBuilder', 'field', 'equals', 'getQuery', 'save', 'find', 'findByTwineId'])->getMock();
     }
 
     private function getTopicRepositoryMock()
@@ -540,44 +492,8 @@ class ImportTwineTest extends WebTestCase
         return $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['find'])->getMock();
     }
 
-    /**
-     * builds all mock objects
-     *
-     * @return array
-     */
-    private function getMockObjects()
+    private function getDmMock()
     {
-        $container = $this->getMockBuilder(Container::class)->disableOriginalConstructor()->setMethods(['get'])->getMock();
-
-        $mongoMock = $this->getMockBuilder('Doctrine\Bundle\MongoDBBundle\ManagerRegistry')->disableOriginalConstructor()->setMethods(['getRepository', 'getManager'])->getMock();
-        $repositoryLicensee = $this->getMockBuilder('repositoryLicenseeMock')->setMethods(['findOneByName', 'find'])->getMock();
-        $importTwine = $this->getMockBuilder('AdminBundle\Model\ImportTwine')->disableOriginalConstructor()->setMethods(['run', 'parserFree'])->getMock();
-        $dm = $this->getMockBuilder('dmMock')->setMethods(['flush', 'persist', 'find'])->getMock();
-        $textnode = $this->getMockBuilder('DembeloMain\Document\Textnode')->getMock();
-        $container->expects($this->any())
-            ->method("get")
-            ->with($this->equalTo('doctrine_mongodb'))
-            ->will($this->returnValue($mongoMock));
-        $mongoMock->expects($this->any())
-            ->method("getRepository")
-            ->will($this->returnCallback([$this, 'mongoGetRepositoryCallback']));
-        $mongoMock->expects($this->any())
-            ->method("getManager")
-            ->will($this->returnValue($dm));
-        $repositoryLicensee->expects($this->any())
-            ->method('findOneByName')
-            ->will($this->returnCallback([$this, 'findOneByNameCallback']));
-        $dm->expects($this->any())
-            ->method('find')
-            ->with($this->equalTo('DembeloMain:Textnode'), $this->equalTo(null))
-            ->will($this->returnValue($textnode));
-
-        return [
-            'mongo' => $mongoMock,
-            'repositoryLicensee' => $repositoryLicensee,
-            'importTwine' => $importTwine,
-            'dm' => $dm,
-            'textnode' => $textnode,
-        ];
+        return $this->getMockBuilder('dmMock')->setMethods(['flush', 'persist', 'find'])->getMock();
     }
 }

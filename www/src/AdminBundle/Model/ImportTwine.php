@@ -297,6 +297,29 @@ class ImportTwine
         $this->twineRelevant = true;
     }
 
+    private function getTwineId($tagString, $textnodeTitle)
+    {
+
+        if (empty($tagString) || !is_string($tagString)) {
+            throw new Exception('no ID given for Textnode "' . $textnodeTitle . '"');
+        }
+        $tagArray = explode(" ", $tagString);
+
+        $twineId = false;
+
+        foreach ($tagArray as $tag) {
+            if (substr($tag, 0, 3) === 'ID:') {
+                $twineId = substr($tag, 3);
+            }
+        }
+
+        if ($twineId === false) {
+            throw new Exception('no ID given for Textnode "' . $textnodeTitle . '"');
+        }
+
+        return $twineId;
+    }
+
     private function startElementPassageData($name, $attrs)
     {
         if ($this->twineText !== false) {
@@ -319,14 +342,20 @@ class ImportTwine
             throw new Exception("There is a '".$name."' in the Twine archive file '".$this->importfile->getFilename()."' which has a 'name' attribute with value '".$attrs['name']."'. This value is used more than once, while it must be unique.");
         }
 
+        $twineId = $this->getTwineId($attrs['tags'], $attrs['name']);
+
         $this->twineTextnodeName = $attrs['name'];
 
-        $this->textnode = new Textnode();
-        $this->textnode->setStatus(Textnode::STATUS_ACTIVE);
-        $this->textnode->setCreated(date('Y-m-d H:i:s'));
-        $this->textnode->setTopicId($this->topicId);
-        $this->textnode->setLicenseeId($this->importfile->getLicenseeId());
-        $this->textnode->setImportfileId($this->importfile->getId());
+        $this->textnode = $this->textnodeRepository->findByTwineId($this->importfile->getId(), $twineId);
+        if (is_null($this->textnode)) {
+            $this->textnode = new Textnode();
+            $this->textnode->setCreated(date('Y-m-d H:i:s'));
+            $this->textnode->setTopicId($this->topicId);
+            $this->textnode->setLicenseeId($this->importfile->getLicenseeId());
+            $this->textnode->setImportfileId($this->importfile->getId());
+            $this->textnode->setStatus(Textnode::STATUS_ACTIVE);
+        }
+
         $this->textnode->setMetadata(
             array(
                 'Titel' => $this->twineTextnodeName,

@@ -39,4 +39,19 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
     {
         return $this->findBy(array('importfileId' => new MongoId($importfileId)));
     }
+
+    /**
+     * finds a textnode by importfileId and twineId
+     * @param string $importfileId
+     * @param string $twineId
+     */
+    public function findByTwineId($importfileId, $twineId)
+    {
+        return $this->findBy(
+            array(
+                'importfileId' => new MongoId($importfileId),
+                'twineId'      => $twineId,
+            )
+        );
+    }
 }

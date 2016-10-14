@@ -54,4 +54,12 @@ interface TextNodeRepositoryInterface
      * @return Textnode[]
      */
     public function findByImportfileId($importfileId);
+
+    /**
+     * finds a textnode by twineId
+     * @param string $importfileId
+     * @param string $twineId
+     * @return Textnode
+     */
+    public function findByTwineId($importfileId, $twineId);
 }

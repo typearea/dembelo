@@ -93,6 +93,11 @@ class Textnode
     protected $importfileId;
 
     /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $twineId;
+
+    /**
      * gets the timestamp of creation
      *
      * @return string
@@ -411,5 +416,25 @@ class Textnode
     public function getImportfileId()
     {
         return $this->importfileId;
+    }
+
+    /**
+     * sets the twine ID
+     *
+     * @param string $twineId
+     */
+    public function setTwineId($twineId)
+    {
+        $this->twineId = $twineId;
+    }
+
+    /**
+     * returns twine ID
+     *
+     * @return string
+     */
+    public function getTwineId()
+    {
+        return $this->twineId;
     }
 }
