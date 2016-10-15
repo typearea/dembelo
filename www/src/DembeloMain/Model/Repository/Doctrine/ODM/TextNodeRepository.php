@@ -20,6 +20,8 @@
 
 namespace DembeloMain\Model\Repository\Doctrine\ODM;
 
+use DembeloMain\Document\Importfile;
+use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use MongoId;
 
@@ -42,16 +44,38 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
 
     /**
      * finds a textnode by importfileId and twineId
-     * @param string $importfileId
+     * @param Importfile $importfile
      * @param string $twineId
+     * @return Textnode
      */
-    public function findByTwineId($importfileId, $twineId)
+    public function findByTwineId($importfile, $twineId)
     {
-        return $this->findBy(
+        $textnodes = $this->findBy(
             array(
-                'importfileId' => new MongoId($importfileId),
+                'importfileId' => new MongoId($importfile->getId()),
                 'twineId'      => $twineId,
             )
         );
+
+        if (!is_array($textnodes) || count($textnodes) === 0) {
+            return null;
+        }
+
+        return $textnodes[0];
+    }
+
+    /**
+     * sets textnodes to status=inactive that are not in $existingTextnodeIds
+     * @param array $existingTextnodes array of textnodeIds
+     */
+    public function disableOrphanedNodes(array $existingTextnodeIds)
+    {
+        $this->getDocumentManager()->createQueryBuilder(Textnode::class)
+            ->update()
+            ->field('id')->notIn($existingTextnodeIds)
+            ->field('status')->set(Textnode::STATUS_INACTIVE)
+            ->multiple(true)
+            ->getQuery()
+            ->execute();
     }
 }

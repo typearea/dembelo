@@ -103,6 +103,16 @@ function fseek()
     return 0;
 }
 
+/**
+ * @param Resource $parser
+ */
+function xml_parser_free($parser)
+{
+    ImportTwineTest::$parserFreeCalled = true;
+
+    return \xml_parser_free($parser);
+}
+
 namespace AdminBundle\Tests\Model;
 
 use AdminBundle\Model\ImportTwine;
@@ -126,6 +136,7 @@ class ImportTwineTest extends WebTestCase
     public static $freadStack = [];
     public static $fgetsStack = [];
     public static $fputsStack = [];
+    public static $parserFreeCalled = false;
     private $mocks;
 
     /**
@@ -135,6 +146,7 @@ class ImportTwineTest extends WebTestCase
     {
         self::$freadStack = self::$fgetsStack = self::$fputsStack = [];
         $this->mocks = [];
+        self::$parserFreeCalled = false;
     }
 
     /**
@@ -448,7 +460,287 @@ class ImportTwineTest extends WebTestCase
         $importTwine->run($importfile);
 
     }
-    
+
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage no ID given for Textnode "someNodeName1"
+     */
+    public function testRunWithTextnodeWithoutAnyTag()
+    {
+        $textnodeRepository = $this->getTextnodeRepositoryMock();
+        $topicRepository = $this->getTopicRepositoryMock();
+
+        $importfile = $this->getDummyImportfile();
+
+        self::$freadStack = [
+            '<tw-storydata ',
+            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata></tw-storydata>',
+        ];
+
+        self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
+
+        $textnode = new Textnode();
+
+        $textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode));
+
+        $topicRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue(true));
+
+        $textnodeRepository->expects($this->never())
+            ->method('save');
+
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine->run($importfile);
+
+    }
+
+    public function testRunWithTextnodeWithTwineID()
+    {
+        $textnodeRepository = $this->getTextnodeRepositoryMock();
+        $topicRepository = $this->getTopicRepositoryMock();
+
+        $importfile = $this->getDummyImportfile();
+
+        self::$freadStack = [
+            '<tw-storydata ',
+            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben ID:foobar" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata></tw-storydata>',
+        ];
+
+        self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
+
+        $textnode = new Textnode();
+
+        $textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode));
+
+        $topicRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue(true));
+
+        $textnodeRepository->expects($this->once())
+            ->method('findByTwineId')
+            ->with($importfile, 'foobar');
+
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine->run($importfile);
+
+    }
+
+    public function testParserFree()
+    {
+        $textnodeRepository = $this->getTextnodeRepositoryMock();
+        $topicRepository = $this->getTopicRepositoryMock();
+
+        $importfile = $this->getDummyImportfile();
+
+        self::$freadStack = [
+            '<tw-storydata ',
+            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben ID:foobar" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata></tw-storydata>',
+        ];
+
+        self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
+
+        $textnode = new Textnode();
+
+        $textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode));
+
+        $topicRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue(true));
+
+        $textnodeRepository->expects($this->once())
+            ->method('findByTwineId')
+            ->with($importfile, 'foobar');
+
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine->run($importfile);
+
+        $this->assertTrue(self::$parserFreeCalled);
+    }
+
+    public function testRunWithTextnodeDeletedInImportfile()
+    {
+        $textnodeRepository = $this->getTextnodeRepositoryMock();
+        $topicRepository = $this->getTopicRepositoryMock();
+
+        $importfile = $this->getDummyImportfile();
+
+        self::$freadStack = [
+            '<tw-storydata ',
+            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben ID:foobar" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata></tw-storydata>',
+        ];
+
+        self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
+
+        $textnode = new Textnode();
+        $textnode->setId('someTextnodeId');
+
+        $textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode));
+
+        $topicRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue(true));
+
+        $textnodeRepository->expects($this->once())
+            ->method('findByTwineId')
+            ->with($importfile, 'foobar')
+            ->will($this->returnValue($textnode));
+
+        $textnodeRepository->expects($this->once())
+            ->method('disableOrphanedNodes')
+            ->with([$textnode->getId()]);
+
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine->run($importfile);
+    }
+
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage There is a 'tw-passagedata' in the Twine archive file 'somefilename_readable' which has a non unique 'id' tag [someTwineId], in node 'someNodeName2'
+     */
+    public function testRunWithDuplicateTwineId()
+    {
+        $textnodeRepository = $this->getTextnodeRepositoryMock();
+        $topicRepository = $this->getTopicRepositoryMock();
+
+        $importfile = $this->getDummyImportfile();
+
+        self::$freadStack = [
+            '<tw-storydata ',
+            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata>',
+            '<tw-passagedata pid="2" name="someNodeName2" tags="ID:someTwineId" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata>',
+            '</tw-storydata>',
+        ];
+
+        self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
+
+        $textnode = new Textnode();
+
+        $textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode));
+
+        $topicRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue(true));
+
+        $textnodeRepository->expects($this->once())
+            ->method('save');
+
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine->run($importfile);
+    }
+
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage There is a textnode which references another textnode named 'someNodeName3', but this textnode doesn't exist within the same story.
+     */
+    public function testRunWithLinkToNonExistingTextnode()
+    {
+        $textnodeRepository = $this->getTextnodeRepositoryMock();
+        $topicRepository = $this->getTopicRepositoryMock();
+
+        $importfile = $this->getDummyImportfile();
+
+        self::$freadStack = [
+            '<tw-storydata ',
+            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
+            'lorem ipsum [[Linkdata->someNodeName3]]</tw-passagedata>',
+            '</tw-storydata>',
+        ];
+
+        self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
+
+        $textnode1 = new Textnode();
+        $textnode1->setText('lorem ipsum [[Linkdata->someNodeName3]]');
+
+        $textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode1));
+
+        $topicRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue(true));
+
+        $textnodeRepository->expects($this->any())
+            ->method('save');
+
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine->run($importfile);
+    }
+
+    public function testRunWithLinkToAnotherTextnode()
+    {
+        $textnodeRepository = $this->getTextnodeRepositoryMock();
+        $topicRepository = $this->getTopicRepositoryMock();
+
+        $importfile = $this->getDummyImportfile();
+
+        self::$freadStack = [
+            '<tw-storydata ',
+            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
+            'lorem ipsum [[Linkdata->someNodeName2]]</tw-passagedata>',
+            '<tw-passagedata pid="2" name="someNodeName2" tags="ID:someTwineId2" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata>',
+            '</tw-storydata>',
+        ];
+
+        self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
+
+        $textnode1 = new Textnode();
+        $textnode1->setText('lorem ipsum [[Linkdata->someNodeName2]]');
+        $textnode1->setId('someId0');
+
+        $textnode2 = new Textnode();
+        $textnode2->setId('someId1');
+
+        $textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode1));
+
+        $topicRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue(true));
+
+        $textnodeRepository->expects($this->any())
+            ->method('save')
+            ->willReturnCallback(function ($textnode) {
+                static $counter = 0;
+                $textnode->setId('someTextnode'.$counter++);
+            });
+
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine->run($importfile);
+    }
+
     private function getDummyImportfile(array $data = [])
     {
         $default = [
@@ -484,7 +776,7 @@ class ImportTwineTest extends WebTestCase
 
     private function getTextnodeRepositoryMock()
     {
-        return $this->getMockBuilder(TextNodeRepository::class)->disableOriginalConstructor()->setMethods(['createQueryBuilder', 'field', 'equals', 'getQuery', 'save', 'find', 'findByTwineId'])->getMock();
+        return $this->getMockBuilder(TextNodeRepository::class)->disableOriginalConstructor()->setMethods(['createQueryBuilder', 'field', 'equals', 'getQuery', 'save', 'find', 'findByTwineId', 'disableOrphanedNodes'])->getMock();
     }
 
     private function getTopicRepositoryMock()

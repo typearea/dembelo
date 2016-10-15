@@ -62,4 +62,11 @@ interface TextNodeRepositoryInterface
      * @return Textnode
      */
     public function findByTwineId($importfileId, $twineId);
+
+    /**
+     * disables textnodes that were not found in importfile
+     * @param array $existingTextnodeIds
+     * @return void
+     */
+    public function disableOrphanedNodes(array $existingTextnodeIds);
 }

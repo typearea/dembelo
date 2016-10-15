@@ -479,13 +479,6 @@ class DefaultController extends Controller
         /* @var $dm \Doctrine\ODM\MongoDB\DocumentManager*/
         $dm = $mongo->getManager();
 
-        $textnodeRepository = $mongo->getRepository('DembeloMain:Textnode');
-        $textnodes = $textnodeRepository->findByImportfileId($importfileId);
-        foreach ($textnodes as $textnode) {
-            $dm->remove($textnode);
-        }
-        $dm->flush();
-
         $repository = $mongo->getRepository('DembeloMain:Importfile');
 
         /* @var $importfile \DembeloMain\Document\Importfile */

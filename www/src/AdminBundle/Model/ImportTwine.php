@@ -31,7 +31,6 @@ use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Exception;
 use phpDocumentor\Reflection\DocBlock\Tags\Method;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class ImportTwine
@@ -39,9 +38,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ImportTwine
 {
-    /** @var ContainerInterface */
-    private $container;
-
     /**
      * @var TextnodeRepositoryInterface
      */
@@ -64,7 +60,9 @@ class ImportTwine
      */
     private $textnode = null;
     private $topicId = null;
+    private $nodeNameMapping = [];
     private $accessSet = false;
+    private $twineId;
 
     private $twineRelevant = false;
     private $twineStartnodeId = -1;
@@ -250,7 +248,7 @@ class ImportTwine
             throw new Exception("Error #".$errorCode.": '".$errorDescription."' occurred while the envelope foot for the Twine archive was parsed.");
         }
 
-        xml_parser_free($this->xmlParser);
+        $this->parserFree();
 
         // PHP 5.4 compatibility: there's no 'finally' yet.
         if (fclose($fileHandler) === false) {
@@ -299,7 +297,6 @@ class ImportTwine
 
     private function getTwineId($tagString, $textnodeTitle)
     {
-
         if (empty($tagString) || !is_string($tagString)) {
             throw new Exception('no ID given for Textnode "' . $textnodeTitle . '"');
         }
@@ -334,19 +331,15 @@ class ImportTwine
             throw new Exception("There is a '".$name."' in the Twine archive file '".$this->importfile->getFilename()."' which hasn't a numeric value in its 'pid' attribute ('".$attrs['pid']."' was found instead).");
         }
 
-        if (isset($attrs['name']) !== true) {
-            throw new Exception("There is a '".$name."' in the Twine archive file '".$this->importfile->getFilename()."' which is missing its 'name' attribute.");
-        }
+        $this->twineId = $this->getTwineId($attrs['tags'], $attrs['name']);
 
-        if (array_key_exists($attrs['name'], $this->textnodeMapping) === true) {
-            throw new Exception("There is a '".$name."' in the Twine archive file '".$this->importfile->getFilename()."' which has a 'name' attribute with value '".$attrs['name']."'. This value is used more than once, while it must be unique.");
+        if (array_key_exists($this->twineId, $this->textnodeMapping) === true) {
+            throw new Exception("There is a '".$name."' in the Twine archive file '".$this->importfile->getFilename()."' which has a non unique 'id' tag [".$this->twineId."], in node '".$attrs['name']."'");
         }
-
-        $twineId = $this->getTwineId($attrs['tags'], $attrs['name']);
 
         $this->twineTextnodeName = $attrs['name'];
 
-        $this->textnode = $this->textnodeRepository->findByTwineId($this->importfile->getId(), $twineId);
+        $this->textnode = $this->textnodeRepository->findByTwineId($this->importfile, $this->twineId);
         if (is_null($this->textnode)) {
             $this->textnode = new Textnode();
             $this->textnode->setCreated(date('Y-m-d H:i:s'));
@@ -354,6 +347,13 @@ class ImportTwine
             $this->textnode->setLicenseeId($this->importfile->getLicenseeId());
             $this->textnode->setImportfileId($this->importfile->getId());
             $this->textnode->setStatus(Textnode::STATUS_ACTIVE);
+            $this->textnode->setTwineId($this->twineId);
+        } else {
+            $this->textnode->setText('');
+            $hitchesCount = $this->textnode->getHitchCount();
+            for($i = 0; $i < $hitchesCount; $i++) {
+                $this->textnode->removeHitch($i);
+            }
         }
 
         $this->textnode->setMetadata(
@@ -396,8 +396,9 @@ class ImportTwine
 
     private function endElementStoryData($name)
     {
-        foreach ($this->textnodeMapping as $twineName => $dembeloId) {
+        foreach ($this->textnodeMapping as $twineId => $dembeloId) {
             $textnode = $this->textnodeRepository->find($dembeloId);
+            $twineName = array_search($dembeloId, $this->nodeNameMapping);
 
             if (is_null($textnode) === true) {
                 throw new Exception("The Dembelo Textnode with Id '".$dembeloId."' doesn't exist, but should by now.");
@@ -429,13 +430,10 @@ class ImportTwine
                             throw new Exception("The Twine archive file '".$this->importfile->getFilename()."' contains a '".$name."' with the invalid element '[[".$content[0]."-->".$content[1]."]]'.");
                         }
 
-                        $externalTextnode = $this->textnodeRepository->createQueryBuilder()
-                        //    ->field('id')->equals(new \MongoId($content[1]))
-                        //    ->getQuery()->getSingleResult();
-                            ->find($content[1]);
+                        $externalTextnode = $this->textnodeRepository->find($content[1]);
 
                         if (is_null($externalTextnode)) {
-                            throw new Exception("There is a textnode named '".$twineName."' in the Twine archive file '".$this->importfile->getFilename()."' which references the external Dembelo Textnode '".$content[1]."', but a Dembelo Textnode with such an Id doesn't exist.");
+                            throw new Exception("There is a textnode named '".$twineName."' which references the external Dembelo Textnode '".$content[1]."', but a Dembelo Textnode with such an Id doesn't exist.");
                         }
 
                         $hitch = array();
@@ -446,16 +444,16 @@ class ImportTwine
                         $content = explode("->", $content, 2);
 
                         if (strlen($content[0]) <= 0 || strlen($content[1]) <= 0) {
-                            throw new Exception("The Twine archive file '".$this->importfile->getFilename()."' contains a '".$name."' with the invalid element '[[".$content[0]."->".$content[1]."]]'.");
+                            throw new Exception("The Twine archive file contains a '".$name."' with the invalid element '[[".$content[0]."->".$content[1]."]]'.");
                         }
 
-                        if (array_key_exists($content[1], $this->textnodeMapping) !== true) {
-                            throw new Exception("There is a textnode in the Twine archive file '".$this->importfile->getFilename()."' which references another textnode named '".$content[1]."', but this textnode doesn't exist within the same story.");
+                        if (array_key_exists($content[1], $this->nodeNameMapping) !== true) {
+                            throw new Exception("There is a textnode which references another textnode named '".$content[1]."', but this textnode doesn't exist within the same story.");
                         }
 
                         $hitch = array();
                         $hitch['description'] = $content[0];
-                        $hitch['textnodeId'] = $this->textnodeMapping[$content[1]];
+                        $hitch['textnodeId'] = $this->nodeNameMapping[$content[1]];
                         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
                     } elseif (strpos($content, "<-") !== false) {
                         $content = explode("<-", $content, 2);
@@ -465,7 +463,7 @@ class ImportTwine
                         }
 
                         if (array_key_exists($content[0], $this->textnodeMapping) !== true) {
-                            throw new Exception("There is a textnode in the Twine archive file '".$this->importfile->getFilename()."' which references another textnode named '".$content[0]."', but this textnode doesn't exist within the same story.");
+                            throw new Exception("There is a textnode in the Twine archive file which references another textnode named '".$content[0]."', but this textnode doesn't exist within the same story.");
                         }
 
                         $hitch = array();
@@ -476,7 +474,7 @@ class ImportTwine
                         $content = explode(">:<", $content, 2);
 
                         if (strlen($content[0]) <= 0 || strlen($content[1]) <= 0) {
-                            throw new Exception("The Twine archive file '".$this->importfile->getFilename()."' contains a '".$name."' with the invalid element '[[".$content[0].">:<".$content[1]."]]'.");
+                            throw new Exception("The Twine archive file contains a '".$name."' with the invalid element '[[".$content[0].">:<".$content[1]."]]'.");
                         }
 
                         $metadata = $textnode->getMetadata();
@@ -486,32 +484,32 @@ class ImportTwine
                         }
 
                         if (array_key_exists($content[0], $metadata) === true) {
-                            throw new Exception("There is a textnode in the Twine archive file '".$this->importfile->getFilename()."' which contains the metadata field '".$content[0]."' twice or would overwrite the already existing value of that field.");
+                            throw new Exception("There is a textnode in the Twine archive file which contains the metadata field '".$content[0]."' twice or would overwrite the already existing value of that field.");
                         }
 
                         $metadata[$content[0]] = $content[1];
                     } else {
                         if (strlen($content) <= 0) {
-                            throw new Exception("The Twine archive file '".$this->importfile->getFilename()."' contains a '".$name."' with the invalid element '[[".$content."]]'.");
+                            throw new Exception("The Twine archive file contains a '".$name."' with the invalid element '[[".$content."]]'.");
                         }
 
-                        if (array_key_exists($content, $this->textnodeMapping) !== true) {
-                            throw new Exception("There is a textnode in the Twine archive file '".$this->importfile->getFilename()."' which references another textnode named '".$content."', but this textnode doesn't exist within the same story.");
+                        if (array_key_exists($content, $this->nodeNameMapping) !== true) {
+                            throw new Exception("There is a textnode in the Twine archive file which references another textnode named '".$content."', but this textnode doesn't exist within the same story.");
                         }
 
                         $hitch = array();
                         $hitch['description'] = $content;
-                        $hitch['textnodeId'] = $this->textnodeMapping[$content];
+                        $hitch['textnodeId'] = $this->nodeNameMapping[$content];
                         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
                     }
 
                     if ($hitch !== null) {
                         if ($textnode->getHitchCount() >= Textnode::HITCHES_MAXIMUM_COUNT) {
-                            throw new Exception("There is a textnode named '".$twineName."' in the Twine archive file '".$this->importfile->getFilename()."' which has more than ".Textnode::HITCHES_MAXIMUM_COUNT." links.");
+                            throw new Exception("There is a textnode named '".$twineName."' in the Twine archive file which has more than ".Textnode::HITCHES_MAXIMUM_COUNT." links.");
                         }
 
                         if ($textnode->appendHitch($hitch) !== true) {
-                            throw new Exception("Failed to append hitch for the textnode named '".$twineName."' from the Twine archive file '".$this->importfile->getFilename()."'.");
+                            throw new Exception("Failed to append hitch for the textnode named '".$twineName."' from the Twine archive file.");
                         }
                     }
 
@@ -556,7 +554,7 @@ class ImportTwine
             $textnode->setText($textnodeTextNew);
         }
 
-        /** @todo Check if there are textnodes which can't be reached. */
+        $this->textnodeRepository->disableOrphanedNodes(array_values($this->textnodeMapping));
 
         $this->twineRelevant = false;
         $this->twineStartnodeId = -1;
@@ -568,7 +566,8 @@ class ImportTwine
     {
         $this->textnodeRepository->save($this->textnode);
 
-        $this->textnodeMapping[$this->twineTextnodeName] = $this->textnode->getId();
+        $this->textnodeMapping[$this->twineId] = $this->textnode->getId();
+        $this->nodeNameMapping[$this->twineTextnodeName] = $this->textnode->getId();
         $this->twineTextnodeName = null;
 
         $this->twineText = false;
