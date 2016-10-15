@@ -221,13 +221,13 @@ dembeloAdmin = (function () {
                 if (params['error'] === false) {
                     webix.modalbox({
                         title: "Aktivierungsmail versandt",
-                        buttons: ["Ok"],
+                        buttons: ["OK"],
                         text: "Die Email zur Aktivierung wurde erfolgreich versandt."
                     });
                 } else {
                     webix.modalbox({
                         title: "Fehler",
-                        buttons: ["Ok"],
+                        buttons: ["OK"],
                         text: "Der Mailversand ist leider fehlgeschlagen..."
                     });
                 }
@@ -237,19 +237,32 @@ dembeloAdmin = (function () {
         import: function () {
             var importfileId = $$('importfilegrid').getSelectedId().id;
 
-            webix.ajax().post(paths.adminImport, {importfileId: importfileId}, function (text) {
-                var params = JSON.parse(text);
-                if (params['success'] === true && params['returnValue'] === true) {
-                    webix.modalbox({
-                        title: "Datei importiert",
-                        buttons: ["Ok"],
-                        text: "Die Datei wurde erfolgreich importiert."
-                    });
-                } else {
+            webix.ajax().post(paths.adminImport, {importfileId: importfileId}, {
+                success: function (text) {
+                    var params = JSON.parse(text);
+                    if (params['success'] === true && params['returnValue'] === true) {
+                        webix.modalbox({
+                            title: "Datei importiert",
+                            buttons: ["OK"],
+                            text: "Die Datei wurde erfolgreich importiert."
+                        });
+                    } else {
+                        webix.modalbox({
+                            title: "Fehler",
+                            buttons: ["OK"],
+                            text: "Fehler: " + params['message']
+                        });
+                    }
+                },
+                error: function (dom, obj, ajaxObj) {
+                    var message = 'Unbekannter Fehler';
+                    if (ajaxObj instanceof XMLHttpRequest) {
+                        message = ajaxObj.statusText;
+                    }
                     webix.modalbox({
                         title: "Fehler",
-                        buttons: ["Ok"],
-                        text: "Fehler: " + params['message']
+                        buttons: ["OK"],
+                        text: "Fehler: " + message
                     });
                 }
             });
