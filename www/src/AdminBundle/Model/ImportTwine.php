@@ -554,7 +554,7 @@ class ImportTwine
             $textnode->setText($textnodeTextNew);
         }
 
-        $this->textnodeRepository->disableOrphanedNodes(array_values($this->textnodeMapping));
+        $this->textnodeRepository->disableOrphanedNodes($this->importfile, array_values($this->textnodeMapping));
 
         $this->twineRelevant = false;
         $this->twineStartnodeId = -1;

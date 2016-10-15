@@ -48,7 +48,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
      * @param string     $twineId
      * @return Textnode
      */
-    public function findByTwineId($importfile, $twineId)
+    public function findByTwineId(Importfile $importfile, $twineId)
     {
         $textnodes = $this->findBy(
             array(
@@ -66,15 +66,17 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
 
     /**
      * sets textnodes to status=inactive that are not in $existingTextnodeIds
-     * @param array $existingTextnodeIds array of textnodeIds
+     * @param Importfile $importfile
+     * @param array      $existingTextnodeIds array of textnodeIds
      */
-    public function disableOrphanedNodes(array $existingTextnodeIds)
+    public function disableOrphanedNodes(Importfile $importfile, array $existingTextnodeIds)
     {
         $this->getDocumentManager()->createQueryBuilder(Textnode::class)
             ->update()
-            ->field('id')->notIn($existingTextnodeIds)
-            ->field('status')->set(Textnode::STATUS_INACTIVE)
             ->multiple(true)
+            ->field('status')->set(Textnode::STATUS_INACTIVE)
+            ->field('importfileId')->equals(new \MongoId($importfile->getId()))
+            ->field('id')->notIn($existingTextnodeIds)
             ->getQuery()
             ->execute();
     }

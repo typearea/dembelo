@@ -20,6 +20,7 @@
 
 namespace DembeloMain\Model\Repository;
 
+use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
 
 /**
@@ -57,16 +58,17 @@ interface TextNodeRepositoryInterface
 
     /**
      * finds a textnode by twineId
-     * @param string $importfileId
-     * @param string $twineId
+     * @param Importfile $importfile
+     * @param string     $twineId
      * @return Textnode
      */
-    public function findByTwineId($importfileId, $twineId);
+    public function findByTwineId(Importfile $importfile, $twineId);
 
     /**
      * disables textnodes that were not found in importfile
-     * @param array $existingTextnodeIds
+     * @param Importfile $importfile
+     * @param array      $existingTextnodeIds
      * @return void
      */
-    public function disableOrphanedNodes(array $existingTextnodeIds);
+    public function disableOrphanedNodes(Importfile $importfile, array $existingTextnodeIds);
 }

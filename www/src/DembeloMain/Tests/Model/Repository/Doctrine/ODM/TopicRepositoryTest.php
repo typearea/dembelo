@@ -30,24 +30,58 @@ use Doctrine\MongoDB\ArrayIterator;
  */
 class TopicRepositoryTest extends AbstractRepositoryTest
 {
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    private $em;
+
+    /**
+     * @var TopicRepository
+     */
+    private $repository;
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function setUp()
+    {
+        self::bootKernel();
+
+        $this->em = static::$kernel->getContainer()
+            ->get('doctrine_mongodb')
+            ->getManager();
+
+        $collection = $this->em->getDocumentCollection(Topic::class);
+        $collection->remove(array());
+
+        $this->repository = $this->em->getRepository('DembeloMain:Topic');
+    }
 
     /**
      * Test find topics with status active
      */
-    public function testFindByStatusActive()
+    public function testFindByStatusActiveWithoutTopics()
     {
-        $dm = $this->getDocumentManagerMock();
-        $class = $this->getClassMock();
-        $uow = $this->getUnitOfWorkMock();
-        $documentPersister = $this->getDocumentPersisterMock();
+        $foundTopics = $this->repository->findByStatusActive();
+        $this->assertEquals([], $foundTopics);
+    }
 
-        $collection = new ArrayIterator(array(new Topic()));
-        $documentPersister->expects($this->once())->method('loadAll')->willReturn($collection);
-        $uow->expects($this->once())->method('getDocumentPersister')->willReturn($documentPersister);
+    /**
+     * Test find topics with status active
+     */
+    public function testFindByStatusActiveWithTopics()
+    {
+        $topic1 = new Topic();
+        $topic1->setName('topic1');
+        $topic1->setStatus(Topic::STATUS_ACTIVE);
+        $this->repository->save($topic1);
 
-        $repository = new TopicRepository($dm, $uow, $class);
-        $topics = $repository->findByStatusActive();
+        $topic2 = new Topic();
+        $topic2->setName('topic2');
+        $topic2->setStatus(Topic::STATUS_INACTIVE);
+        $this->repository->save($topic1);
 
-        $this->assertInstanceOf(Topic::class, $topics[0]);
+        $foundTopics = $this->repository->findByStatusActive();
+        $this->assertEquals(1, count($foundTopics));
     }
 }

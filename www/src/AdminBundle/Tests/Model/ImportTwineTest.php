@@ -617,7 +617,7 @@ class ImportTwineTest extends WebTestCase
 
         $textnodeRepository->expects($this->once())
             ->method('disableOrphanedNodes')
-            ->with([$textnode->getId()]);
+            ->with($importfile, [$textnode->getId()]);
 
         $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
         $importTwine->run($importfile);
