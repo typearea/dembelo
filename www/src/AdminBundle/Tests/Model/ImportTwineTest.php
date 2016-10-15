@@ -458,7 +458,6 @@ class ImportTwineTest extends WebTestCase
 
         $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
         $importTwine->run($importfile);
-
     }
 
     /**
@@ -497,9 +496,12 @@ class ImportTwineTest extends WebTestCase
 
         $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
         $importTwine->run($importfile);
-
     }
 
+    /**
+     * tests identifying a textnode by a twine ID
+     * @throws \Exception
+     */
     public function testRunWithTextnodeWithTwineID()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
@@ -533,9 +535,12 @@ class ImportTwineTest extends WebTestCase
 
         $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
         $importTwine->run($importfile);
-
     }
 
+    /**
+     * tests the freeing of xml parser
+     * @throws \Exception
+     */
     public function testParserFree()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
@@ -573,6 +578,10 @@ class ImportTwineTest extends WebTestCase
         $this->assertTrue(self::$parserFreeCalled);
     }
 
+    /**
+     * tests disabling of a textnode that is no longer found in import file
+     * @throws \Exception
+     */
     public function testRunWithTextnodeDeletedInImportfile()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
@@ -695,6 +704,10 @@ class ImportTwineTest extends WebTestCase
         $importTwine->run($importfile);
     }
 
+    /**
+     * tests a hitch to another textnode
+     * @throws \Exception
+     */
     public function testRunWithLinkToAnotherTextnode()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();

@@ -45,7 +45,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
     /**
      * finds a textnode by importfileId and twineId
      * @param Importfile $importfile
-     * @param string $twineId
+     * @param string     $twineId
      * @return Textnode
      */
     public function findByTwineId($importfile, $twineId)
@@ -66,7 +66,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
 
     /**
      * sets textnodes to status=inactive that are not in $existingTextnodeIds
-     * @param array $existingTextnodes array of textnodeIds
+     * @param array $existingTextnodeIds array of textnodeIds
      */
     public function disableOrphanedNodes(array $existingTextnodeIds)
     {

@@ -298,7 +298,7 @@ class ImportTwine
     private function getTwineId($tagString, $textnodeTitle)
     {
         if (empty($tagString) || !is_string($tagString)) {
-            throw new Exception('no ID given for Textnode "' . $textnodeTitle . '"');
+            throw new Exception('no ID given for Textnode "'.$textnodeTitle.'"');
         }
         $tagArray = explode(" ", $tagString);
 
@@ -311,7 +311,7 @@ class ImportTwine
         }
 
         if ($twineId === false) {
-            throw new Exception('no ID given for Textnode "' . $textnodeTitle . '"');
+            throw new Exception('no ID given for Textnode "'.$textnodeTitle.'"');
         }
 
         return $twineId;
@@ -351,7 +351,7 @@ class ImportTwine
         } else {
             $this->textnode->setText('');
             $hitchesCount = $this->textnode->getHitchCount();
-            for($i = 0; $i < $hitchesCount; $i++) {
+            for ($i = 0; $i < $hitchesCount; $i++) {
                 $this->textnode->removeHitch($i);
             }
         }
