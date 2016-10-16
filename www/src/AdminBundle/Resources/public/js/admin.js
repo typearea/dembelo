@@ -66,6 +66,8 @@ dembeloAdmin = (function () {
             });
 
             $$("mainnav").select(1);
+            $$('usergrid').load(paths.adminUsers);
+            $$('userstuff').show();
 
             $$('userform').bind($$('usergrid'));
             $$('userformrole').attachEvent('onChange', function (newValue) {
