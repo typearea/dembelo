@@ -13,6 +13,7 @@ script:
 - ./www/bin/phpcs --standard=symfony2 www/src
 - ls -l www/vendor/symfony/symfony/src/Symfony/Bundle/FrameworkBundle/Test/WebTestCase.php
 - ./www/bin/phpunit -c www/app/
+- php ./scripts/coverage-checker.php www/app/logs/clover.xml 24
 install:
 - if [[ $MONGOEXTENSION == "mongo.so" ]]; then composer --working-dir="www" remove alcaeus/mongo-php-adapter mongodb/mongodb; fi
 - composer --working-dir="www" install
