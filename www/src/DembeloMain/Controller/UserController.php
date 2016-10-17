@@ -55,8 +55,8 @@ class UserController extends Controller
         $form = $this->createFormBuilder($user)
             ->setAction($this->generateUrl('login_check'))
             ->add('_username', FormType\EmailType::class, array('label' => 'Email'))
-            ->add('password', FormType\PasswordType::class, array('label' => 'Passwort'))
-            ->add('save', FormType\SubmitType::class, array('label' => 'Einloggen', 'attr' => array('class' => 'btn btn-primary')))
+            ->add('password', FormType\PasswordType::class, array('label' => 'Password'))
+            ->add('save', FormType\SubmitType::class, array('label' => 'Login', 'attr' => array('class' => 'btn btn-primary')))
             ->getForm();
 
 
@@ -92,15 +92,15 @@ class UserController extends Controller
         $user->setStatus(0);
         $form = $this->createFormBuilder($user)
             ->add('email', FormType\EmailType::class)
-            ->add('password', FormType\PasswordType::class, array('label' => 'Passwort'))
+            ->add('password', FormType\PasswordType::class, array('label' => 'Password'))
             ->add('gender', FormType\ChoiceType::class, array(
-                'choices'  => array('m' => 'männlich', 'f' => 'weiblich'),
-                'label' => 'Geschlecht',
+                'choices'  => array('male' => 'm', 'female' => 'f'),
+                'label' => 'Gender',
                 'required' => false,
             ))
-            ->add('source', FormType\TextType::class, array('label' => 'Wo hast du von Dembelo erfahren?', 'required' => false))
-            ->add('reason', FormType\TextareaType::class, array('label' => 'Wieso möchtest du an der geschlossenen Beta teilnehmen?', 'required' => false))
-            ->add('save', FormType\SubmitType::class, array('label' => 'Registrierung anfordern'))
+            ->add('source', FormType\TextType::class, array('label' => 'Where have you first heard of Dembelo?', 'required' => false))
+            ->add('reason', FormType\TextareaType::class, array('label' => 'Why to you want to participate in our Closed Beta?', 'required' => false))
+            ->add('save', FormType\SubmitType::class, array('label' => 'Request registration'))
             ->getForm();
 
         $form->handleRequest($request);
