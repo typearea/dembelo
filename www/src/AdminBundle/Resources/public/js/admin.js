@@ -23,15 +23,19 @@ dembeloAdmin = (function () {
         init: function () {
             $$("mainnav").attachEvent("onAfterSelect", function (id){
                 if (id == 1) {
+                    $$('usergrid').clearAll();
                     $$('usergrid').load(paths.adminUsers);
                     $$('userstuff').show();
                 } else if (id == 2) {
+                    $$('licenseegrid').clearAll();
                     $$('licenseegrid').load(paths.adminLicensees);
                     $$('licenseestuff').show();
                 } else if (id == 3) {
+                    $$('topicgrid').clearAll();
                     $$('topicgrid').load(paths.adminTopics);
                     $$('topicgrid').show();
                 } else if (id == 4) {
+                    $$('storygrid').clearAll();
                     $$('storygrid').load(paths.adminStories);
                     $$('storygrid').show();
                 }
