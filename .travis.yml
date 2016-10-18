@@ -3,8 +3,8 @@ php:
 - 5.6
 - 7
 before_install:
-- export DEMBELO_VERSION="v1.3"
-- export RELEASE_FILENAME="dembelo_$DEMBELO_VERSION.$TRAVIS_BUILD_NUMBER.zip"
+- export DEMBELO_VERSION="v1.3.$TRAVIS_BUILD_NUMBER"
+- export RELEASE_FILENAME="dembelo_$DEMBELO_VERSION.zip"
 - export MONGOEXTENSION="mongodb.so"
 - if [[ ${TRAVIS_PHP_VERSION:0:1} == "5" ]]; then export MONGOEXTENSION="mongo.so";
   fi
@@ -15,13 +15,13 @@ script:
 - "./www/bin/phpcs --config-set installed_paths www/vendor/escapestudios/symfony2-coding-standard"
 - "./www/bin/phpcs --standard=symfony2 www/src"
 - "./www/bin/phpunit -c www/app/"
-# - if [[ $TRAVIS_EVENT_TYPE == "cron" ]]; then ./scripts/buildRelease.sh; fi
-- ./scripts/buildRelease.sh
 install:
 - if [[ $MONGOEXTENSION == "mongo.so" ]]; then composer --working-dir="www" remove
   alcaeus/mongo-php-adapter mongodb/mongodb; fi
 - composer --working-dir="www" install
 - phpenv rehash
+before_deploy:
+- ./scripts/buildRelease.sh
 deploy:
   provider: releases
   api_key:
@@ -33,4 +33,4 @@ deploy:
     repo: typearea/dembelo
     #condition: $TRAVIS_EVENT_TYPE == "cron" AND ${TRAVIS_PHP_VERSION:0:1} == "5"
     condition: ${TRAVIS_PHP_VERSION:0:1} == "5"
-    tags: true
+    tags: false
