@@ -9,6 +9,8 @@ before_install:
 - if [[ ${TRAVIS_PHP_VERSION:0:1} == "5" ]]; then export MONGOEXTENSION="mongo.so";
   fi
 - echo "extension =" $MONGOEXTENSION >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+- openssl aes-256-cbc -K $encrypted_39a904e418a2_key -iv $encrypted_39a904e418a2_iv -in files/travisci.enc -out ./files/travisci -d
+- ssh-add files/travisci
 services:
 - mongodb
 script:
