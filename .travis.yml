@@ -27,6 +27,7 @@ deploy:
   api_key:
     secure: P/NZ51kBicZ2+YjG1uVVbXQQ9mzcRlkKfq5sgr5CWXA75Hwtg4Crau4FsG8ERPNMiFCIJ85WmP5KVsNMT5lYFVMaWgWCl/DdUZf8Us+OtGnjE1zQdcbAVGI290rK2OLD9cvclpJbbkksHIekLdNhmYdIHVZUlO1zsBjeDIG14phnqOJqI7kSRrvAzsV9g3x7JEichVy4wMmFCtpN1rMVMDjFt8WaVwK+yr1xqmHiG/TvdveD85AjIoLLMu6q5Ad/mkHKBLE2GE6slaoRqtAbpMMqCZqLV17ycKQedEbwuiMAVURnZ55YmU+yItONY35ye0u1TDn1qyPN5QF2lHRI6YN/qEy+w8gfMihHnnhqk9e+Yrj3YOQr1Hbdw6jFU+ES11ue4cdmvU4nHCNGY+SV319mY1d2AyWk+D6B38ZWJojGcJ8rnLtZ6klaM/KpXBmsSMea5R2zshAudSmmGRFfKAAqfoe8gOSZyQDh0k/R+qUK3Cnd8LpuyJeFfIYU1NgIzWbIZKa+2lo0YO9RnkvdA7BFwkuvfAqWxGpyVIBUu8+w0Up/HDkj7RKBedH5ecbeSUG1LIMRdS/A1/Q3kXrJIR8syPzIl1LUcHNaNBshIvJL/8JdrgX0xfKCAnH96dbndg0A8A97Oof7koPPQti3rxKIIQW8hjkqg0rROlXUFaw=
   file: release/$RELEASE_FILENAME
+  skip_cleanup: true
   on:
     branch: feature/233-weekly-build
     repo: typearea/dembelo
