@@ -10,6 +10,8 @@ before_install:
   fi
 - echo "extension =" $MONGOEXTENSION >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 - openssl aes-256-cbc -K $encrypted_39a904e418a2_key -iv $encrypted_39a904e418a2_iv -in files/travisci.enc -out ./files/travisci -d
+- chmod 600 files/travisci
+- eval `ssh-agent -s`
 - ssh-add files/travisci
 services:
 - mongodb
