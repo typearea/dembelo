@@ -33,8 +33,6 @@ deploy:
   file: release/$RELEASE_FILENAME
   skip_cleanup: true
   on:
-    branch: feature/233-weekly-build
     repo: typearea/dembelo
-    #condition: $TRAVIS_EVENT_TYPE == "cron" AND ${TRAVIS_PHP_VERSION:0:1} == "5"
-    condition: ${TRAVIS_PHP_VERSION:0:1} == "5"
+    condition: $TRAVIS_EVENT_TYPE == "cron" AND ${TRAVIS_PHP_VERSION:0:1} == "5"
     tags: false

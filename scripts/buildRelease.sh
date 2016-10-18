@@ -5,7 +5,7 @@ git config user.name "Travis CI"
 git config user.email "travisci@waszulesen.de"
 git add files/version
 git commit -m "Set build version number" files/version
-git tag $DEMBELO_VERSION -a -m "Generated tag from TravisCI build $TRAVIS_BUILD_NUMBER"
+git tag $DEMBELO_VERSION -a -m "Tag from weekly TravisCI build $TRAVIS_BUILD_NUMBER"
 git push --quiet git@github.com:typearea/dembelo.git $DEMBELO_VERSION
 git checkout-index -a -f --prefix release/
 cd release
