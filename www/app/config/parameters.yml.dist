@@ -20,3 +20,5 @@ parameters:
 
     piwik_host: ~
     piwik_id:   ~
+
+    locale: de

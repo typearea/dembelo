@@ -24,12 +24,49 @@ webix.i18n.locales["de-DE"] = {
 		dayShort:["So","Mo","Di","Mi","Do","Fr","Sa"],
 		hours: "Stunden",
 		minutes: "Minuten",
-		done:"Bereit",
-		clear: "Klären",
+		done:"Fertig",
+		clear: "Entfernen",
 		today: "Heute"
     },
 
     controls:{
-    	select:"Wählen"
+    	select:"Wählen",
+    	invalidMessage:"Irreguläre Eingabewert"
+    },
+    dataExport:{
+		page:"Seite",
+		of:"aus"
+    },
+    PDFviewer:{
+		of:"aus",
+		automaticZoom:"Automatisch Zoom",
+		actualSize:"Aktuelles Ausmaß",
+		pageFit:"Seite Ausmaß",
+		pageWidth:"Seite Breite",
+		pageHeight:"Seite Höhe"
+    },
+    aria:{
+		increaseValue:"Wert erhöhen",
+		decreaseValue:"Wert verringern",
+		navMonth:["Vorheriger Monat", "Nächsten Monat"],
+		navYear:["Vorheriges Jahr", "Nächstes Jahr"],
+		navDecade:["Zurück Jahrzehnt", "Als nächstes Jahrzehnt"],
+		removeItem:"Element entfernen",
+		pages:["Erste Seite", "Vorherige Seite", "Folgeseite", "Letzte Seite"],
+		page:"Seite",
+		headermenu:"Titelmenü",
+		openGroup:"Öffnen Spaltengruppe ",
+		closeGroup:"Schließen Spaltengruppe ",
+		closeTab:"Tab schließen",
+		showTabs:"Weitere Tabs",
+		resetTreeMap:"Zurück zur ursprünglichen Ansicht",
+		navTreeMap:"Aufleveln",
+		nextTab:"Weiter tab",
+		prevTab:"Zurück tab",
+		multitextSection:"Element hinzufügen",
+		multitextextraSection:"Element entfernen",
+		showChart:"Chart anzeigen",
+		hideChart:"Chart verstecken",
+		resizeChart:"Chart Größe ändern"
     }
 };
