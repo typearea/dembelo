@@ -19,7 +19,6 @@
         "sensio/distribution-bundle": "^5.0",
         "sensio/framework-extra-bundle": "^3.0.2",
         "sensio/generator-bundle": "^3.0",
-        "incenteev/composer-parameter-handler": "~2.0",
         "twbs/bootstrap-sass": "3.3.5",
         "twig/twig": "^1.22",
         "typearea/hyphenator": "dev-master",
@@ -39,7 +38,6 @@
           "SymfonyStandard\\Composer::hookRootPackageInstall"
         ],
         "symfony-scripts": [
-            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
@@ -63,9 +61,6 @@
         "symfony-var-dir": "var",
         "symfony-web-dir": "web",
         "symfony-assets-install": "relative",
-        "incenteev-parameters": {
-            "file": "app/config/parameters.yml"
-        },
         "branch-alias": {
             "dev-master": "3.1-dev"
         }
