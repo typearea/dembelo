@@ -341,7 +341,7 @@ class DefaultController extends Controller
 
         $message = \Swift_Message::newInstance()
             ->setSubject('Dembelo - Bestätigung der Email-Adresse')
-            ->setFrom('noreply@dembelo.de')
+            ->setFrom('system@waszulesen.de')
             ->setTo($user->getEmail())
             ->setBody(
                 $this->renderView(
