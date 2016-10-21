@@ -12,6 +12,7 @@ cd release
 export SYMFONY_ENV=prod
 composer --working-dir="www" remove alcaeus/mongo-php-adapter mongodb/mongodb
 composer --working-dir="www" install --no-dev --optimize-autoloader
+rm www/app/config/parameters.yml
 echo "zip release: $RELEASE_FILENAME"
 zip -rq $RELEASE_FILENAME ./
 ls -l $RELEASE_FILENAME
