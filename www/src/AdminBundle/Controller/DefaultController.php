@@ -228,6 +228,9 @@ class DefaultController extends Controller
         if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'story'))) {
             return new Response(\json_encode(array('error' => true)));
         }
+        if (!isset($params['id'])) {
+            return new Response(\json_encode(array('error' => true)));
+        }
         $formtype = ucfirst($params['formtype']);
 
         /* @var $mongo \Doctrine\Bundle\MongoDBBundle\ManagerRegistry */
@@ -237,7 +240,7 @@ class DefaultController extends Controller
 
         /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
         $repository = $mongo->getRepository('DembeloMain:'.$formtype);
-        if (isset($params['id']) && $params['id'] == 'new') {
+        if ($params['id'] == 'new') {
             $className = $repository->getClassName();
             $item = new $className();
         } else {

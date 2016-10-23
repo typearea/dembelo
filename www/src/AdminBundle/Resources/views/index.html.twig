@@ -68,6 +68,7 @@
                                                                 view: "form",
                                                                 id: "userform",
                                                                 gravity: 0.5,
+                                                                disabled: true,
                                                                 elements: [
                                                                     {view: "text", name: "email", label: "Email", validate:webix.rules.isEmail},
                                                                     {cols: [
@@ -113,6 +114,7 @@
                                                     view: "form",
                                                     id: "licenseeform",
                                                     gravity: 0.5,
+                                                    disabled: true,
                                                     elements: [
                                                         {view: "text", name: "name", label: "Name", validate:webix.rules.isNotEmpty},
                                                         {view: "button", value:"Speichern", click:"dembeloAdmin.formsave('licensee')" }

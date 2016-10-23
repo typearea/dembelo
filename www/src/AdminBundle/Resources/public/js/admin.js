@@ -19,6 +19,16 @@
 /*global paths*/
 dembeloAdmin = (function () {
 
+    function checkFormBindStatus() {
+        var values = this.getValues();
+
+        if (values.hasOwnProperty('id')) {
+            this.enable();
+        }  else {
+            this.disable();
+        }
+    }
+
     return {
         init: function () {
             $$("mainnav").attachEvent("onAfterSelect", function (id){
@@ -44,6 +54,7 @@ dembeloAdmin = (function () {
             $$("mainnav").select(1);
 
             $$('userform').bind($$('usergrid'));
+            $$('userform').attachEvent('onValues', checkFormBindStatus);
             $$('userformrole').attachEvent('onChange', function (newValue) {
                 if (newValue == 'ROLE_LICENSEE') {
                     $$('userformlicensee').enable()
@@ -61,6 +72,7 @@ dembeloAdmin = (function () {
             });
 
             $$('licenseeform').bind($$('licenseegrid'));
+            $$('licenseeform').attachEvent('onValues', checkFormBindStatus);
         },
         formsave: function (type) {
             var id = type + "form",

@@ -308,6 +308,34 @@ class DefaultControllerTest extends WebTestCase
     }
 
     /**
+     * tests the formsaveAction with missing id parameter
+     */
+    public function testFormsaveActionWithMissingIdParameter()
+    {
+        $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
+        $postMock = $this->getMockBuilder("Symfony\Component\HttpFoundation\ParameterBag")->disableOriginalConstructor()->getMock();
+        $postArray = array(
+            'formtype' => 'licensee',
+            'name' => 'someLNName',
+        );
+        $postMock->expects($this->once())
+            ->method("all")
+            ->will($this->returnValue($postArray));
+        $request->request = $postMock;
+
+        $controller = new DefaultController();
+        $controller->setContainer($this->container);
+
+        /* @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $controller->formsaveAction($request);
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $json = $response->getContent();
+        $this->assertJson($json);
+        $json = json_decode($json);
+        $this->assertTrue($json->error);
+    }
+
+    /**
      * tests the formdelAction without admin permission
      */
     public function testFormdelActionWithoutAdminPermission()
