@@ -6,7 +6,9 @@
 
 body {
   font-family: 'Open Sans', sans-serif;
+  color: $font-color;
   padding-top: 56px;
+  background: $sepia;
 
   &.nav-active {
     header, main {

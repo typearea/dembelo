@@ -13,8 +13,8 @@ $prefix-for-spec: true !default;
 $is-fluid: true; // Change to true to enable the fluid grid
 $use-global-border-box: false; // Change to true the enable global border-box
 
-$link-color: #1EAEDB; // default link color
-$link-hover: #0FA0CE; // default link color on :hover
+$link-color: $red; // default link color
+$link-hover: $red; // default link color on :hover
 $link-decoration: underline; // default link decoration
 
 $base-width: if($is-fluid, 100%, ($base-col-width + $base-gutter-width) * $base-col-count);

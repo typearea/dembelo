@@ -1,3 +1,4 @@
+@import "variables";
 /**
 * Skeleton Styles
 */
@@ -8,7 +9,7 @@
 // import default theme variables
 @import "variables/skeleton";
 // theme base styles
-@import "../../../../../web/vendor/skeleton-sass/skeleton/themes/fresh/base";
+@import "skeleton/themes/dembelo";
 // theme grid styles
 @import "../../../../../web/vendor/skeleton-sass/skeleton/themes/fresh/skeleton";
 /**
