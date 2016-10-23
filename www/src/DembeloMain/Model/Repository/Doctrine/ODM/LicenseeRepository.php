@@ -20,6 +20,7 @@
 
 namespace DembeloMain\Model\Repository\Doctrine\ODM;
 
+use DembeloMain\Document\Licensee;
 use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
 
 /**
@@ -28,5 +29,12 @@ use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
  */
 class LicenseeRepository extends AbstractRepository implements LicenseeRepositoryInterface
 {
-
+    /**
+     * @param string $name
+     * @return Licensee
+     */
+    public function findOneByName($name)
+    {
+        return $this->__call(__FUNCTION__, func_get_args());
+    }
 }

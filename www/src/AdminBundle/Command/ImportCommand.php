@@ -25,6 +25,7 @@
 namespace AdminBundle\Command;
 
 use DembeloMain\Document\Importfile;
+use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -54,8 +55,8 @@ class ImportCommand extends ContainerAwareCommand
     private $dm = null;
 
     private $licenseeId = null;
-    private $author = "";
-    private $publisher = "";
+    private $author = '';
+    private $publisher = '';
 
     /**
      * configures the symfony cli command
@@ -141,7 +142,7 @@ class ImportCommand extends ContainerAwareCommand
         $this->dm = $this->mongo->getManager();
 
         /**
-         * @var $repositoryLicensee EntityRepository
+         * @var $repositoryLicensee LicenseeRepositoryInterface
          */
         $repositoryLicensee = $this->mongo->getRepository('DembeloMain:Licensee');
 

@@ -108,9 +108,9 @@ class ImportfileTest extends WebTestCase
      */
     public function testOrgname()
     {
-        $this->assertNull($this->importfile->getOrgname());
-        $this->importfile->setOrgname('someOrgname');
-        $this->assertEquals('someOrgname', $this->importfile->getOrgname());
+        $this->assertNull($this->importfile->getOriginalname());
+        $this->importfile->setOriginalname('someOrgname');
+        $this->assertEquals('someOrgname', $this->importfile->getOriginalname());
     }
 
     /**

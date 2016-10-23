@@ -385,15 +385,15 @@ class DefaultController extends Controller
         $output = array();
         /* @var $importfile \DembeloMain\Document\Importfile */
         foreach ($importfiles as $importfile) {
-            $obj = new StdClass();
-            $obj->id = $importfile->getId();
-            $obj->name = $importfile->getName();
-            $obj->author = $importfile->getAuthor();
-            $obj->publisher = $importfile->getPublisher();
-            $obj->imported = $importfile->getImported();
-            $obj->orgname = $importfile->getOrgname();
-            $obj->licenseeId = $importfile->getLicenseeId();
-            $output[] = $obj;
+            $importfileData = [];
+            $importfileData['id'] = $importfile->getId();
+            $importfileData['name'] = $importfile->getName();
+            $importfileData['author'] = $importfile->getAuthor();
+            $importfileData['publisher'] = $importfile->getPublisher();
+            $importfileData['imported'] = $importfile->getImported();
+            $importfileData['orgname'] = $importfile->getOriginalname();
+            $importfileData['licenseeId'] = $importfile->getLicenseeId();
+            $output[] = $importfileData;
         }
 
         return new Response(\json_encode($output));
@@ -524,7 +524,7 @@ class DefaultController extends Controller
         $file = $directory.$filename;
         rename($file, $finalName);
 
-        $item->setOrgname($orgname);
+        $item->setOriginalname($orgname);
         $item->setFilename($finalName);
     }
 

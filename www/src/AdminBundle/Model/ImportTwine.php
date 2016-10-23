@@ -258,7 +258,7 @@ class ImportTwine
         return true;
     }
 
-    private function startElementStoryData($name, $attrs)
+    private function startElementStoryData($name, array $attrs)
     {
         if ($this->twineRelevant === true) {
             throw new Exception("Nested '".$name."' found in Twine archive file '".$this->importfile->getFilename()."'.");

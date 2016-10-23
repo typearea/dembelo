@@ -35,7 +35,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
      * finds textnodes by importfileId
      *
      * @param string $importfileId
-     * @return array
+     * @return Textnode[]
      */
     public function findByImportfileId($importfileId)
     {
@@ -50,18 +50,14 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
      */
     public function findByTwineId(Importfile $importfile, $twineId)
     {
-        $textnodes = $this->findBy(
+        $textnode = $this->findOneBy(
             array(
                 'importfileId' => new MongoId($importfile->getId()),
                 'twineId'      => $twineId,
             )
         );
 
-        if (!is_array($textnodes) || count($textnodes) === 0) {
-            return null;
-        }
-
-        return $textnodes[0];
+        return $textnode;
     }
 
     /**

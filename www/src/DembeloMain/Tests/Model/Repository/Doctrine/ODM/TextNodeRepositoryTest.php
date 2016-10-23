@@ -31,7 +31,7 @@ use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
 class TextNodeRepositoryTest extends AbstractRepositoryTest
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var \Doctrine\ODM\MongoDB\DocumentManager
      */
     private $em;
 
@@ -67,7 +67,8 @@ class TextNodeRepositoryTest extends AbstractRepositoryTest
         $importfile = $this->createImportfile();
         $textnodes = $this->repository->findByImportfileId($importfile->getId());
 
-        $this->assertEquals([], $textnodes);
+        $this->assertInternalType('array', $textnodes);
+        $this->assertEmpty($textnodes);
     }
 
     /**
@@ -83,7 +84,7 @@ class TextNodeRepositoryTest extends AbstractRepositoryTest
 
         $textnodes = $this->repository->findByImportfileId($importfile->getId());
 
-        $this->assertEquals(1, count($textnodes));
+        $this->assertCount(1, $textnodes);
         $this->assertEquals($importfile->getId(), $textnodes[0]->getImportfileId());
     }
 
@@ -103,7 +104,7 @@ class TextNodeRepositoryTest extends AbstractRepositoryTest
 
         $textnodes = $this->repository->findByImportfileId($importfile->getId());
 
-        $this->assertEquals(1, count($textnodes));
+        $this->assertCount(1, $textnodes);
         $this->assertEquals($importfile->getId(), $textnodes[0]->getImportfileId());
         $this->assertEquals($textnode1->getId(), $textnodes[0]->getId());
     }
@@ -153,9 +154,9 @@ class TextNodeRepositoryTest extends AbstractRepositoryTest
         $textnode2->setTwineId('twineId2');
         $this->repository->save($textnode2);
 
-        $retVal = $this->repository->findByTwineId($importfile, 'twineId');
+        $returnedTextnode = $this->repository->findByTwineId($importfile, 'twineId');
 
-        $this->assertEquals($textnode1, $retVal);
+        $this->assertEquals($textnode1, $returnedTextnode);
     }
 
     /**
@@ -180,13 +181,13 @@ class TextNodeRepositoryTest extends AbstractRepositoryTest
 
         $cursor = $this->repository->createQueryBuilder()->find()->refresh()->getQuery()->execute();
 
-        $this->assertEquals(2, count($cursor));
+        $this->assertCount(2, $cursor);
 
-        foreach ($cursor as $c) {
-            if ($c->getId() === $textnode1->getId()) {
-                $this->assertEquals(Textnode::STATUS_ACTIVE, $c->getStatus());
-            } elseif ($c->getId() === $textnode2->getId()) {
-                $this->assertEquals(Textnode::STATUS_INACTIVE, $c->getStatus());
+        foreach ($cursor as $cursorItem) {
+            if ($cursorItem->getId() === $textnode1->getId()) {
+                $this->assertEquals(Textnode::STATUS_ACTIVE, $cursorItem->getStatus());
+            } elseif ($cursorItem->getId() === $textnode2->getId()) {
+                $this->assertEquals(Textnode::STATUS_INACTIVE, $cursorItem->getStatus());
             } else {
                 $this->assertFalse(true);
             }

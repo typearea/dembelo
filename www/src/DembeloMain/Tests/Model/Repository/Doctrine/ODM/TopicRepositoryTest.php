@@ -31,9 +31,9 @@ use Doctrine\MongoDB\ArrayIterator;
 class TopicRepositoryTest extends AbstractRepositoryTest
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var \Doctrine\ODM\MongoDB\DocumentManager
      */
-    private $em;
+    private $dm;
 
     /**
      * @var TopicRepository
@@ -47,14 +47,14 @@ class TopicRepositoryTest extends AbstractRepositoryTest
     {
         self::bootKernel();
 
-        $this->em = static::$kernel->getContainer()
+        $this->dm = static::$kernel->getContainer()
             ->get('doctrine_mongodb')
             ->getManager();
 
-        $collection = $this->em->getDocumentCollection(Topic::class);
+        $collection = $this->dm->getDocumentCollection(Topic::class);
         $collection->remove(array());
 
-        $this->repository = $this->em->getRepository('DembeloMain:Topic');
+        $this->repository = $this->dm->getRepository('DembeloMain:Topic');
     }
 
     /**
