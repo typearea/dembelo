@@ -16,9 +16,9 @@ var Toolbar = function () {
         }
 
         if (scrollTop > lastScroll && scrollTop > toolbarElement.offsetHeight) {
-            toolbarElement.classList.add('nav-up');
+            Toolbar.addNavUpClass();
         } else {
-            toolbarElement.classList.remove('nav-up');
+            Toolbar.removeNavUpClass();
         }
 
         lastScroll = scrollTop;
@@ -26,5 +26,18 @@ var Toolbar = function () {
 
     document.addEventListener('scroll', toggleToolbarOnScroll);
 
-    return {};
+    return {
+        /**
+         * Add css class "nav-up" to toolbar element
+         */
+        addNavUpClass: function () {
+            toolbarElement.classList.add('nav-up');
+        },
+        /**
+         * Remove css class "nav-up" to toolbar element
+         */
+        removeNavUpClass: function () {
+            toolbarElement.classList.remove('nav-up');
+        }
+    };
 }();

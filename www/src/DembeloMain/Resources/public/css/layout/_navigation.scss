@@ -1,6 +1,6 @@
 #navigation {
   position: fixed;
-  top: 0;
+  top: $toolbar-height;
   left: 0;
   z-index: 999;
   background-color: $nav-background;
