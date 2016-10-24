@@ -1,17 +1,22 @@
+@mixin cover_grid($cols) {
+  width: calc(100% / #{$cols});
+  float: left;
+
+  &:nth-of-type(#{$cols}n) {
+    margin-right: 0;
+  }
+
+  &:nth-last-child(-n+#{$cols}) {
+    margin-bottom: 0;
+  }
+}
+
 body#dashboard {
   .genres {
     .cover {
-      width: calc((100% - #{$base-gutter-width} * (#{$dashboard-cover-cols} - 1)) / #{$dashboard-cover-cols});
-      float: left;
-      margin-right: $base-gutter-width;
-      margin-bottom: $base-gutter-width;
-
-      &:nth-of-type(#{$dashboard-cover-cols}n) {
-        margin-right: 0;
-      }
-
-      &:nth-last-child(-n+#{$dashboard-cover-cols}) {
-        margin-bottom: 0;
+      @include cover_grid($dashboard-cover-cols);
+      @media (min-width: 550px) {
+        @include cover_grid($dashboard-cover-cols-desktop);
       }
 
       a {
