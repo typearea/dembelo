@@ -340,8 +340,8 @@ class DefaultController extends Controller
         $dm->flush();
 
         $message = \Swift_Message::newInstance()
-            ->setSubject('Dembelo - Bestätigung der Email-Adresse')
-            ->setFrom('noreply@dembelo.de')
+            ->setSubject('waszulesen - Bestätigung der Email-Adresse')
+            ->setFrom('system@waszulesen.de')
             ->setTo($user->getEmail())
             ->setBody(
                 $this->renderView(

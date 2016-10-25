@@ -16,9 +16,10 @@ before_install:
 services:
 - mongodb
 script:
-- "./www/bin/phpcs --config-set installed_paths www/vendor/escapestudios/symfony2-coding-standard"
-- "./www/bin/phpcs --standard=symfony2 www/src"
-- "./www/bin/phpunit -c www/app/"
+- ./www/bin/phpcs --config-set installed_paths www/vendor/escapestudios/symfony2-coding-standard
+- ./www/bin/phpcs --standard=symfony2 www/src
+- ./www/bin/phpunit -c www/app/
+- php ./scripts/coverage-checker.php www/app/logs/clover.xml 24
 install:
 - if [[ $MONGOEXTENSION == "mongo.so" ]]; then composer --working-dir="www" remove
   alcaeus/mongo-php-adapter mongodb/mongodb; fi
