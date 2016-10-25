@@ -33,7 +33,7 @@ dembeloAdmin = (function () {
                 } else if (id == 3) {
                     $$('topicgrid').clearAll();
                     $$('topicgrid').load(paths.adminTopics);
-                    $$('topicgrid').show();
+                    $$('topicstuff').show();
                 } else if (id == 4) {
                     $$('storygrid').clearAll();
                     $$('storygrid').load(paths.adminStories);
@@ -41,7 +41,7 @@ dembeloAdmin = (function () {
                 }
             });
 
-            $$("mainnav").select(1);
+            $$("mainnav").select(3);
 
             $$('userform').bind($$('usergrid'));
             $$('userformrole').attachEvent('onChange', function (newValue) {
@@ -61,6 +61,8 @@ dembeloAdmin = (function () {
             });
 
             $$('licenseeform').bind($$('licenseegrid'));
+
+            $$("topicform").bind($$("topicgrid"));
         },
         formsave: function (type) {
             var id = type + "form",
@@ -127,6 +129,9 @@ dembeloAdmin = (function () {
                     break;
                 case 'licensee':
                     clickString = "$$('licenseegrid').add({id: 'new', name: ''})";
+                    break;
+                case 'topic':
+                    clickString = "$$('topicgrid').add({id: 'new', name: '', status: 0})";
                     break;
             }
 

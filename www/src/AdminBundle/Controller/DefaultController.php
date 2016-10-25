@@ -25,6 +25,8 @@
 
 namespace AdminBundle\Controller;
 
+use DembeloMain\Model\Repository\Doctrine\ODM\AbstractRepository;
+use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -172,18 +174,18 @@ class DefaultController extends Controller
      */
     public function topicsAction()
     {
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:Topic');
+        /* @var $repository TopicRepositoryInterface */
+        $repository = $this->get('app.model_repository_topic');
 
-        $users = $repository->findAll();
+        $topics = $repository->findAll();
 
         $output = array();
-        /* @var $user \DembeloMain\Document\Topic */
-        foreach ($users as $user) {
+        /* @var $topic \DembeloMain\Document\Topic */
+        foreach ($topics as $topic) {
             $obj = new StdClass();
-            $obj->id = $user->getId();
-            $obj->name = $user->getName();
+            $obj->id = $topic->getId();
+            $obj->name = $topic->getName();
+            $obj->status = (String)$topic->getStatus();
             $output[] = $obj;
         }
 
@@ -228,15 +230,11 @@ class DefaultController extends Controller
         if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'story'))) {
             return new Response(\json_encode(array('error' => true)));
         }
-        $formtype = ucfirst($params['formtype']);
+        $formtype = $params['formtype'];
 
-        /* @var $mongo \Doctrine\Bundle\MongoDBBundle\ManagerRegistry */
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $dm \Doctrine\ODM\MongoDB\DocumentManager*/
-        $dm = $mongo->getManager();
+        /* @var $repository AbstractRepository */
+        $repository = $this->get('app.model_repository_'.$formtype);
 
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:'.$formtype);
         if (isset($params['id']) && $params['id'] == 'new') {
             $className = $repository->getClassName();
             $item = new $className();
@@ -267,8 +265,7 @@ class DefaultController extends Controller
         if (method_exists($item, 'setMetadata')) {
             $item->setMetadata('updated', time());
         }
-        $dm->persist($item);
-        $dm->flush();
+        $repository->save($item);
 
         $output = array(
             'error' => false,

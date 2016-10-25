@@ -25,9 +25,13 @@
 
 namespace AdminBundle\Tests\Controller;
 
+use DembeloMain\Document\Topic;
 use DembeloMain\Document\User;
+use DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AdminBundle\Controller\DefaultController;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class DefaultControllerTest
@@ -463,6 +467,57 @@ class DefaultControllerTest extends WebTestCase
         $this->assertFalse($json->error);
     }
 
+    public function testTopicActionWithNoTopics()
+    {
+        $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findAll'])->getMock();
+        $repository->expects($this->once())
+            ->method('findAll')
+            ->willReturn([]);
+
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container->expects($this->once())
+            ->method('get')
+            ->with('app.model_repository_topic')
+            ->willReturn($repository);
+
+        $controller = new DefaultController();
+        $controller->setContainer($container);
+
+        /* @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $controller->topicsAction();
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $this->assertJsonStringEqualsJsonString('[]', $response->getContent());
+        $this->assertEquals('200', $response->getStatusCode());
+    }
+
+    public function testTopicActionWithOneTopic()
+    {
+        $topic = new Topic();
+        $topic->setName('someName');
+        $topic->setId('someId');
+        $topic->setStatus(1);
+
+        $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findAll'])->getMock();
+        $repository->expects($this->once())
+            ->method('findAll')
+            ->willReturn([$topic]);
+
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container->expects($this->once())
+            ->method('get')
+            ->with('app.model_repository_topic')
+            ->willReturn($repository);
+
+        $controller = new DefaultController();
+        $controller->setContainer($container);
+
+        /* @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $controller->topicsAction();
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $this->assertJsonStringEqualsJsonString('[{"id":"someId","name":"someName","status":1}]', $response->getContent());
+        $this->assertEquals('200', $response->getStatusCode());
+    }
+
     /**
      * load mockoed container and mocked mongodb repository
      */
@@ -496,4 +551,5 @@ class DefaultControllerTest extends WebTestCase
             ->with($this->equalTo('DembeloMain:User'))
             ->will($this->returnValue($this->repository));
     }
+
 }

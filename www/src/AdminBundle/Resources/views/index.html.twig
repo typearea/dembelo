@@ -121,11 +121,45 @@
                                             ]
                                         },
                                         {
-                                            id: "topicgrid",
-                                            view: "datatable",
-                                            autoConfig: true,
-                                            select: true,
-                                            datatype: "json"
+                                            id: "topicstuff",
+                                            cols: [
+                                                {
+                                                    rows: [
+                                                        dembeloAdmin.getToolbar('topic'),
+                                                        {
+                                                            id: "topicgrid",
+                                                            view: "datatable",
+                                                            autoConfig: true,
+                                                            select: true,
+                                                            datatype: "json",
+                                                            columns: [
+                                                                {id: 'name', header: ['Name', {content: 'serverFilter'}], fillspace: true},
+                                                                {id: 'status', header: ['Status', {content: 'serverSelectFilter'}], format: function (value) { if (value === '0') return 'inaktiv'; else return 'aktiv';}},
+
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {view: "resizer"},
+                                                {
+                                                    view: "scrollview",
+                                                    scroll: "y",
+                                                    body: {
+                                                        rows: [
+                                                            {
+                                                                view: "form",
+                                                                id: "topicform",
+                                                                gravity: 0.5,
+                                                                elements: [
+                                                                    {view: "text", name: "name", label: "Name", validate:webix.rules.isNotEmpty},
+                                                                    {view: "combo", id: "topicformstatus", name: "status", label: "Status", options: [{id:"0", value: "inaktiv"}, {id:"1", value: "aktiv"}], validate:webix.rules.isNotEmpty},
+                                                                    {view: "button", value:"Speichern", click:"dembeloAdmin.formsave('topic')" }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
                                         },
                                         {
                                             id: "storygrid",
