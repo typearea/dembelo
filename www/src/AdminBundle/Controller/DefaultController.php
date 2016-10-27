@@ -70,9 +70,7 @@ class DefaultController extends Controller
      */
     public function usersAction(Request $request)
     {
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:User');
+        $repository = $this->get('app.model_repository_user');
 
         $filters = $request->query->get('filter');
 
@@ -119,9 +117,7 @@ class DefaultController extends Controller
      */
     public function licenseesAction()
     {
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:Licensee');
+        $repository = $this->get('app.model_repository_licensee');
 
         $licensees = $repository->findAll();
 
@@ -273,43 +269,6 @@ class DefaultController extends Controller
         );
 
         return new Response(\json_encode($output));
-    }
-
-    /**
-     * @Route("/delete", name="admin_formdel")
-     *
-     * @param Request $request
-     * @return String
-     */
-    public function formdelAction(Request $request)
-    {
-        $params = $request->request->all();
-
-        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'story'))) {
-            return new Response(\json_encode(array('error' => true)));
-        }
-
-        $formtype = ucfirst($params['formtype']);
-
-        /* @var $mongo \Doctrine\Bundle\MongoDBBundle\ManagerRegistry */
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $dm \Doctrine\ODM\MongoDB\DocumentManager*/
-        $dm = $mongo->getManager();
-
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:'.$formtype);
-        if (!isset($params['id']) || empty($params['id'])) {
-            return new Response(\json_encode(array('error' => true)));
-        }
-
-        $user = $repository->find($params['id']);
-        if (is_null($user)) {
-            return new Response(\json_encode(array('error' => true)));
-        }
-        $dm->remove($user);
-        $dm->flush();
-
-        return new Response(\json_encode(array('error' => false)));
     }
 
     /**

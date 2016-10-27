@@ -144,13 +144,6 @@ dembeloAdmin = (function () {
                     value: "Neu",
                     type: "form",
                     click: clickString
-                },
-                {
-                    id: "deleteBtn" + type,
-                    view: "button",
-                    value: "Löschen",
-                    type: "danger",
-                    click: "dembeloAdmin.delItem('" + type + "')"
                 }
             ]
             };
