@@ -18,17 +18,14 @@
  */
 
 $url = 'https://api.github.com/repos/typearea/dembelo/releases';
-$curl = curl_init();
-curl_setopt($curl, CURLOPT_URL, $url);
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl, CURLOPT_HEADER, false);
-curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-    'User-Agent: dembelo'
-));
-$data = curl_exec($curl);
-curl_close($curl);
+$data = shell_exec('curl '.$url);
 
 $releases = json_decode($data);
+
+if (is_null($releases)) {
+    echo 'Data can\'t be parsed as JSON. exit' . "\n";
+    exit(1);
+}
 
 $latestReleaseDate = 0;
 $downloadUrl = '';
@@ -44,10 +41,15 @@ foreach ($releases as $release) {
     }
 }
 
+if ($latestReleaseDate === 0) {
+    echo 'No release found. exit' . "\n";
+    exit(1);
+}
+
 if (file_exists("files/version")) {
     $installedVersion = file_get_contents("files/version");
     if ($installedVersion === $newVersion) {
-        echo 'latest version already installed. exit' . "\n";
+        echo 'latest version ['.$installedVersion.'] already installed. exit' . "\n";
         exit(1);
     }
 }
@@ -57,7 +59,7 @@ shell_exec('wget -q '.$downloadUrl);
 echo 'finished' . "\n";
 
 echo 'extract '.$downloadName."...\n";
-shell_exec('unzip '.$downloadName);
+shell_exec('unzip -o '.$downloadName);
 echo 'finished' . "\n";
 
 echo 'clearing cache '."...\n";
@@ -67,5 +69,5 @@ shell_exec('php app/console assetic:dump --env=prod');
 echo 'finished' . "\n";
 
 shell_exec('rm '.$downloadName);
-echo "installation finished\n";
+echo 'installation ['.$newVersion.'] finished'."\n";
 exit(0);
