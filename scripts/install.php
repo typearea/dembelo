@@ -47,7 +47,7 @@ if ($latestReleaseDate === 0) {
 }
 
 if (file_exists("files/version")) {
-    $installedVersion = file_get_contents("files/version");
+    $installedVersion = trim(file_get_contents("files/version"));
     if ($installedVersion === $newVersion) {
         echo 'latest version ['.$installedVersion.'] already installed. exit' . "\n";
         exit(1);
