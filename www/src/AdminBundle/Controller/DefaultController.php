@@ -173,7 +173,7 @@ class DefaultController extends Controller
         /* @var $repository TopicRepositoryInterface */
         $repository = $this->get('app.model_repository_topic');
 
-        $topics = $repository->findAll();
+        $topics = $repository->findBy([], ['sortKey' => 'ASC']);
 
         $output = array();
         /* @var $topic \DembeloMain\Document\Topic */
@@ -181,7 +181,8 @@ class DefaultController extends Controller
             $obj = new StdClass();
             $obj->id = $topic->getId();
             $obj->name = $topic->getName();
-            $obj->status = (String)$topic->getStatus();
+            $obj->status = (String) $topic->getStatus();
+            $obj->sortKey = $topic->getSortKey();
             $output[] = $obj;
         }
 

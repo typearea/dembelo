@@ -51,6 +51,11 @@ class Topic
     protected $status;
 
     /**
+     * @MongoDB\Field(type="int")
+     */
+    protected $sortKey;
+
+    /**
      * @return mixed
      */
     public function getId()
@@ -96,5 +101,21 @@ class Topic
     public function setStatus($status)
     {
         $this->status = $status;
+    }
+
+    /**
+     * @param int $sortKey
+     */
+    public function setSortKey($sortKey)
+    {
+        $this->sortKey = $sortKey;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSortKey()
+    {
+        return $this->sortKey;
     }
 }

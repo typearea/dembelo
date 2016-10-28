@@ -43,6 +43,15 @@ interface TopicRepositoryInterface
     public function findAll();
 
     /**
+     * @param array      $criteria
+     * @param array|null $sort
+     * @param null       $limit
+     * @param null       $skip
+     * @return Topic[]
+     */
+    public function findBy(array $criteria, array $sort = null, $limit = null, $skip = null);
+
+    /**
      * Find all active topics
      * @return Topic[]
      */

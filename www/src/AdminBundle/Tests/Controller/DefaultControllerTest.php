@@ -300,11 +300,14 @@ class DefaultControllerTest extends WebTestCase
         $this->assertTrue($crawler->filter('html:contains("login")')->count() > 0);
     }
 
+    /**
+     * tests topicAction() with no topics
+     */
     public function testTopicActionWithNoTopics()
     {
-        $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findAll'])->getMock();
+        $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findBy'])->getMock();
         $repository->expects($this->once())
-            ->method('findAll')
+            ->method('findBy')
             ->willReturn([]);
 
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
@@ -323,16 +326,20 @@ class DefaultControllerTest extends WebTestCase
         $this->assertEquals('200', $response->getStatusCode());
     }
 
+    /**
+     * tests topicAction with one topic
+     */
     public function testTopicActionWithOneTopic()
     {
         $topic = new Topic();
         $topic->setName('someName');
         $topic->setId('someId');
         $topic->setStatus(1);
+        $topic->setSortKey(123);
 
-        $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findAll'])->getMock();
+        $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findBy'])->getMock();
         $repository->expects($this->once())
-            ->method('findAll')
+            ->method('findBy')
             ->willReturn([$topic]);
 
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
@@ -347,10 +354,13 @@ class DefaultControllerTest extends WebTestCase
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $controller->topicsAction();
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-        $this->assertJsonStringEqualsJsonString('[{"id":"someId","name":"someName","status":"1"}]', $response->getContent());
+        $this->assertJsonStringEqualsJsonString('[{"id":"someId","name":"someName","status":"1","sortKey":123}]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
     }
 
+    /**
+     * tests licenseeAction with no licensees
+     */
     public function testLicenseeActionWithNoLicensees()
     {
         $repository = $this->getMockBuilder(LicenseeRepository::class)->disableOriginalConstructor()->setMethods(['findAll'])->getMock();
@@ -374,6 +384,9 @@ class DefaultControllerTest extends WebTestCase
         $this->assertEquals('200', $response->getStatusCode());
     }
 
+    /**
+     * tests licenseeAction() with one licensee
+     */
     public function testLicenseeActionWithOneLicensee()
     {
         $licensee = new Licensee();
@@ -430,5 +443,4 @@ class DefaultControllerTest extends WebTestCase
             ->with($this->equalTo('app.model_repository_'.$repository))
             ->will($this->returnValue($this->repository));
     }
-
 }
