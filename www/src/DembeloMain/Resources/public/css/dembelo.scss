@@ -9,9 +9,9 @@
 // import default theme variables
 @import "variables/skeleton";
 // theme base styles
-@import "skeleton/themes/dembelo";
+@import "skeleton/themes/dembelo/base";
 // theme grid styles
-@import "../../../../../web/vendor/skeleton-sass/skeleton/themes/fresh/skeleton";
+@import "skeleton/themes/dembelo/skeleton";
 /**
 * Dembelo Styles
 */

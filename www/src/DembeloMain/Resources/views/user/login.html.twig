@@ -2,6 +2,7 @@
 {% block title %}Login{% endblock %}
 {% block body %}
     <div class="row ">
+        <h1>Login</h1>
         {% if error %}
             <div class="form-errors">
                 <i class="ion-alert-circled"></i>{{ error.messageKey|trans(error.messageData, 'security') }}
