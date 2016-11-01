@@ -81,6 +81,9 @@ class TopicControllerTest extends WebTestCase
         $this->assertEquals('200', $response->getStatusCode());
     }
 
+    /**
+     * tests uploadImageAction with an error in $_FILES
+     */
     public function testUploadImageActionWithNoFileError()
     {
         $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findBy'])->getMock();
@@ -93,7 +96,7 @@ class TopicControllerTest extends WebTestCase
         $controller = new TopicController($container, $repository);
 
         $_FILES['upload'] = [
-            'error' => UPLOAD_ERR_NO_FILE
+            'error' => UPLOAD_ERR_NO_FILE,
         ];
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
@@ -102,6 +105,9 @@ class TopicControllerTest extends WebTestCase
         $this->assertJsonStringEqualsJsonString('{"status":"error"}', $response->getContent());
     }
 
+    /**
+     * tests uploadImageAction
+     */
     public function testUploadImageActionWithNoError()
     {
         $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findBy'])->getMock();
@@ -136,5 +142,4 @@ class TopicControllerTest extends WebTestCase
         $this->repository = null;
         $this->service = null;
     }
-
 }

@@ -41,6 +41,7 @@ class TopicController extends Controller
 
     /**
      * TopicController constructor.
+     * @param ContainerInterface       $container
      * @param TopicRepositoryInterface $topicRepository
      */
     public function __construct(ContainerInterface $container, TopicRepositoryInterface $topicRepository)
@@ -84,6 +85,7 @@ class TopicController extends Controller
         $file = $_FILES['upload'];
         if ($file['error'] !== UPLOAD_ERR_OK) {
             $output['status'] = 'error';
+
             return new Response(\json_encode($output));
         }
         $directory = $this->getParameter('topic_image_directory');
