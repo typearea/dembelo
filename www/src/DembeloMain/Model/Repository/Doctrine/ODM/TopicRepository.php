@@ -36,6 +36,6 @@ class TopicRepository extends AbstractRepository implements TopicRepositoryInter
      */
     public function findByStatusActive()
     {
-        return $this->findBy(array('status' => Topic::STATUS_ACTIVE));
+        return $this->findBy(array('status' => Topic::STATUS_ACTIVE), array('sortKey' => 'ASC'));
     }
 }
