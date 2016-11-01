@@ -56,6 +56,16 @@ class Topic
     protected $sortKey;
 
     /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $originalImageName;
+
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $imageFilename;
+
+    /**
      * @return mixed
      */
     public function getId()
@@ -117,5 +127,37 @@ class Topic
     public function getSortKey()
     {
         return $this->sortKey;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOriginalImageName()
+    {
+        return $this->originalImageName;
+    }
+
+    /**
+     * @param string $originalImageName
+     */
+    public function setOriginalImageName($originalImageName)
+    {
+        $this->originalImageName = $originalImageName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImageFilename()
+    {
+        return $this->imageFilename;
+    }
+
+    /**
+     * @param string $imageFilename
+     */
+    public function setImageFilename($imageFilename)
+    {
+        $this->imageFilename = $imageFilename;
     }
 }

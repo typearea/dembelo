@@ -54,7 +54,6 @@ class DefaultController extends Controller
             ['id' => "1", 'type' => "folder", 'value' => "Benutzer", 'css' => "folder_music"],
             ['id' => "2", 'type' => "folder", 'value' => "Lizenznehmer", 'css' => "folder_music"],
             ['id' => "3", 'type' => "folder", 'value' => "Themenfelder", 'css' => "folder_music"],
-            ['id' => "4s", 'type' => "folder", 'value' => "Geschichten", 'css' => "folder_music"],
         ];
 
         $jsonEncoder = new JsonEncoder();
@@ -164,57 +163,6 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/topics", name="admin_topics")
-     *
-     * @return String
-     */
-    public function topicsAction()
-    {
-        /* @var $repository TopicRepositoryInterface */
-        $repository = $this->get('app.model_repository_topic');
-
-        $topics = $repository->findBy([], ['sortKey' => 'ASC']);
-
-        $output = array();
-        /* @var $topic \DembeloMain\Document\Topic */
-        foreach ($topics as $topic) {
-            $obj = new StdClass();
-            $obj->id = $topic->getId();
-            $obj->name = $topic->getName();
-            $obj->status = (String) $topic->getStatus();
-            $obj->sortKey = $topic->getSortKey();
-            $output[] = $obj;
-        }
-
-        return new Response(\json_encode($output));
-    }
-
-    /**
-     * @Route("/stories", name="admin_stories")
-     *
-     * @return String
-     */
-    public function storiesAction()
-    {
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:Story');
-
-        $users = $repository->findAll();
-
-        $output = array();
-        /* @var $user \DembeloMain\Document\Story */
-        foreach ($users as $user) {
-            $obj = new StdClass();
-            $obj->id = $user->getId();
-            $obj->name = $user->getName();
-            $output[] = $obj;
-        }
-
-        return new Response(\json_encode($output));
-    }
-
-    /**
      * @Route("/save", name="admin_formsave")
      *
      * @param Request $request
@@ -224,7 +172,7 @@ class DefaultController extends Controller
     {
         $params = $request->request->all();
 
-        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'story'))) {
+        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic'))) {
             return new Response(\json_encode(array('error' => true)));
         }
         $formtype = $params['formtype'];
