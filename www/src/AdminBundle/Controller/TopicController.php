@@ -23,6 +23,7 @@ use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -52,11 +53,18 @@ class TopicController extends Controller
     /**
      * @Route("/topic/list", name="admin_topics")
      *
+     * @param Request $request
      * @return Response
      */
-    public function listAction()
+    public function listAction(Request $request)
     {
-        $topics = $this->topicRepository->findBy([], ['sortKey' => 'ASC']);
+        $filters = $request->query->get('filter');
+
+        if (is_null($filters)) {
+            $topics = $this->topicRepository->findBy([], ['sortKey' => 'ASC']);
+        } else {
+            $topics = $this->topicRepository->findFiltered($filters, ['sortKey', 'ASC']);
+        }
 
         $output = array();
         /* @var $topic \DembeloMain\Document\Topic */

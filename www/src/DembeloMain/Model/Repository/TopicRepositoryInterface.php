@@ -58,6 +58,14 @@ interface TopicRepositoryInterface
     public function findByStatusActive();
 
     /**
+     * finds filtered topics
+     * @param array $filters
+     * @param array $orderBy
+     * @return mixed
+     */
+    public function findFiltered(array $filters = array(), array $orderBy = array());
+
+    /**
      * Save topic
      * @param Topic $topic
      * @return Topic

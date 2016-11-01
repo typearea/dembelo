@@ -109,6 +109,16 @@ define(function () {
         });
     }
 
+    function buildStatusFilter(grid) {
+        var filter = grid.getFilter("status"),
+            oldStatusValue = filter.value
+        filter.innerHTML = "<option value></option>" +
+            "<option value=\"0\">inaktiv</option>" +
+            "<option value=\"1\">aktiv</option>";
+
+        filter.value = oldStatusValue;
+    }
+
     return {
         init: function () {
             $$("mainnav").attachEvent("onAfterSelect", function (id){
@@ -154,6 +164,10 @@ define(function () {
             });
 
             $$('licenseeform').bind($$('licenseegrid'));
+
+            $$("topicgrid").attachEvent("onAfterLoad", function () {
+                buildStatusFilter($$("topicgrid"));
+            });
 
             $$("topicform").bind($$("topicgrid"));
         },

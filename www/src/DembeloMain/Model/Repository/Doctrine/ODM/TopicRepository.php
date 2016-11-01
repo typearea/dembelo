@@ -38,4 +38,33 @@ class TopicRepository extends AbstractRepository implements TopicRepositoryInter
     {
         return $this->findBy(array('status' => Topic::STATUS_ACTIVE), array('sortKey' => 'ASC'));
     }
+
+    /**
+     * finds filtered topics
+     * @param array $filters
+     * @param array $orderBy
+     * @return mixed
+     */
+    public function findFiltered(array $filters = array(), array $orderBy = array())
+    {
+        $query = $this->createQueryBuilder();
+
+        foreach ($filters as $field => $value) {
+            if (empty($value) && $value !== '0') {
+                continue;
+            }
+            if ($field === 'status') {
+                //$value = $value === 'aktiv' ? 1 : 0;
+                $query->field($field)->equals((int) $value);
+            } else {
+                $query->field($field)->equals(new \MongoRegex('/.*'.$value.'.*/i'));
+            }
+        }
+
+        if (count($orderBy) === 2) {
+            $query->sort($orderBy[0], $orderBy[1]);
+        }
+
+        return $query->getQuery()->execute();
+    }
 }

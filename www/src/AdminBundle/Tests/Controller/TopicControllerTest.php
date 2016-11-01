@@ -24,6 +24,7 @@ use DembeloMain\Document\Topic;
 use DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -35,7 +36,7 @@ class TopicControllerTest extends WebTestCase
     /**
      * tests topicAction() with no topics
      */
-    public function testTopicActionWithNoTopics()
+    public function testListActionWithNoTopics()
     {
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
 
@@ -44,10 +45,15 @@ class TopicControllerTest extends WebTestCase
             ->method('findBy')
             ->willReturn([]);
 
+        $parameterBag = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->setMethods(['get'])->getMock();
+
+        $request = $this->getMockBuilder(Request::class)->getMock();
+        $request->query = $parameterBag;
+
         $controller = new TopicController($container, $repository);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->listAction();
+        $response = $controller->listAction($request);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertJsonStringEqualsJsonString('[]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
@@ -56,7 +62,7 @@ class TopicControllerTest extends WebTestCase
     /**
      * tests topicAction with one topic
      */
-    public function testTopicActionWithOneTopic()
+    public function testListActionWithOneTopic()
     {
         $topic = new Topic();
         $topic->setName('someName');
@@ -72,10 +78,56 @@ class TopicControllerTest extends WebTestCase
             ->method('findBy')
             ->willReturn([$topic]);
 
+        $parameterBag = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->setMethods(['get'])->getMock();
+
+        $request = $this->getMockBuilder(Request::class)->getMock();
+        $request->query = $parameterBag;
+
         $controller = new TopicController($container, $repository);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->listAction();
+        $response = $controller->listAction($request);
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertJsonStringEqualsJsonString('[{"id":"someId","name":"someName","status":"1","sortKey":123,"originalImageName":"someImageName"}]', $response->getContent());
+        $this->assertEquals('200', $response->getStatusCode());
+    }
+
+    /**
+     * tests topicAction with some filters
+     */
+    public function testListActionWithSomeFilters()
+    {
+        $topic = new Topic();
+        $topic->setName('someName');
+        $topic->setId('someId');
+        $topic->setStatus(1);
+        $topic->setSortKey(123);
+        $topic->setOriginalImageName("someImageName");
+
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+
+        $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findBy', 'findFiltered'])->getMock();
+        $repository->expects($this->never())
+            ->method('findBy')
+            ->willReturn([$topic]);
+        $repository->expects($this->once())
+            ->method('findFiltered')
+            ->with(['status' => '1'])
+            ->willReturn([$topic]);
+
+        $parameterBag = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->setMethods(['get'])->getMock();
+        $parameterBag->expects($this->once())
+            ->method('get')
+            ->with('filter')
+            ->willReturn(['status' => '1']);
+
+        $request = $this->getMockBuilder(Request::class)->getMock();
+        $request->query = $parameterBag;
+
+        $controller = new TopicController($container, $repository);
+
+        /* @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $controller->listAction($request);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertJsonStringEqualsJsonString('[{"id":"someId","name":"someName","status":"1","sortKey":123,"originalImageName":"someImageName"}]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
