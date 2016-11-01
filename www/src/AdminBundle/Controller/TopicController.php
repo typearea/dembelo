@@ -19,27 +19,44 @@
 
 namespace AdminBundle\Controller;
 
+use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use StdClass;
 
 /**
  * Class TopicController
+ *
+ * @Route(service="app.controller_admin_topic")
  */
 class TopicController extends Controller
 {
-    /**
-     * @Route("/topics", name="admin_topics")
-     *
-     * @return String
-     */
-    public function topicsAction()
-    {
-        /* @var $repository TopicRepositoryInterface */
-        $repository = $this->get('app.model_repository_topic');
 
-        $topics = $repository->findBy([], ['sortKey' => 'ASC']);
+    /**
+     * @var TopicRepositoryInterface
+     */
+    private $topicRepository;
+
+    /**
+     * TopicController constructor.
+     * @param TopicRepositoryInterface $topicRepository
+     */
+    public function __construct(ContainerInterface $container, TopicRepositoryInterface $topicRepository)
+    {
+        $this->container = $container;
+        $this->topicRepository = $topicRepository;
+    }
+
+    /**
+     * @Route("/topic/list", name="admin_topics")
+     *
+     * @return Response
+     */
+    public function listAction()
+    {
+        $topics = $this->topicRepository->findBy([], ['sortKey' => 'ASC']);
 
         $output = array();
         /* @var $topic \DembeloMain\Document\Topic */
@@ -57,7 +74,7 @@ class TopicController extends Controller
     }
 
     /**
-     * @Route("/topics/uploadimage", name="admin_topics_image")
+     * @Route("/topic/uploadimage", name="admin_topics_image")
      *
      * @return Response
      */
@@ -69,7 +86,7 @@ class TopicController extends Controller
             $output['status'] = 'error';
             return new Response(\json_encode($output));
         }
-        $directory = $this->container->getParameter('topic_image_directory');
+        $directory = $this->getParameter('topic_image_directory');
         $filename = md5(uniqid().$file['name']);
         move_uploaded_file($file["tmp_name"], $directory.$filename);
         $output['imageFileName'] = $filename;

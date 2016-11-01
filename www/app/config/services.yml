@@ -12,6 +12,10 @@ services:
         class: DembeloMain\Controller\Dashboard\DefaultController
         arguments: ["@templating","@app.model_repository_topic"]
 
+    app.controller_admin_topic:
+        class: AdminBundle\Controller\TopicController
+        arguments: ["@service_container", "@app.model_repository_topic"]
+
     app.model_repository_topic:
         class: DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository
         factory: ["@doctrine_mongodb.odm.document_manager", getRepository]

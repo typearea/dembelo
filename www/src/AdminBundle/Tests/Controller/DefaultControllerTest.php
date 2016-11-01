@@ -301,64 +301,6 @@ class DefaultControllerTest extends WebTestCase
     }
 
     /**
-     * tests topicAction() with no topics
-     */
-    public function testTopicActionWithNoTopics()
-    {
-        $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findBy'])->getMock();
-        $repository->expects($this->once())
-            ->method('findBy')
-            ->willReturn([]);
-
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $container->expects($this->once())
-            ->method('get')
-            ->with('app.model_repository_topic')
-            ->willReturn($repository);
-
-        $controller = new DefaultController();
-        $controller->setContainer($container);
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->topicsAction();
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-        $this->assertJsonStringEqualsJsonString('[]', $response->getContent());
-        $this->assertEquals('200', $response->getStatusCode());
-    }
-
-    /**
-     * tests topicAction with one topic
-     */
-    public function testTopicActionWithOneTopic()
-    {
-        $topic = new Topic();
-        $topic->setName('someName');
-        $topic->setId('someId');
-        $topic->setStatus(1);
-        $topic->setSortKey(123);
-
-        $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findBy'])->getMock();
-        $repository->expects($this->once())
-            ->method('findBy')
-            ->willReturn([$topic]);
-
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $container->expects($this->once())
-            ->method('get')
-            ->with('app.model_repository_topic')
-            ->willReturn($repository);
-
-        $controller = new DefaultController();
-        $controller->setContainer($container);
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->topicsAction();
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-        $this->assertJsonStringEqualsJsonString('[{"id":"someId","name":"someName","status":"1","sortKey":123}]', $response->getContent());
-        $this->assertEquals('200', $response->getStatusCode());
-    }
-
-    /**
      * tests licenseeAction with no licensees
      */
     public function testLicenseeActionWithNoLicensees()
