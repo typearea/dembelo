@@ -21,8 +21,15 @@ namespace DembeloMain\Composer;
 
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * Class ScriptHandler
+ * @package DembeloMain\Composer
+ */
 class ScriptHandler
 {
+    /**
+     * build Symlinks
+     */
     public static function buildSymLinks()
     {
         $fs = new Filesystem();
