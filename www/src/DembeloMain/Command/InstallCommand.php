@@ -68,8 +68,10 @@ class InstallCommand extends ContainerAwareCommand
     {
 
         if ($input->getOption('purge-db')) {
-            $this->purgeDB($output);
+            $this->purgeDB();
             $output->writeln("<info>Database cleared</info>");
+            $this->cleanImageDirectories();
+            $output->writeln("<info>Directories cleared</info>");
         }
 
         $this->installDefaultUsers($output);
@@ -257,13 +259,25 @@ class InstallCommand extends ContainerAwareCommand
             array('name' => 'Themenfeld 9', 'status' => Topic::STATUS_ACTIVE),
         );
 
+        $imagesSrcFolder = $this->getContainer()->getParameter('kernel.root_dir').'/../src/DembeloMain/Resources/public/images/';
+        $imagesTargetFolder = $this->getContainer()->getParameter('topic_image_directory');
+
+        $sortKey = 1;
         foreach ($topicData as $topicDatum) {
             $topic = $repository->findOneByName($topicDatum['name']);
             if (is_null($topic)) {
+                $imagename = 'bg0'.$sortKey.'.jpg';
                 $topic = new Topic();
                 $topic->setName($topicDatum['name']);
                 $topic->setStatus($topicDatum['status']);
+                $topic->setSortKey($sortKey);
+                $topic->setOriginalImageName($imagename);
+                $topic->setImageFilename($imagename);
                 $dm->persist($topic);
+                $topicFolder = $imagesTargetFolder.'/'.$topic->getId().'/';
+                mkdir($topicFolder);
+                copy($imagesSrcFolder.$imagename, $topicFolder.'/'.$imagename);
+                $sortKey++;
             }
             $this->dummyData['topics'][] = $topic;
         }
@@ -392,5 +406,13 @@ class InstallCommand extends ContainerAwareCommand
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
         $this->dummyData['textnodes'][0]->appendHitch($hitch);
         $dm->persist($this->dummyData['textnodes'][0]);
+    }
+
+    private function cleanImageDirectories()
+    {
+        $topicImageDirectory = $this->getContainer()->getParameter('topic_image_directory').'/';
+        if (is_dir($topicImageDirectory)) {
+            shell_exec('rm -r '.$topicImageDirectory.'*');
+        }
     }
 }
