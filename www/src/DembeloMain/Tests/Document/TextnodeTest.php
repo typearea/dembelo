@@ -134,6 +134,15 @@ class TextnodeTest extends WebTestCase
     }
 
     /**
+     * tests the access
+     */
+    public function testTwineId()
+    {
+        $this->textnode->setTwineId('foobarTwineId');
+        $this->assertEquals('foobarTwineId', $this->textnode->getTwineId());
+    }
+
+    /**
      * Tests that no hitches are present after the Textnode was constructed.
      */
     public function testGetHitchCountAfterTextnodeConstruction()

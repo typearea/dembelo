@@ -88,6 +88,16 @@ class Textnode
     protected $hitches = array();
 
     /**
+     * @MongoDB\ObjectId
+     */
+    protected $importfileId;
+
+    /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $twineId;
+
+    /**
      * gets the timestamp of creation
      *
      * @return string
@@ -386,5 +396,45 @@ class Textnode
         array_splice($this->hitches, $hitchIndex, 1);
 
         return true;
+    }
+
+    /**
+     * sets the importfile ID
+     *
+     * @param string $importfileId
+     */
+    public function setImportfileId($importfileId)
+    {
+        $this->importfileId = $importfileId;
+    }
+
+    /**
+     * returns importfile ID
+     *
+     * @return string
+     */
+    public function getImportfileId()
+    {
+        return $this->importfileId;
+    }
+
+    /**
+     * sets the twine ID
+     *
+     * @param string $twineId
+     */
+    public function setTwineId($twineId)
+    {
+        $this->twineId = $twineId;
+    }
+
+    /**
+     * returns twine ID
+     *
+     * @return string
+     */
+    public function getTwineId()
+    {
+        return $this->twineId;
     }
 }

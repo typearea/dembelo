@@ -7,6 +7,7 @@ imports:
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: de
+    twine_directory: '%kernel.root_dir%/../uploads/twine/'
 
 framework:
     #esi:             ~

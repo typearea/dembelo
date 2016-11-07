@@ -47,4 +47,10 @@ interface LicenseeRepositoryInterface
      * @return Licensee
      */
     public function save($licensee);
+
+    /**
+     * @param string $name
+     * @return Licensee
+     */
+    public function findOneByName($name);
 }
