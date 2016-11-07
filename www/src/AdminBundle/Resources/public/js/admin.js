@@ -70,11 +70,11 @@ dembeloAdmin = (function () {
                     $$('storygrid').clearAll();
                     $$('storygrid').load(paths.adminStories);
                     $$('storygrid').show();
-                } else if (id === 5) {
+                } else if (id == 5) {
                     $$('importfilegrid').clearAll();
                     $$('importfilegrid').load(paths.adminImportfiles);
                     $$('importfilestuff').show();
-                } else if (id === 6) {
+                } else if (id == 6) {
                     $$('textnodegrid').clearAll();
                     $$('textnodegrid').load(paths.adminTextnodes);
                     $$('textnodestuff').show();
@@ -87,6 +87,8 @@ dembeloAdmin = (function () {
 
             $$('userform').bind($$('usergrid'));
             $$('userform').attachEvent('onValues', checkFormBindStatus);
+            $$('textnodeform').attachEvent('onValues', checkFormBindStatus);
+            $$('importfileform').attachEvent('onValues', checkFormBindStatus);
             $$('userformrole').attachEvent('onChange', function (newValue) {
                 if (newValue == 'ROLE_LICENSEE') {
                     $$('userformlicensee').enable()
