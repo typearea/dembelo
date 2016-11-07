@@ -18,13 +18,14 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * @package AdminBundle
  */
 
 namespace AdminBundle\Controller;
 
+use AdminBundle\Model\ImportTwine;
+use DembeloMain\Document\Importfile;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,7 +53,9 @@ class DefaultController extends Controller
             ['id' => "1", 'type' => "folder", 'value' => "Benutzer", 'css' => "folder_music"],
             ['id' => "2", 'type' => "folder", 'value' => "Lizenznehmer", 'css' => "folder_music"],
             ['id' => "3", 'type' => "folder", 'value' => "Themenfelder", 'css' => "folder_music"],
-            ['id' => "4s", 'type' => "folder", 'value' => "Geschichten", 'css' => "folder_music"],
+            ['id' => "4", 'type' => "folder", 'value' => "Geschichten", 'css' => "folder_music"],
+            ['id' => "5", 'type' => "folder", 'value' => "Importe", 'css' => "folder_music"],
+            ['id' => "6", 'type' => "folder", 'value' => "Textknoten", 'css' => "folder_music"],
         ];
 
         $jsonEncoder = new JsonEncoder();
@@ -225,7 +228,7 @@ class DefaultController extends Controller
     {
         $params = $request->request->all();
 
-        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'story'))) {
+        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'story', 'importfile', 'textnode'))) {
             return new Response(\json_encode(array('error' => true)));
         }
         if (!isset($params['id'])) {
@@ -249,8 +252,9 @@ class DefaultController extends Controller
                 return new Response(\json_encode(array('error' => true)));
             }
         }
+
         foreach ($params as $param => $value) {
-            if (in_array($param, array('id', 'formtype'))) {
+            if (in_array($param, array('id', 'formtype', 'filename', 'orgname'))) {
                 continue;
             }
             if ($param == 'password' && empty($value)) {
@@ -259,6 +263,8 @@ class DefaultController extends Controller
                 $encoder = $this->get('security.password_encoder');
                 $value = $encoder->encodePassword($item, $value);
             } elseif ($param == 'licenseeId' && $value === '') {
+                $value = null;
+            } elseif ($param === 'imported' && $value === '') {
                 $value = null;
             }
             $method = 'set'.ucfirst($param);
@@ -272,6 +278,12 @@ class DefaultController extends Controller
         }
         $dm->persist($item);
         $dm->flush();
+
+        if ($formtype == 'Importfile' && array_key_exists('filename', $params)) {
+            $this->saveFile($item, $params['filename'], $params['orgname']);
+            $dm->persist($item);
+            $dm->flush();
+        }
 
         $output = array(
             'error' => false,
@@ -343,8 +355,8 @@ class DefaultController extends Controller
         $dm->flush();
 
         $message = \Swift_Message::newInstance()
-            ->setSubject('Dembelo - Bestätigung der Email-Adresse')
-            ->setFrom('noreply@dembelo.de')
+            ->setSubject('waszulesen - Bestätigung der Email-Adresse')
+            ->setFrom('system@waszulesen.de')
             ->setTo($user->getEmail())
             ->setBody(
                 $this->renderView(
@@ -358,5 +370,190 @@ class DefaultController extends Controller
         $this->get('mailer')->send($message);
 
         return new Response(\json_encode(['error' => false]));
+    }
+
+    /**
+     * @Route("/importfiles", name="admin_importfiles")
+     *
+     * @return Response
+     */
+    public function importfilesAction()
+    {
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Importfile');
+
+        $importfiles = $repository->findAll();
+
+        $output = array();
+        /* @var $importfile \DembeloMain\Document\Importfile */
+        foreach ($importfiles as $importfile) {
+            $importfileData = [];
+            $importfileData['id'] = $importfile->getId();
+            $importfileData['name'] = $importfile->getName();
+            $importfileData['author'] = $importfile->getAuthor();
+            $importfileData['publisher'] = $importfile->getPublisher();
+            $importfileData['imported'] = $importfile->getImported();
+            $importfileData['orgname'] = $importfile->getOriginalname();
+            $importfileData['licenseeId'] = $importfile->getLicenseeId();
+            $output[] = $importfileData;
+        }
+
+        return new Response(\json_encode($output));
+    }
+
+    /**
+     * @Route("/uploadimportfile", name="admin_upload_file")
+     *
+     * @return Response
+     */
+    public function uploadImportfileAction()
+    {
+        $output = array();
+
+        $file = $_FILES['upload'];
+
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            $output['status'] = 'error';
+
+            return new Response(\json_encode($output));
+        }
+
+        $directory = $this->container->getParameter('twine_directory');
+
+        $filename = md5(uniqid().$file['name']);
+
+        move_uploaded_file($file["tmp_name"], $directory.$filename);
+
+        $output['filename'] = $filename;
+        $output['orgname'] = $file['name'];
+
+        $output['status'] = 'server';
+
+        return new Response(\json_encode($output));
+    }
+
+    /**
+     * @Route("/textnodes", name="admin_textnodes")
+     *
+     * @return Response
+     */
+    public function textnodesAction()
+    {
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Textnode');
+
+        $textnodes = $repository->findAll();
+
+        $licenseeIndex = $this->buildLicenseeIndex($mongo);
+        $importfileIndex = $this->buildImportfileIndex($mongo);
+
+        $output = array();
+        /* @var $user \DembeloMain\Document\Textnode */
+        foreach ($textnodes as $textnode) {
+            $obj = new StdClass();
+            $obj->id = $textnode->getId();
+            $obj->created = $textnode->getCreated()->format('d.m.Y, H:i:s');
+            $obj->status = $textnode->getStatus() ? 'aktiv' : 'inaktiv';
+            $obj->access = $textnode->getAccess();
+            $obj->licensee = $licenseeIndex[$textnode->getLicenseeId()];
+            $obj->importfile = isset($importfileIndex[$textnode->getImportfileId()]) ? $importfileIndex[$textnode->getImportfileId()] : 'unbekannt';
+            $obj->beginning = substr(htmlentities(strip_tags($textnode->getText())), 0, 200)."...";
+            $output[] = $obj;
+        }
+
+        return new Response(\json_encode($output));
+    }
+
+    /**
+     * @Route("/import", name="admin_import")
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function importAction(Request $request)
+    {
+        $importfileId = $request->get('importfileId');
+
+        /* @var $mongo \Doctrine\Bundle\MongoDBBundle\ManagerRegistry */
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $dm \Doctrine\ODM\MongoDB\DocumentManager*/
+        $dm = $mongo->getManager();
+
+        $repository = $mongo->getRepository('DembeloMain:Importfile');
+
+        /* @var $importfile \DembeloMain\Document\Importfile */
+        $importfile = $repository->find($importfileId);
+        $importer = $this->get('admin.import.twine');
+        try {
+            $returnValue = $importer->run($importfile);
+
+            $dm->flush();
+            $output = [
+                'success' => true,
+                'returnValue' => $returnValue,
+            ];
+        } catch (\Exception $e) {
+            $output = [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        return new Response(json_encode($output));
+    }
+
+    /**
+     * saves temporary file to final place
+     *
+     * @param Importfile $item importfile instance
+     * @param string $filename filename hash
+     * @param string $orgname original name
+     */
+    private function saveFile(Importfile $item, $filename, $orgname)
+    {
+        if (empty($filename) || empty($orgname)) {
+            return;
+        }
+
+        $directory = $this->container->getParameter('twine_directory');
+        $finalDirectory = $directory.$item->getLicenseeId().'/';
+        if (!is_dir($finalDirectory)) {
+            mkdir($finalDirectory);
+        }
+        $finalName = $finalDirectory.$item->getId();
+        $file = $directory.$filename;
+        rename($file, $finalName);
+
+        $item->setOriginalname($orgname);
+        $item->setFilename($finalName);
+    }
+
+    private function buildLicenseeIndex(\Doctrine\Bundle\MongoDBBundle\ManagerRegistry $mongo)
+    {
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Licensee');
+        $licensees = $repository->findAll();
+        $index = [];
+        foreach ($licensees as $licensee) {
+            $index[$licensee->getID()] = $licensee->getName();
+        }
+
+        return $index;
+    }
+
+    private function buildImportfileIndex(\Doctrine\Bundle\MongoDBBundle\ManagerRegistry $mongo)
+    {
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Importfile');
+        $importfiles = $repository->findAll();
+        $index = [];
+        foreach ($importfiles as $importfile) {
+            $index[$importfile->getID()] = $importfile->getName();
+        }
+
+        return $index;
     }
 }

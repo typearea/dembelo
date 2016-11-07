@@ -1,6 +1,9 @@
 imports:
     - { resource: config_dev.yml }
 
+doctrine_mongodb:
+    default_database: dembelo_test
+
 framework:
     test: ~
     session:

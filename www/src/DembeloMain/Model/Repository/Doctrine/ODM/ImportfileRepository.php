@@ -1,6 +1,5 @@
 <?php
-
-/* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
+/* Copyright (C) 2016 Michael Giesler
  *
  * This file is part of Dembelo.
  *
@@ -17,24 +16,15 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace DembeloMain\Model\Repository\Doctrine\ODM;
 
-use DembeloMain\Document\Licensee;
-use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
+use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
 
 /**
- * Class LicenseeRepository
+ * Class ImportfileRepository
  * @package DembeloMain\Model\Repository\Doctrine\ODM
  */
-class LicenseeRepository extends AbstractRepository implements LicenseeRepositoryInterface
+class ImportfileRepository extends AbstractRepository implements ImportfileRepositoryInterface
 {
-    /**
-     * @param string $name
-     * @return Licensee
-     */
-    public function findOneByName($name)
-    {
-        return $this->__call(__FUNCTION__, func_get_args());
-    }
+
 }

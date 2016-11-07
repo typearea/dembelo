@@ -5,16 +5,20 @@
     <script type="text/javascript" charset="utf-8">
 
         var mainMenuData = {{ mainMenuData|raw }},
-                paths = {
-                    adminUsers: "{{ path('admin_users') }}",
-                    adminLicensees: "{{ path('admin_licensees') }}",
-                    adminTopics: "{{ path('admin_topics') }}",
-                    adminStories: "{{ path('admin_stories') }}",
-                    adminFormSave: "{{ path('admin_formsave') }}",
-                    adminFormDel: "{{ path('admin_formdel') }}",
-                    adminLicenceeSuggest: "{{ path('admin_licensee_suggest') }}",
-                    adminUserActivationMail: "{{ path('admin_user_activation_mail') }}"
-                };
+            paths = {
+                adminUsers: "{{ path('admin_users') }}",
+                adminLicensees: "{{ path('admin_licensees') }}",
+                adminTopics: "{{ path('admin_topics') }}",
+                adminStories: "{{ path('admin_stories') }}",
+                adminImportfiles: "{{ path('admin_importfiles') }}",
+                adminFormSave: "{{ path('admin_formsave') }}",
+                adminFormDel: "{{ path('admin_formdel') }}",
+                adminLicenceeSuggest: "{{ path('admin_licensee_suggest') }}",
+                adminUserActivationMail: "{{ path('admin_user_activation_mail') }}",
+                adminImportfileUploader: "{{ path('admin_upload_file') }}",
+                adminTextnodes: "{{ path('admin_textnodes') }}",
+                adminImport: "{{ path('admin_import') }}"
+            };
 
         webix.ui({
             rows: [
@@ -135,6 +139,104 @@
                                             autoConfig: true,
                                             select: true,
                                             datatype: "json"
+                                        },
+                                        {
+                                            id: "importfilestuff",
+                                            cols: [
+                                                {
+                                                    rows: [
+                                                        dembeloAdmin.getToolbar('importfile'),
+                                                        {
+                                                            id: "importfilegrid",
+                                                            view: "datatable",
+                                                            autoConfig: true,
+                                                            select: true,
+                                                            datatype: "json",
+                                                            columns: [
+                                                                {id: 'name', header: 'Name', fillspace: true},
+                                                                {id: 'author', header: 'Autor'},
+                                                                {id: 'publisher', header: 'Verlag'},
+                                                                {id: 'imported', header: 'Importiert'}
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {view: "resizer"},
+                                                {
+                                                    view: "scrollview",
+                                                    scroll: "y",
+                                                    body: {
+                                                        rows: [
+                                                            {
+                                                                view: "form",
+                                                                id: "importfileform",
+                                                                gravity: 0.5,
+                                                                elements: [
+                                                                    {view: "text", name: "name", label: "Name"},
+                                                                    {view: "text", name: "author", label: "Autor"},
+                                                                    {view: "text", name: "publisher", label: "Verlag"},
+                                                                    {view: "combo", id: "userformlicensee", name: "licenseeId", label: "Lizenznehmer", suggest: paths.adminLicenceeSuggest},
+                                                                    {view: "text", name: "orgname", label: "Datei", disabled: true},
+                                                                    {
+                                                                        view:"uploader",
+                                                                        id: "uploadfile",
+                                                                        value:"Dateiauswahl",
+                                                                        link:"uploadfilelist",
+                                                                        upload: paths.adminImportfileUploader,
+                                                                        multiple: false
+                                                                    },
+                                                                    {
+                                                                        view:"list",
+                                                                        id:"uploadfilelist",
+                                                                        type:"uploader",
+                                                                        autoheight:true,
+                                                                        borderless:true
+                                                                    },
+                                                                    {view: "button", id: "importfileSaveButton", value:"Speichern", click:"dembeloAdmin.formsave('importfile')", disabled: true },
+                                                                    {view: "button", id: "importfileImportButton", value:"Importieren", click:"dembeloAdmin.import()", disabled: true}
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+
+                                        },
+                                        {
+                                            id: "textnodestuff",
+                                            cols: [
+                                                {
+                                                    rows: [
+                                                        {
+                                                            id: "textnodegrid",
+                                                            view: "datatable",
+                                                            autoConfig: true,
+                                                            select: true,
+                                                            datatype: "json",
+                                                            columns: [
+                                                                {id: 'created', header: 'angelegt'},
+                                                                {id: 'status', header: 'Status'},
+                                                                {id: 'beginning', header: 'Text', fillspace: true},
+                                                                {id: 'importfile', header: 'Importdatei'}
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    view: "form",
+                                                    id: "textnodeform",
+                                                    gravity: 0.5,
+                                                    elements: [
+                                                        {view: "text", name: "id", label: "ID", disabled: true},
+                                                        {view: "text", name: "created", label: "angelegt", disabled: true},
+                                                        {view: "text", name: "status", label: "Status", disabled: true},
+                                                        {view: "text", name: "access", label: "Access-Knoten", disabled: true},
+                                                        {view: "text", name: "licensee", label: "Lizenznehmer", disabled: true},
+                                                        {view: "text", name: "importfile", label: "Importdatei", disabled: true},
+                                                        {view: "textarea", name: "beginning", label: "Textanfang", height: 200, disabled: true}
+                                                    ]
+                                                }
+                                            ]
                                         }
                                     ]
                                 }
