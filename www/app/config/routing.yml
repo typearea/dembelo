@@ -7,6 +7,10 @@ admin:
     type:     annotation
     prefix:   /admin
 
+admin_topic:
+    path:     /admin/topic
+    defaults: { _controller: app.controller_admin_topic.listAction }
+
 logout:
     path: /logout
 

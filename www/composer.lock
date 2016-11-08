@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "196f642acbe8a60d1533d3c2bb3e8183",
-    "content-hash": "3bd310e5a3dd8a578b170f6530a99c96",
+    "hash": "c7c473a7f196d7ed95da0ef0c2b1a78b",
+    "content-hash": "9db373db0571de332cbc1d6c63840792",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -1069,6 +1069,60 @@
                 "orm"
             ],
             "time": "2016-09-10 18:51:13"
+        },
+        {
+            "name": "etdsolutions/domready",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/etd-framework/domReady.git",
+                "reference": "5f41625f940f25c90d3e485f2348d3173c68fc58"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/etd-framework/domReady/zipball/5f41625f940f25c90d3e485f2348d3173c68fc58",
+                "reference": "5f41625f940f25c90d3e485f2348d3173c68fc58",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "domReady plugin for RequireJS",
+            "homepage": "https://github.com/requirejs/domReady",
+            "time": "2016-09-14 09:36:59"
+        },
+        {
+            "name": "etdsolutions/requirejs",
+            "version": "2.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/etd-framework/requirejs.git",
+                "reference": "ef872a6f6142b1e3f314a68b0bb685df6d3530a5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/etd-framework/requirejs/zipball/ef872a6f6142b1e3f314a68b0bb685df6d3530a5",
+                "reference": "ef872a6f6142b1e3f314a68b0bb685df6d3530a5",
+                "shasum": ""
+            },
+            "require": {
+                "etdsolutions/domready": "*"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "James Burke"
+                }
+            ],
+            "description": "Shim repository for RequireJS",
+            "homepage": "http://requirejs.org/",
+            "time": "2016-10-19 09:13:34"
         },
         {
             "name": "incenteev/composer-parameter-handler",
@@ -3994,12 +4048,13 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "typearea/hyphenator": 20,
+        "etdsolutions/domready": 20,
         "apoutchika/loremipsum-bundle": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.5.9"
+        "php": ">=5.6.0"
     },
     "platform-dev": []
 }

@@ -18,12 +18,15 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 /**
  * @package AdminBundle
  */
 
 namespace AdminBundle\Controller;
 
+use DembeloMain\Model\Repository\Doctrine\ODM\AbstractRepository;
+use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use AdminBundle\Model\ImportTwine;
 use DembeloMain\Document\Importfile;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -33,7 +36,6 @@ use Symfony\Component\HttpFoundation\Response;
 use StdClass;
 use DembeloMain\Document\User;
 use DembeloMain\Document\Topic;
-use DembeloMain\Document\Story;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 /**
@@ -53,9 +55,8 @@ class DefaultController extends Controller
             ['id' => "1", 'type' => "folder", 'value' => "Benutzer", 'css' => "folder_music"],
             ['id' => "2", 'type' => "folder", 'value' => "Lizenznehmer", 'css' => "folder_music"],
             ['id' => "3", 'type' => "folder", 'value' => "Themenfelder", 'css' => "folder_music"],
-            ['id' => "4", 'type' => "folder", 'value' => "Geschichten", 'css' => "folder_music"],
-            ['id' => "5", 'type' => "folder", 'value' => "Importe", 'css' => "folder_music"],
-            ['id' => "6", 'type' => "folder", 'value' => "Textknoten", 'css' => "folder_music"],
+            ['id' => "4", 'type' => "folder", 'value' => "Importe", 'css' => "folder_music"],
+            ['id' => "5", 'type' => "folder", 'value' => "Textknoten", 'css' => "folder_music"],
         ];
 
         $jsonEncoder = new JsonEncoder();
@@ -71,9 +72,7 @@ class DefaultController extends Controller
      */
     public function usersAction(Request $request)
     {
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:User');
+        $repository = $this->get('app.model_repository_user');
 
         $filters = $request->query->get('filter');
 
@@ -120,9 +119,7 @@ class DefaultController extends Controller
      */
     public function licenseesAction()
     {
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:Licensee');
+        $repository = $this->get('app.model_repository_licensee');
 
         $licensees = $repository->findAll();
 
@@ -194,31 +191,6 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/stories", name="admin_stories")
-     *
-     * @return String
-     */
-    public function storiesAction()
-    {
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:Story');
-
-        $users = $repository->findAll();
-
-        $output = array();
-        /* @var $user \DembeloMain\Document\Story */
-        foreach ($users as $user) {
-            $obj = new StdClass();
-            $obj->id = $user->getId();
-            $obj->name = $user->getName();
-            $output[] = $obj;
-        }
-
-        return new Response(\json_encode($output));
-    }
-
-    /**
      * @Route("/save", name="admin_formsave")
      *
      * @param Request $request
@@ -228,22 +200,18 @@ class DefaultController extends Controller
     {
         $params = $request->request->all();
 
-        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'story', 'importfile', 'textnode'))) {
+        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'importfile', 'textnode'))) {
             return new Response(\json_encode(array('error' => true)));
         }
         if (!isset($params['id'])) {
             return new Response(\json_encode(array('error' => true)));
         }
-        $formtype = ucfirst($params['formtype']);
+        $formtype = $params['formtype'];
 
-        /* @var $mongo \Doctrine\Bundle\MongoDBBundle\ManagerRegistry */
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $dm \Doctrine\ODM\MongoDB\DocumentManager*/
-        $dm = $mongo->getManager();
+        /* @var $repository AbstractRepository */
+        $repository = $this->get('app.model_repository_'.$formtype);
 
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:'.$formtype);
-        if ($params['id'] == 'new') {
+        if (isset($params['id']) && $params['id'] == 'new') {
             $className = $repository->getClassName();
             $item = new $className();
         } else {
@@ -276,13 +244,16 @@ class DefaultController extends Controller
         if (method_exists($item, 'setMetadata')) {
             $item->setMetadata('updated', time());
         }
-        $dm->persist($item);
-        $dm->flush();
+        $repository->save($item);
 
-        if ($formtype == 'Importfile' && array_key_exists('filename', $params)) {
+        if ($formtype === 'topic' && array_key_exists('imageFileName', $params)) {
+            $this->saveTopicImage($item, $params['imageFileName'], $params['originalImageName']);
+            $repository->save($item);
+        }
+
+        if ($formtype == 'importfile' && array_key_exists('filename', $params)) {
             $this->saveFile($item, $params['filename'], $params['orgname']);
-            $dm->persist($item);
-            $dm->flush();
+            $repository->save($item);
         }
 
         $output = array(
@@ -291,43 +262,6 @@ class DefaultController extends Controller
         );
 
         return new Response(\json_encode($output));
-    }
-
-    /**
-     * @Route("/delete", name="admin_formdel")
-     *
-     * @param Request $request
-     * @return String
-     */
-    public function formdelAction(Request $request)
-    {
-        $params = $request->request->all();
-
-        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'story'))) {
-            return new Response(\json_encode(array('error' => true)));
-        }
-
-        $formtype = ucfirst($params['formtype']);
-
-        /* @var $mongo \Doctrine\Bundle\MongoDBBundle\ManagerRegistry */
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $dm \Doctrine\ODM\MongoDB\DocumentManager*/
-        $dm = $mongo->getManager();
-
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:'.$formtype);
-        if (!isset($params['id']) || empty($params['id'])) {
-            return new Response(\json_encode(array('error' => true)));
-        }
-
-        $user = $repository->find($params['id']);
-        if (is_null($user)) {
-            return new Response(\json_encode(array('error' => true)));
-        }
-        $dm->remove($user);
-        $dm->flush();
-
-        return new Response(\json_encode(array('error' => false)));
     }
 
     /**
@@ -555,5 +489,29 @@ class DefaultController extends Controller
         }
 
         return $index;
+    }
+
+    /**
+     * saves temporary file to final place
+     *
+     * @param Topic $item topic instance
+     * @param string $filename filename hash
+     * @param string $orgname original name
+     */
+    private function saveTopicImage(Topic $item, $filename, $orgname)
+    {
+        if (empty($filename) || empty($orgname)) {
+            return;
+        }
+        $directory = $this->container->getParameter('topic_image_directory');
+        $finalDirectory = $directory.$item->getId().'/';
+        if (!is_dir($finalDirectory)) {
+            mkdir($finalDirectory);
+        }
+        $finalName = $finalDirectory.$orgname;
+        $file = $directory.$filename;
+        rename($file, $finalName);
+        $item->setOriginalImageName($orgname);
+        $item->setImageFilename($finalName);
     }
 }

@@ -25,15 +25,18 @@
 
 namespace AdminBundle\Tests\Controller;
 
+use DembeloMain\Document\Licensee;
+use DembeloMain\Document\Topic;
 use DembeloMain\Document\User;
+use DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AdminBundle\Controller\DefaultController;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -79,7 +82,7 @@ class DefaultControllerTest extends WebTestCase
             ->method("execute")
             ->will($this->returnValue(array()));
 
-        $this->loadMongoContainer();
+        $this->loadMongoContainer('user');
         $this->repository->expects($this->once())
             ->method("createQueryBuilder")
             ->will($this->returnValue($queryMock));
@@ -112,7 +115,7 @@ class DefaultControllerTest extends WebTestCase
             ->method("getQuery")
             ->will($this->returnSelf());
 
-        $this->loadMongoContainer();
+        $this->loadMongoContainer('user');
 
         $this->repository->expects($this->once())
             ->method("createQueryBuilder")
@@ -220,7 +223,7 @@ class DefaultControllerTest extends WebTestCase
         $user->setEmail('some@email.de');
         $user->setRoles('ROLE_USER');
 
-        $this->loadMongoContainer();
+        $this->loadMongoContainer('user');
         $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
         $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
         $postArray = array(
@@ -236,12 +239,6 @@ class DefaultControllerTest extends WebTestCase
             ->method('find')
             ->with($user->getId())
             ->will($this->returnValue($user));
-
-        $dm = $this->getMockBuilder(DocumentManager::class)->disableOriginalConstructor()->getMock();
-
-        $this->service->expects($this->once())
-            ->method('getManager')
-            ->will($this->returnValue($dm));
 
         $controller = new DefaultController();
         $controller->setContainer($this->container);
@@ -266,7 +263,7 @@ class DefaultControllerTest extends WebTestCase
         $user->setEmail('some@email.de');
         $user->setRoles('ROLE_USER');
 
-        $this->loadMongoContainer();
+        $this->loadMongoContainer('user');
         $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
         $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
         $postArray = array(
@@ -282,12 +279,6 @@ class DefaultControllerTest extends WebTestCase
             ->method('find')
             ->with($user->getId())
             ->will($this->returnValue(null));
-
-        $dm = $this->getMockBuilder(DocumentManager::class)->disableOriginalConstructor()->getMock();
-
-        $this->service->expects($this->once())
-            ->method('getManager')
-            ->will($this->returnValue($dm));
 
         $controller = new DefaultController();
         $controller->setContainer($this->container);
@@ -343,168 +334,68 @@ class DefaultControllerTest extends WebTestCase
     }
 
     /**
-     * tests the formdelAction without admin permission
+     * tests licenseeAction with no licensees
      */
-    public function testFormdelActionWithoutAdminPermission()
+    public function testLicenseeActionWithNoLicensees()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/admin/delete');
+        $repository = $this->getMockBuilder(LicenseeRepository::class)->disableOriginalConstructor()->setMethods(['findAll'])->getMock();
+        $repository->expects($this->once())
+            ->method('findAll')
+            ->willReturn([]);
 
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container->expects($this->once())
+            ->method('get')
+            ->with('app.model_repository_licensee')
+            ->willReturn($repository);
 
-        $this->assertEquals(302, $client->getResponse()->getStatusCode());
-        $this->assertTrue($crawler->filter('html:contains("login")')->count() > 0);
+        $controller = new DefaultController();
+        $controller->setContainer($container);
+
+        /* @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $controller->licenseesAction();
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $this->assertJsonStringEqualsJsonString('[]', $response->getContent());
+        $this->assertEquals('200', $response->getStatusCode());
     }
 
     /**
-     * tests the formdelAction without parameters
+     * tests licenseeAction() with one licensee
      */
-    public function testFormdelActionWithoutParameters()
+    public function testLicenseeActionWithOneLicensee()
     {
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
-        $postArray = array();
-        $postMock->expects($this->once())
-            ->method("all")
-            ->will($this->returnValue($postArray));
-        $request->request = $postMock;
+        $licensee = new Licensee();
+        $licensee->setName('someName');
+        $licensee->setId('someId');
+
+        $repository = $this->getMockBuilder(LicenseeRepository::class)->disableOriginalConstructor()->setMethods(['findAll'])->getMock();
+        $repository->expects($this->once())
+            ->method('findAll')
+            ->willReturn([$licensee]);
+
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container->expects($this->once())
+            ->method('get')
+            ->with('app.model_repository_licensee')
+            ->willReturn($repository);
 
         $controller = new DefaultController();
-        $controller->setContainer($this->container);
+        $controller->setContainer($container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->formdelAction($request);
-        $this->assertInstanceOf(Response::class, $response);
-        $json = $response->getContent();
-        $this->assertJson($json);
-        $json = json_decode($json);
-        $this->assertTrue($json->error);
-    }
-
-    /**
-     * tests the formdelAction with wrong parameters
-     */
-    public function testFormdelActionWithWrongParameters()
-    {
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
-        $postArray = array(
-            'formtype' => 'foobar',
-        );
-        $postMock->expects($this->once())
-            ->method("all")
-            ->will($this->returnValue($postArray));
-        $request->request = $postMock;
-
-        $controller = new DefaultController();
-        $controller->setContainer($this->container);
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->formdelAction($request);
-        $this->assertInstanceOf(Response::class, $response);
-        $json = $response->getContent();
-        $this->assertJson($json);
-        $json = json_decode($json);
-        $this->assertTrue($json->error);
-    }
-
-    /**
-     * tests the formdelAction with a nonexisting user
-     */
-    public function testFormdelActionNonExistingUser()
-    {
-        $user = new User();
-        $user->setId('someId');
-        $user->setEmail('some@email.de');
-        $user->setRoles('ROLE_USER');
-
-        $this->loadMongoContainer();
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
-        $postArray = array(
-            'formtype' => 'user',
-            'id' => 'nonexisting',
-        );
-        $postMock->expects($this->once())
-            ->method("all")
-            ->will($this->returnValue($postArray));
-        $request->request = $postMock;
-
-        $this->repository->expects($this->once())
-            ->method('find')
-            ->with('nonexisting')
-            ->will($this->returnValue(null));
-
-        $controller = new DefaultController();
-        $controller->setContainer($this->container);
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->formdelAction($request);
-        $this->assertInstanceOf(Response::class, $response);
-        $json = $response->getContent();
-        $this->assertJson($json);
-        $json = json_decode($json);
-        $this->assertTrue($json->error);
-    }
-
-    /**
-     * tests the formdelAction with an existing user
-     */
-    public function testFormdelActionExistingUser()
-    {
-        $user = new User();
-        $user->setId('someId');
-        $user->setEmail('some@email.de');
-        $user->setRoles('ROLE_USER');
-
-        $this->loadMongoContainer();
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
-        $postArray = array(
-            'formtype' => 'user',
-            'id' => $user->getId(),
-        );
-        $postMock->expects($this->once())
-            ->method("all")
-            ->will($this->returnValue($postArray));
-        $request->request = $postMock;
-
-        $this->repository->expects($this->once())
-            ->method('find')
-            ->with($user->getId())
-            ->will($this->returnValue($user));
-
-        $dm = $this->getMockBuilder(DocumentManager::class)->disableOriginalConstructor()->getMock();
-
-        $this->service->expects($this->once())
-            ->method('getManager')
-            ->will($this->returnValue($dm));
-
-        $dm->expects($this->once())
-            ->method('remove')
-            ->with($user);
-
-        $dm->expects($this->once())
-            ->method('flush');
-
-        $controller = new DefaultController();
-        $controller->setContainer($this->container);
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->formdelAction($request);
-        $this->assertInstanceOf(Response::class, $response);
-        $json = $response->getContent();
-        $this->assertJson($json);
-        $json = json_decode($json);
-        $this->assertFalse($json->error);
+        $response = $controller->licenseesAction();
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $this->assertJsonStringEqualsJsonString('[{"id":"someId","name":"someName"}]', $response->getContent());
+        $this->assertEquals('200', $response->getStatusCode());
     }
 
     /**
      * load mockoed container and mocked mongodb repository
      */
-    private function loadMongoContainer()
+    private function loadMongoContainer($repository)
     {
         $this->loadMockedContainer();
-        $this->loadMockedMongoRepository();
+        $this->loadMockedMongoRepository($repository);
     }
 
     /**
@@ -518,17 +409,13 @@ class DefaultControllerTest extends WebTestCase
     /**
      * load mocked mongodb repository
      */
-    private function loadMockedMongoRepository()
+    private function loadMockedMongoRepository($repository)
     {
         $this->service = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
         $this->repository = $this->getMockBuilder(DocumentRepository::class)->disableOriginalConstructor()->getMock();
         $this->container->expects($this->once())
             ->method("get")
-            ->with($this->equalTo('doctrine_mongodb'))
-            ->will($this->returnValue($this->service));
-        $this->service->expects($this->once())
-            ->method("getRepository")
-            ->with($this->equalTo('DembeloMain:User'))
+            ->with($this->equalTo('app.model_repository_'.$repository))
             ->will($this->returnValue($this->repository));
     }
 }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Dembelo Admin Area{% endblock %}</title>
+    <title>{% block title %}Was zu lesen - Admin Area{% endblock %}</title>
 
     {% block stylesheets %}
         <link rel="stylesheet" href="/bundles/admin/webix/webix.css" type="text/css">
@@ -17,7 +17,7 @@
 
     {% block javascripts %}
         <script src="/bundles/admin/webix/webix.js" type="text/javascript"></script>
-        <script src="/bundles/admin/js/admin.js" type="text/javascript"></script>
+        <script data-main="/bundles/admin/js/main" src="/js/libs/require.js"></script>
 
     {% endblock %}
 
@@ -25,7 +25,7 @@
 </head>
 <body>
     {% block body %}
-        hallo admin body
+        main admin body
     {% endblock %}
 </body>
 </html>
