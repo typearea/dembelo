@@ -17,14 +17,46 @@
  */
 
 /*global paths*/
-define(function () {
 
+define(function () {
     function showError(msg) {
         webix.modalbox({
             title: "Fehler",
             buttons: ["Ok"],
             text: msg
         });
+    }
+
+    function checkFormBindStatus() {
+        var values = this.getValues();
+
+        if (values.hasOwnProperty('id')) {
+            this.enable();
+        } else {
+            this.disable();
+        }
+    }
+
+    function hasNewRow(dataTableId) {
+        var newRows = $$(dataTableId).find(function (obj) {
+            return obj.id === 'new';
+        });
+        return newRows.length > 0;
+    }
+
+    function importfileCheckActions() {
+        var values = $$('importfileform').getValues();
+        if (values.name !== '' && values.licenseeId !== '') {
+            $$("importfileSaveButton").enable();
+            if (values.id !== 'new') {
+                $$("importfileImportButton").enable();
+            } else {
+                $$("importfileImportButton").disable();
+            }
+        } else {
+            $$("importfileSaveButton").disable();
+            $$("importfileImportButton").disable();
+        }
     }
 
     function formsave(type) {
@@ -36,7 +68,7 @@ define(function () {
             return;
         }
 
-        webix.ajax().post(paths.adminFormSave, values, function (text) {
+        webix.ajax().post(window.paths.adminFormSave, values, function (text) {
             var params = JSON.parse(text);
             if (params['error'] === false) {
                 $$("topicuploadimagelist").clearAll();
@@ -44,6 +76,11 @@ define(function () {
                 if (params['newId']) {
                     $$(type + 'grid').getSelectedItem().id = params['newId'];
                 }
+                webix.modalbox({
+                    title: "Gespeichert",
+                    buttons: ["Ok"],
+                    text: "Der Datensatz wurde erfolgreich gespeichert..."
+                });
             } else {
                 showError("Das Speichern ist leider fehlgeschlagen...");
             }
@@ -62,6 +99,44 @@ define(function () {
         formsave("topic");
     }
 
+    function importfileSave() {
+        formsave("importfile");
+    }
+
+    function importfileImport() {
+        var importfileId = $$('importfilegrid').getSelectedId().id;
+
+        webix.ajax().post(window.paths.adminImport, {importfileId: importfileId}, {
+            success: function (text) {
+                var params = JSON.parse(text);
+                if (params['success'] === true && params['returnValue'] === true) {
+                    webix.modalbox({
+                        title: "Datei importiert",
+                        buttons: ["OK"],
+                        text: "Die Datei wurde erfolgreich importiert."
+                    });
+                } else {
+                    webix.modalbox({
+                        title: "Fehler",
+                        buttons: ["OK"],
+                        text: "Fehler: " + params['message']
+                    });
+                }
+            },
+            error: function (dom, obj, ajaxObj) {
+                var message = 'Unbekannter Fehler';
+                if (ajaxObj instanceof XMLHttpRequest) {
+                    message = ajaxObj.statusText;
+                }
+                webix.modalbox({
+                    title: "Fehler",
+                    buttons: ["OK"],
+                    text: "Fehler: " + message
+                });
+            }
+        });
+    }
+
     function getToolbar(type) {
 
         var clickString;
@@ -75,6 +150,9 @@ define(function () {
                 break;
             case 'topic':
                 clickString = "$$('topicgrid').add({id: 'new', name: '', status: 0})";
+                break;
+            case 'importfile':
+                clickString = "$$('importfilegrid').add({id: 'new', name: ''});";
                 break;
         }
 
@@ -134,10 +212,25 @@ define(function () {
                     $$('topicgrid').clearAll();
                     $$('topicgrid').load(window.paths.adminTopics);
                     $$('topicstuff').show();
+                } else if (id == 4) {
+                    $$('importfilegrid').clearAll();
+                    $$('importfilegrid').load(window.paths.adminImportfiles);
+                    $$('importfilestuff').show();
+                } else if (id == 5) {
+                    $$('textnodegrid').clearAll();
+                    $$('textnodegrid').load(window.paths.adminTextnodes);
+                    $$('textnodestuff').show();
                 }
             });
 
-            $$("mainnav").select(3);
+            $$("mainnav").select(1);
+            $$('usergrid').load(window.paths.adminUsers);
+            $$('userstuff').show();
+
+            $$('userform').attachEvent('onValues', checkFormBindStatus);
+            $$('textnodeform').attachEvent('onValues', checkFormBindStatus);
+            $$('importfileform').attachEvent('onValues', checkFormBindStatus);
+
 
             $$('userform').bind($$('usergrid'));
             $$('userformrole').attachEvent('onChange', function (newValue) {
@@ -163,7 +256,18 @@ define(function () {
                 $$('topicform').setValues(response, true);
             });
 
+            $$('uploadfile').attachEvent("onUploadComplete", function(response) {
+                $$('importfileform').setValues(response, true);
+            });
+
+            $$('importfileform').bind($$('importfilegrid'));
+            $$('importfileform').attachEvent('onChange', importfileCheckActions);
+            $$('importfileform').attachEvent('onValues', importfileCheckActions);
+
+
             $$('licenseeform').bind($$('licenseegrid'));
+            $$('licenseeform').attachEvent('onValues', checkFormBindStatus);
+
 
             $$("topicgrid").attachEvent("onAfterLoad", function () {
                 buildStatusFilter($$("topicgrid"));
@@ -332,6 +436,106 @@ define(function () {
                                                                 }
                                                             ]
                                                         }
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                id: "importfilestuff",
+                                                cols: [
+                                                    {
+                                                        rows: [
+                                                            getToolbar('importfile'),
+                                                            {
+                                                                id: "importfilegrid",
+                                                                view: "datatable",
+                                                                autoConfig: true,
+                                                                select: true,
+                                                                datatype: "json",
+                                                                columns: [
+                                                                    {id: 'name', header: 'Name', fillspace: true},
+                                                                    {id: 'author', header: 'Autor'},
+                                                                    {id: 'publisher', header: 'Verlag'},
+                                                                    {id: 'imported', header: 'Importiert'}
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {view: "resizer"},
+                                                    {
+                                                        view: "scrollview",
+                                                        scroll: "y",
+                                                        body: {
+                                                            rows: [
+                                                                {
+                                                                    view: "form",
+                                                                    id: "importfileform",
+                                                                    disabled: true,
+                                                                    gravity: 0.5,
+                                                                    elements: [
+                                                                        {view: "text", name: "name", label: "Name"},
+                                                                        {view: "text", name: "author", label: "Autor"},
+                                                                        {view: "text", name: "publisher", label: "Verlag"},
+                                                                        {view: "combo", id: "userformlicensee", name: "licenseeId", label: "Lizenznehmer", suggest: paths.adminLicenceeSuggest},
+                                                                        {view: "text", name: "orgname", label: "Datei", disabled: true},
+                                                                        {
+                                                                            view:"uploader",
+                                                                            id: "uploadfile",
+                                                                            value:"Dateiauswahl",
+                                                                            link:"uploadfilelist",
+                                                                            upload: window.paths.adminImportfileUploader,
+                                                                            multiple: false
+                                                                        },
+                                                                        {
+                                                                            view:"list",
+                                                                            id:"uploadfilelist",
+                                                                            type:"uploader",
+                                                                            autoheight:true,
+                                                                            borderless:true
+                                                                        },
+                                                                        {view: "button", id: "importfileSaveButton", value:"Speichern", click:importfileSave, disabled: true },
+                                                                        {view: "button", id: "importfileImportButton", value:"Importieren", click:importfileImport, disabled: true}
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+
+                                            },
+                                            {
+                                                id: "textnodestuff",
+                                                cols: [
+                                                    {
+                                                        rows: [
+                                                            {
+                                                                id: "textnodegrid",
+                                                                view: "datatable",
+                                                                autoConfig: true,
+                                                                select: true,
+                                                                datatype: "json",
+                                                                columns: [
+                                                                    {id: 'created', header: 'angelegt'},
+                                                                    {id: 'status', header: 'Status'},
+                                                                    {id: 'beginning', header: 'Text', fillspace: true},
+                                                                    {id: 'importfile', header: 'Importdatei'}
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        view: "form",
+                                                        id: "textnodeform",
+                                                        disabled: true,
+                                                        gravity: 0.5,
+                                                        elements: [
+                                                            {view: "text", name: "id", label: "ID", disabled: true},
+                                                            {view: "text", name: "created", label: "angelegt", disabled: true},
+                                                            {view: "text", name: "status", label: "Status", disabled: true},
+                                                            {view: "text", name: "access", label: "Access-Knoten", disabled: true},
+                                                            {view: "text", name: "licensee", label: "Lizenznehmer", disabled: true},
+                                                            {view: "text", name: "importfile", label: "Importdatei", disabled: true},
+                                                            {view: "textarea", name: "beginning", label: "Textanfang", height: 200, disabled: true}
+                                                        ]
                                                     }
                                                 ]
                                             }

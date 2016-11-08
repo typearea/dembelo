@@ -4,6 +4,9 @@ parameters:
 #    parameter_name: value
 
 services:
+    admin.import.twine:
+        class: AdminBundle\Model\ImportTwine
+        arguments: ["@app.model_repository_textNode", "@app.model_repository_topic"]
 #    service_name:
 #        class: DembeloMain\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
@@ -51,3 +54,9 @@ services:
         factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
         arguments:
             - DembeloMain\Document\User
+
+    app.model_repository_importfile:
+            class: DembeloMain\Model\Repository\Doctrine\ODM\ImportfileRepository
+            factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
+            arguments:
+                - DembeloMain\Document\Importfile

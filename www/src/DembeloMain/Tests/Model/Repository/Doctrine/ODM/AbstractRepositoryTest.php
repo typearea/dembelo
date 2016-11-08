@@ -25,12 +25,13 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Persisters\DocumentPersister;
 use Doctrine\ODM\MongoDB\UnitOfWork;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
  * Class AbstractRepositoryTest
  * @package DembeloMain\Tests\Model\Repository\Doctrine\ODM
  */
-abstract class AbstractRepositoryTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractRepositoryTest extends KernelTestCase
 {
     /**
      * Test save

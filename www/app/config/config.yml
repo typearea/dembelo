@@ -8,6 +8,7 @@ imports:
 parameters:
     locale: de
     topic_image_directory: '%kernel.root_dir%/../uploads/topicimage/'
+    twine_directory: '%kernel.root_dir%/../uploads/twine/'
 
 framework:
     #esi:             ~
