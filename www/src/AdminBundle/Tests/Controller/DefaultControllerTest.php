@@ -240,12 +240,6 @@ class DefaultControllerTest extends WebTestCase
             ->with($user->getId())
             ->will($this->returnValue($user));
 
-        $dm = $this->getMockBuilder(DocumentManager::class)->disableOriginalConstructor()->getMock();
-
-        $this->service->expects($this->once())
-            ->method('getManager')
-            ->will($this->returnValue($dm));
-
         $controller = new DefaultController();
         $controller->setContainer($this->container);
 
@@ -285,12 +279,6 @@ class DefaultControllerTest extends WebTestCase
             ->method('find')
             ->with($user->getId())
             ->will($this->returnValue(null));
-
-        $dm = $this->getMockBuilder(DocumentManager::class)->disableOriginalConstructor()->getMock();
-
-        $this->service->expects($this->once())
-            ->method('getManager')
-            ->will($this->returnValue($dm));
 
         $controller = new DefaultController();
         $controller->setContainer($this->container);
