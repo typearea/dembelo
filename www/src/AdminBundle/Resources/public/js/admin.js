@@ -230,6 +230,7 @@ define(function () {
             $$('userform').attachEvent('onValues', checkFormBindStatus);
             $$('textnodeform').attachEvent('onValues', checkFormBindStatus);
             $$('importfileform').attachEvent('onValues', checkFormBindStatus);
+            $$('topicform').attachEvent('onValues', checkFormBindStatus);
 
 
             $$('userform').bind($$('usergrid'));
@@ -274,6 +275,7 @@ define(function () {
             });
 
             $$("topicform").bind($$("topicgrid"));
+            $$("textnodeform").bind($$("textnodegrid"));
         },
 
         getUiJson: function () {
@@ -411,6 +413,7 @@ define(function () {
                                                                     view: "form",
                                                                     id: "topicform",
                                                                     gravity: 0.5,
+                                                                    disabled: true,
                                                                     elements: [
                                                                         {view: "text", name: "name", label: "Name", validate:webix.rules.isNotEmpty},
                                                                         {view: "combo", id: "topicformstatus", name: "status", label: "Status", options: [{id:"0", value: "inaktiv"}, {id:"1", value: "aktiv"}], validate:webix.rules.isNotEmpty},
