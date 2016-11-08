@@ -19,6 +19,16 @@
 /*global paths*/
 dembeloAdmin = (function () {
 
+    function checkFormBindStatus() {
+        var values = this.getValues();
+
+        if (values.hasOwnProperty('id')) {
+            this.enable();
+        } else {
+            this.disable();
+        }
+    }
+
     function hasNewRow(dataTableId) {
         var newRows = $$(dataTableId).find(function (obj) {
             return obj.id === 'new';
@@ -60,11 +70,11 @@ dembeloAdmin = (function () {
                     $$('storygrid').clearAll();
                     $$('storygrid').load(paths.adminStories);
                     $$('storygrid').show();
-                } else if (id === 5) {
+                } else if (id == 5) {
                     $$('importfilegrid').clearAll();
                     $$('importfilegrid').load(paths.adminImportfiles);
                     $$('importfilestuff').show();
-                } else if (id === 6) {
+                } else if (id == 6) {
                     $$('textnodegrid').clearAll();
                     $$('textnodegrid').load(paths.adminTextnodes);
                     $$('textnodestuff').show();
@@ -76,6 +86,9 @@ dembeloAdmin = (function () {
             $$('userstuff').show();
 
             $$('userform').bind($$('usergrid'));
+            $$('userform').attachEvent('onValues', checkFormBindStatus);
+            $$('textnodeform').attachEvent('onValues', checkFormBindStatus);
+            $$('importfileform').attachEvent('onValues', checkFormBindStatus);
             $$('userformrole').attachEvent('onChange', function (newValue) {
                 if (newValue == 'ROLE_LICENSEE') {
                     $$('userformlicensee').enable()
@@ -96,12 +109,15 @@ dembeloAdmin = (function () {
                 $$('importfileform').setValues(response, true);
             });
 
+            $$('importfileform').bind($$('importfilegrid'));
             $$('importfileform').attachEvent('onChange', importfileCheckActions);
             $$('importfileform').attachEvent('onValues', importfileCheckActions);
 
             $$('licenseeform').bind($$('licenseegrid'));
-            $$('importfileform').bind($$('importfilegrid'));
+            $$('licenseeform').attachEvent('onValues', checkFormBindStatus);
+
             $$('textnodeform').bind($$('textnodegrid'));
+
         },
         formsave: function (type) {
             var id = type + "form",
