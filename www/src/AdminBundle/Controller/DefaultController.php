@@ -307,30 +307,6 @@ class DefaultController extends Controller
     }
 
     /**
-     * saves temporary file to final place
-     *
-     * @param Topic $item topic instance
-     * @param string $filename filename hash
-     * @param string $orgname original name
-     */
-    private function saveTopicImage(Topic $item, $filename, $orgname)
-    {
-        if (empty($filename) || empty($orgname)) {
-            return;
-        }
-        $directory = $this->container->getParameter('topic_image_directory');
-        $finalDirectory = $directory.$item->getId().'/';
-        if (!is_dir($finalDirectory)) {
-            mkdir($finalDirectory);
-        }
-        $finalName = $finalDirectory.$orgname;
-        $file = $directory.$filename;
-        rename($file, $finalName);
-        $item->setOriginalImageName($orgname);
-        $item->setImageFilename($finalName);
-    }
-
-    /**
      * @Route("/importfiles", name="admin_importfiles")
      *
      * @return Response
@@ -513,5 +489,29 @@ class DefaultController extends Controller
         }
 
         return $index;
+    }
+
+    /**
+     * saves temporary file to final place
+     *
+     * @param Topic $item topic instance
+     * @param string $filename filename hash
+     * @param string $orgname original name
+     */
+    private function saveTopicImage(Topic $item, $filename, $orgname)
+    {
+        if (empty($filename) || empty($orgname)) {
+            return;
+        }
+        $directory = $this->container->getParameter('topic_image_directory');
+        $finalDirectory = $directory.$item->getId().'/';
+        if (!is_dir($finalDirectory)) {
+            mkdir($finalDirectory);
+        }
+        $finalName = $finalDirectory.$orgname;
+        $file = $directory.$filename;
+        rename($file, $finalName);
+        $item->setOriginalImageName($orgname);
+        $item->setImageFilename($finalName);
     }
 }
