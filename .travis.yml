@@ -13,6 +13,8 @@ before_install:
 - chmod 600 files/travisci
 - eval `ssh-agent -s`
 - ssh-add files/travisci
+- phantomjs --webdriver=localhost:8910 &
+- cd www/web/ && php -S localhost:8000
 services:
 - mongodb
 script:
@@ -20,6 +22,7 @@ script:
 - ./www/bin/phpcs --standard=symfony2 www/src
 - ./www/bin/phpunit -c www/app/
 - php ./scripts/coverage-checker.php www/app/logs/clover.xml 48
+- ./www/bin/phpunit www/selenium/
 install:
 - if [[ $MONGOEXTENSION == "mongo.so" ]]; then composer --working-dir="www" remove
   alcaeus/mongo-php-adapter mongodb/mongodb; fi
