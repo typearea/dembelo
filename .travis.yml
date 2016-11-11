@@ -14,7 +14,7 @@ before_install:
 - eval `ssh-agent -s`
 - ssh-add files/travisci
 - phantomjs --webdriver=localhost:8910 &
-- cd www/web/ && php -S localhost:8000
+- cd www/web/ && php -S localhost:8000 &
 services:
 - mongodb
 script:
