@@ -76,4 +76,33 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
             ->getQuery()
             ->execute();
     }
+
+    /**
+     * @param Textnode $object
+     */
+    protected function beforeSave($object)
+    {
+        parent::beforeSave($object);
+        if (is_null($object->getArbitraryId())) {
+            $object->setArbitraryId($this->createArbitraryId($object));
+        }
+    }
+
+    /**
+     * @param Textnode $object
+     *
+     * @return string
+     */
+    private function createArbitraryId($object)
+    {
+        $id = substr(md5(time().substr($object->getText(), 0, 100)), 0, 15);
+
+        $exists = count($this->findBy(array('arbitraryId' => $id))) > 0;
+
+        if (!$exists) {
+            return $this->createArbitraryId($object);
+        }
+
+        return $id;
+    }
 }
