@@ -36,7 +36,8 @@
         "apoutchika/loremipsum-bundle": "dev-master",
         "symfony/debug": "3.1.*",
         "facebook/webdriver": "^1.2",
-        "jakoch/phantomjs-installer": "^2.1"
+        "jakoch/phantomjs-installer": "^2.1",
+        "doctrine/doctrine-fixtures-bundle": "^2.3"
     },
     "scripts": {
         "post-root-package-install": [

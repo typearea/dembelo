@@ -17,5 +17,18 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var_dump(shell_exec('bin/phantomjs --webdriver=localhost:8910 &'));
-var_dump(shell_exec('`cd www/web/ && php -S localhost:8000 &'));
+use Symfony\Component\HttpFoundation\Request;
+
+$loader = require __DIR__.'/../app/autoload.php';
+include_once __DIR__.'/../app/bootstrap.php.cache';
+
+$kernel = new AppKernel('selenium', false);
+$kernel->loadClassCache();
+//$kernel = new AppCache($kernel);
+
+// When using the HttpCache, you need to call the method in your front controller instead of relying on the configuration parameter
+//Request::enableHttpMethodParameterOverride();
+$request = Request::createFromGlobals();
+$response = $kernel->handle($request);
+$response->send();
+$kernel->terminate($request, $response);
