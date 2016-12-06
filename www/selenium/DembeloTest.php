@@ -40,6 +40,8 @@ class DembeloTest extends PHPUnit_Framework_TestCase
     {
         $this->webDriver->get($this->url);
 
+        $this->webDriver->manage()->window()->maximize();
+
         //$this->assertEquals('hurz', $this->webDriver->getPageSource());
 
         $menuSettings = $this->webDriver->findElement(
