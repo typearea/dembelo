@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd ../www/
+cd ./www/
 
 php app/console server:start -q
 bin/phantomjs --webdriver=8910 --webdriver-loglevel=ERROR &
