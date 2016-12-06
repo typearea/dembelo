@@ -24,7 +24,7 @@ class DembeloTest extends PHPUnit_Framework_TestCase
         );
         $this->webDriver = RemoteWebDriver::create('127.0.0.1:8910', $capabilities);
 
-        $this->webDriver->manage()->window()->setSize(new \Facebook\WebDriver\WebDriverDimension(2000, 1000));
+        $this->webDriver->manage()->window()->maximize();
 
         $this->webDriver->manage()->deleteAllCookies();
         shell_exec('php app/console doctrine:mongodb:fixtures:load -n');
