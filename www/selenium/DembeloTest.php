@@ -38,11 +38,11 @@ class DembeloTest extends PHPUnit_Framework_TestCase
 
     public function testDembeloLogin()
     {
-        $this->webDriver->get($this->url);
-
         $this->webDriver->manage()->window()->maximize();
 
-        //$this->assertEquals('hurz', $this->webDriver->getPageSource());
+        $this->webDriver->get($this->url);
+
+        $this->assertEquals('hurz', $this->webDriver->manage()->window());
 
         $menuSettings = $this->webDriver->findElement(
             WebDriverBy::className('glyphicon-menu-hamburger')
