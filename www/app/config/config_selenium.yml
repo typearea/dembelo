@@ -4,3 +4,6 @@ imports:
 web_profiler:
     toolbar: false
     intercept_redirects: false
+
+assetic:
+    sass: sass
