@@ -48,6 +48,7 @@ class DembeloTest extends PHPUnit_Framework_TestCase
         $menuSettings = $this->webDriver->findElement(
             WebDriverBy::className('glyphicon-menu-hamburger')
         );
+        $this->assertEquals('hurz', 'url: '.$this->webDriver->getCurrentURL().' ---- '.$this->webDriver->getPageSource());
         $menuSettings->click();
 
         $menuLogin = $this->webDriver->findElement(
