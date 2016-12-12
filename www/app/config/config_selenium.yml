@@ -6,4 +6,4 @@ web_profiler:
     intercept_redirects: false
 
 assetic:
-    sass: sass
+    sass: /home/travis/.rvm/gems/ruby-1.9.3-p551/bin/sass
