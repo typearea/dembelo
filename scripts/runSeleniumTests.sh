@@ -2,9 +2,8 @@
 
 cd ./www/
 
-php app/console server:start -q
-bin/phantomjs --webdriver=8910 &
-# bin/phantomjs --webdriver=8910 --webdriver-loglevel=ERROR &
+php app/console server:start
+bin/phantomjs --webdriver=8910 --webdriver-loglevel=ERROR &
 app/console assetic:dump --env=selenium
 app/console cache:warmup --env=selenium -q
 
