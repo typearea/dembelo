@@ -97,9 +97,11 @@ class TextNodeRepositoryTest extends AbstractRepositoryTest
 
         $textnode1 = new Textnode();
         $textnode1->setImportfileId($importfile->getId());
+        $textnode1->setArbitraryId('arb1');
         $this->repository->save($textnode1);
 
         $textnode2 = new Textnode();
+        $textnode2->setArbitraryId('arb2');
         $this->repository->save($textnode2);
 
         $textnodes = $this->repository->findByImportfileId($importfile->getId());
@@ -147,11 +149,13 @@ class TextNodeRepositoryTest extends AbstractRepositoryTest
         $textnode1 = new Textnode();
         $textnode1->setImportfileId($importfile->getId());
         $textnode1->setTwineId('twineId');
+        $textnode1->setArbitraryId('arb1');
         $this->repository->save($textnode1);
 
         $textnode2 = new Textnode();
         $textnode2->setImportfileId($importfile->getId());
         $textnode2->setTwineId('twineId2');
+        $textnode2->setArbitraryId('arb2');
         $this->repository->save($textnode2);
 
         $returnedTextnode = $this->repository->findByTwineId($importfile, 'twineId');
@@ -170,11 +174,13 @@ class TextNodeRepositoryTest extends AbstractRepositoryTest
         $textnode1 = new Textnode();
         $textnode1->setImportfileId($importfile->getId());
         $textnode1->setStatus(Textnode::STATUS_ACTIVE);
+        $textnode1->setArbitraryId('arb1');
         $this->repository->save($textnode1);
 
         $textnode2 = new Textnode();
         $textnode2->setImportfileId($importfile->getId());
         $textnode2->setStatus(Textnode::STATUS_ACTIVE);
+        $textnode2->setArbitraryId('arb2');
         $this->repository->save($textnode2);
 
         $this->repository->disableOrphanedNodes($importfile, [$textnode1->getId()]);
@@ -192,6 +198,66 @@ class TextNodeRepositoryTest extends AbstractRepositoryTest
                 $this->assertFalse(true);
             }
         }
+    }
+
+    /**
+     * tests the findOneActiveByArbitraryId() method with no active textnodes available
+     */
+    public function testFindOneActiveByArbitraryIdWithNoActiveTextnodes()
+    {
+        $textnode = new Textnode();
+        $textnode->setStatus(Textnode::STATUS_INACTIVE);
+        $textnode->setArbitraryId('arb1');
+        $this->repository->save($textnode);
+
+        $returnValue = $this->repository->findOneActiveByArbitraryId('arb1');
+        $this->assertNull($returnValue);
+    }
+
+    /**
+     * tests the findOneActiveByArbitraryId() method with an active textnodes available
+     */
+    public function testFindOneActiveByArbitraryIdWithActiveTextnodes()
+    {
+        $textnode = new Textnode();
+        $textnode->setStatus(Textnode::STATUS_ACTIVE);
+        $textnode->setArbitraryId('arb1');
+        $this->repository->save($textnode);
+
+        $returnValue = $this->repository->findOneActiveByArbitraryId('arb1');
+        $this->assertInstanceOf(Textnode::class, $returnValue);
+        $this->assertEquals('arb1', $returnValue->getArbitraryId());
+    }
+
+    /**
+     * tests the findOneActiveById() method with no active textnodes available
+     */
+    public function testFindOneActiveByIdWithNoActiveTextnodes()
+    {
+        $textnode = new Textnode();
+        $textnode->setStatus(Textnode::STATUS_INACTIVE);
+        $textnode->setArbitraryId('arb1');
+        $this->repository->save($textnode);
+        $id = $textnode->getId();
+
+        $returnValue = $this->repository->findOneActiveById($id);
+        $this->assertNull($returnValue);
+    }
+
+    /**
+     * tests the findOneActiveById() method with an active textnodes available
+     */
+    public function testFindOneActiveByIdWithActiveTextnodes()
+    {
+        $textnode = new Textnode();
+        $textnode->setStatus(Textnode::STATUS_ACTIVE);
+        $textnode->setArbitraryId('arb1');
+        $this->repository->save($textnode);
+        $id = $textnode->getId();
+
+        $returnValue = $this->repository->findOneActiveById($id);
+        $this->assertInstanceOf(Textnode::class, $returnValue);
+        $this->assertEquals($id, $returnValue->getId());
     }
 
     private function createImportfile()
