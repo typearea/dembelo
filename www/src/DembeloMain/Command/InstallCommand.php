@@ -287,7 +287,7 @@ class InstallCommand extends ContainerAwareCommand
     {
         $loremIpsumLength = 3500;
 
-        $repository = $mongo->getRepository('DembeloMain:Textnode');
+        $repository = $this->getContainer()->get('app.model_repository_textNode');
 
         $allAccessNodes = $repository->findByAccess(true);
         if (count($allAccessNodes) >= 7) {
@@ -374,7 +374,8 @@ class InstallCommand extends ContainerAwareCommand
             $textnode->setText($textnodeDatum['text']);
             $textnode->setAccess($textnodeDatum['access']);
             $textnode->setMetadata($textnodeDatum['metadata']);
-            $dm->persist($textnode);
+            $repository->save($textnode);
+
             $this->dummyData['textnodes'][] = $textnode;
         }
     }

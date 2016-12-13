@@ -44,6 +44,5 @@ abstract class AbstractRepository extends DocumentRepository
 
     protected function beforeSave($object)
     {
-
     }
 }

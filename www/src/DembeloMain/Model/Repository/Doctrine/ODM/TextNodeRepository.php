@@ -78,6 +78,34 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
     }
 
     /**
+     * @param string $arbitraryId textnode arbitrary id
+     * @return Textnode
+     */
+    public function findOneActiveByArbitraryId($arbitraryId)
+    {
+        return $this->findOneBy(
+            array(
+                'arbitraryId' => $arbitraryId,
+                'status' => Textnode::STATUS_ACTIVE,
+            )
+        );
+    }
+
+    /**
+     * @param string $id Textnode Id
+     * @return Textnode
+     */
+    public function findOneActiveById($id)
+    {
+        return $this->findOneBy(
+            array(
+                'id' => new \MongoId($id),
+                'status' => Textnode::STATUS_ACTIVE,
+            )
+        );
+    }
+
+    /**
      * @param Textnode $object
      */
     protected function beforeSave($object)
@@ -96,10 +124,9 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
     private function createArbitraryId($object)
     {
         $id = substr(md5(time().substr($object->getText(), 0, 100)), 0, 15);
-
         $exists = count($this->findBy(array('arbitraryId' => $id))) > 0;
 
-        if (!$exists) {
+        if ($exists) {
             return $this->createArbitraryId($object);
         }
 
