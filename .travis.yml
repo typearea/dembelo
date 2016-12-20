@@ -3,7 +3,7 @@ php:
 - 5.6
 - 7
 before_install:
-- export DEMBELO_VERSION="v1.3.$TRAVIS_BUILD_NUMBER"
+- export DEMBELO_VERSION="v1.3-$TRAVIS_BUILD_NUMBER"
 - export RELEASE_FILENAME="dembelo_$DEMBELO_VERSION.zip"
 - export MONGOEXTENSION="mongodb.so"
 - if [[ ${TRAVIS_PHP_VERSION:0:1} == "5" ]]; then export MONGOEXTENSION="mongo.so";
