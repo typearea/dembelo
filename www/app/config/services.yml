@@ -60,3 +60,10 @@ services:
             factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
             arguments:
                 - DembeloMain\Document\Importfile
+
+    app.twig_extension:
+            class: DembeloMain\Twig\VersionExtension
+            arguments: ["@service_container"]
+            public: false
+            tags:
+                - { name: twig.extension }
