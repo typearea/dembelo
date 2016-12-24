@@ -70,6 +70,10 @@ define(function () {
 
         webix.ajax().post(window.paths.adminFormSave, values, function (text) {
             var params = JSON.parse(text);
+            if (params.session_expired) {
+                window.location = window.paths.login;
+                return;
+            }
             if (params['error'] === false) {
                 $$("topicuploadimagelist").clearAll();
                 $$(id).save();
@@ -109,6 +113,10 @@ define(function () {
         webix.ajax().post(window.paths.adminImport, {importfileId: importfileId}, {
             success: function (text) {
                 var params = JSON.parse(text);
+                if (params.session_expired) {
+                    window.location = window.paths.login;
+                    return;
+                }
                 if (params['success'] === true && params['returnValue'] === true) {
                     webix.modalbox({
                         title: "Datei importiert",
@@ -197,34 +205,40 @@ define(function () {
         filter.value = oldStatusValue;
     }
 
+    function ajaxCallback(text, response) {
+        if (response.json().session_expired) {
+            window.location = window.paths.login;
+        }
+    }
+
     return {
         init: function () {
             $$("mainnav").attachEvent("onAfterSelect", function (id){
                 if (id == 1) {
                     $$('usergrid').clearAll();
-                    $$('usergrid').load(window.paths.adminUsers);
+                    $$('usergrid').load(window.paths.adminUsers, ajaxCallback);
                     $$('userstuff').show();
                 } else if (id == 2) {
                     $$('licenseegrid').clearAll();
-                    $$('licenseegrid').load(window.paths.adminLicensees);
+                    $$('licenseegrid').load(window.paths.adminLicensees, ajaxCallback);
                     $$('licenseestuff').show();
                 } else if (id == 3) {
                     $$('topicgrid').clearAll();
-                    $$('topicgrid').load(window.paths.adminTopics);
+                    $$('topicgrid').load(window.paths.adminTopics, ajaxCallback);
                     $$('topicstuff').show();
                 } else if (id == 4) {
                     $$('importfilegrid').clearAll();
-                    $$('importfilegrid').load(window.paths.adminImportfiles);
+                    $$('importfilegrid').load(window.paths.adminImportfiles, ajaxCallback);
                     $$('importfilestuff').show();
                 } else if (id == 5) {
                     $$('textnodegrid').clearAll();
-                    $$('textnodegrid').load(window.paths.adminTextnodes);
+                    $$('textnodegrid').load(window.paths.adminTextnodes, ajaxCallback);
                     $$('textnodestuff').show();
                 }
             });
 
             $$("mainnav").select(1);
-            $$('usergrid').load(window.paths.adminUsers);
+            $$('usergrid').load(window.paths.adminUsers, ajaxCallback);
             $$('userstuff').show();
 
             $$('userform').attachEvent('onValues', checkFormBindStatus);
