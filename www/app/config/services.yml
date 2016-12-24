@@ -67,3 +67,8 @@ services:
             public: false
             tags:
                 - { name: twig.extension }
+
+    app.requestlistener_session_expiration:
+            class: DembeloMain\EventListener\RequestListener
+            tags:
+                - { name: kernel.event_listener, event: kernel.request, method: onRequest }
