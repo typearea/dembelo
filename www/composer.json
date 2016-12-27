@@ -59,18 +59,20 @@
   },
   "config": {
         "bin-dir": "bin"
-    },
-    "extra": {
-        "symfony-app-dir": "app",
+  },
+  "extra": {
+      "symfony-app-dir": "app",
         "symfony-bin-dir": "bin",
         "symfony-var-dir": "var",
-        "symfony-web-dir": "web",
-        "symfony-assets-install": "relative",
-        "incenteev-parameters": {
-            "file": "app/config/parameters.yml"
-        },
-        "branch-alias": {
-            "dev-master": "3.1-dev"
-        }
-    }
+      "symfony-bin-dir": "bin",
+      "symfony-var-dir": "var",
+      "symfony-web-dir": "web",
+      "symfony-assets-install": "relative",
+      "incenteev-parameters": {
+          "file": "app/config/parameters.yml"
+      },
+      "branch-alias": {
+          "dev-master": "3.1-dev"
+      }
+  }
 }
