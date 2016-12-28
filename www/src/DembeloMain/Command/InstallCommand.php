@@ -81,6 +81,9 @@ class InstallCommand extends ContainerAwareCommand
             $this->installDummyData($output);
             $output->writeln("<info>Dummy data installed</info>");
         }
+        $mongo = $this->getContainer()->get('doctrine_mongodb');
+        $dm = $mongo->getManager();
+        $dm->flush();
     }
 
     protected function purgeDB()
@@ -151,8 +154,6 @@ class InstallCommand extends ContainerAwareCommand
 
         $this->createHitches($mongo, $dm);
         $output->writeln("Hitches installed...");
-
-        $dm->flush();
     }
 
     private function createLicensees(ManagerRegistry $mongo, DocumentManager $dm)
