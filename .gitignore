@@ -6,7 +6,6 @@ files/twine
 www/app/spool
 www/var/cache
 www/var/logs
-www/bin
 www/web/css/
 www/web/images/
 www/web/js/
