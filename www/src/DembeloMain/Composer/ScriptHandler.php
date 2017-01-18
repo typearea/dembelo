@@ -33,8 +33,15 @@ class ScriptHandler
     public static function buildSymLinks()
     {
         $fs = new Filesystem();
+
+        // topic images
         $originDir = '../../uploads/topicimage/';
         $targetDir = 'web/images/topics';
+        $fs->symlink($originDir, $targetDir);
+
+        // webix
+        $originDir = '../../../vendor/typearea/webix/lib/codebase/';
+        $targetDir = './web/js/libs/webix';
         $fs->symlink($originDir, $targetDir);
     }
 }

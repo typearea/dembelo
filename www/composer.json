@@ -27,7 +27,8 @@
         "doctrine/mongodb-odm": "1.1.*",
         "doctrine/mongodb-odm-bundle": "3.2.*",
         "etdsolutions/domready": "dev-master",
-        "etdsolutions/requirejs": "^2.3"
+        "etdsolutions/requirejs": "^2.3",
+        "typearea/webix": "^4.1"
     },
     "require-dev": {
         "phpunit/phpunit": "5.6.*",
@@ -49,28 +50,28 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::removeSymfonyStandardFiles",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
         ],
-    "post-install-cmd": [
-        "@symfony-scripts",
-        "DembeloMain\\Composer\\ScriptHandler::buildSymLinks"
-    ],
-    "post-update-cmd": [
-        "@symfony-scripts"
-    ]
-  },
-  "config": {
+        "post-install-cmd": [
+            "@symfony-scripts",
+            "DembeloMain\\Composer\\ScriptHandler::buildSymLinks"
+        ],
+        "post-update-cmd": [
+            "@symfony-scripts"
+        ]
+    },
+    "config": {
         "bin-dir": "bin"
-  },
-  "extra": {
-      "symfony-app-dir": "app",
-      "symfony-bin-dir": "bin",
-      "symfony-var-dir": "var",
-      "symfony-web-dir": "web",
-      "symfony-assets-install": "relative",
-      "incenteev-parameters": {
-          "file": "app/config/parameters.yml"
-      },
-      "branch-alias": {
-          "dev-master": "3.1-dev"
-      }
-  }
+    },
+    "extra": {
+        "symfony-app-dir": "app",
+        "symfony-bin-dir": "bin",
+        "symfony-var-dir": "var",
+        "symfony-web-dir": "web",
+        "symfony-assets-install": "relative",
+        "incenteev-parameters": {
+            "file": "app/config/parameters.yml"
+        },
+        "branch-alias": {
+            "dev-master": "3.1-dev"
+        }
+    }
 }
