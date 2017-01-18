@@ -64,8 +64,8 @@ echo 'finished' . "\n";
 
 echo 'clearing cache '."...\n";
 shell_exec('cd www');
-shell_exec('php app/console cache:clear --env=prod');
-shell_exec('php app/console assetic:dump --env=prod');
+shell_exec('php bin/console cache:clear --env=prod');
+shell_exec('php bin/console assetic:dump --env=prod');
 echo 'finished' . "\n";
 
 shell_exec('rm '.$downloadName);
