@@ -1,1 +1,12 @@
 @import 'https://fonts.googleapis.com/css?family=Open+Sans';
+
+@font-face {
+  font-family: 'Linux Libertine'; /* normal */
+  src: url('/css/fonts/linlibertine/LinLibertine_R.woff') format('woff'),
+  url('/css/fonts/linlibertine/LinLibertine_R.otf') format('opentype'),
+  url('/css/fonts/linlibertine/LinLibertine_R.svg#LinuxLibertineORegular') format('svg'),
+  url('/css/fonts/linlibertine/LinLibertine_Rah.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+$font-color: $brown;

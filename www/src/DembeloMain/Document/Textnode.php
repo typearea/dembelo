@@ -58,17 +58,17 @@ class Textnode
     protected $topicId;
 
     /**
-     * @MongoDB\Int
+     * @MongoDB\Field(type="int")
      */
     protected $status;
 
     /**
-     * @MongoDB\String
+     * @MongoDB\Field(type="string")
      */
     protected $text;
 
     /**
-     * @MongoDB\Bool
+     * @MongoDB\Field(type="boolean")
      */
     protected $access;
 

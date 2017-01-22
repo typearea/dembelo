@@ -27,7 +27,7 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
             {% for licensee in topics %}
                 <div class="cover">
                     <a href="{{ path('themenfeld', {'topicId': licensee.id}) }}">
-                        {% image '@DembeloMain/Resources/public/images/bg02.jpg' %}
+                        {% image '@DembeloMain/Resources/public/images/placeholder.jpg' %}
                         <img src="{{ asset_url }}" alt="{{ licensee.name }}" title="{{ licensee.name }}"/>
                         {% endimage %}
                     </a>

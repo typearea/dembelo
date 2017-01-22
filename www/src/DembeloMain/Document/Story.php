@@ -41,7 +41,7 @@ class Story
     protected $id;
 
     /**
-     * @MongoDB\String
+     * @MongoDB\Field(type="string")
      */
     protected $name;
 
@@ -51,7 +51,7 @@ class Story
     protected $topicId;
 
     /**
-     * @MongoDB\Int
+     * @MongoDB\Field(type="int")
      */
     protected $status;
 

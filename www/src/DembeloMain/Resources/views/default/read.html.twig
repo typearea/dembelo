@@ -26,10 +26,8 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 {% block bodyid %}content-page{% endblock %}
 
 {% block body %}
-    <div class="twelve columns">
-        <div class="read">
-            {{ hyphenated | raw }}
-        </div>
+    <div class="read">
+        {{ hyphenated | raw }}
     </div>
 
     {% set hitchCount = textnode.getHitchCount() %}

@@ -1,10 +1,10 @@
 #navigation {
   position: fixed;
-  top: 0;
+  top: $toolbar-height;
   left: 0;
   z-index: 999;
   background-color: $nav-background;
-  height: 100%;
+  height: calc(100% - #{$toolbar-height});
   width: $nav-width;
   overflow-y: auto;
   transform: translateX(-100%);

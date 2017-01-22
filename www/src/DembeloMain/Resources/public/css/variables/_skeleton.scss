@@ -13,26 +13,26 @@ $prefix-for-spec: true !default;
 $is-fluid: true; // Change to true to enable the fluid grid
 $use-global-border-box: false; // Change to true the enable global border-box
 
-$link-color: #1EAEDB; // default link color
-$link-hover: #0FA0CE; // default link color on :hover
+$link-color: $red; // default link color
+$link-hover: $red; // default link color on :hover
 $link-decoration: underline; // default link decoration
 
 $base-width: if($is-fluid, 100%, ($base-col-width + $base-gutter-width) * $base-col-count);
 
 $font-size: 15px; // default font size. Change here will adjust sizes across the board.
 $font-weight: 400; // sets the font weight
-$font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif; // default fonts
+$font-family: "Open Sans", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif; // default fonts
 $font-color: #222; // default font color
 
 $heading-family: $font-family; // default heading (h1-h6) font
-$heading-color: $font-color; // default heading (h1-h6) color
+$heading-color: $blue-dark; // default heading (h1-h6) color
 $heading-weight: 300; // sets the weight of the heading text
 
 $form-font: $font-family; // default form font
 
 $button-color: #555;
 $button-weight: 600;
-$button-font-uppercase: true;
+$button-font-uppercase: false;
 $button-border-color: #bbb;
 
 // GRID CHANGES

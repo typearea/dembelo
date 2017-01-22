@@ -1,3 +1,4 @@
+@import "variables";
 /**
 * Skeleton Styles
 */
@@ -8,9 +9,9 @@
 // import default theme variables
 @import "variables/skeleton";
 // theme base styles
-@import "../../../../../web/vendor/skeleton-sass/skeleton/themes/fresh/base";
+@import "skeleton/themes/dembelo/base";
 // theme grid styles
-@import "../../../../../web/vendor/skeleton-sass/skeleton/themes/fresh/skeleton";
+@import "skeleton/themes/dembelo/skeleton";
 /**
 * Dembelo Styles
 */
@@ -18,6 +19,7 @@
 @import "fonts";
 @import "variables/dashboard";
 @import "variables/layout/navigation";
+@import "variables/layout/toolbar";
 @import "variables/form";
 // import layout
 @import "layout";
@@ -25,3 +27,4 @@
 @import "layout/navigation";
 @import "form";
 @import "dashboard";
+@import "content-page";

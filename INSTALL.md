@@ -63,8 +63,13 @@ php app/console dembelo:install --purge-db --with-dummy-data
 [github.com/irmantas/symfony2-vagrant](https://github.com/irmantas/symfony2-vagrant) für die Vagrant/Puppet/Composer-Basis.
 
 ## Deployment
-* den Cache leeren: `php app/console cache:clear --env=prod`
-* Assets erstellen: `php app/console assetic:dump --env=prod`
+```
+export SYMFONY_ENV=prod
+composer install --no-dev --optimize-autoloader
+php app/console cache:clear --env=prod
+php app/console assetic:dump --env=prod
+```
+Quelle: http://symfony.com/doc/current/deployment.html
 
 ## Problembehebung
 ### ausreichend Arbeitsspeicher

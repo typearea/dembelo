@@ -67,12 +67,12 @@ class DefaultControllerTest extends WebTestCase
         $textnode->setStatus(Textnode::STATUS_ACTIVE);
         $textnode->setText("Lorem ipsum dolor sit amet.");
 
-        $container = $this->getMock("Symfony\Component\DependencyInjection\ContainerInterface");
+        $container = $this->getMockBuilder("Symfony\Component\DependencyInjection\ContainerInterface")->getMock();
         $authorizationChecker = $this->getMockBuilder('foobar')->setMethods(array('isGranted'))->getMock();
         $tokenStorage = $this->getMockBuilder("Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage")->disableOriginalConstructor()->getMock();
         $mongo = $this->getMockBuilder("Doctrine\Bundle\MongoDBBundle\ManagerRegistry")->disableOriginalConstructor()->getMock();
         $repository = $this->getMockBuilder("Doctrine\ODM\MongoDB\DocumentRepository")->disableOriginalConstructor()->getMock();
-        $router = $this->getMock("Symfony\Component\Routing\RouterInterface");
+        $router = $this->getMockBuilder("Symfony\Component\Routing\RouterInterface")->getMock();
         $queryBuilder = $this->getMockBuilder("Doctrine\ODM\MongoDB\QueryBuilder")->setMethods(array('field', 'equals', 'getQuery', 'getSingleResult'))->getMock();
 
         $container->expects($this->at(0))
@@ -145,12 +145,12 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testReadTextnodeWithoutLogin()
     {
-        $container = $this->getMock("Symfony\Component\DependencyInjection\ContainerInterface");
+        $container = $this->getMockBuilder("Symfony\Component\DependencyInjection\ContainerInterface")->getMock();
         $mongo = $this->getMockBuilder("Doctrine\Bundle\MongoDBBundle\ManagerRegistry")->disableOriginalConstructor()->getMock();
         $repository = $this->getMockBuilder("Doctrine\ODM\MongoDB\DocumentRepository")->disableOriginalConstructor()->getMock();
         $authorizationChecker = $this->getMockBuilder('foobar')->setMethods(array('isGranted'))->getMock();
         $tokenStorage = $this->getMockBuilder("Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage")->disableOriginalConstructor()->getMock();
-        $template = $this->getMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
+        $template = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
         $router = $this->getMockBuilder('\Symfony\Bundle\FrameworkBundle\Routing\Router')->disableOriginalConstructor()->getMock();
 
         $router->expects($this->once())
@@ -185,7 +185,7 @@ class DefaultControllerTest extends WebTestCase
     {
         $textnodeId = 'textnode1';
         $hitchIndex = 123;
-        $container = $this->getMock("Symfony\Component\DependencyInjection\ContainerInterface");
+        $container = $this->getMockBuilder("Symfony\Component\DependencyInjection\ContainerInterface")->getMock();
         $repository = $this->getMockBuilder("Doctrine\ODM\MongoDB\DocumentRepository")->disableOriginalConstructor()->getMock();
         $service = $this->getMockBuilder("Doctrine\Bundle\MongoDBBundle\ManagerRegistry")->disableOriginalConstructor()->getMock();
         $container->expects($this->once())

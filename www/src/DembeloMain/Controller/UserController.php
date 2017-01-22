@@ -28,8 +28,12 @@ namespace DembeloMain\Controller;
 use DembeloMain\Document\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -62,13 +66,13 @@ class UserController extends Controller
             )
             ->add(
                 'password',
-                'password',
-                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'Passwort'))
+                PasswordType::class,
+                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'Password'))
             )
             ->add(
                 'save',
                 SubmitType::class,
-                array('label' => 'Anmelden', 'attr' => array('class' => 'button button-primary u-full-width'))
+                array('label' => 'Login', 'attr' => array('class' => 'button button-primary u-full-width'))
             )
             ->getForm();
 
@@ -104,16 +108,53 @@ class UserController extends Controller
         $user->setRoles(['ROLE_USER']);
         $user->setStatus(0);
         $form = $this->createFormBuilder($user)
-            ->add('email', 'email')
-            ->add('password', 'password', array('label' => 'Passwort'))
-            ->add('gender', 'choice', array(
-                'choices'  => array('m' => 'männlich', 'f' => 'weiblich'),
-                'label' => 'Geschlecht',
-                'required' => false,
-            ))
-            ->add('source', 'text', array('label' => 'Wo hast du von Dembelo erfahren?', 'required' => false))
-            ->add('reason', 'textarea', array('label' => 'Wieso möchtest du an der geschlossenen Beta teilnehmen?', 'required' => false))
-            ->add('save', 'submit', array('label' => 'Registrierung anfordern'))
+            ->add(
+                'email',
+                EmailType::class,
+                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'E-Mail'))
+            )
+            ->add(
+                'password',
+                PasswordType::class,
+                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'Password'))
+            )
+            ->add(
+                'gender',
+                ChoiceType::class,
+                array(
+                    'choices' => array('male' => 'm', 'female' => 'f'),
+                    'label' => false,
+                    'placeholder' => 'Gender',
+                    'required' => false,
+                    'attr' => array('class' => 'u-full-width'),
+                )
+            )
+            ->add(
+                'source',
+                TextType::class,
+                array(
+                    'label' => 'Where have you first heard of Dembelo?',
+                    'required' => false,
+                    'attr' => array('class' => 'u-full-width'),
+                )
+            )
+            ->add(
+                'reason',
+                TextareaType::class,
+                array(
+                    'label' => 'Why to you want to participate in our Closed Beta?',
+                    'required' => false,
+                    'attr' => array('class' => 'u-full-width'),
+                )
+            )
+            ->add(
+                'save',
+                SubmitType::class,
+                array(
+                    'label' => 'Request registration',
+                    'attr' => array('class' => 'button button-primary u-full-width'),
+                )
+            )
             ->getForm();
 
         $form->handleRequest($request);
