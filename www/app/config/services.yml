@@ -15,6 +15,10 @@ services:
         class: DembeloMain\Controller\Dashboard\DefaultController
         arguments: ["@templating","@app.model_repository_topic"]
 
+    app.controller_admin_topic:
+        class: AdminBundle\Controller\TopicController
+        arguments: ["@service_container", "@app.model_repository_topic"]
+
     app.model_repository_topic:
         class: DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository
         factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
@@ -50,3 +54,21 @@ services:
         factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
         arguments:
             - DembeloMain\Document\User
+
+    app.model_repository_importfile:
+            class: DembeloMain\Model\Repository\Doctrine\ODM\ImportfileRepository
+            factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
+            arguments:
+                - DembeloMain\Document\Importfile
+
+    app.twig_extension:
+            class: DembeloMain\Twig\VersionExtension
+            arguments: ["@service_container"]
+            public: false
+            tags:
+                - { name: twig.extension }
+
+    app.requestlistener_session_expiration:
+            class: DembeloMain\EventListener\RequestListener
+            tags:
+                - { name: kernel.event_listener, event: kernel.request, method: onRequest }

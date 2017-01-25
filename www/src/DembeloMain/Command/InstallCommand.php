@@ -68,8 +68,10 @@ class InstallCommand extends ContainerAwareCommand
     {
 
         if ($input->getOption('purge-db')) {
-            $this->purgeDB($output);
+            $this->purgeDB();
             $output->writeln("<info>Database cleared</info>");
+            $this->cleanImageDirectories();
+            $output->writeln("<info>Directories cleared</info>");
         }
 
         $this->installDefaultUsers($output);
@@ -79,6 +81,9 @@ class InstallCommand extends ContainerAwareCommand
             $this->installDummyData($output);
             $output->writeln("<info>Dummy data installed</info>");
         }
+        $mongo = $this->getContainer()->get('doctrine_mongodb');
+        $dm = $mongo->getManager();
+        $dm->flush();
     }
 
     protected function purgeDB()
@@ -149,8 +154,6 @@ class InstallCommand extends ContainerAwareCommand
 
         $this->createHitches($mongo, $dm);
         $output->writeln("Hitches installed...");
-
-        $dm->flush();
     }
 
     private function createLicensees(ManagerRegistry $mongo, DocumentManager $dm)
@@ -257,13 +260,25 @@ class InstallCommand extends ContainerAwareCommand
             array('name' => 'Themenfeld 9', 'status' => Topic::STATUS_ACTIVE),
         );
 
+        $imagesSrcFolder = $this->getContainer()->getParameter('kernel.root_dir').'/../src/DembeloMain/Resources/public/images/';
+        $imagesTargetFolder = $this->getContainer()->getParameter('topic_image_directory');
+
+        $sortKey = 1;
         foreach ($topicData as $topicDatum) {
             $topic = $repository->findOneByName($topicDatum['name']);
             if (is_null($topic)) {
+                $imagename = 'bg0'.$sortKey.'.jpg';
                 $topic = new Topic();
                 $topic->setName($topicDatum['name']);
                 $topic->setStatus($topicDatum['status']);
+                $topic->setSortKey($sortKey);
+                $topic->setOriginalImageName($imagename);
+                $topic->setImageFilename($imagename);
                 $dm->persist($topic);
+                $topicFolder = $imagesTargetFolder.'/'.$topic->getId().'/';
+                mkdir($topicFolder);
+                copy($imagesSrcFolder.$imagename, $topicFolder.'/'.$imagename);
+                $sortKey++;
             }
             $this->dummyData['topics'][] = $topic;
         }
@@ -273,7 +288,7 @@ class InstallCommand extends ContainerAwareCommand
     {
         $loremIpsumLength = 3500;
 
-        $repository = $mongo->getRepository('DembeloMain:Textnode');
+        $repository = $this->getContainer()->get('app.model_repository_textNode');
 
         $allAccessNodes = $repository->findByAccess(true);
         if (count($allAccessNodes) >= 7) {
@@ -360,7 +375,8 @@ class InstallCommand extends ContainerAwareCommand
             $textnode->setText($textnodeDatum['text']);
             $textnode->setAccess($textnodeDatum['access']);
             $textnode->setMetadata($textnodeDatum['metadata']);
-            $dm->persist($textnode);
+            $repository->save($textnode);
+
             $this->dummyData['textnodes'][] = $textnode;
         }
     }
@@ -392,5 +408,13 @@ class InstallCommand extends ContainerAwareCommand
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
         $this->dummyData['textnodes'][0]->appendHitch($hitch);
         $dm->persist($this->dummyData['textnodes'][0]);
+    }
+
+    private function cleanImageDirectories()
+    {
+        $topicImageDirectory = $this->getContainer()->getParameter('topic_image_directory').'/';
+        if (is_dir($topicImageDirectory)) {
+            shell_exec('rm -r '.$topicImageDirectory.'*');
+        }
     }
 }

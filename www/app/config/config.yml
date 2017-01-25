@@ -7,6 +7,7 @@ imports:
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: de
+    topic_image_directory: '%kernel.root_dir%/../uploads/topicimage/'
     twine_directory: '%kernel.root_dir%/../uploads/twine/'
 
 framework:
@@ -31,6 +32,7 @@ framework:
         handler_id:  ~
     fragments:       ~
     http_method_override: true
+    assets: ~
 
 # Twig Configuration
 twig:
@@ -77,6 +79,9 @@ assetic:
         linlibertine-regular-ttf:
             inputs: '@DembeloMain/Resources/public/fonts/LinLibertine/LinLibertine_Rah.ttf'
             output: 'css/fonts/linlibertine/LinLibertine_Rah.ttf'
+        requirejs:
+            inputs: '%kernel.root_dir%/../vendor/etdsolutions/requirejs/require.js'
+            output: 'js/libs/require.js'
 
 # Doctrine Configuration
 doctrine_mongodb:

@@ -34,7 +34,7 @@ use DembeloMain\Document\Topic;
 class TopicTest extends WebTestCase
 {
     /**
-     * @var DembeloMain\Document\Topic
+     * @var Topic
      */
     private $topic;
 
@@ -71,5 +71,14 @@ class TopicTest extends WebTestCase
     {
         $this->topic->setStatus('teststatus');
         $this->assertEquals('teststatus', $this->topic->getStatus());
+    }
+
+    /**
+     * tests getSortKey()
+     */
+    public function testGetSortKey()
+    {
+        $this->topic->setSortKey(123);
+        $this->assertEquals(123, $this->topic->getSortKey());
     }
 }

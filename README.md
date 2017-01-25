@@ -39,8 +39,8 @@ Version der Lizenz, so wie diese von der Free Software Foundation herausgegeben 
 
 ### CodeSniffer
 
-    cd /vagrant/
-    sudo phpcs --config-set installed_paths www/vendor/escapestudios/symfony2-coding-standard
-    phpcs --standard=symfony2 www/src
+    cd /vagrant/www
+    ./bin/phpcs --config-set installed_paths vendor/escapestudios/symfony2-coding-standard
+    ./bin/phpcs --standard=symfony2 src
 
 

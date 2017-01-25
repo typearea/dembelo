@@ -36,7 +36,7 @@ use DembeloMain\Document\Topic;
 class TextnodeTest extends WebTestCase
 {
     /**
-     * @var DembeloMain\Document\Textnode
+     * @var \DembeloMain\Document\Textnode
      */
     private $textnode;
 
@@ -131,6 +131,15 @@ class TextnodeTest extends WebTestCase
     {
         $this->textnode->setAccess(false);
         $this->assertFalse($this->textnode->getAccess());
+    }
+
+    /**
+     * tests the access
+     */
+    public function testTwineId()
+    {
+        $this->textnode->setTwineId('foobarTwineId');
+        $this->assertEquals('foobarTwineId', $this->textnode->getTwineId());
     }
 
     /**
@@ -531,5 +540,14 @@ class TextnodeTest extends WebTestCase
 
         $result = $this->textnode->getHitch(2);
         $this->assertTrue(is_null($result));
+    }
+
+    /**
+     * tests the access
+     */
+    public function testGetArbitraryId()
+    {
+        $this->textnode->setArbitraryId('foobarArbitraryId');
+        $this->assertEquals('foobarArbitraryId', $this->textnode->getArbitraryId());
     }
 }

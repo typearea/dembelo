@@ -1,6 +1,5 @@
 <?php
-
-/* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
+/* Copyright (C) 2016 Michael Giesler
  *
  * This file is part of Dembelo.
  *
@@ -18,23 +17,31 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace DembeloMain\Model\Repository\Doctrine\ODM;
+namespace DembeloMain\Composer;
 
-use DembeloMain\Document\Licensee;
-use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Class LicenseeRepository
- * @package DembeloMain\Model\Repository\Doctrine\ODM
+ * Class ScriptHandler
+ * @package DembeloMain\Composer
  */
-class LicenseeRepository extends AbstractRepository implements LicenseeRepositoryInterface
+class ScriptHandler
 {
     /**
-     * @param string $name
-     * @return Licensee
+     * build Symlinks
      */
-    public function findOneByName($name)
+    public static function buildSymLinks()
     {
-        return $this->__call(__FUNCTION__, func_get_args());
+        $fs = new Filesystem();
+
+        // topic images
+        $originDir = '../../uploads/topicimage/';
+        $targetDir = 'web/images/topics';
+        $fs->symlink($originDir, $targetDir);
+
+        // webix
+        $originDir = '../../../vendor/typearea/webix/lib/codebase/';
+        $targetDir = './web/js/libs/webix';
+        $fs->symlink($originDir, $targetDir);
     }
 }

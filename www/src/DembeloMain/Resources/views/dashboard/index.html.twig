@@ -1,5 +1,5 @@
 {#
-Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
+Copyright (C) 2015-2017 Michael Giesler, Stephan Kreutzer, Daniel Hebestreit
 
 This file is part of Dembelo.
 
@@ -26,10 +26,8 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
         <div class="row">
             {% for licensee in topics %}
                 <div class="cover">
-                    <a href="{{ path('themenfeld', {'topicId': licensee.id}) }}">
-                        {% image '@DembeloMain/Resources/public/images/placeholder.jpg' %}
-                        <img src="{{ asset_url }}" alt="{{ licensee.name }}" title="{{ licensee.name }}"/>
-                        {% endimage %}
+                    <a href="{{ path('themenfeld', {'topicId': topic.id}) }}">
+                        <img src="/images/topics/{{ topic.id }}/{{ topic.originalImageName }}" alt="{{ topic.name }}" title="{{ topic.name }}"/>
                     </a>
                 </div>
             {% endfor %}

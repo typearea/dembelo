@@ -20,6 +20,8 @@
 
 namespace DembeloMain\Model\Repository\Doctrine\ODM;
 
+use DembeloMain\Document\Importfile;
+use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use MongoId;
 
@@ -33,10 +35,101 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
      * finds textnodes by importfileId
      *
      * @param string $importfileId
-     * @return array
+     * @return Textnode[]
      */
     public function findByImportfileId($importfileId)
     {
         return $this->findBy(array('importfileId' => new MongoId($importfileId)));
+    }
+
+    /**
+     * finds a textnode by importfileId and twineId
+     * @param Importfile $importfile
+     * @param string     $twineId
+     * @return Textnode
+     */
+    public function findByTwineId(Importfile $importfile, $twineId)
+    {
+        $textnode = $this->findOneBy(
+            array(
+                'importfileId' => new MongoId($importfile->getId()),
+                'twineId'      => $twineId,
+            )
+        );
+
+        return $textnode;
+    }
+
+    /**
+     * sets textnodes to status=inactive that are not in $existingTextnodeIds
+     * @param Importfile $importfile
+     * @param array      $existingTextnodeIds array of textnodeIds
+     */
+    public function disableOrphanedNodes(Importfile $importfile, array $existingTextnodeIds)
+    {
+        $this->getDocumentManager()->createQueryBuilder(Textnode::class)
+            ->update()
+            ->multiple(true)
+            ->field('status')->set(Textnode::STATUS_INACTIVE)
+            ->field('importfileId')->equals(new \MongoId($importfile->getId()))
+            ->field('id')->notIn($existingTextnodeIds)
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * @param string $arbitraryId textnode arbitrary id
+     * @return Textnode
+     */
+    public function findOneActiveByArbitraryId($arbitraryId)
+    {
+        return $this->findOneBy(
+            array(
+                'arbitraryId' => $arbitraryId,
+                'status' => Textnode::STATUS_ACTIVE,
+            )
+        );
+    }
+
+    /**
+     * @param string $id Textnode Id
+     * @return Textnode
+     */
+    public function findOneActiveById($id)
+    {
+        return $this->findOneBy(
+            array(
+                'id' => new \MongoId($id),
+                'status' => Textnode::STATUS_ACTIVE,
+            )
+        );
+    }
+
+    /**
+     * @param Textnode $object
+     */
+    protected function beforeSave($object)
+    {
+        parent::beforeSave($object);
+        if (is_null($object->getArbitraryId())) {
+            $object->setArbitraryId($this->createArbitraryId($object));
+        }
+    }
+
+    /**
+     * @param Textnode $object
+     *
+     * @return string
+     */
+    private function createArbitraryId($object)
+    {
+        $id = substr(md5(time().substr($object->getText(), 0, 100)), 0, 15);
+        $exists = count($this->findBy(array('arbitraryId' => $id))) > 0;
+
+        if ($exists) {
+            return $this->createArbitraryId($object);
+        }
+
+        return $id;
     }
 }

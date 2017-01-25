@@ -221,12 +221,12 @@ class ImportCommandTest extends KernelTestCase
 
     private function getMockObjects()
     {
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
 
         $service = $this->getMockBuilder('Doctrine\Bundle\MongoDBBundle\ManagerRegistry')->disableOriginalConstructor()->getMock();
-        $repositoryLicensee = $this->getMock('repositoryLicenseeMock', ['findOneByName']);
+        $repositoryLicensee = $this->getMockBuilder('repositoryLicenseeMock')->setMethods(['findOneByName'])->getMock();
         $importTwine = $this->getMockBuilder('AdminBundle\Model\ImportTwine')->disableOriginalConstructor()->setMethods(['run', 'parserFree'])->getMock();
-        $dm = $this->getMock('dmMock', ['flush', 'persist']);
+        $dm = $this->getMockBuilder('dmMock')->setMethods(['flush', 'persist'])->getMock();
 
         $container->expects($this->at(0))
             ->method("get")

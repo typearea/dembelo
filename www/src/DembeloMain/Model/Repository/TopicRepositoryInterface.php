@@ -43,10 +43,27 @@ interface TopicRepositoryInterface
     public function findAll();
 
     /**
+     * @param array      $criteria
+     * @param array|null $sort
+     * @param null       $limit
+     * @param null       $skip
+     * @return Topic[]
+     */
+    public function findBy(array $criteria, array $sort = null, $limit = null, $skip = null);
+
+    /**
      * Find all active topics
      * @return Topic[]
      */
     public function findByStatusActive();
+
+    /**
+     * finds filtered topics
+     * @param array $filters
+     * @param array $orderBy
+     * @return mixed
+     */
+    public function findFiltered(array $filters = array(), array $orderBy = array());
 
     /**
      * Save topic

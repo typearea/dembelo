@@ -42,7 +42,7 @@ class Importfile
     protected $id;
 
     /**
-     * @MongoDB\String
+     * @MongoDB\Field(type="string")
      */
     protected $name;
 
@@ -57,22 +57,22 @@ class Importfile
     protected $imported;
 
     /**
-     * @MongoDB\String
+     * @MongoDB\Field(type="string")
      */
     protected $author;
 
     /**
-     * @MongoDB\String
+     * @MongoDB\Field(type="string")
      */
     protected $publisher;
 
     /**
-     * @MongoDB\String
+     * @MongoDB\Field(type="string")
      */
-    protected $orgname;
+    protected $originalname;
 
     /**
-     * @MongoDB\String
+     * @MongoDB\Field(type="string")
      */
     protected $filename;
 
@@ -187,17 +187,17 @@ class Importfile
     /**
      * @return string
      */
-    public function getOrgname()
+    public function getOriginalname()
     {
-        return $this->orgname;
+        return $this->originalname;
     }
 
     /**
-     * @param string $orgname
+     * @param string $originalname
      */
-    public function setOrgname($orgname)
+    public function setOriginalname($originalname)
     {
-        $this->orgname = $orgname;
+        $this->originalname = $originalname;
     }
 
     /**

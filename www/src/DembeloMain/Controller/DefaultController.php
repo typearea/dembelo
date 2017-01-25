@@ -65,6 +65,8 @@ class DefaultController extends Controller
         $dm->flush();
 
         $repository = $mongo->getRepository('DembeloMain:Textnode');
+
+        /* @var $textnode Textnode */
         $textnode = $repository->createQueryBuilder()
             ->field('topicId')->equals(new \MongoId($topicId))
             ->field('status')->equals(Textnode::STATUS_ACTIVE)
@@ -75,17 +77,17 @@ class DefaultController extends Controller
             throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found, while the user was logged in, but without current textnode ID set.');
         }
 
-        return $this->redirectToRoute('text', array('textnodeId' => $textnode->getId()));
+        return $this->redirectToRoute('text', array('textnodeArbitraryId' => $textnode->getArbitraryId()));
     }
 
     /**
-     * @Route("/text/{textnodeId}", name="text")
+     * @Route("/text/{textnodeArbitraryId}", name="text")
      *
-     * @param string $textnodeId Textnode ID from URL
+     * @param string $textnodeArbitraryId Textnode arbitrary ID from URL
      *
      * @return string
      */
-    public function readTextnodeAction($textnodeId)
+    public function readTextnodeAction($textnodeArbitraryId)
     {
         $authorizationChecker = $this->get('security.authorization_checker');
         if (!$authorizationChecker->isGranted('ROLE_USER')) {
@@ -94,16 +96,11 @@ class DefaultController extends Controller
 
         $mongo = $this->get('doctrine_mongodb');
 
-        $repository = $mongo->getRepository('DembeloMain:Textnode');
-        $textnodes = $repository->findBy(
-            array(
-                'id' => new \MongoId($textnodeId),
-                'status' => Textnode::STATUS_ACTIVE,
-            )
-        );
+        $textnodeRepository = $this->get('app.model_repository_textNode');
+        $textnode = $textnodeRepository->findOneActiveByArbitraryId($textnodeArbitraryId);
 
-        if (empty($textnodes)) {
-            throw $this->createNotFoundException('No Textnode with ID \''.$textnodeId.'\' found.');
+        if (is_null($textnode)) {
+            throw $this->createNotFoundException('No Textnode with arbitrary ID \''.$textnodeArbitraryId.'\' found.');
         }
 
         /* @var $authorizationChecker \Symfony\Component\Security\Core\Authorization\AuthorizationChecker */
@@ -117,7 +114,7 @@ class DefaultController extends Controller
         $user = $tokenStorage->getToken()->getUser();
 
         $dm = $mongo->getManager();
-        $user->setCurrentTextnode($textnodeId);
+        $user->setCurrentTextnode($textnode->getId());
         $dm->persist($user);
 
         $oldReadpathItem = $dm->createQueryBuilder('DembeloMain:Readpath')
@@ -126,10 +123,10 @@ class DefaultController extends Controller
             ->getQuery()
             ->getSingleResult();
 
-        if (is_null($oldReadpathItem) || $oldReadpathItem->getTextnodeId() !== $textnodeId) {
+        if (is_null($oldReadpathItem) || $oldReadpathItem->getTextnodeId() !== $textnode->getId()) {
             $readpath = new Readpath();
             $readpath->setUserId($user->getId());
-            $readpath->setTextnodeId($textnodeId);
+            $readpath->setTextnodeId($textnode->getId());
             $readpath->setTimestamp(new \MongoDate(time()));
             if (!is_null($oldReadpathItem)) {
                 $readpath->setPreviousTextnodeId($oldReadpathItem->getTextnodeId());
@@ -141,8 +138,6 @@ class DefaultController extends Controller
         }
 
         $dm->flush();
-
-        $textnode = $textnodes[0];
 
         $hyphenator = new Hyphenator();
         $hyphenator->registerPatterns('de');
@@ -167,28 +162,22 @@ class DefaultController extends Controller
      */
     public function paywallAction($textnodeId, $hitchIndex)
     {
-        $mongo = $this->get('doctrine_mongodb');
+        $textnodeRepository = $this->get('app.model_repository_textNode');
 
-        $repository = $mongo->getRepository('DembeloMain:Textnode');
-        $textnodes = $repository->findBy(
-            array(
-                'id' => new \MongoId($textnodeId),
-                'status' => Textnode::STATUS_ACTIVE,
-            )
-        );
+        $textnode = $textnodeRepository->findOneActiveById($textnodeId);
 
-        if (empty($textnodes)) {
+        if (is_null($textnode)) {
             throw $this->createNotFoundException('No Textnode with ID \''.$textnodeId.'\' found.');
         }
 
-        $textnode = $textnodes[0];
         $hitch = $textnode->getHitch($hitchIndex);
+        $linkedTextnode = $textnodeRepository->findOneActiveById($hitch['textnodeId']);
 
         $output = array(
             'url' => $this->generateUrl(
                 'text',
                 array(
-                    'textnodeId' => $hitch['textnodeId'],
+                    'textnodeArbitraryId' => $linkedTextnode->getArbitraryId(),
                 )
             ),
         );
@@ -208,8 +197,6 @@ class DefaultController extends Controller
      */
     public function reloadAction()
     {
-        $mongo = $this->get('doctrine_mongodb');
-
         /* @var $authorizationChecker \Symfony\Component\Security\Core\Authorization\AuthorizationChecker */
         $authorizationChecker = $this->get('security.authorization_checker');
         /* @var $tokenStorage TokenStorage */
@@ -219,23 +206,17 @@ class DefaultController extends Controller
         }
         $user = $tokenStorage->getToken()->getUser();
         $currentTextnodeId = $user->getCurrentTextnode();
-        $textnodeRepository = $mongo->getRepository('DembeloMain:Textnode');
-        $textnodes = $textnodeRepository->findBy(
-            array(
-                'id' => new \MongoId($currentTextnodeId),
-            )
-        );
-        $textnode = $textnodes[0];
+        $textnodeRepository = $this->get('app.model_repository_textNode');
+
         // find topic from readpath and show another access node
-        $repository = $mongo->getRepository('DembeloMain:Textnode');
-        $textnode = $repository->createQueryBuilder()
+        $textnode = $textnodeRepository->createQueryBuilder()
             ->field('topicId')->equals(new \MongoId($user->getLastTopicId()))
             ->field('status')->equals(Textnode::STATUS_ACTIVE)
             ->field('access')->equals(true)
-            ->field('textnodeId')->notEqual($textnode->getId())
+            ->field('textnodeId')->notEqual($currentTextnodeId)
             ->getQuery()->getSingleResult();
 
-        return $this->redirectToRoute('text', array('textnodeId' => $textnode->getId()));
+        return $this->redirectToRoute('text', array('textnodeArbitraryId' => $textnode->getArbitraryId()));
     }
 
     /**
