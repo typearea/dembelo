@@ -5,9 +5,9 @@
             <a href="{{ path('mainpage') }}"><i class="ion-home"></i> Startseite</a>
         </li>
         {% if is_granted('ROLE_USER') %}
-            <li>
+            {#<li>
                 <a href="#"><i class="ion-person"></i> Mein Profil</a>
-            </li>
+            </li>#}
             <li>
                 <a href="{{ path('logout') }}"><i class="ion-android-exit"></i> Abmelden</a>
             </li>
@@ -27,7 +27,7 @@
     <ul class="social-links">
         <li><a href="https://www.dembelo.de/blog/"><i class="ion-social-rss"></i> Blog</a></li>
         <li><a href="https://www.facebook.com/groups/dembelo/"><i class="ion-social-facebook"></i> facebook</a></li>
-        <li><a href="https://twitter.com/type_area"><i class="ion-social-twitter"></i> twitter</a></li>
+        <li><a href="https://twitter.com/waszulesen"><i class="ion-social-twitter"></i> twitter</a></li>
         <li><a href="https://github.com/typearea/dembelo"><i class="ion-social-github"></i> github</a></li>
     </ul>
 </div>
