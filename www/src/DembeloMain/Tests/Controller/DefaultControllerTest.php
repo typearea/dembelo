@@ -26,9 +26,14 @@
 namespace DembeloMain\Tests\Controller;
 
 use DembeloMain\Document\Topic;
+use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
+use Doctrine\ODM\MongoDB\DocumentRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use DembeloMain\Controller\DefaultController;
 use DembeloMain\Document\Textnode;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 /**
  * Class DefaultControllerTest
@@ -45,7 +50,7 @@ class DefaultControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertTrue($crawler->filter('html:contains("Dembelo")')->count() > 0);
+        $this->assertTrue($crawler->filter('html:contains("was zu lesen")')->count() > 0);
     }
 
     /**
@@ -67,12 +72,12 @@ class DefaultControllerTest extends WebTestCase
         $textnode->setStatus(Textnode::STATUS_ACTIVE);
         $textnode->setText("Lorem ipsum dolor sit amet.");
 
-        $container = $this->getMockBuilder("Symfony\Component\DependencyInjection\ContainerInterface")->getMock();
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $authorizationChecker = $this->getMockBuilder('foobar')->setMethods(array('isGranted'))->getMock();
-        $tokenStorage = $this->getMockBuilder("Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage")->disableOriginalConstructor()->getMock();
-        $mongo = $this->getMockBuilder("Doctrine\Bundle\MongoDBBundle\ManagerRegistry")->disableOriginalConstructor()->getMock();
-        $repository = $this->getMockBuilder("Doctrine\ODM\MongoDB\DocumentRepository")->disableOriginalConstructor()->getMock();
-        $router = $this->getMockBuilder("Symfony\Component\Routing\RouterInterface")->getMock();
+        $tokenStorage = $this->getMockBuilder(TokenStorage::class)->disableOriginalConstructor()->getMock();
+        $mongo = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
+        $repository = $this->getMockBuilder(DocumentRepository::class)->disableOriginalConstructor()->getMock();
+        $router = $this->getMockBuilder(RouterInterface::class)->getMock();
         $queryBuilder = $this->getMockBuilder("Doctrine\ODM\MongoDB\QueryBuilder")->setMethods(array('field', 'equals', 'getQuery', 'getSingleResult'))->getMock();
 
         $container->expects($this->at(0))

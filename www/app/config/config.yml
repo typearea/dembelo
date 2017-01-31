@@ -38,7 +38,6 @@ framework:
 twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
-    form_themes: ['bootstrap_3_layout.html.twig']
     globals:
         piwik_host: "%piwik_host%"
         piwik_id: "%piwik_id%"
@@ -58,15 +57,6 @@ assetic:
         #yui_css:
         #    jar: "%kernel.root_dir%/Resources/java/yuicompressor-2.4.7.jar"
     assets:
-        glyphicons-halflings-regular-woff:
-            inputs: '%kernel.root_dir%/../vendor/twbs/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff'
-            output: 'css/fonts/bootstrap/glyphicons-halflings-regular.woff'
-        glyphicons-halflings-regular-woff2:
-            inputs: '%kernel.root_dir%/../vendor/twbs/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff2'
-            output: 'css/fonts/bootstrap/glyphicons-halflings-regular.woff2'
-        glyphicons-halflings-regular-ttf:
-            inputs: '%kernel.root_dir%/../vendor/twbs/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.ttf'
-            output: 'css/fonts/bootstrap/glyphicons-halflings-regular.ttf'
         linlibertine-regular-woff:
             inputs: '@DembeloMain/Resources/public/fonts/LinLibertine/LinLibertine_R.woff'
             output: 'css/fonts/linlibertine/LinLibertine_R.woff'

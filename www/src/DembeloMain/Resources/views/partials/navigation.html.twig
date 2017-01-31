@@ -1,0 +1,33 @@
+<div id="navigation">
+    <div class="logo"></div>
+    <ul class="links">
+        <li>
+            <a href="{{ path('mainpage') }}"><i class="ion-home"></i> Startseite</a>
+        </li>
+        {% if is_granted('ROLE_USER') %}
+            {#<li>
+                <a href="#"><i class="ion-person"></i> Mein Profil</a>
+            </li>#}
+            <li>
+                <a href="{{ path('logout') }}"><i class="ion-android-exit"></i> Abmelden</a>
+            </li>
+        {% else %}
+            <li>
+                <a href="{{ path('login_route') }}"> <i class="ion-person"></i> Anmelden </a>
+            </li>
+            <li>
+                <a href="{{ path('register') }}"> <i class="ion-person-add"></i> Registrieren </a>
+            </li>
+        {% endif %}
+        <li>
+            <a href="{{ path('imprint') }}"><i class="ion-help"></i> Impressum</a>
+        </li>
+    </ul>
+
+    <ul class="social-links">
+        <li><a href="https://www.dembelo.de/blog/"><i class="ion-social-rss"></i> Blog</a></li>
+        <li><a href="https://www.facebook.com/groups/dembelo/"><i class="ion-social-facebook"></i> facebook</a></li>
+        <li><a href="https://twitter.com/waszulesen"><i class="ion-social-twitter"></i> twitter</a></li>
+        <li><a href="https://github.com/typearea/dembelo"><i class="ion-social-github"></i> github</a></li>
+    </ul>
+</div>

@@ -1,28 +1,16 @@
 {% extends 'DembeloMain::base.html.twig' %}
 {% block title %}Login{% endblock %}
 {% block body %}
-
-<div class="container-fluid">
-    <div id="row1" class="row ">
-
+    <div class="row ">
+        <h1>Login</h1>
         {% if error %}
-            <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            <div class="form-errors">
+                <i class="ion-alert-circled"></i>{{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
         {% endif %}
 
         {{ form_start(form) }}
         {{ form_widget(form) }}
         {{ form_end(form) }}
-
-        {# <form action="{{ path('login_check') }}" method="post">
-            <label for="username">Email:</label>
-            <input type="text" id="username" name="_username" value="{{ last_username }}" />
-
-            <label for="password">Passwort:</label>
-            <input type="password" id="password" name="_password" />
-
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>#}
-
     </div>
-</div>
 {% endblock %}

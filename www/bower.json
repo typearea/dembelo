@@ -1,0 +1,24 @@
+{
+  "name": "Dembelo",
+  "homepage": "https://github.com/typearea/dembelo",
+  "authors": [
+    "Michael Giesler <michael@4horsemen.de>",
+    "Stephan Kreutzer <skreutzer@fsfe.org>",
+    "Daniel Hebestreit <daniel.hebestreit@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "skeleton-sass": "^3.0.0",
+    "Ionicons": "ionicons#^2.0.1"
+  }
+}

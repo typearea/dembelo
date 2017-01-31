@@ -226,7 +226,7 @@ define(function () {
                     $$('topicgrid').clearAll();
                     $$('topicgrid').load(window.paths.adminTopics, ajaxCallback);
                     $$('topicstuff').show();
-                } else if (id == 4) {
+                } else if (id === 4) {
                     $$('importfilegrid').clearAll();
                     $$('importfilegrid').load(window.paths.adminImportfiles, ajaxCallback);
                     $$('importfilestuff').show();
