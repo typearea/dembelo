@@ -10,7 +10,7 @@
 
     {% block stylesheets %}
         <link rel="stylesheet" href="{{ asset('vendor/Ionicons/css/ionicons.min.css') }}">
-        {% stylesheets '@DembeloMain/Resources/public/css/dembelo.scss'filter='sass' output='css/compiled/app.css' %}
+        {% stylesheets '@DembeloMain/Resources/public/css/dembelo.scss' filter='sass' output='css/compiled/app.css' %}
         <link rel="stylesheet" href="{{ asset_url }}">
         {% endstylesheets %}
     {% endblock %}
@@ -34,6 +34,7 @@
     '@DembeloMain/Resources/public/js/toolbar.js'
     '@DembeloMain/Resources/public/js/navigation.js'
     '@DembeloMain/Resources/public/js/touch.js'
+    '@DembeloMain/Resources/public/js/modal.js'
     '@DembeloMain/Resources/public/js/dembelo.js' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
