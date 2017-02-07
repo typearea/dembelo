@@ -41,6 +41,13 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
         </ul>
     {% endif %}
 
+    <div id="social-sharing-bar">
+        <div class="fb-share-button"
+             data-href="{{ app.request.uri }}"
+             data-layout="button">
+        </div>
+    </div>
+
     {{ include('DembeloMain::default/read.metadata.html.twig') }}
 
     {{ include('DembeloMain::default/paywall.html.twig', {'dialogId': 'modalPaywall'}) }}
