@@ -1,3 +1,21 @@
+{#
+Copyright (C) 2015-2017 Michael Giesler, Stephan Kreutzer, Daniel Hebestreit
+
+This file is part of Dembelo.
+
+Dembelo is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Dembelo is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License 3 for more details.
+
+You should have received a copy of the GNU Affero General Public License 3
+along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
+#}
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -7,6 +25,13 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}"/>
     {% set titleBlock = block('title') %}
     <title>was zu lesen{% if titleBlock is not empty %} - {{ titleBlock|raw }}{% endif %}</title>
+
+    {# Open Graph Tags, used by Facebook for sharing #}
+    <meta property="og:url"           content="{{ app.request.uri }}" />
+    <meta property="og:type"          content="website" />
+    <meta property="og:title"         content="Was zu lesen" />
+    <meta property="og:description"   content="Literatur digital gedacht" />
+    <meta property="og:image"         content="//www.dembelo.de/img/Logo%20schwarz.jpg" />
 
     {% block stylesheets %}
         <link rel="stylesheet" href="{{ asset('vendor/Ionicons/css/ionicons.min.css') }}">
@@ -39,7 +64,7 @@
     <script type="text/javascript" src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock %}
-<!-- Piwik -->
+{# Piwik #}
 <script type="text/javascript">
     var _paq = _paq || [];
     _paq.push(['trackPageView']);
@@ -57,6 +82,21 @@
     })();
 </script>
 <noscript><p><img src="{{ piwik_host }}piwik.php?idsite={{ piwik_id }}" style="border:0;" alt=""/></p></noscript>
-<!-- End Piwik Code -->
+{# End Piwik #}
+
+{# Facebook #}
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/de_DE/sdk.js#xfbml=1&version=v2.8";
+        js.async = true;
+        js.defer = true;
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+</script>
+{# End Facebook #}
+
 </body>
 </html>

@@ -8,6 +8,7 @@
     border: 1px solid $brown;
     padding: 12px;
     border-radius: 10px;
+    margin: 10px;
 
     h3 {
       display: block;
@@ -15,4 +16,10 @@
       font-size: 1.5rem;
     }
   }
+
+  #social-sharing-bar {
+    margin: 10px;
+    height: 24px;
+  }
+
 }
