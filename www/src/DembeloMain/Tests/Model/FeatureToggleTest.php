@@ -23,7 +23,10 @@ use DembeloMain\Model\FeatureToggle;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
 
-
+/**
+ * Class FeatureToggleTest
+ * @package DembeloMain\Tests\Model
+ */
 class FeatureToggleTest extends WebTestCase
 {
     /**
@@ -36,6 +39,9 @@ class FeatureToggleTest extends WebTestCase
      */
     private $containerMock;
 
+    /**
+     * @inheritdoc
+     */
     public function setUp()
     {
         $this->containerMock = $this->getMockBuilder(Container::class)->setMethods(['hasParameter', 'getParameter'])->getMock();
@@ -43,12 +49,16 @@ class FeatureToggleTest extends WebTestCase
         $this->featureToggle->setContainer($this->containerMock);
     }
 
+    /**
+     * tests hasFeature() exists
+     */
     public function testHasFeatureExists()
     {
         $this->assertTrue(method_exists($this->featureToggle, 'hasFeature'));
     }
 
     /**
+     * tests hasFeature() throws an error because of missing parameter
      * @expectedException \PHPUnit_Framework_Error
      */
     public function testHasFeatureThrowsErrorWithMissingParameter()
@@ -56,16 +66,25 @@ class FeatureToggleTest extends WebTestCase
         $this->featureToggle->hasFeature();
     }
 
+    /**
+     * tests hasFeature() returns false for unknown feature
+     */
     public function testHasFeatureReturnsFalseForUnknownFeature()
     {
         $this->assertFalse($this->featureToggle->hasFeature('unknownFeature'));
     }
 
+    /**
+     * tests hasFeature returns false for test feature
+     */
     public function testHasFeatureReturnsFalseForTestFeature()
     {
         $this->assertFalse($this->featureToggle->hasFeature('test_feature'));
     }
 
+    /**
+     * tests hasFeature() returns false when no parameter exists for test feature
+     */
     public function testHasFeatureReturnsWhenNoParameterExistsForTestFeature()
     {
         $this->containerMock->expects($this->atLeastOnce())
@@ -75,7 +94,10 @@ class FeatureToggleTest extends WebTestCase
         $this->assertFalse($this->featureToggle->hasFeature('test_feature'));
     }
 
-    public function testHasFeatureReturnsWhenTestFeatureIsEnabledByParameter()
+    /**
+     * tests hasFeature() returns true when test Feature is enabled by parameter
+     */
+    public function testHasFeatureReturnsTrueWhenTestFeatureIsEnabledByParameter()
     {
         $this->containerMock->expects($this->atLeastOnce())
             ->method('hasParameter')
@@ -90,21 +112,33 @@ class FeatureToggleTest extends WebTestCase
         $this->assertTrue($this->featureToggle->hasFeature('test_feature'));
     }
 
+    /**
+     * tests getFeatures() is existing
+     */
     public function testGetFeaturesExists()
     {
         $this->assertTrue(method_exists($this->featureToggle, 'getFeatures'));
     }
 
+    /**
+     * tests getFeatures() returns an array
+     */
     public function testGetFeaturesReturnsAnArray()
     {
         $this->assertInternalType(\PHPUnit_Framework_Constraint_IsType::TYPE_ARRAY, $this->featureToggle->getFeatures());
     }
 
+    /**
+     * tests getFeature() count is greater than 1
+     */
     public function testGetFeaturesCountGreaterOne()
     {
         $this->assertGreaterThan(0, count($this->featureToggle->getFeatures()));
     }
 
+    /**
+     * tests getFeatures() contains the test feature
+     */
     public function testGetFeaturesContainsTestFeature()
     {
         $features = $this->featureToggle->getFeatures();
