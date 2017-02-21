@@ -49,31 +49,28 @@ class DefaultController extends Controller
     {
         $textnodes = null;
 
-        $mongo = $this->get('doctrine_mongodb');
-
         if ($this->container->get('app.feature_toggle')->hasFeature('login_needed') && !$this->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('login_route');
         }
 
-        $dm = $mongo->getManager();
         $user = $this->getUser();
         if ($user instanceof User) {
+            $userRepository = $this->get('app.model_repository_user');
             $user->setLastTopicId($topicId);
-            $dm->persist($user);
-            $dm->flush();
+            $userRepository->save($user);
         }
 
-        $repository = $mongo->getRepository('DembeloMain:Textnode');
+        $textnodeRepository = $this->get('app.model_repository_textNode');
 
         /* @var $textnode Textnode */
-        $textnode = $repository->createQueryBuilder()
+        $textnode = $textnodeRepository->createQueryBuilder()
             ->field('topicId')->equals(new \MongoId($topicId))
             ->field('status')->equals(Textnode::STATUS_ACTIVE)
             ->field('access')->equals(true)
             ->getQuery()->getSingleResult();
 
         if (is_null($textnode)) {
-            throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found, while the user was logged in, but without current textnode ID set.');
+            throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found.');
         }
 
         return $this->redirectToRoute('text', array('textnodeArbitraryId' => $textnode->getArbitraryId()));
@@ -104,9 +101,10 @@ class DefaultController extends Controller
         $user = $this->getUser();
 
         if ($user instanceof User) {
+            $userRepository = $this->get('app.model_repository_user');
             $dm = $mongo->getManager();
             $user->setCurrentTextnode($textnode->getId());
-            $dm->persist($user);
+            $userRepository->save($user);
 
             $oldReadpathItem = $dm->createQueryBuilder('DembeloMain:Readpath')
                 ->field('userId')->equals(new \MongoId($user->getId()))
