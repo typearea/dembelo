@@ -38,5 +38,6 @@ deploy:
   skip_cleanup: true
   on:
     repo: typearea/dembelo
-    condition: ($TRAVIS_EVENT_TYPE == "cron") && (${TRAVIS_PHP_VERSION:0:1} == "5")
+    php: '5.6'
+    branch: master
     tags: false
