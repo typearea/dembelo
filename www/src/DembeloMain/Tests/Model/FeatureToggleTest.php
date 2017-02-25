@@ -62,7 +62,7 @@ class FeatureToggleTest extends WebTestCase
      */
     public function testHasFeatureThrowsErrorWithMissingParameter()
     {
-        if (version_compare(PHP_VERSION, '7.1.0')) {
+        if (version_compare(PHP_VERSION, '7.1.0') >= 0) {
             $this->expectException(\ArgumentCountError::class);
         } else {
             $this->expectException(\PHPUnit_Framework_Error::class);
