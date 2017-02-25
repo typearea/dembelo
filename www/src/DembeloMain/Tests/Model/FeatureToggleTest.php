@@ -59,7 +59,7 @@ class FeatureToggleTest extends WebTestCase
 
     /**
      * tests hasFeature() throws an error because of missing parameter
-     * @expectedException
+     * @expectedException \Exception
      */
     public function testHasFeatureThrowsErrorWithMissingParameter()
     {
