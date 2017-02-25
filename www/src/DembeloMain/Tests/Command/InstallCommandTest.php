@@ -57,6 +57,9 @@ class InstallCommandTest extends KernelTestCase
         $this->command->setContainer($this->containerMock);
     }
 
+    /**
+     * tests the install
+     */
     public function testRunConfigure()
     {
         $returnValue = $this->commandTester->execute(array(
@@ -71,7 +74,6 @@ class InstallCommandTest extends KernelTestCase
         $output = $this->commandTester->getDisplay();
         $this->assertEquals('admin user installed'."\n".'Default users installed'."\n", $output);
         $this->assertEquals(0, $returnValue);
-
     }
 
     private function getUserRepositoryMock()
@@ -81,10 +83,9 @@ class InstallCommandTest extends KernelTestCase
             'find',
             'findByEmail',
             'findAll',
-            'save'
+            'save',
         ];
         $this->userRepositoryMock = $this->getMockBuilder(UserRepositoryInterface::class)->setMethods($methods)->getMock();
-
     }
 
     private function getPasswordEncoderMock()
@@ -109,7 +110,7 @@ class InstallCommandTest extends KernelTestCase
             ->method('get')
             ->willReturnCallback(function ($param) {
                 switch ($param) {
-                    case 'app.model_repository_user';
+                    case 'app.model_repository_user':
                         return $this->userRepositoryMock;
                     case 'security.password_encoder':
                         return $this->passwordEncoderMock;
@@ -118,6 +119,4 @@ class InstallCommandTest extends KernelTestCase
 
         return $containerMock;
     }
-
-
 }
