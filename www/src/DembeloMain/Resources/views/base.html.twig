@@ -23,7 +23,11 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}"/>
-    {% set titleBlock = block('title') %}
+    {% if block('title') is defined %}
+        {% set titleBlock = block('title') %}
+    {% else %}
+        {% set titleBlock = "" %}
+    {% endif %}
     <title>was zu lesen{% if titleBlock is not empty %} - {{ titleBlock|raw }}{% endif %}</title>
 
     {# Open Graph Tags, used by Facebook for sharing #}

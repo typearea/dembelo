@@ -11,6 +11,11 @@ services:
 #        class: DembeloMain\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
 
+    app.feature_toggle:
+        class: DembeloMain\Model\FeatureToggle
+        calls:
+        - [setContainer, ["@service_container"]]
+
     app.controller_dashboard:
         class: DembeloMain\Controller\Dashboard\DefaultController
         arguments: ["@templating","@app.model_repository_topic"]
@@ -61,12 +66,19 @@ services:
             arguments:
                 - DembeloMain\Document\Importfile
 
-    app.twig_extension:
+    app.twig_extension.version:
             class: DembeloMain\Twig\VersionExtension
             arguments: ["@service_container"]
             public: false
             tags:
                 - { name: twig.extension }
+
+    app.twig_extension.hasFeature:
+                class: DembeloMain\Twig\FeatureToggleExtension
+                arguments: ["@service_container"]
+                public: false
+                tags:
+                    - { name: twig.extension }
 
     app.requestlistener_session_expiration:
             class: DembeloMain\EventListener\RequestListener

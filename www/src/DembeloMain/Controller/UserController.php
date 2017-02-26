@@ -159,7 +159,7 @@ class UserController extends Controller
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $mongo = $this->get('doctrine_mongodb');
             $dm = $mongo->getManager();
             $encoder = $this->get('security.password_encoder');

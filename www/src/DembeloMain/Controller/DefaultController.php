@@ -18,7 +18,6 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * @package DembeloMain
  */
@@ -27,10 +26,12 @@ namespace DembeloMain\Controller;
 
 use DembeloMain\Document\Readpath;
 use DembeloMain\Document\Textnode;
+use DembeloMain\Document\User;
 use Hyphenator\Core as Hyphenator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 /**
  * Class DefaultController
@@ -48,33 +49,28 @@ class DefaultController extends Controller
     {
         $textnodes = null;
 
-        /* @var $authorizationChecker \Symfony\Component\Security\Core\Authorization\AuthorizationChecker */
-        $authorizationChecker = $this->get('security.authorization_checker');
-        /* @var $tokenStorage TokenStorage */
-        $tokenStorage = $this->get('security.token_storage');
-        $mongo = $this->get('doctrine_mongodb');
-
-        if (!$authorizationChecker->isGranted('ROLE_USER')) {
+        if ($this->container->get('app.feature_toggle')->hasFeature('login_needed') && !$this->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('login_route');
         }
 
-        $dm = $mongo->getManager();
-        $user = $tokenStorage->getToken()->getUser();
-        $user->setLastTopicId($topicId);
-        $dm->persist($user);
-        $dm->flush();
+        $user = $this->getUser();
+        if ($user instanceof User) {
+            $userRepository = $this->get('app.model_repository_user');
+            $user->setLastTopicId($topicId);
+            $userRepository->save($user);
+        }
 
-        $repository = $mongo->getRepository('DembeloMain:Textnode');
+        $textnodeRepository = $this->get('app.model_repository_textNode');
 
         /* @var $textnode Textnode */
-        $textnode = $repository->createQueryBuilder()
+        $textnode = $textnodeRepository->createQueryBuilder()
             ->field('topicId')->equals(new \MongoId($topicId))
             ->field('status')->equals(Textnode::STATUS_ACTIVE)
             ->field('access')->equals(true)
             ->getQuery()->getSingleResult();
 
         if (is_null($textnode)) {
-            throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found, while the user was logged in, but without current textnode ID set.');
+            throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found.');
         }
 
         return $this->redirectToRoute('text', array('textnodeArbitraryId' => $textnode->getArbitraryId()));
@@ -89,8 +85,7 @@ class DefaultController extends Controller
      */
     public function readTextnodeAction($textnodeArbitraryId)
     {
-        $authorizationChecker = $this->get('security.authorization_checker');
-        if (!$authorizationChecker->isGranted('ROLE_USER')) {
+        if ($this->container->get('app.feature_toggle')->hasFeature('login_needed') && !$this->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('login_route');
         }
 
@@ -103,41 +98,36 @@ class DefaultController extends Controller
             throw $this->createNotFoundException('No Textnode with arbitrary ID \''.$textnodeArbitraryId.'\' found.');
         }
 
-        /* @var $authorizationChecker \Symfony\Component\Security\Core\Authorization\AuthorizationChecker */
-        $authorizationChecker = $this->get('security.authorization_checker');
-        /* @var $tokenStorage TokenStorage */
-        $tokenStorage = $this->get('security.token_storage');
+        $user = $this->getUser();
 
-        if (!$authorizationChecker->isGranted('ROLE_USER')) {
-            return $this->redirectToRoute('login_route');
-        }
-        $user = $tokenStorage->getToken()->getUser();
+        if ($user instanceof User) {
+            $userRepository = $this->get('app.model_repository_user');
+            $dm = $mongo->getManager();
+            $user->setCurrentTextnode($textnode->getId());
+            $userRepository->save($user);
 
-        $dm = $mongo->getManager();
-        $user->setCurrentTextnode($textnode->getId());
-        $dm->persist($user);
+            $oldReadpathItem = $dm->createQueryBuilder('DembeloMain:Readpath')
+                ->field('userId')->equals(new \MongoId($user->getId()))
+                ->sort('timestamp', 'desc')
+                ->getQuery()
+                ->getSingleResult();
 
-        $oldReadpathItem = $dm->createQueryBuilder('DembeloMain:Readpath')
-            ->field('userId')->equals(new \MongoId($user->getId()))
-            ->sort('timestamp', 'desc')
-            ->getQuery()
-            ->getSingleResult();
-
-        if (is_null($oldReadpathItem) || $oldReadpathItem->getTextnodeId() !== $textnode->getId()) {
-            $readpath = new Readpath();
-            $readpath->setUserId($user->getId());
-            $readpath->setTextnodeId($textnode->getId());
-            $readpath->setTimestamp(new \MongoDate(time()));
-            if (!is_null($oldReadpathItem)) {
-                $readpath->setPreviousTextnodeId($oldReadpathItem->getTextnodeId());
+            if (is_null($oldReadpathItem) || $oldReadpathItem->getTextnodeId() !== $textnode->getId()) {
+                $readpath = new Readpath();
+                $readpath->setUserId($user->getId());
+                $readpath->setTextnodeId($textnode->getId());
+                $readpath->setTimestamp(new \MongoDate(time()));
+                if (!is_null($oldReadpathItem)) {
+                    $readpath->setPreviousTextnodeId($oldReadpathItem->getTextnodeId());
+                }
+                $dm->persist($readpath);
+            } else {
+                $oldReadpathItem->setTimestamp(time());
+                $dm->persist($oldReadpathItem);
             }
-            $dm->persist($readpath);
-        } else {
-            $oldReadpathItem->setTimestamp(time());
-            $dm->persist($oldReadpathItem);
-        }
 
-        $dm->flush();
+            $dm->flush();
+        }
 
         $hyphenator = new Hyphenator();
         $hyphenator->registerPatterns('de');
@@ -197,24 +187,27 @@ class DefaultController extends Controller
      */
     public function reloadAction()
     {
-        /* @var $authorizationChecker \Symfony\Component\Security\Core\Authorization\AuthorizationChecker */
-        $authorizationChecker = $this->get('security.authorization_checker');
-        /* @var $tokenStorage TokenStorage */
-        $tokenStorage = $this->get('security.token_storage');
-        if (!$authorizationChecker->isGranted('ROLE_USER')) {
+        if ($this->container->get('app.feature_toggle')->hasFeature('login_needed') && !$this->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('login_route');
         }
-        $user = $tokenStorage->getToken()->getUser();
-        $currentTextnodeId = $user->getCurrentTextnode();
+
         $textnodeRepository = $this->get('app.model_repository_textNode');
 
-        // find topic from readpath and show another access node
-        $textnode = $textnodeRepository->createQueryBuilder()
-            ->field('topicId')->equals(new \MongoId($user->getLastTopicId()))
-            ->field('status')->equals(Textnode::STATUS_ACTIVE)
-            ->field('access')->equals(true)
-            ->field('textnodeId')->notEqual($currentTextnodeId)
-            ->getQuery()->getSingleResult();
+        $user = $this->getUser();
+        if ($user instanceof User) {
+            $currentTextnodeId = $user->getCurrentTextnode();
+            $textnode = $textnodeRepository->createQueryBuilder()
+                ->field('topicId')->equals(new \MongoId($user->getLastTopicId()))
+                ->field('status')->equals(Textnode::STATUS_ACTIVE)
+                ->field('access')->equals(true)
+                ->field('textnodeId')->notEqual($currentTextnodeId)
+                ->getQuery()->getSingleResult();
+        } else {
+            $textnode = $textnodeRepository->createQueryBuilder()
+                ->field('status')->equals(Textnode::STATUS_ACTIVE)
+                ->field('access')->equals(true)
+                ->getQuery()->getSingleResult();
+        }
 
         return $this->redirectToRoute('text', array('textnodeArbitraryId' => $textnode->getArbitraryId()));
     }

@@ -81,9 +81,9 @@ class InstallCommand extends ContainerAwareCommand
             $this->installDummyData($output);
             $output->writeln("<info>Dummy data installed</info>");
         }
-        $mongo = $this->getContainer()->get('doctrine_mongodb');
-        $dm = $mongo->getManager();
-        $dm->flush();
+        //$mongo = $this->getContainer()->get('doctrine_mongodb');
+        //$dm = $mongo->getManager();
+        //$dm->flush();
     }
 
     protected function purgeDB()
@@ -113,10 +113,6 @@ class InstallCommand extends ContainerAwareCommand
 
     protected function installAdminUser()
     {
-        $mongo = $this->getContainer()->get('doctrine_mongodb');
-
-        $dm = $mongo->getManager();
-
         $users = array(
             array(
                 'email' => 'admin@dembelo.tld',
@@ -130,7 +126,7 @@ class InstallCommand extends ContainerAwareCommand
             ),
         );
 
-        $this->installUsers($users, $mongo, $dm);
+        $this->installUsers($users);
     }
 
     protected function installDummyData(OutputInterface $output)
@@ -143,7 +139,7 @@ class InstallCommand extends ContainerAwareCommand
         $this->createLicensees($mongo, $dm);
         $output->writeln("Licensees installed...");
 
-        $this->createUsers($mongo, $dm);
+        $this->createUsers();
         $output->writeln("Users installed...");
 
         $this->createTopics($mongo, $dm);
@@ -179,7 +175,7 @@ class InstallCommand extends ContainerAwareCommand
         }
     }
 
-    private function createUsers(ManagerRegistry $mongo, DocumentManager $dm)
+    private function createUsers()
     {
         $users = array(
             array(
@@ -204,12 +200,13 @@ class InstallCommand extends ContainerAwareCommand
             ),
         );
 
-        $this->installUsers($users, $mongo, $dm);
+        $this->installUsers($users);
     }
 
-    private function installUsers(array $users, ManagerRegistry $mongo, DocumentManager $dm)
+    private function installUsers(array $users)
     {
-        $repository = $mongo->getRepository('DembeloMain:User');
+        /* @var \DembeloMain\Model\Repository\UserRepositoryInterface */
+        $userRepository = $this->getContainer()->get('app.model_repository_user');
 
         $encoder = $this->getContainer()->get('security.password_encoder');
 
@@ -218,7 +215,7 @@ class InstallCommand extends ContainerAwareCommand
         }
 
         foreach ($users as $userData) {
-            $user = $repository->findOneByEmail($userData['email']);
+            $user = $userRepository->findOneByEmail($userData['email']);
 
             if (is_null($user)) {
                 $user = new User();
@@ -236,7 +233,7 @@ class InstallCommand extends ContainerAwareCommand
                     $user->setLicenseeId($this->dummyData['licensees'][0]->getId());
                 }
 
-                $dm->persist($user);
+                $userRepository->save($user);
             }
 
             $this->dummyData['users'][] = $user;
