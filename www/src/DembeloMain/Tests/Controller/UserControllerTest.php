@@ -124,7 +124,7 @@ class UserControllerTest extends WebTestCase
     {
         $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
         $mock = $this->getMockBuilder('foobar')
-            ->setMethods(array('get', 'renderResponse', 'createBuilder', 'add', 'getForm', 'handleRequest', 'isValid', 'getManager', 'createView'))
+            ->setMethods(array('get', 'renderResponse', 'createBuilder', 'add', 'getForm', 'handleRequest', 'isSubmitted', 'isValid', 'getManager', 'createView'))
             ->getMock();
         $container = $this->getMockBuilder("Symfony\Component\DependencyInjection\ContainerInterface")->getMock();
         $container->expects($this->any())
@@ -149,6 +149,9 @@ class UserControllerTest extends WebTestCase
         $mock->expects($this->any())
             ->method('isValid')
             ->will($this->returnValue(false));
+        $mock->expects($this->any())
+            ->method('isValid')
+            ->will($this->returnValue(true));
         $mock->expects($this->any())
             ->method('getManager')
             ->will($this->returnSelf());
