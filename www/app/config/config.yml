@@ -77,9 +77,9 @@ assetic:
 doctrine_mongodb:
     connections:
         default:
-            server: mongodb://localhost:27017
+            server: "mongodb://%database_host%:%database_port%"
             options: {}
-    default_database: dembelo
+    default_database: "%database_name%"
     document_managers:
         default:
             auto_mapping: true
