@@ -56,17 +56,21 @@ if (file_exists("files/version")) {
 
 echo 'download '.$downloadUrl."...\n";
 shell_exec('wget -q '.$downloadUrl);
-echo 'finished' . "\n";
+echo 'finished'."\n";
 
 echo 'extract '.$downloadName."...\n";
 shell_exec('unzip -o '.$downloadName);
-echo 'finished' . "\n";
+echo 'finished'."\n";
 
 echo 'clearing cache '."...\n";
 shell_exec('cd www');
 shell_exec('php bin/console cache:clear --env=prod');
 shell_exec('php bin/console assetic:dump --env=prod');
-echo 'finished' . "\n";
+echo 'finished'."\n";
+
+echo 'prepare some apache stuff'."\n";
+shell_exec('cp files/apache/htaccess www/web/.htaccess');
+echo 'finished'."\n";
 
 shell_exec('rm '.$downloadName);
 echo 'installation ['.$newVersion.'] finished'."\n";
