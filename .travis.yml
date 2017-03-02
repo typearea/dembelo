@@ -15,7 +15,6 @@ before_install:
 - eval `ssh-agent -s`
 - ssh-add files/travisci
 - gem install sass
-- which sass
 services:
 - mongodb
 script:
