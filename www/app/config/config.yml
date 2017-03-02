@@ -48,7 +48,7 @@ assetic:
     use_controller: false
     bundles:        [ DembeloMain, AdminBundle ]
     #java: /usr/bin/java
-    sass:           /usr/local/bin/sass
+    sass:           sass
     ruby:           ~
     filters:
         cssrewrite: ~
