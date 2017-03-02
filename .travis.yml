@@ -6,10 +6,8 @@ php:
 before_install:
 - export DEMBELO_VERSION="v1.3-$TRAVIS_BUILD_NUMBER"
 - export RELEASE_FILENAME="dembelo_$DEMBELO_VERSION.zip"
-- export MONGOEXTENSION="mongodb.so"
+- export MONGOEXTENSION=$(php -m | grep mongo)".so"
 - export SENSIOLABS_ENABLE_NEW_DIRECTORY_STRUCTURE=true
-- if [[ ${TRAVIS_PHP_VERSION:0:1} == "5" ]]; then export MONGOEXTENSION="mongo.so";
-  fi
 - echo "extension =" $MONGOEXTENSION >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 - openssl aes-256-cbc -K $encrypted_39a904e418a2_key -iv $encrypted_39a904e418a2_iv -in files/travisci.enc -out ./files/travisci -d
 - chmod 600 files/travisci
@@ -27,6 +25,7 @@ install:
   alcaeus/mongo-php-adapter mongodb/mongodb; fi
 - composer --working-dir="www" install
 - phpenv rehash
+- php www/bin/console assetic:dump --env=prod
 before_deploy:
 - ./scripts/buildRelease.sh
 deploy:
