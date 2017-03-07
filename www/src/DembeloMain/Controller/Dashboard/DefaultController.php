@@ -55,7 +55,7 @@ class DefaultController extends Controller
     {
         return $this->templating->renderResponse(
             'DembeloMain::dashboard/index.html.twig',
-            array('topics' => $this->topicRepository->findByStatusActive())
+            array('topics' => $this->topicRepository->findBy([], array('sortKey' => 'ASC'), 8))
         );
     }
 }

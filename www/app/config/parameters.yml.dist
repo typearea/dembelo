@@ -20,4 +20,5 @@ parameters:
     locale: de
 
     # features
-    login_in_navigation: true
+    features.login_enabled: true
+    features.login_needed: true

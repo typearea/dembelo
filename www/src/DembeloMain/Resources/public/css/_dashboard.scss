@@ -19,14 +19,13 @@ body#dashboard {
         @include cover_grid($dashboard-cover-cols-desktop);
       }
 
-      a {
-        img {
-          display: block;
-          width: 100%;
-          max-width: 100%;
-          max-height: 100%;
-        }
+      img {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        max-height: 100%;
       }
+
     }
   }
 }
