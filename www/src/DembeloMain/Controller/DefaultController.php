@@ -1,6 +1,6 @@
 <?php
 
-/* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
+/* Copyright (C) 2015-2017 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
  *
@@ -31,7 +31,6 @@ use Hyphenator\Core as Hyphenator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 /**
  * Class DefaultController
@@ -100,34 +99,8 @@ class DefaultController extends Controller
 
         $user = $this->getUser();
 
-        if ($user instanceof User) {
-            $userRepository = $this->get('app.model_repository_user');
-            $dm = $mongo->getManager();
-            $user->setCurrentTextnode($textnode->getId());
-            $userRepository->save($user);
-
-            $oldReadpathItem = $dm->createQueryBuilder('DembeloMain:Readpath')
-                ->field('userId')->equals(new \MongoId($user->getId()))
-                ->sort('timestamp', 'desc')
-                ->getQuery()
-                ->getSingleResult();
-
-            if (is_null($oldReadpathItem) || $oldReadpathItem->getTextnodeId() !== $textnode->getId()) {
-                $readpath = new Readpath();
-                $readpath->setUserId($user->getId());
-                $readpath->setTextnodeId($textnode->getId());
-                $readpath->setTimestamp(new \MongoDate(time()));
-                if (!is_null($oldReadpathItem)) {
-                    $readpath->setPreviousTextnodeId($oldReadpathItem->getTextnodeId());
-                }
-                $dm->persist($readpath);
-            } else {
-                $oldReadpathItem->setTimestamp(time());
-                $dm->persist($oldReadpathItem);
-            }
-
-            $dm->flush();
-        }
+        $this->get('app.readpath')->storeReadPath($textnode, $user);
+        //$this->get('app.favorites')->storeFavorite($user, $textnode);
 
         $hyphenator = new Hyphenator();
         $hyphenator->registerPatterns('de');
@@ -173,43 +146,6 @@ class DefaultController extends Controller
         );
 
         return new Response(\json_encode($output));
-    }
-
-    /**
-     * @Route("/reload/", name="reload")
-     *
-     * @return string
-     *
-     * @todo behaviour of left main menu button:
-     *       if access node, then jump to homepage
-     *       if not access node, them jump to another access node
-     *       if no other access node available, then jump to homepage
-     */
-    public function reloadAction()
-    {
-        if ($this->container->get('app.feature_toggle')->hasFeature('login_needed') && !$this->isGranted('ROLE_USER')) {
-            return $this->redirectToRoute('login_route');
-        }
-
-        $textnodeRepository = $this->get('app.model_repository_textNode');
-
-        $user = $this->getUser();
-        if ($user instanceof User) {
-            $currentTextnodeId = $user->getCurrentTextnode();
-            $textnode = $textnodeRepository->createQueryBuilder()
-                ->field('topicId')->equals(new \MongoId($user->getLastTopicId()))
-                ->field('status')->equals(Textnode::STATUS_ACTIVE)
-                ->field('access')->equals(true)
-                ->field('textnodeId')->notEqual($currentTextnodeId)
-                ->getQuery()->getSingleResult();
-        } else {
-            $textnode = $textnodeRepository->createQueryBuilder()
-                ->field('status')->equals(Textnode::STATUS_ACTIVE)
-                ->field('access')->equals(true)
-                ->getQuery()->getSingleResult();
-        }
-
-        return $this->redirectToRoute('text', array('textnodeArbitraryId' => $textnode->getArbitraryId()));
     }
 
     /**

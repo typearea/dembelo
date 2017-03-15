@@ -16,6 +16,10 @@ services:
         calls:
         - [setContainer, ["@service_container"]]
 
+    app.readpath:
+        class: DembeloMain\Model\Readpath
+        arguments: ["@app.model_repository_read_path"]
+
     app.controller_dashboard:
         class: DembeloMain\Controller\Dashboard\DefaultController
         arguments: ["@templating","@app.model_repository_topic"]
