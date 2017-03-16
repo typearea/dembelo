@@ -34,7 +34,7 @@ use DembeloMain\Document\User;
 class UserTest extends WebTestCase
 {
     /**
-     * @var DembeloMain\Document\User
+     * @var User
      */
     private $user;
 

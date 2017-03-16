@@ -88,3 +88,7 @@ services:
             class: DembeloMain\EventListener\RequestListener
             tags:
                 - { name: kernel.event_listener, event: kernel.request, method: onRequest }
+
+    app.favoriteManager:
+            class: DembeloMain\Model\FavoriteManager
+            arguments: ["@session", "@app.model_repository_textNode"]
