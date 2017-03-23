@@ -70,7 +70,7 @@ class FavoriteManager
     public function getFavorite(Topic $topic, User $user = null)
     {
         if (is_null($user)) {
-            return $this->session->get('favorite_' . $topic->getId());
+            return $this->session->get('favorite_'.$topic->getId());
         }
 
         return $user->getFavorite($topic->getId());

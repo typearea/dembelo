@@ -104,5 +104,4 @@ class FavoriteManagerTest extends WebTestCase
         $this->assertEquals('textnodeId', $favMgr->getFavorite($this->topic));
         $this->assertEquals('textnodeId', $this->session->get('favorite_topicId'));
     }
-
 }
