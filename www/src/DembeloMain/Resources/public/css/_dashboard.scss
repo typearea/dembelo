@@ -26,6 +26,25 @@ body#dashboard {
         max-height: 100%;
       }
 
+      .favorite {
+        position: absolute;
+        color: $red;
+        font-size: 130px;
+        line-height: 1em;
+        margin-top: -18px;
+        width: calc(100% / #{$dashboard-cover-cols});
+        padding-right: 30px;
+
+        @media (min-width: 550px) {
+          width: calc(100% / #{$dashboard-cover-cols-desktop});
+          padding-right: 20px;
+        }
+
+        div {
+          float: right;
+        }
+      }
+
     }
   }
 }

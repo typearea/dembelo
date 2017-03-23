@@ -54,11 +54,6 @@ class Readpath
     protected $timestamp;
 
     /**
-     * @MongoDB\ObjectId
-     */
-    protected $previousTextnodeId;
-
-    /**
      * @return mixed
      */
     public function getId()
@@ -120,21 +115,5 @@ class Readpath
     public function setTimestamp($timestamp)
     {
         $this->timestamp = $timestamp;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPreviousTextnodeId()
-    {
-        return $this->previousTextnodeId;
-    }
-
-    /**
-     * @param mixed $previousTextnodeId
-     */
-    public function setPreviousTextnodeId($previousTextnodeId)
-    {
-        $this->previousTextnodeId = $previousTextnodeId;
     }
 }

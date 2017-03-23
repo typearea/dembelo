@@ -20,6 +20,8 @@
 
 namespace DembeloMain\Controller\Dashboard;
 
+use DembeloMain\Document\Textnode;
+use DembeloMain\Model\FavoriteManager;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -32,30 +34,33 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
  */
 class DefaultController extends Controller
 {
-    /** @var TextNodeRepositoryInterface */
-    private $topicRepository;
-    private $templating;
-
-    /**
-     * DefaultController constructor.
-     * @param EngineInterface          $templating
-     * @param TopicRepositoryInterface $topicRepository
-     */
-    public function __construct(EngineInterface $templating, TopicRepositoryInterface $topicRepository)
-    {
-        $this->templating = $templating;
-        $this->topicRepository = $topicRepository;
-    }
-
     /**
      * @Route("/", name="mainpage")
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction()
     {
-        return $this->templating->renderResponse(
+        $topicRepository = $this->get('app.model_repository_topic');
+        $favoriteManager = $this->get('app.favoriteManager');
+
+        $topics = $topicRepository->findBy([], array('sortKey' => 'ASC'), 8);
+        $favorites = [];
+
+        foreach ($topics as $topic) {
+            $favoriteId = $favoriteManager->getFavorite($topic, $this->getUser());
+            if (is_null($favoriteId)) {
+                $favorites[$topic->getId()] = false;
+            } else {
+                $favorites[$topic->getId()] = $favoriteId;
+            }
+        }
+
+        return $this->render(
             'DembeloMain::dashboard/index.html.twig',
-            array('topics' => $this->topicRepository->findBy([], array('sortKey' => 'ASC'), 8))
+            array(
+                'topics' => $topics,
+                'favorites' => $favorites,
+            )
         );
     }
 }
