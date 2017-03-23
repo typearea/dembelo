@@ -88,8 +88,6 @@ class DefaultController extends Controller
             return $this->redirectToRoute('login_route');
         }
 
-        $mongo = $this->get('doctrine_mongodb');
-
         $textnodeRepository = $this->get('app.model_repository_textNode');
         $textnode = $textnodeRepository->findOneActiveByArbitraryId($textnodeArbitraryId);
 
@@ -100,7 +98,11 @@ class DefaultController extends Controller
         $user = $this->getUser();
 
         $this->get('app.readpath')->storeReadPath($textnode, $user);
-        //$this->get('app.favorites')->storeFavorite($user, $textnode);
+        $this->get('app.favoriteManager')->setFavorite($textnode, $user);
+
+        if ($user instanceof User) {
+            $this->get('app.model_repository_user')->save($user);
+        }
 
         $hyphenator = new Hyphenator();
         $hyphenator->registerPatterns('de');

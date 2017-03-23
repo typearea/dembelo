@@ -52,13 +52,13 @@ class FavoriteManagerTest extends WebTestCase
         $this->topic = new Topic();
         $this->topic->setId('topicId');
         $this->textnode = new Textnode();
-        $this->textnode->setId('textnodeId');
+        $this->textnode->setArbitraryId('textnodeId');
+        $this->textnode->setTopicId('topicId');
         $this->user = new User();
 
         $this->session = new Session(new MockArraySessionStorage());
-        $this->textnodeRepository = $this->getTextnodeRepositoryMock();
 
-        $this->favMgr = new FavoriteManager($this->session, $this->textnodeRepository);
+        $this->favMgr = new FavoriteManager($this->session);
     }
 
     /**
@@ -66,8 +66,8 @@ class FavoriteManagerTest extends WebTestCase
      */
     public function testSetFavoriteWithCookie()
     {
-        $this->favMgr->setFavorite($this->topic, $this->textnode);
-        $this->assertInstanceOf(Textnode::class, $this->favMgr->getFavorite($this->topic));
+        $this->favMgr->setFavorite($this->textnode);
+        $this->assertEquals('textnodeId', $this->favMgr->getFavorite($this->topic));
         $this->assertEquals('textnodeId', $this->session->get('favorite_topicId'));
     }
 
@@ -76,8 +76,8 @@ class FavoriteManagerTest extends WebTestCase
      */
     public function testSetFavoriteWithUser()
     {
-        $this->favMgr->setFavorite($this->topic, $this->textnode, $this->user);
-        $this->assertInstanceOf(Textnode::class, $this->favMgr->getFavorite($this->topic, $this->user));
+        $this->favMgr->setFavorite($this->textnode, $this->user);
+        $this->assertEquals('textnodeId', $this->favMgr->getFavorite($this->topic, $this->user));
         $this->assertNull($this->session->get('favorite_topicId'));
     }
 
@@ -86,10 +86,10 @@ class FavoriteManagerTest extends WebTestCase
      */
     public function testSetFavoriteWithMultipleInstancesWithUser()
     {
-        $this->favMgr->setFavorite($this->topic, $this->textnode, $this->user);
+        $this->favMgr->setFavorite($this->textnode, $this->user);
 
         $favMgr = new FavoriteManager($this->session, $this->textnodeRepository);
-        $this->assertInstanceOf(Textnode::class, $favMgr->getFavorite($this->topic, $this->user));
+        $this->assertEquals('textnodeId', $favMgr->getFavorite($this->topic, $this->user));
         $this->assertNull($this->session->get('favorite_topicId'));
     }
 
@@ -98,21 +98,11 @@ class FavoriteManagerTest extends WebTestCase
      */
     public function testSetFavoriteWithMultipleInstancesWithCookie()
     {
-        $this->favMgr->setFavorite($this->topic, $this->textnode);
+        $this->favMgr->setFavorite($this->textnode);
 
         $favMgr = new FavoriteManager($this->session, $this->textnodeRepository);
-        $this->assertInstanceOf(Textnode::class, $favMgr->getFavorite($this->topic));
+        $this->assertEquals('textnodeId', $favMgr->getFavorite($this->topic));
         $this->assertEquals('textnodeId', $this->session->get('favorite_topicId'));
     }
 
-    private function getTextnodeRepositoryMock()
-    {
-        $mock = $this->getMockBuilder(TextNodeRepository::class)->disableOriginalConstructor()->getMock();
-        $mock->expects($this->once())
-            ->method('find')
-            ->with('textnodeId')
-            ->willReturn(new Textnode());
-
-        return $mock;
-    }
 }

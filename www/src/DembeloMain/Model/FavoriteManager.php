@@ -39,45 +39,40 @@ class FavoriteManager
 
     /**
      * FavoriteManager constructor.
-     * @param Session                     $session
-     * @param TextNodeRepositoryInterface $textNodeRepository
+     * @param Session $session
      */
-    public function __construct(Session $session, TextNodeRepositoryInterface $textNodeRepository)
+    public function __construct(Session $session)
     {
         $this->session = $session;
-        $this->textNodeRepository = $textNodeRepository;
     }
 
     /**
      * sets a favorite textnode for a topic
-     * @param Topic     $topic
      * @param Textnode  $textnode
      * @param User|null $user
      */
-    public function setFavorite(Topic $topic, Textnode $textnode, User $user = null)
+    public function setFavorite(Textnode $textnode, User $user = null)
     {
         if (is_null($user)) {
-            $this->session->set('favorite_'.$topic->getId(), $textnode->getId());
+            $this->session->set('favorite_'.$textnode->getTopicId(), $textnode->getArbitraryId());
 
             return;
         }
-        $user->setFavorite($topic->getId(), $textnode->getId());
+        $user->setFavorite($textnode->getTopicId(), $textnode->getArbitraryId());
     }
 
     /**
      * gets a favorite textnode for a topic
      * @param Topic     $topic
      * @param User|null $user
-     * @return Textnode
+     * @return string
      */
     public function getFavorite(Topic $topic, User $user = null)
     {
         if (is_null($user)) {
-            $textnodeId = $this->session->get('favorite_'.$topic->getId());
-        } else {
-            $textnodeId = $user->getFavorite($topic->getId());
+            return $this->session->get('favorite_' . $topic->getId());
         }
 
-        return $this->textNodeRepository->find($textnodeId);
+        return $user->getFavorite($topic->getId());
     }
 }

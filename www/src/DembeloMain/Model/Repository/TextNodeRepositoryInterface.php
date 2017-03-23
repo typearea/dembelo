@@ -71,4 +71,11 @@ interface TextNodeRepositoryInterface
      * @return void
      */
     public function disableOrphanedNodes(Importfile $importfile, array $existingTextnodeIds);
+
+    /**
+     * finds a textnode by arbitraryId
+     * @param string $arbitraryId
+     * @return Textnode
+     */
+    public function findOneActiveByArbitraryId($arbitraryId);
 }

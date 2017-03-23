@@ -27,9 +27,13 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
             {% for topic in topics %}
                 <div class="cover">
                     {% if topic.status == 1 %}
-                        <div class="favorite">
-                            <div class="ion-bookmark"></div>
-                        </div>
+                        {%  if attribute(favorites, topic.id) %}
+                            <div class="favorite">
+                                <a href="{{ path('text', {'textnodeArbitraryId': attribute(favorites, topic.id)}) }}">
+                                    <div class="ion-bookmark"></div>
+                                </a>
+                            </div>
+                        {% endif %}
                         <a href="{{ path('themenfeld', {'topicId': topic.id}) }}">
                     {% endif %}
                         <img src="/images/topics/{{ topic.id }}/{{ topic.originalImageName }}" alt="{{ topic.name }}" title="{{ topic.name }}"/>
