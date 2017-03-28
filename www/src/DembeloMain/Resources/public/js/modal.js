@@ -33,7 +33,9 @@
         for(var i=0;i<hitchLinks.length;i++){
             hitchLinks[i].addEventListener('click', hitchClick, false);
         }
-        submitter.addEventListener('click', submitPaywall);
+        if (submitter !== null) {
+            submitter.addEventListener('click', submitPaywall);
+        }
     }
 
     function closeModal(e) {
