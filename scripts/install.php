@@ -17,6 +17,23 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
+$shortOptions = 'u:';
+
+$longOptions = [
+    'help',
+];
+
+$options = getopt($shortOptions, $longOptions);
+
+if (array_key_exists('help', $options)) {
+    echo "dembelo install script, ".file_get_contents('./files/version')."\n";
+    echo "\n";
+    echo "options:\n";
+    echo " -u\tuser for chmod (for example: www-data)\n";
+    echo "--help\tdisplays this help\n";
+    exit(0);
+}
+
 $url = 'https://api.github.com/repos/typearea/dembelo/releases';
 $data = shell_exec('curl '.$url);
 
@@ -62,6 +79,11 @@ echo 'extract '.$downloadName."...\n";
 shell_exec('unzip -o '.$downloadName);
 echo 'finished'."\n";
 
+if (array_key_exists('u', $options)) {
+    echo 'chown to '.$options['u']."...\n";
+    shell_exec('chown -R '.$options['u']. ' www/');
+}
+
 echo 'clearing cache '."...\n";
 shell_exec('cd www');
 shell_exec('php bin/console cache:clear --env=prod');
@@ -70,6 +92,9 @@ echo 'finished'."\n";
 
 echo 'prepare some apache stuff'."\n";
 shell_exec('cp files/apache/htaccess www/web/.htaccess');
+if (array_key_exists('u', $options)) {
+    shell_exec('chown ' . $options['u'] . ' www/web/.htaccess');
+}
 echo 'finished'."\n";
 
 shell_exec('rm '.$downloadName);
