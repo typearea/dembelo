@@ -123,7 +123,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
      */
     private function createArbitraryId($object)
     {
-        $id = substr(md5(time().substr($object->getText(), 0, 100)), 0, 15);
+        $id = substr(md5(time().$object->getTwineId().substr($object->getText(), 0, 100)), 0, 15);
         $exists = count($this->findBy(array('arbitraryId' => $id))) > 0;
 
         if ($exists) {
