@@ -214,23 +214,23 @@ define(function () {
     return {
         init: function () {
             $$("mainnav").attachEvent("onAfterSelect", function (id){
-                if (id == 1) {
+                if (id === '1') {
                     $$('usergrid').clearAll();
                     $$('usergrid').load(window.paths.adminUsers, ajaxCallback);
                     $$('userstuff').show();
-                } else if (id == 2) {
+                } else if (id === '2') {
                     $$('licenseegrid').clearAll();
                     $$('licenseegrid').load(window.paths.adminLicensees, ajaxCallback);
                     $$('licenseestuff').show();
-                } else if (id == 3) {
+                } else if (id === '3') {
                     $$('topicgrid').clearAll();
                     $$('topicgrid').load(window.paths.adminTopics, ajaxCallback);
                     $$('topicstuff').show();
-                } else if (id === 4) {
+                } else if (id === '4') {
                     $$('importfilegrid').clearAll();
                     $$('importfilegrid').load(window.paths.adminImportfiles, ajaxCallback);
                     $$('importfilestuff').show();
-                } else if (id == 5) {
+                } else if (id === '5') {
                     $$('textnodegrid').clearAll();
                     $$('textnodegrid').load(window.paths.adminTextnodes, ajaxCallback);
                     $$('textnodestuff').show();
