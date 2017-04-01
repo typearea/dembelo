@@ -246,7 +246,7 @@ class DefaultController extends Controller
         }
         $repository->save($item);
 
-        if ($formtype === 'topic' && array_key_exists('imageFileName', $params)) {
+        if ($formtype === 'topic' && array_key_exists('imageFileName', $params) && !is_null($params['imageFileName'])) {
             $this->saveTopicImage($item, $params['imageFileName'], $params['originalImageName']);
             $repository->save($item);
         }

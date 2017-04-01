@@ -75,7 +75,10 @@ define(function () {
                 return;
             }
             if (params['error'] === false) {
-                $$("topicuploadimagelist").clearAll();
+                if (type === 'topic') {
+                    $$("topicuploadimagelist").clearAll();
+                    $$('topicform').setValues({imageFileName: null}, true);
+                }
                 $$(id).save();
                 if (params['newId']) {
                     $$(type + 'grid').getSelectedItem().id = params['newId'];
