@@ -37,13 +37,6 @@ define(function () {
         }
     }
 
-    function hasNewRow(dataTableId) {
-        var newRows = $$(dataTableId).find(function (obj) {
-            return obj.id === 'new';
-        });
-        return newRows.length > 0;
-    }
-
     function importfileCheckActions() {
         var values = $$('importfileform').getValues();
         if (values.name !== '' && values.licenseeId !== '') {
@@ -149,24 +142,6 @@ define(function () {
     }
 
     function getToolbar(type) {
-
-        var clickString;
-
-        switch(type) {
-            case 'user':
-                clickString = "$$('usergrid').add({id: 'new', email: '', roles: 'ROLE_USER'})";
-                break;
-            case 'licensee':
-                clickString = "$$('licenseegrid').add({id: 'new', name: ''})";
-                break;
-            case 'topic':
-                clickString = "$$('topicgrid').add({id: 'new', name: '', status: 0})";
-                break;
-            case 'importfile':
-                clickString = "$$('importfilegrid').add({id: 'new', name: ''});";
-                break;
-        }
-
         return {
             view: "toolbar",
             cols: [
@@ -174,8 +149,7 @@ define(function () {
                     id: "newBtn" + type,
                     view: "button",
                     value: "Neu",
-                    type: "form",
-                    click: clickString
+                    type: "form"
                 }
             ]
         };
@@ -212,6 +186,24 @@ define(function () {
         if (response.json().session_expired) {
             window.location = window.paths.login;
         }
+    }
+
+    function hasNewRow(type) {
+        var newRows = $$(type+'grid').find(function (obj) {
+            return obj.id === 'new';
+        });
+        return newRows.length > 0;
+    }
+
+    function addNewRow(type, row) {
+        if (hasNewRow(type)) {
+            return;
+        }
+        if (row === undefined) {
+            row = {};
+        }
+        row.id = 'new';
+        $$(type + 'grid').add(row);
     }
 
     return {
@@ -293,6 +285,19 @@ define(function () {
 
             $$("topicform").bind($$("topicgrid"));
             $$("textnodeform").bind($$("textnodegrid"));
+
+            $$('newBtnuser').attachEvent('onItemClick', function () {
+                addNewRow('user', {email: '', roles: 'ROLE_USER'});
+            });
+            $$('newBtnlicensee').attachEvent('onItemClick', function () {
+                addNewRow('licensee', {name: ''});
+            });
+            $$('newBtntopic').attachEvent('onItemClick', function () {
+                addNewRow('topic', {name: '', status: '0'});
+            });
+            $$('newBtnimportfile').attachEvent('onItemClick', function () {
+                addNewRow('importfile', {name: ''});
+            });
         },
 
         getUiJson: function () {
