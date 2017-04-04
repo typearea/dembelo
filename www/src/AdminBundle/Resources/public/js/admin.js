@@ -55,6 +55,10 @@ define(function () {
     function formsave(type) {
         var id = type + "form",
             values = $$(id).getValues();
+
+        if (values.id.substring(0,4) === 'new_') {
+            values.id = 'new';
+        }
         values['formtype'] = type;
 
         if (!$$(id).validate()) {
@@ -76,6 +80,7 @@ define(function () {
                 if (params['newId']) {
                     $$(type + 'grid').getSelectedItem().id = params['newId'];
                 }
+
                 webix.modalbox({
                     title: "Gespeichert",
                     buttons: ["Ok"],
@@ -196,14 +201,17 @@ define(function () {
     }
 
     function addNewRow(type, row) {
+        var itemId;
+
         if (hasNewRow(type)) {
             return;
         }
         if (row === undefined) {
             row = {};
         }
-        row.id = 'new';
-        $$(type + 'grid').add(row);
+        row.id = 'new_'+Date.now();
+        itemId = $$(type + 'grid').add(row);
+        $$(type + 'grid').select(itemId);
     }
 
     return {
