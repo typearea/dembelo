@@ -1,5 +1,5 @@
 {#
-Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
+Copyright (C) 2015-2017 Michael Giesler, Stephan Kreutzer, Daniel Hebestreit
 
 This file is part of Dembelo.
 
@@ -19,37 +19,29 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 
 {% extends 'DembeloMain::base.html.twig' %}
 
-{% block bodyid %}main-page{% endblock %}
-
-{% block infohomelink %}
-    <a href="#" class="btn btn-default" data-toggle="modal" data-target="#modalInfo"><span class="glyphicon glyphicon-info-sign"></span></a>
-{% endblock %}
+{% block bodyid %}dashboard{% endblock %}
 
 {% block body %}
-    <div id="mainpagecontainer" class="container-fluid">
-        <div id="row1" class="row ">
-            <div class="col-xs-12 bg-bookmark">{{ include('DembeloMain::default/carousel.html.twig', {}) }}</div>
-        </div>
-
-        <div id="row3" class="row">
+    <div class="genres">
+        <div class="row">
             {% for topic in topics %}
-                <div class="licensee col-xs-3">
-                    <a href="{{ path('themenfeld', {'topicId': topic.id}) }}">
+                <div class="cover">
+                    {% if topic.status == 1 %}
+                        {%  if attribute(favorites, topic.id) %}
+                            <div class="favorite">
+                                <a href="{{ path('text', {'textnodeArbitraryId': attribute(favorites, topic.id)}) }}">
+                                    <div class="ion-bookmark"></div>
+                                </a>
+                            </div>
+                        {% endif %}
+                        <a href="{{ path('themenfeld', {'topicId': topic.id}) }}">
+                    {% endif %}
                         <img src="/images/topics/{{ topic.id }}/{{ topic.originalImageName }}" alt="{{ topic.name }}" title="{{ topic.name }}"/>
-                    </a>
+                    {% if topic.status == 1 %}
+                        </a>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>
-        <div id="row4" class="row ">
-            <div class="col-xs-12">
-                <a href="https://github.com/typearea/dembelo" target="_blank">
-                    {% image '@DembeloMain/Resources/public/images/werbegrafik.png' %}
-                    <img src="{{ asset_url }}"/>
-                    {% endimage %}
-                    <p class="ad-text">Entwickle mit! Besuche Dembelo auf Github.</p>
-                </a>
-            </div>
-        </div>
     </div>
-    {{ include('DembeloMain::info.html.twig', {'dialogId': 'modalInfo'}) }}
 {% endblock %}

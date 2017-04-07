@@ -462,13 +462,14 @@ class ImportTwine
                             throw new Exception("The Twine archive file '".$this->importfile->getFilename()."' contains a '".$name."' with the invalid element '[[".$content[0]."<-".$content[1]."]]'.");
                         }
 
-                        if (array_key_exists($content[0], $this->textnodeMapping) !== true) {
+                        if (array_key_exists($content[0], $this->nodeNameMapping) !== true) {
+                            var_dump($this->nodeNameMapping);
                             throw new Exception("There is a textnode in the Twine archive file which references another textnode named '".$content[0]."', but this textnode doesn't exist within the same story.");
                         }
 
                         $hitch = array();
                         $hitch['description'] = $content[1];
-                        $hitch['textnodeId'] = $this->textnodeMapping[$content[0]];
+                        $hitch['textnodeId'] = $this->nodeNameMapping[$content[0]];
                         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
                     } elseif (strpos($content, ">:<") !== false) {
                         $content = explode(">:<", $content, 2);

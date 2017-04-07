@@ -34,7 +34,7 @@ use DembeloMain\Document\User;
 class UserTest extends WebTestCase
 {
     /**
-     * @var DembeloMain\Document\User
+     * @var User
      */
     private $user;
 
@@ -56,7 +56,7 @@ class UserTest extends WebTestCase
         foreach ($properties as $property) {
             $getter = 'get'.ucfirst($property);
             $setter = 'set'.ucfirst($property);
-            $string = tempnam($property, 'hrz');
+            $string = @tempnam($property, 'hrz');
             $this->assertNull($this->user->$getter());
             $this->user->$setter($string);
             $this->assertEquals($string, $this->user->$getter());

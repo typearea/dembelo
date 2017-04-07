@@ -112,6 +112,11 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
     protected $lastTopicId;
 
     /**
+     * @MongoDB\Hash
+     */
+    protected $favorites = [];
+
+    /**
      * gets the mongodb id
      *
      * @return string
@@ -481,5 +486,29 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
     public function getLastTopicId()
     {
         return $this->lastTopicId;
+    }
+
+    /**
+     * sets favorite textnode for topic
+     * @param String $topicId
+     * @param String $textnodeId
+     */
+    public function setFavorite($topicId, $textnodeId)
+    {
+        $this->favorites[$topicId] = $textnodeId;
+    }
+
+    /**
+     * gets favorite textnode for topic
+     * @param String $topicId
+     * @return null|String
+     */
+    public function getFavorite($topicId)
+    {
+        if (!isset($this->favorites[$topicId])) {
+            return null;
+        }
+
+        return $this->favorites[$topicId];
     }
 }

@@ -11,9 +11,19 @@ services:
 #        class: DembeloMain\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
 
+    app.feature_toggle:
+        class: DembeloMain\Model\FeatureToggle
+        calls:
+        - [setContainer, ["@service_container"]]
+
+    app.readpath:
+        class: DembeloMain\Model\Readpath
+        arguments: ["@app.model_repository_read_path"]
+
     app.controller_dashboard:
         class: DembeloMain\Controller\Dashboard\DefaultController
-        arguments: ["@templating","@app.model_repository_topic"]
+        calls:
+                - [setContainer, ["@service_container"]]
 
     app.controller_admin_topic:
         class: AdminBundle\Controller\TopicController
@@ -60,3 +70,26 @@ services:
             factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
             arguments:
                 - DembeloMain\Document\Importfile
+
+    app.twig_extension.version:
+            class: DembeloMain\Twig\VersionExtension
+            arguments: ["@service_container"]
+            public: false
+            tags:
+                - { name: twig.extension }
+
+    app.twig_extension.hasFeature:
+                class: DembeloMain\Twig\FeatureToggleExtension
+                arguments: ["@service_container"]
+                public: false
+                tags:
+                    - { name: twig.extension }
+
+    app.requestlistener_session_expiration:
+            class: DembeloMain\EventListener\RequestListener
+            tags:
+                - { name: kernel.event_listener, event: kernel.request, method: onRequest }
+
+    app.favoriteManager:
+            class: DembeloMain\Model\FavoriteManager
+            arguments: ["@session"]

@@ -1,16 +1,11 @@
 <div class="well clearfix">
-    <p id="readmetadatabutton" class="text-muted pull-left">Metadaten
-        <span id="readmetadataarrow" class="glyphicon glyphicon-menu-down"></span>
-    </p>
-    <h2 id="readmetadatatext" class="hidden">
-        {{ textnode.getMetadata.Titel }} <br />
-        <small>von {{ textnode.getMetadata.Autor }} aus {{ textnode.getMetadata.Verlag }}</small>
-    </h2>
-    <div class="pull-right">
-        <a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-sa/3.0/de/">
-            {% image '@DembeloMain/Resources/public/images/cc-by-sa.png' %}
-                <img src="{{ asset_url }}" alt="Creative Commons Lizenzvertrag" />
-            {% endimage %}
-        </a>
-    </div>
+    <h3>Metadaten</h3>
+    <h4>{{ textnode.getMetadata.Titel }}</h4>
+    <p>von {{ textnode.getMetadata.Autor }} aus {{ textnode.getMetadata.Verlag }}</p>
+
+    <a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-sa/3.0/de/">
+        {% image '@DembeloMain/Resources/public/images/cc-by-sa.png' %}
+        <img src="{{ asset_url }}" alt="Creative Commons Lizenzvertrag"/>
+        {% endimage %}
+    </a>
 </div>

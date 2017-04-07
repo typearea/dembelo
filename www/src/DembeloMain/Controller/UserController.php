@@ -27,9 +27,14 @@ namespace DembeloMain\Controller;
 
 use DembeloMain\Document\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\Form\Extension\Core\Type as FormType;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class DefaultController
@@ -54,9 +59,21 @@ class UserController extends Controller
 
         $form = $this->createFormBuilder($user)
             ->setAction($this->generateUrl('login_check'))
-            ->add('_username', FormType\EmailType::class, array('label' => 'Email'))
-            ->add('password', FormType\PasswordType::class, array('label' => 'Password'))
-            ->add('save', FormType\SubmitType::class, array('label' => 'Login', 'attr' => array('class' => 'btn btn-primary')))
+            ->add(
+                '_username',
+                EmailType::class,
+                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'E-Mail'))
+            )
+            ->add(
+                'password',
+                PasswordType::class,
+                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'Password'))
+            )
+            ->add(
+                'save',
+                SubmitType::class,
+                array('label' => 'Login', 'attr' => array('class' => 'button button-primary u-full-width'))
+            )
             ->getForm();
 
 
@@ -91,21 +108,58 @@ class UserController extends Controller
         $user->setRoles(['ROLE_USER']);
         $user->setStatus(0);
         $form = $this->createFormBuilder($user)
-            ->add('email', FormType\EmailType::class)
-            ->add('password', FormType\PasswordType::class, array('label' => 'Password'))
-            ->add('gender', FormType\ChoiceType::class, array(
-                'choices'  => array('male' => 'm', 'female' => 'f'),
-                'label' => 'Gender',
-                'required' => false,
-            ))
-            ->add('source', FormType\TextType::class, array('label' => 'Where have you first heard of Dembelo?', 'required' => false))
-            ->add('reason', FormType\TextareaType::class, array('label' => 'Why to you want to participate in our Closed Beta?', 'required' => false))
-            ->add('save', FormType\SubmitType::class, array('label' => 'Request registration'))
+            ->add(
+                'email',
+                EmailType::class,
+                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'E-Mail'))
+            )
+            ->add(
+                'password',
+                PasswordType::class,
+                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'Password'))
+            )
+            ->add(
+                'gender',
+                ChoiceType::class,
+                array(
+                    'choices' => array('male' => 'm', 'female' => 'f'),
+                    'label' => false,
+                    'placeholder' => 'Gender',
+                    'required' => false,
+                    'attr' => array('class' => 'u-full-width'),
+                )
+            )
+            ->add(
+                'source',
+                TextType::class,
+                array(
+                    'label' => 'Where have you first heard of Dembelo?',
+                    'required' => false,
+                    'attr' => array('class' => 'u-full-width'),
+                )
+            )
+            ->add(
+                'reason',
+                TextareaType::class,
+                array(
+                    'label' => 'Why to you want to participate in our Closed Beta?',
+                    'required' => false,
+                    'attr' => array('class' => 'u-full-width'),
+                )
+            )
+            ->add(
+                'save',
+                SubmitType::class,
+                array(
+                    'label' => 'Request registration',
+                    'attr' => array('class' => 'button button-primary u-full-width'),
+                )
+            )
             ->getForm();
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $mongo = $this->get('doctrine_mongodb');
             $dm = $mongo->getManager();
             $encoder = $this->get('security.password_encoder');

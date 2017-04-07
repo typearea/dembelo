@@ -35,9 +35,14 @@ abstract class AbstractRepository extends DocumentRepository
      */
     public function save($object)
     {
+        $this->beforeSave($object);
         $this->dm->persist($object);
         $this->dm->flush();
 
         return $object;
+    }
+
+    protected function beforeSave($object)
+    {
     }
 }

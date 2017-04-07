@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 apt-get update
-apt-get -y install git curl vim ruby php5-fpm php5-cli php5-dev php5-gd php5-curl php-apc php5-mcrypt php5-xdebug php5-memcache php5-intl php5-tidy php5-imap php5-imagick php5-fpm mongodb nginx imagemagick libsasl2-dev pkg-config
+apt-get -y install git curl vim ruby php5-fpm php5-cli php5-dev php5-gd php5-curl php-apc php5-mcrypt php5-xdebug php5-memcache php5-intl php5-tidy php5-imap php5-imagick php5-fpm mongodb nginx imagemagick libsasl2-dev pkg-config unzip
 
 mkdir -p /etc/php5/cli/
 mkdir -p /etc/php5/fpm/

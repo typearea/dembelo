@@ -2,12 +2,13 @@ language: php
 php:
 - 5.6
 - 7
+- 7.1
 before_install:
-- export DEMBELO_VERSION="v1.3.$TRAVIS_BUILD_NUMBER"
+- export DEMBELO_VERSION="v1.3-$TRAVIS_BUILD_NUMBER"
 - export RELEASE_FILENAME="dembelo_$DEMBELO_VERSION.zip"
 - export MONGOEXTENSION="mongodb.so"
-- if [[ ${TRAVIS_PHP_VERSION:0:1} == "5" ]]; then export MONGOEXTENSION="mongo.so";
-  fi
+- export SENSIOLABS_ENABLE_NEW_DIRECTORY_STRUCTURE=true
+- if [[ ${TRAVIS_PHP_VERSION:0:1} == "5" ]]; then export MONGOEXTENSION="mongo.so"; fi
 - echo "extension =" $MONGOEXTENSION >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 - openssl aes-256-cbc -K $encrypted_39a904e418a2_key -iv $encrypted_39a904e418a2_iv -in files/travisci.enc -out ./files/travisci -d
 - chmod 600 files/travisci
@@ -20,13 +21,14 @@ script:
 - ./www/bin/phpcs --config-set installed_paths www/vendor/escapestudios/symfony2-coding-standard
 - ./www/bin/phpcs --standard=symfony2 www/src
 - ./www/bin/phpunit -c www/app/
-- php ./scripts/coverage-checker.php www/app/logs/clover.xml 49
+- php ./scripts/coverage-checker.php www/app/logs/clover.xml 56
 - ./scripts/runSeleniumTests.sh
 install:
 - if [[ $MONGOEXTENSION == "mongo.so" ]]; then composer --working-dir="www" remove
   alcaeus/mongo-php-adapter mongodb/mongodb; fi
 - composer --working-dir="www" install
 - phpenv rehash
+- php www/bin/console assetic:dump --env=prod
 before_deploy:
 - ./scripts/buildRelease.sh
 deploy:
@@ -38,5 +40,6 @@ deploy:
   skip_cleanup: true
   on:
     repo: typearea/dembelo
-    condition: ($TRAVIS_EVENT_TYPE == "cron") && (${TRAVIS_PHP_VERSION:0:1} == "5")
+    php: '5.6'
+    branch: master
     tags: false

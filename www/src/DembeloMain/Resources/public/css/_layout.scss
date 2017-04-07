@@ -1,0 +1,20 @@
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  color: $font-color;
+  padding-top: $toolbar-height;
+  background: $sepia;
+  overflow-x: hidden;
+  &.nav-active {
+    overflow-y: hidden;
+  }
+
+  main {
+    padding-top: 20px;
+  }
+}

@@ -37,13 +37,6 @@ define(function () {
         }
     }
 
-    function hasNewRow(dataTableId) {
-        var newRows = $$(dataTableId).find(function (obj) {
-            return obj.id === 'new';
-        });
-        return newRows.length > 0;
-    }
-
     function importfileCheckActions() {
         var values = $$('importfileform').getValues();
         if (values.name !== '' && values.licenseeId !== '') {
@@ -62,6 +55,10 @@ define(function () {
     function formsave(type) {
         var id = type + "form",
             values = $$(id).getValues();
+
+        if (values.id.substring(0,4) === 'new_') {
+            values.id = 'new';
+        }
         values['formtype'] = type;
 
         if (!$$(id).validate()) {
@@ -70,12 +67,20 @@ define(function () {
 
         webix.ajax().post(window.paths.adminFormSave, values, function (text) {
             var params = JSON.parse(text);
+            if (params.session_expired) {
+                window.location = window.paths.login;
+                return;
+            }
             if (params['error'] === false) {
-                $$("topicuploadimagelist").clearAll();
+                if (type === 'topic') {
+                    $$("topicuploadimagelist").clearAll();
+                    $$('topicform').setValues({imageFileName: null}, true);
+                }
                 $$(id).save();
                 if (params['newId']) {
                     $$(type + 'grid').getSelectedItem().id = params['newId'];
                 }
+
                 webix.modalbox({
                     title: "Gespeichert",
                     buttons: ["Ok"],
@@ -109,6 +114,10 @@ define(function () {
         webix.ajax().post(window.paths.adminImport, {importfileId: importfileId}, {
             success: function (text) {
                 var params = JSON.parse(text);
+                if (params.session_expired) {
+                    window.location = window.paths.login;
+                    return;
+                }
                 if (params['success'] === true && params['returnValue'] === true) {
                     webix.modalbox({
                         title: "Datei importiert",
@@ -138,24 +147,6 @@ define(function () {
     }
 
     function getToolbar(type) {
-
-        var clickString;
-
-        switch(type) {
-            case 'user':
-                clickString = "$$('usergrid').add({id: 'new', email: '', roles: 'ROLE_USER'})";
-                break;
-            case 'licensee':
-                clickString = "$$('licenseegrid').add({id: 'new', name: ''})";
-                break;
-            case 'topic':
-                clickString = "$$('topicgrid').add({id: 'new', name: '', status: 0})";
-                break;
-            case 'importfile':
-                clickString = "$$('importfilegrid').add({id: 'new', name: ''});";
-                break;
-        }
-
         return {
             view: "toolbar",
             cols: [
@@ -163,8 +154,7 @@ define(function () {
                     id: "newBtn" + type,
                     view: "button",
                     value: "Neu",
-                    type: "form",
-                    click: clickString
+                    type: "form"
                 }
             ]
         };
@@ -197,34 +187,61 @@ define(function () {
         filter.value = oldStatusValue;
     }
 
+    function ajaxCallback(text, response) {
+        if (response.json().session_expired) {
+            window.location = window.paths.login;
+        }
+    }
+
+    function hasNewRow(type) {
+        var newRows = $$(type+'grid').find(function (obj) {
+            return obj.id === 'new';
+        });
+        return newRows.length > 0;
+    }
+
+    function addNewRow(type, row) {
+        var itemId;
+
+        if (hasNewRow(type)) {
+            return;
+        }
+        if (row === undefined) {
+            row = {};
+        }
+        row.id = 'new_'+Date.now();
+        itemId = $$(type + 'grid').add(row);
+        $$(type + 'grid').select(itemId);
+    }
+
     return {
         init: function () {
             $$("mainnav").attachEvent("onAfterSelect", function (id){
-                if (id == 1) {
+                if (id === '1') {
                     $$('usergrid').clearAll();
-                    $$('usergrid').load(window.paths.adminUsers);
+                    $$('usergrid').load(window.paths.adminUsers, ajaxCallback);
                     $$('userstuff').show();
-                } else if (id == 2) {
+                } else if (id === '2') {
                     $$('licenseegrid').clearAll();
-                    $$('licenseegrid').load(window.paths.adminLicensees);
+                    $$('licenseegrid').load(window.paths.adminLicensees, ajaxCallback);
                     $$('licenseestuff').show();
-                } else if (id == 3) {
+                } else if (id === '3') {
                     $$('topicgrid').clearAll();
-                    $$('topicgrid').load(window.paths.adminTopics);
+                    $$('topicgrid').load(window.paths.adminTopics, ajaxCallback);
                     $$('topicstuff').show();
-                } else if (id == 4) {
+                } else if (id === '4') {
                     $$('importfilegrid').clearAll();
-                    $$('importfilegrid').load(window.paths.adminImportfiles);
+                    $$('importfilegrid').load(window.paths.adminImportfiles, ajaxCallback);
                     $$('importfilestuff').show();
-                } else if (id == 5) {
+                } else if (id === '5') {
                     $$('textnodegrid').clearAll();
-                    $$('textnodegrid').load(window.paths.adminTextnodes);
+                    $$('textnodegrid').load(window.paths.adminTextnodes, ajaxCallback);
                     $$('textnodestuff').show();
                 }
             });
 
             $$("mainnav").select(1);
-            $$('usergrid').load(window.paths.adminUsers);
+            $$('usergrid').load(window.paths.adminUsers, ajaxCallback);
             $$('userstuff').show();
 
             $$('userform').attachEvent('onValues', checkFormBindStatus);
@@ -276,6 +293,19 @@ define(function () {
 
             $$("topicform").bind($$("topicgrid"));
             $$("textnodeform").bind($$("textnodegrid"));
+
+            $$('newBtnuser').attachEvent('onItemClick', function () {
+                addNewRow('user', {email: '', roles: 'ROLE_USER'});
+            });
+            $$('newBtnlicensee').attachEvent('onItemClick', function () {
+                addNewRow('licensee', {name: ''});
+            });
+            $$('newBtntopic').attachEvent('onItemClick', function () {
+                addNewRow('topic', {name: '', status: '0'});
+            });
+            $$('newBtnimportfile').attachEvent('onItemClick', function () {
+                addNewRow('importfile', {name: ''});
+            });
         },
 
         getUiJson: function () {

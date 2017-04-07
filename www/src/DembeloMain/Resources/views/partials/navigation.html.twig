@@ -1,0 +1,53 @@
+{#
+Copyright (C) 2015-2017 Michael Giesler, Stephan Kreutzer, Daniel Hebestreit
+
+This file is part of Dembelo.
+
+Dembelo is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Dembelo is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License 3 for more details.
+
+You should have received a copy of the GNU Affero General Public License 3
+along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
+#}
+<div id="navigation">
+    <div class="logo"></div>
+    <ul class="links">
+        <li>
+            <a href="{{ path('mainpage') }}"><i class="ion-home"></i> Startseite</a>
+        </li>
+        {% if has_feature("login_enabled") %}
+            {% if is_granted('ROLE_USER') %}
+                {#<li>
+                    <a href="#"><i class="ion-person"></i> Mein Profil</a>
+                </li>#}
+                <li>
+                    <a href="{{ path('logout') }}"><i class="ion-android-exit"></i> Abmelden</a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="{{ path('login_route') }}"> <i class="ion-person"></i> Anmelden </a>
+                </li>
+                <li>
+                    <a href="{{ path('register') }}"> <i class="ion-person-add"></i> Registrieren </a>
+                </li>
+            {% endif %}
+        {% endif %}
+        <li>
+            <a href="{{ path('imprint') }}"><i class="ion-help"></i> Impressum</a>
+        </li>
+    </ul>
+
+    <ul class="social-links">
+        <li><a href="https://www.dembelo.de/blog/"><i class="ion-social-rss"></i> Blog</a></li>
+        <li><a href="https://www.facebook.com/groups/dembelo/"><i class="ion-social-facebook"></i> facebook</a></li>
+        <li><a href="https://twitter.com/waszulesen"><i class="ion-social-twitter"></i> twitter</a></li>
+        <li><a href="https://github.com/typearea/dembelo"><i class="ion-social-github"></i> github</a></li>
+    </ul>
+</div>

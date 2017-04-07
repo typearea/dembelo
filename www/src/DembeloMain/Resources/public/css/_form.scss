@@ -1,0 +1,12 @@
+.form-errors {
+  padding: 10px;
+  color: $form-errors-color;
+  border: 1px solid $form-errors-color;
+  border-radius: $form-errors-border-radius;
+  margin-bottom: 20px;
+
+  i {
+    font-size: 18px;
+    margin-right: 5px;
+  }
+}
