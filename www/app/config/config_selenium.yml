@@ -1,9 +1,7 @@
 imports:
     - { resource: config_dev.yml }
+    - { resource: parameters_selenium.yml}
 
 web_profiler:
     toolbar: false
     intercept_redirects: false
-
-assetic:
-    sass: /home/travis/.rvm/gems/ruby-1.9.3-p551/bin/sass

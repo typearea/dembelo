@@ -46,12 +46,12 @@ class DembeloTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1366, $this->webDriver->manage()->window()->getSize()->getWidth());
 
         $menuSettings = $this->webDriver->findElement(
-            WebDriverBy::className('glyphicon-menu-hamburger')
+            WebDriverBy::className('menu-icon')
         );
         $menuSettings->click();
 
         $menuLogin = $this->webDriver->findElement(
-            WebDriverBy::linkText('Einloggen')
+            WebDriverBy::className('ion-person')
         );
         $menuLogin->click();
 
@@ -71,19 +71,27 @@ class DembeloTest extends PHPUnit_Framework_TestCase
         );
         $formPassword->sendKeys('dembelo')->submit();
 
+        $this->webDriver->wait(20)->until(
+            WebDriverExpectedCondition::presenceOfAllElementsLocatedBy(
+                WebDriverBy::className('ion-android-exit')
+            )
+        );
+
+        //$this->s
+
         //$this->assertEquals('hurz', $this->webDriver->getCurrentURL());
         //$this->assertEquals('hurz', $this->webDriver->getPageSource());
 
-        $this->webDriver->wait(20)->until(
+        /**$this->webDriver->wait(20)->until(
             WebDriverExpectedCondition::presenceOfAllElementsLocatedBy(
-                WebDriverBy::xpath('//a[text()="Ausloggen"]')
+                WebDriverBy::xpath('//a[text()=" Abmelden "]')
             )
         );
 
         $menuLogout = $this->webDriver->findElement(
             WebDriverBy::xpath('//a[text()="Ausloggen"]')
-        );
+        );*/
 
-        $this->assertInstanceOf(\Facebook\WebDriver\Remote\RemoteWebElement::class, $menuLogout);
+        //$this->assertInstanceOf(\Facebook\WebDriver\Remote\RemoteWebElement::class, $menuLogout);
     }
 }

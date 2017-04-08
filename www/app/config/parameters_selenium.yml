@@ -1,0 +1,15 @@
+# This file is auto-generated during the composer install
+parameters:
+    database_host: localhost
+    database_port: 27017
+    database_name: dbselenium
+    mailer_transport: smtp
+    mailer_host: 127.0.0.1
+    mailer_user: null
+    mailer_password: null
+    secret: ThisTokenIsNotSoSecretChangeIt
+    piwik_host: //piwik.waszulesen.de/
+    piwik_id: 2
+    locale: de
+    features.login_enabled: true
+    features.login_needed: true
