@@ -38,12 +38,15 @@ class DembeloTest extends PHPUnit_Framework_TestCase
 
     public function testDembeloLogin()
     {
-        $this->webDriver->manage()->window()->maximize();
+        //$this->webDriver->manage()->window()->maximize();
 
+        $this->loginAsAdmin();
+
+    }
+
+    protected function loginAsAdmin()
+    {
         $this->webDriver->get($this->url);
-
-        $this->assertEquals(768, $this->webDriver->manage()->window()->getSize()->getHeight());
-        $this->assertEquals(1366, $this->webDriver->manage()->window()->getSize()->getWidth());
 
         $menuSettings = $this->webDriver->findElement(
             WebDriverBy::className('menu-icon')
@@ -77,21 +80,5 @@ class DembeloTest extends PHPUnit_Framework_TestCase
             )
         );
 
-        //$this->s
-
-        //$this->assertEquals('hurz', $this->webDriver->getCurrentURL());
-        //$this->assertEquals('hurz', $this->webDriver->getPageSource());
-
-        /**$this->webDriver->wait(20)->until(
-            WebDriverExpectedCondition::presenceOfAllElementsLocatedBy(
-                WebDriverBy::xpath('//a[text()=" Abmelden "]')
-            )
-        );
-
-        $menuLogout = $this->webDriver->findElement(
-            WebDriverBy::xpath('//a[text()="Ausloggen"]')
-        );*/
-
-        //$this->assertInstanceOf(\Facebook\WebDriver\Remote\RemoteWebElement::class, $menuLogout);
     }
 }
