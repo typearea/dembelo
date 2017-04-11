@@ -27,7 +27,7 @@ class DembeloTest extends PHPUnit_Framework_TestCase
         $this->webDriver->manage()->window()->maximize();
 
         $this->webDriver->manage()->deleteAllCookies();
-        shell_exec('php bin/console doctrine:mongodb:fixtures:load -n');
+        shell_exec('php bin/console doctrine:mongodb:fixtures:load -n -e selenium');
     }
 
     public function testDembeloHome()
