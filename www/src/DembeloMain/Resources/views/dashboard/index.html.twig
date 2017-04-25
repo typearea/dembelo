@@ -28,15 +28,15 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
                 <div class="cover">
                     {% if topic.status == 1 %}
                         {%  if attribute(favorites, topic.id) %}
-                            <div class="favorite">
-                                <a href="{{ path('text', {'textnodeArbitraryId': attribute(favorites, topic.id)}) }}">
-                                    <div class="ion-bookmark"></div>
-                                </a>
-                            </div>
+                            <a href="{{ path('text', {'textnodeArbitraryId': attribute(favorites, topic.id)}) }}">
+                                {% image '@DembeloMain/Resources/public/images/favorite.png' %}
+                                <img class="favorite" src="{{ asset_url }}"/>
+                                {% endimage %}
+                            </a>
                         {% endif %}
                         <a href="{{ path('themenfeld', {'topicId': topic.id}) }}">
                     {% endif %}
-                        <img src="/images/topics/{{ topic.id }}/{{ topic.originalImageName }}" alt="{{ topic.name }}" title="{{ topic.name }}"/>
+                        <img class="coverImg" src="/images/topics/{{ topic.id }}/{{ topic.originalImageName }}" alt="{{ topic.name }}" title="{{ topic.name }}"/>
                     {% if topic.status == 1 %}
                         </a>
                     {% endif %}

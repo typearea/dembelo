@@ -1,48 +1,21 @@
-@mixin cover_grid($cols) {
-  width: calc(100% / #{$cols});
-  float: left;
-
-  &:nth-of-type(#{$cols}n) {
-    margin-right: 0;
-  }
-
-  &:nth-last-child(-n+#{$cols}) {
-    margin-bottom: 0;
-  }
-}
-
 body#dashboard {
   .genres {
+
+    .linebreakafter {
+      clear:both;
+    }
+
     .cover {
-      @include cover_grid($dashboard-cover-cols);
-      @media (min-width: 550px) {
-        @include cover_grid($dashboard-cover-cols-desktop);
-      }
+
+      //display:none;
+      float:left;
 
       img {
         display: block;
-        width: 100%;
-        max-width: 100%;
-        max-height: 100%;
       }
 
       .favorite {
         position: absolute;
-        color: $red;
-        font-size: 130px;
-        line-height: 1em;
-        margin-top: -18px;
-        width: calc(100% / #{$dashboard-cover-cols});
-        padding-right: 30px;
-
-        @media (min-width: 550px) {
-          width: calc(100% / #{$dashboard-cover-cols-desktop});
-          padding-right: 20px;
-        }
-
-        div {
-          float: right;
-        }
       }
 
     }
