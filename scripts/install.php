@@ -21,63 +21,30 @@ $shortOptions = 'u:';
 
 $longOptions = [
     'help',
+    'branch:'
 ];
 
 $options = getopt($shortOptions, $longOptions);
 
 if (array_key_exists('help', $options)) {
-    echo "dembelo install script, ".file_get_contents('./files/version')."\n";
+    if (file_exists('./files/version')) {
+        echo "dembelo install script, " . file_get_contents('./files/version') . "\n";
+    } else {
+        echo "dembelo install script, unknown version\n";
+    }
     echo "\n";
     echo "options:\n";
     echo " -u\tuser for chmod (for example: www-data)\n";
+    echo "--branch\tinstall a git branch instead of release\n";
     echo "--help\tdisplays this help\n";
     exit(0);
 }
 
-$url = 'https://api.github.com/repos/typearea/dembelo/releases';
-$data = shell_exec('curl '.$url);
-
-$releases = json_decode($data);
-
-if (is_null($releases)) {
-    echo 'Data can\'t be parsed as JSON. exit' . "\n";
-    exit(1);
+if (array_key_exists('branch', $options)) {
+    installBranch($options['branch']);
+} else {
+    $downloadName = installLatestRelease();
 }
-
-$latestReleaseDate = 0;
-$downloadUrl = '';
-
-foreach ($releases as $release) {
-    if (count($release->assets) > 0) {
-        if ($latestReleaseDate < $release->published_at) {
-            $latestReleaseDate = $release->published_at;
-            $downloadUrl = $release->assets[0]->browser_download_url;
-            $downloadName = $release->assets[0]->name;
-            $newVersion = $release->tag_name;
-        }
-    }
-}
-
-if ($latestReleaseDate === 0) {
-    echo 'No release found. exit' . "\n";
-    exit(1);
-}
-
-if (file_exists("files/version")) {
-    $installedVersion = trim(file_get_contents("files/version"));
-    if ($installedVersion === $newVersion) {
-        echo 'latest version ['.$installedVersion.'] already installed. exit' . "\n";
-        exit(1);
-    }
-}
-
-echo 'download '.$downloadUrl."...\n";
-shell_exec('wget -q '.$downloadUrl);
-echo 'finished'."\n";
-
-echo 'extract '.$downloadName."...\n";
-shell_exec('unzip -o '.$downloadName);
-echo 'finished'."\n";
 
 if (array_key_exists('u', $options)) {
     echo 'chown to '.$options['u']."...\n";
@@ -96,6 +63,88 @@ if (array_key_exists('u', $options)) {
 }
 echo 'finished'."\n";
 
-shell_exec('rm '.$downloadName);
-echo 'installation ['.$newVersion.'] finished'."\n";
+//shell_exec('rm ' . $downloadName);
+echo 'installation finished'."\n";
 exit(0);
+
+/**
+ * some functions
+ */
+function installLatestRelease()
+{
+    $url = 'https://api.github.com/repos/typearea/dembelo/releases';
+    $data = shell_exec('curl ' . $url);
+
+    $releases = json_decode($data);
+
+    if (is_null($releases)) {
+        echo 'Data can\'t be parsed as JSON. exit' . "\n";
+        exit(1);
+    }
+
+    $latestReleaseDate = 0;
+    $downloadUrl = '';
+    $downloadName = '';
+    $newVersion = '';
+
+    foreach ($releases as $release) {
+        if (count($release->assets) > 0) {
+            if ($latestReleaseDate < $release->published_at) {
+                $latestReleaseDate = $release->published_at;
+                $downloadUrl = $release->assets[0]->browser_download_url;
+                $downloadName = $release->assets[0]->name;
+                $newVersion = $release->tag_name;
+            }
+        }
+    }
+
+    if ($latestReleaseDate === 0) {
+        echo 'No release found. exit' . "\n";
+        exit(1);
+    }
+
+    if (file_exists("files/version")) {
+        $installedVersion = trim(file_get_contents("files/version"));
+        if ($installedVersion === $newVersion) {
+            echo 'latest version [' . $installedVersion . '] already installed. exit' . "\n";
+            exit(1);
+        }
+    }
+
+    echo 'download ' . $downloadUrl . "...\n";
+    shell_exec('wget -q ' . $downloadUrl);
+    echo 'finished' . "\n";
+
+    echo 'extract ' . $downloadName . "...\n";
+    shell_exec('unzip -o ' . $downloadName);
+    echo 'finished' . "\n";
+
+    return $downloadName;
+}
+
+function installBranch($branch)
+{
+    $downloadName = 'branch.zip';
+    $downloadUrl = 'https://github.com/typearea/dembelo/archive/'.$branch.'.zip';
+
+    echo 'download ' . $downloadUrl . "...\n";
+    shell_exec('wget -q -O branch.zip ' . $downloadUrl);
+    echo 'finished' . "\n";
+
+    echo 'extract ' . $downloadName . "...\n";
+    shell_exec('unzip -o ' . $downloadName);
+    echo 'finished' . "\n";
+
+    echo 'move files...'."\n";
+    shell_exec('mv dembelo-'.str_replace('/', '-', $branch).'/* .');
+    shell_exec('rm dembelo-'.str_replace('/', '-', $branch).'/.gitignore');
+    shell_exec('rm dembelo-'.str_replace('/', '-', $branch).'/.travis.yml');
+    shell_exec('rmdir dembelo-'.str_replace('/', '-', $branch));
+    echo 'finished' . "\n";
+
+    echo "package installation...\n";
+    shell_exec('composer --working-dir=www/ -n install');
+    echo 'finished' . "\n";
+
+    return $downloadName;
+}
