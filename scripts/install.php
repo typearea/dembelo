@@ -27,24 +27,15 @@ $longOptions = [
 $options = getopt($shortOptions, $longOptions);
 
 if (array_key_exists('help', $options)) {
-    if (file_exists('./files/version')) {
-        echo "dembelo install script, " . file_get_contents('./files/version') . "\n";
-    } else {
-        echo "dembelo install script, unknown version\n";
-    }
+    echo "dembelo install script, " . file_get_contents('./files/version') . "\n";
     echo "\n";
     echo "options:\n";
     echo " -u\tuser for chmod (for example: www-data)\n";
-    echo "--branch\tinstall a git branch instead of release\n";
     echo "--help\tdisplays this help\n";
     exit(0);
 }
 
-if (array_key_exists('branch', $options)) {
-    installBranch($options['branch']);
-} else {
-    $downloadName = installLatestRelease();
-}
+$downloadName = installLatestRelease();
 
 if (array_key_exists('u', $options)) {
     echo 'chown to '.$options['u']."...\n";
@@ -63,7 +54,9 @@ if (array_key_exists('u', $options)) {
 }
 echo 'finished'."\n";
 
-//shell_exec('rm ' . $downloadName);
+if (isset($downloadName)) {
+    shell_exec('rm ' . $downloadName);
+}
 echo 'installation finished'."\n";
 exit(0);
 
@@ -117,33 +110,6 @@ function installLatestRelease()
 
     echo 'extract ' . $downloadName . "...\n";
     shell_exec('unzip -o ' . $downloadName);
-    echo 'finished' . "\n";
-
-    return $downloadName;
-}
-
-function installBranch($branch)
-{
-    $downloadName = 'branch.zip';
-    $downloadUrl = 'https://github.com/typearea/dembelo/archive/'.$branch.'.zip';
-
-    echo 'download ' . $downloadUrl . "...\n";
-    shell_exec('wget -q -O branch.zip ' . $downloadUrl);
-    echo 'finished' . "\n";
-
-    echo 'extract ' . $downloadName . "...\n";
-    shell_exec('unzip -o ' . $downloadName);
-    echo 'finished' . "\n";
-
-    echo 'move files...'."\n";
-    shell_exec('mv dembelo-'.str_replace('/', '-', $branch).'/* .');
-    shell_exec('rm dembelo-'.str_replace('/', '-', $branch).'/.gitignore');
-    shell_exec('rm dembelo-'.str_replace('/', '-', $branch).'/.travis.yml');
-    shell_exec('rmdir dembelo-'.str_replace('/', '-', $branch));
-    echo 'finished' . "\n";
-
-    echo "package installation...\n";
-    shell_exec('composer --working-dir=www/ -n install');
     echo 'finished' . "\n";
 
     return $downloadName;
