@@ -40,6 +40,7 @@ deploy:
   skip_cleanup: true
   on:
     repo: typearea/dembelo
+    all_branches: true
     php: '5.6'
     tags: false
     condition: ($TRAVIS_COMMIT_MESSAGE = "buildrelease") || ($TRAVIS_BRANCH = "master")
