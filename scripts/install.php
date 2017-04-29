@@ -81,7 +81,7 @@ function installLatestRelease()
     $newVersion = '';
 
     foreach ($releases as $release) {
-        if (count($release->assets) > 0) {
+        if (count($release->assets) > 0 && substr($release->assets[0]->name, -10) !== '-alpha.zip') {
             if ($latestReleaseDate < $release->published_at) {
                 $latestReleaseDate = $release->published_at;
                 $downloadUrl = $release->assets[0]->browser_download_url;

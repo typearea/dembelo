@@ -5,7 +5,8 @@ php:
 - 7.1
 before_install:
 - export DEMBELO_VERSION="v1.3-$TRAVIS_BUILD_NUMBER"
-- export RELEASE_FILENAME="dembelo_$DEMBELO_VERSION.zip"
+- export RELEASE_FILENAME="dembelo_$DEMBELO_VERSION-alpha.zip"
+- if [[  ${TRAVIS_BRANCH} == "master" ]]; then export RELEASE_FILENAME="dembelo_$DEMBELO_VERSION.zip"; fi
 - export MONGOEXTENSION="mongodb.so"
 - export SENSIOLABS_ENABLE_NEW_DIRECTORY_STRUCTURE=true
 - if [[ ${TRAVIS_PHP_VERSION:0:1} == "5" ]]; then export MONGOEXTENSION="mongo.so"; fi
@@ -40,5 +41,5 @@ deploy:
   on:
     repo: typearea/dembelo
     php: '5.6'
-    branch: master
     tags: false
+    condition: ($TRAVIS_COMMIT_MESSAGE = "buildrelease") || ($TRAVIS_BRANCH = "master")
