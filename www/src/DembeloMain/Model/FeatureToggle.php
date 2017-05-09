@@ -31,9 +31,10 @@ class FeatureToggle implements ContainerAwareInterface
     use ContainerAwareTrait;
 
     private $features = [
-        'test_feature' => false, // for unittesting, don't remove
+        'test_feature'  => false, // for unittesting, don't remove
         'login_enabled' => false, // registration and login enabled in navigation?
-        'login_needed' => false, //
+        'login_needed'  => false, //
+        'paywall'       => true
     ];
 
     /**
