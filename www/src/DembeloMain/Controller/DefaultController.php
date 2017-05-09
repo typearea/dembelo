@@ -109,7 +109,8 @@ class DefaultController extends Controller
         $hyphenator->setHyphen('&shy;');
 
         $hitches = [];
-        for ($i=0;$i<$textnode->getHitchCount();++$i) {
+
+        for ($i = 0; $i < $textnode->getHitchCount(); ++$i) {
             $hitch = $textnode->getHitch($i);
             $arbitraryId = $this->getArbitraryIdForTextnodeId($hitch['textnodeId']);
             $hitches[] = [
@@ -174,6 +175,7 @@ class DefaultController extends Controller
         }
 
         $hitch = $textnode->getHitch($hitchIndex);
+
         return $this->getArbitraryIdForTextnodeId($hitch['textnodeId']);
     }
 

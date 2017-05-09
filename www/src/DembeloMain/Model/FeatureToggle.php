@@ -34,7 +34,7 @@ class FeatureToggle implements ContainerAwareInterface
         'test_feature'  => false, // for unittesting, don't remove
         'login_enabled' => false, // registration and login enabled in navigation?
         'login_needed'  => false, //
-        'paywall'       => true
+        'paywall'       => true,
     ];
 
     /**
