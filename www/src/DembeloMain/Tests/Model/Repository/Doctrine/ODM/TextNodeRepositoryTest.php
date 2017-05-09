@@ -260,6 +260,14 @@ class TextNodeRepositoryTest extends AbstractRepositoryTest
         $this->assertEquals($id, $returnValue->getId());
     }
 
+    public function testSetHyphenatedText()
+    {
+        $textnode = new Textnode();
+        $textnode->setText('Tischbein');
+        $this->repository->setHyphenatedText($textnode);
+        $this->assertEquals('Tisch&shy;bein', $textnode->getTextHyphenated());
+    }
+
     private function createImportfile()
     {
         $importfile = new Importfile();

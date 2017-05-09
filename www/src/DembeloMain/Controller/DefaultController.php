@@ -27,7 +27,6 @@ namespace DembeloMain\Controller;
 use DembeloMain\Document\Readpath;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Document\User;
-use Hyphenator\Core as Hyphenator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -104,10 +103,6 @@ class DefaultController extends Controller
             $this->get('app.model_repository_user')->save($user);
         }
 
-        $hyphenator = new Hyphenator();
-        $hyphenator->registerPatterns('de');
-        $hyphenator->setHyphen('&shy;');
-
         $hitches = [];
 
         for ($i = 0; $i < $textnode->getHitchCount(); ++$i) {
@@ -124,7 +119,6 @@ class DefaultController extends Controller
             'DembeloMain::default/read.html.twig',
             array(
                 'textnode' => $textnode,
-                'hyphenated' => $hyphenator->hyphenate($textnode->getText()),
                 'hitches' => $hitches,
             )
         );

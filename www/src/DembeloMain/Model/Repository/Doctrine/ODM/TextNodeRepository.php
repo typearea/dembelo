@@ -24,6 +24,7 @@ use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use MongoId;
+use Hyphenator\Core as Hyphenator;
 
 /**
  * Class TextNodeRepository
@@ -103,6 +104,20 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
                 'status' => Textnode::STATUS_ACTIVE,
             )
         );
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @param Textnode $textnode
+     */
+    public function setHyphenatedText(Textnode $textnode)
+    {
+        $hyphenator = new Hyphenator();
+        $hyphenator->registerPatterns('de');
+        $hyphenator->setHyphen('&shy;');
+
+        $textnode->setTextHyphenated($hyphenator->hyphenate($textnode->getText()));
     }
 
     /**

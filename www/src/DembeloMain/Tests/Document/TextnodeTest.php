@@ -550,4 +550,14 @@ class TextnodeTest extends WebTestCase
         $this->textnode->setArbitraryId('foobarArbitraryId');
         $this->assertEquals('foobarArbitraryId', $this->textnode->getArbitraryId());
     }
+
+    /**
+     * tests the text
+     */
+    public function testTextHyphenated()
+    {
+        $text = 'Lorem Ipsum';
+        $this->textnode->setTextHyphenated($text);
+        $this->assertEquals($text, $this->textnode->getTextHyphenated());
+    }
 }

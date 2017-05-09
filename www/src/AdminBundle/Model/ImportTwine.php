@@ -553,6 +553,7 @@ class ImportTwine
             $textnodeTextNew .= "</p>";
 
             $textnode->setText($textnodeTextNew);
+            $this->textnodeRepository->setHyphenatedText($textnode);
         }
 
         $this->textnodeRepository->disableOrphanedNodes($this->importfile, array_values($this->textnodeMapping));
