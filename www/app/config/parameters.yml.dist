@@ -22,3 +22,4 @@ parameters:
     # features
     features.login_enabled: true
     features.login_needed: true
+    features.paywall: true

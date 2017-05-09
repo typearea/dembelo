@@ -1,5 +1,5 @@
 {#
-Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
+Copyright (C) 2015-2017 Michael Giesler, Stephan Kreutzer
 
 This file is part of Dembelo.
 
@@ -17,7 +17,6 @@ You should have received a copy of the GNU Affero General Public License 3
 along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 #}
 
-
 {% extends 'DembeloMain::base.html.twig' %}
 
 {% block textnavclass %}{% endblock %}
@@ -30,12 +29,15 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
         {{ hyphenated | raw }}
     </div>
 
-    {% set hitchCount = textnode.getHitchCount() %}
-    {% if hitchCount > 0 %}
+    {% if hitches|length > 0 %}
         <ul class="hitches">
-            {% for hitchIndex in 0..hitchCount-1 %}
+            {% for hitch in hitches %}
                 <li class="hitch">
-                    <a href="#" class="hitch-link" data-url="{{ path('paywall', {textnodeId: textnode.id, hitchIndex: hitchIndex}) }}">{{ textnode.getHitch(hitchIndex).description }}</a>
+                    {% if has_feature("paywall") %}
+                        <a href="#" class="hitch-link" data-url="{{ path('paywall', {textnodeId: textnode.id, hitchIndex: hitch.index}) }}">{{ hitch.description }}</a>
+                    {% else %}
+                        <a href="{{ path('text', {textnodeArbitraryId: hitch.arbitraryId}) }}" class="hitch-link">{{ hitch.description }}</a>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>
@@ -50,6 +52,8 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 
     {{ include('DembeloMain::default/read.metadata.html.twig') }}
 
-    {{ include('DembeloMain::default/paywall.html.twig', {'dialogId': 'modalPaywall'}) }}
+    {% if has_feature("paywall") %}
+        {{ include('DembeloMain::default/paywall.html.twig', {'dialogId': 'modalPaywall'}) }}
+    {% endif %}
 
 {% endblock %}

@@ -108,11 +108,24 @@ class DefaultController extends Controller
         $hyphenator->registerPatterns('de');
         $hyphenator->setHyphen('&shy;');
 
+        $hitches = [];
+
+        for ($i = 0; $i < $textnode->getHitchCount(); ++$i) {
+            $hitch = $textnode->getHitch($i);
+            $arbitraryId = $this->getArbitraryIdForTextnodeId($hitch['textnodeId']);
+            $hitches[] = [
+                'index' => $i,
+                'description' => $hitch['description'],
+                'arbitraryId' => $arbitraryId,
+            ];
+        }
+
         return $this->render(
             'DembeloMain::default/read.html.twig',
             array(
                 'textnode' => $textnode,
                 'hyphenated' => $hyphenator->hyphenate($textnode->getText()),
+                'hitches' => $hitches,
             )
         );
     }
@@ -127,22 +140,13 @@ class DefaultController extends Controller
      */
     public function paywallAction($textnodeId, $hitchIndex)
     {
-        $textnodeRepository = $this->get('app.model_repository_textNode');
-
-        $textnode = $textnodeRepository->findOneActiveById($textnodeId);
-
-        if (is_null($textnode)) {
-            throw $this->createNotFoundException('No Textnode with ID \''.$textnodeId.'\' found.');
-        }
-
-        $hitch = $textnode->getHitch($hitchIndex);
-        $linkedTextnode = $textnodeRepository->findOneActiveById($hitch['textnodeId']);
+        $arbitraryId = $this->getArbitraryIdForHitchIndex($textnodeId, $hitchIndex);
 
         $output = array(
             'url' => $this->generateUrl(
                 'text',
                 array(
-                    'textnodeArbitraryId' => $linkedTextnode->getArbitraryId(),
+                    'textnodeArbitraryId' => $arbitraryId,
                 )
             ),
         );
@@ -158,5 +162,28 @@ class DefaultController extends Controller
     public function imprintAction()
     {
         return $this->render('DembeloMain::default/imprint.html.twig');
+    }
+
+    private function getArbitraryIdForHitchIndex($textnodeId, $hitchIndex)
+    {
+        $textnodeRepository = $this->get('app.model_repository_textNode');
+
+        $textnode = $textnodeRepository->findOneActiveById($textnodeId);
+
+        if (is_null($textnode)) {
+            throw $this->createNotFoundException('No Textnode with ID \''.$textnodeId.'\' found.');
+        }
+
+        $hitch = $textnode->getHitch($hitchIndex);
+
+        return $this->getArbitraryIdForTextnodeId($hitch['textnodeId']);
+    }
+
+    private function getArbitraryIdForTextnodeId($textnodeId)
+    {
+        $textnodeRepository = $this->get('app.model_repository_textNode');
+        $linkedTextnode = $textnodeRepository->findOneActiveById($textnodeId);
+
+        return $linkedTextnode->getArbitraryId();
     }
 }
