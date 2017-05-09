@@ -78,4 +78,11 @@ interface TextNodeRepositoryInterface
      * @return Textnode
      */
     public function findOneActiveByArbitraryId($arbitraryId);
+
+    /**
+     * sets the hyphenated version of the text content to $textnode
+     * @param Textnode $textnode
+     * @return void
+     */
+    public function setHyphenatedText(Textnode $textnode);
 }

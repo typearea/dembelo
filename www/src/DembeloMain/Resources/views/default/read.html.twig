@@ -26,7 +26,7 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 
 {% block body %}
     <div class="read">
-        {{ hyphenated | raw }}
+        {{ textnode.textHyphenated | raw }}
     </div>
 
     {% if hitches|length > 0 %}

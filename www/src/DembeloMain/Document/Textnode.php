@@ -68,6 +68,11 @@ class Textnode
     protected $text;
 
     /**
+     * @MongoDB\Field(type="string")
+     */
+    protected $textHyphenated;
+
+    /**
      * @MongoDB\Field(type="boolean")
      */
     protected $access;
@@ -192,6 +197,26 @@ class Textnode
     public function setText($text)
     {
         $this->text = $text;
+    }
+
+    /**
+     * gets the textnode's hyphenated text
+     *
+     * @return string
+     */
+    public function getTextHyphenated()
+    {
+        return $this->textHyphenated;
+    }
+
+    /**
+     * sets the textnode's hyphenated text
+     *
+     * @param string $textHyphenated
+     */
+    public function setTextHyphenated($textHyphenated)
+    {
+        $this->textHyphenated = $textHyphenated;
     }
 
     /**
