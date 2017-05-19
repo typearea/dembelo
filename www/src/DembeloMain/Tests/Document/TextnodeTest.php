@@ -560,4 +560,33 @@ class TextnodeTest extends WebTestCase
         $this->textnode->setTextHyphenated($text);
         $this->assertEquals($text, $this->textnode->getTextHyphenated());
     }
+
+    /**
+     * tests clearHitches() method
+     */
+    public function testClearHitches()
+    {
+        $hitch1 = array();
+        $hitch1['textnodeId'] = "Id1";
+        $hitch1['description'] = "Abort.";
+        $hitch1['status'] = Textnode::HITCH_STATUS_ACTIVE;
+
+        $hitch2 = array();
+        $hitch2['textnodeId'] = "Id2";
+        $hitch2['description'] = "Abort.";
+        $hitch2['status'] = Textnode::HITCH_STATUS_ACTIVE;
+
+        $hitch3 = array();
+        $hitch3['textnodeId'] = "Id3";
+        $hitch3['description'] = "Abort.";
+        $hitch3['status'] = Textnode::HITCH_STATUS_ACTIVE;
+
+        $this->textnode->appendHitch($hitch1);
+        $this->textnode->appendHitch($hitch2);
+        $this->textnode->appendHitch($hitch3);
+        $this->assertEquals(3, $this->textnode->getHitchCount());
+
+        $this->textnode->clearHitches();
+        $this->assertEquals(0, $this->textnode->getHitchCount());
+    }
 }

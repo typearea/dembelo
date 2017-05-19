@@ -487,4 +487,12 @@ class Textnode
     {
         return $this->arbitraryId;
     }
+
+    /**
+     * removes all hitches
+     */
+    public function clearHitches()
+    {
+        $this->hitches = [];
+    }
 }
