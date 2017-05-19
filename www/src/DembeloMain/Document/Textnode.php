@@ -48,7 +48,7 @@ class Textnode
     protected $id;
 
     /**
-     * @MongoDB\Date
+     * @MongoDB\Field(type="date")
      */
     protected $created;
 
@@ -110,7 +110,7 @@ class Textnode
     /**
      * gets the timestamp of creation
      *
-     * @return string
+     * @return \DateTime
      */
     public function getCreated()
     {
@@ -486,5 +486,15 @@ class Textnode
     public function getArbitraryId()
     {
         return $this->arbitraryId;
+    }
+
+    /**
+     * returns true if textnode is a finance node
+     *
+     * @return bool
+     */
+    public function isFinanceNode()
+    {
+        return $this->getHitchCount() === 0;
     }
 }

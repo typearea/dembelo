@@ -549,6 +549,7 @@ define(function () {
                                                                 columns: [
                                                                     {id: 'created', header: 'angelegt'},
                                                                     {id: 'status', header: 'Status'},
+                                                                    {id: 'financenode', header: 'Finanz'},
                                                                     {id: 'beginning', header: 'Text', fillspace: true},
                                                                     {id: 'importfile', header: 'Importdatei'}
                                                                 ]
@@ -560,14 +561,19 @@ define(function () {
                                                         id: "textnodeform",
                                                         disabled: true,
                                                         gravity: 0.5,
+                                                        scroll: "y",
                                                         elements: [
                                                             {view: "text", name: "id", label: "ID", disabled: true},
+                                                            {view: "text", name: "twineId", label: "twineID", disabled: true},
+                                                            {view: "text", name: "arbitraryId", label: "aID", disabled: true, tooltip: "arbitraryID"},
                                                             {view: "text", name: "created", label: "angelegt", disabled: true},
                                                             {view: "text", name: "status", label: "Status", disabled: true},
+                                                            {view: "text", name: "financenode", label: "Finanzierung", disabled: true},
                                                             {view: "text", name: "access", label: "Access-Knoten", disabled: true},
                                                             {view: "text", name: "licensee", label: "Lizenznehmer", disabled: true},
                                                             {view: "text", name: "importfile", label: "Importdatei", disabled: true},
-                                                            {view: "textarea", name: "beginning", label: "Textanfang", height: 200, disabled: true}
+                                                            {view: "textarea", name: "beginning", label: "Textanfang", height: 200, disabled: true},
+                                                            {view: "textarea", name: "metadata", label: "Metadaten", attributes: {disabled: "true"}}
                                                         ]
                                                     }
                                                 ]

@@ -560,4 +560,17 @@ class TextnodeTest extends WebTestCase
         $this->textnode->setTextHyphenated($text);
         $this->assertEquals($text, $this->textnode->getTextHyphenated());
     }
+
+    public function testIsFinanceknot()
+    {
+        $hitch = [
+            'textnodeId' => 12,
+            'description' => 'foobar',
+            'status' => Textnode::HITCH_STATUS_ACTIVE,
+        ];
+        $this->assertTrue($this->textnode->isFinanceNode());
+        $this->textnode->appendHitch($hitch);
+        $this->assertFalse($this->textnode->isFinanceNode());
+
+    }
 }
