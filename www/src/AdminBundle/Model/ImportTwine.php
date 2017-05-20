@@ -350,10 +350,7 @@ class ImportTwine
             $this->textnode->setTwineId($this->twineId);
         } else {
             $this->textnode->setText('');
-            $hitchesCount = $this->textnode->getHitchCount();
-            for ($i = 0; $i < $hitchesCount; $i++) {
-                $this->textnode->removeHitch($i);
-            }
+            $this->textnode->clearHitches();
         }
 
         $this->textnode->setMetadata(

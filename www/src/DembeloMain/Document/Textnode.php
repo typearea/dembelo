@@ -497,4 +497,12 @@ class Textnode
     {
         return $this->getHitchCount() === 0;
     }
+
+    /**
+     * removes all hitches
+     */
+    public function clearHitches()
+    {
+        $this->hitches = [];
+    }
 }
