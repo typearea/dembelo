@@ -20,7 +20,7 @@ server {
   }
 
   # pass the PHP scripts to FastCGI server listening socket
-  location ~ ^/(app|app_dev)\.php(/|$) {
+  location ~ ^/(app|app_dev|app_selenium)\.php(/|$) {
     fastcgi_pass unix://var/run/php5-fpm.sock;
     fastcgi_keep_conn on;
     fastcgi_split_path_info ^(.+\.php)(/.*)$;

@@ -22,6 +22,7 @@ script:
 - ./www/bin/phpcs --standard=symfony2 www/src
 - ./www/bin/phpunit -c www/app/
 - php ./scripts/coverage-checker.php www/var/logs/clover.xml 56
+- ./scripts/runSeleniumTests.sh
 install:
 - if [[ $MONGOEXTENSION == "mongo.so" ]]; then composer --working-dir="www" remove
   alcaeus/mongo-php-adapter mongodb/mongodb; fi
