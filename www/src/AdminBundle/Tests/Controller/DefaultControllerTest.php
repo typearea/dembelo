@@ -457,7 +457,7 @@ class DefaultControllerTest extends WebTestCase
         $expectedJson = '[{"id":"someId","status":"aktiv","created":"01.01.2017, 12:00:00",'.
             '"access":"ja","licensee":"someLicenseeName","importfile":"unbekannt","beginning":"...",'.
             '"financenode":"ja","arbitraryId":"someArbitraryId","twineId":"someTwineId",'.
-            '"metadata":{"key1":"val1","key2":"val2"}}]';
+            '"metadata":"key1: val1\nkey2: val2\n"}]';
         $this->assertJsonStringEqualsJsonString($expectedJson, $response->getContent());
 
     }
