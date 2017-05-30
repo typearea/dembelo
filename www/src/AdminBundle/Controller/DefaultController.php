@@ -401,14 +401,6 @@ class DefaultController extends Controller
         return new Response(\json_encode($output));
     }
 
-    private function formatMetadata(array $metadata) {
-        $string = '';
-        foreach ($metadata as $key => $value) {
-            $string .= $key.': '.$value."\n";
-        }
-        return $string;
-    }
-
     /**
      * @Route("/import", name="admin_import")
      *
@@ -520,5 +512,15 @@ class DefaultController extends Controller
         rename($file, $finalName);
         $item->setOriginalImageName($orgname);
         $item->setImageFilename($finalName);
+    }
+
+    private function formatMetadata(array $metadata)
+    {
+        $string = '';
+        foreach ($metadata as $key => $value) {
+            $string .= $key.': '.$value."\n";
+        }
+
+        return $string;
     }
 }

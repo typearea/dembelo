@@ -22,6 +22,10 @@ namespace DembeloMain\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+/**
+ * Class FinanceNodeController
+ * @package DembeloMain\Controller
+ */
 class FinanceNodeController extends Controller
 {
     /**

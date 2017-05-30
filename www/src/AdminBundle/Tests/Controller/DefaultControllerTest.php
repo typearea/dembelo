@@ -394,6 +394,9 @@ class DefaultControllerTest extends WebTestCase
         $this->assertEquals('200', $response->getStatusCode());
     }
 
+    /**
+     * tests textnode action
+     */
     public function testTextnodesAction()
     {
         $textnode = new Textnode();
@@ -454,12 +457,11 @@ class DefaultControllerTest extends WebTestCase
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $controller->textnodesAction();
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-        $expectedJson = '[{"id":"someId","status":"aktiv","created":"01.01.2017, 12:00:00",'.
-            '"access":"ja","licensee":"someLicenseeName","importfile":"unbekannt","beginning":"...",'.
-            '"financenode":"ja","arbitraryId":"someArbitraryId","twineId":"someTwineId",'.
-            '"metadata":"key1: val1\nkey2: val2\n"}]';
+        $expectedJson = '[{"id":"someId","status":"aktiv","created":"01.01.2017, 12:00:00",';
+        $expectedJson .= '"access":"ja","licensee":"someLicenseeName","importfile":"unbekannt","beginning":"...",';
+        $expectedJson .= '"financenode":"ja","arbitraryId":"someArbitraryId","twineId":"someTwineId",';
+        $expectedJson .= '"metadata":"key1: val1\nkey2: val2\n"}]';
         $this->assertJsonStringEqualsJsonString($expectedJson, $response->getContent());
-
     }
 
     private function getLicenseeRepositoryMock()

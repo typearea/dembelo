@@ -60,15 +60,14 @@ class DefaultController extends Controller
 
         $textnodeRepository = $this->get('app.model_repository_textNode');
 
-        /* @var $textnode Textnode */
-        $textnode = $textnodeRepository->createQueryBuilder()
-            ->field('topicId')->equals(new \MongoId($topicId))
-            ->field('status')->equals(Textnode::STATUS_ACTIVE)
-            ->field('access')->equals(true)
-            ->getQuery()->getSingleResult();
+        $textnode = $textnodeRepository->getTextnodeToRead($topicId);
 
         if (is_null($textnode)) {
             throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found.');
+        }
+
+        if ($textnode->isFinanceNode()) {
+            return $this->redirectToRoute('financenode', ['textnodeArbitraryId' => $textnode->getArbitraryId()]);
         }
 
         return $this->redirectToRoute('text', array('textnodeArbitraryId' => $textnode->getArbitraryId()));
@@ -91,7 +90,11 @@ class DefaultController extends Controller
         $textnode = $textnodeRepository->findOneActiveByArbitraryId($textnodeArbitraryId);
 
         if (is_null($textnode)) {
-            throw $this->createNotFoundException('No Textnode with arbitrary ID \''.$textnodeArbitraryId.'\' found.');
+            throw $this->createNotFoundException('No Textnode with arbitrary ID \''.$textnode->getArbitraryId().'\' found.');
+        }
+
+        if ($textnode->isFinanceNode()) {
+            return $this->redirectToRoute('financenode', ['textnodeArbitraryId' => $textnode->getArbitraryId()]);
         }
 
         $user = $this->getUser();
@@ -107,11 +110,12 @@ class DefaultController extends Controller
 
         for ($i = 0; $i < $textnode->getHitchCount(); ++$i) {
             $hitch = $textnode->getHitch($i);
-            $arbitraryId = $this->getArbitraryIdForTextnodeId($hitch['textnodeId']);
+            $hitchedTextnode = $this->getTextnodeForTextnodeId($hitch['textnodeId']);
             $hitches[] = [
                 'index' => $i,
                 'description' => $hitch['description'],
-                'arbitraryId' => $arbitraryId,
+                'arbitraryId' => $hitchedTextnode->getArbitraryId(),
+                'isFinanceNode' => $hitchedTextnode->isFinanceNode(),
             ];
         }
 
@@ -134,13 +138,13 @@ class DefaultController extends Controller
      */
     public function paywallAction($textnodeId, $hitchIndex)
     {
-        $arbitraryId = $this->getArbitraryIdForHitchIndex($textnodeId, $hitchIndex);
+        $hitchedTextnode = $this->getTextnodeForHitchIndex($textnodeId, $hitchIndex);
 
         $output = array(
             'url' => $this->generateUrl(
                 'text',
                 array(
-                    'textnodeArbitraryId' => $arbitraryId,
+                    'textnodeArbitraryId' => $hitchedTextnode->getArbitraryId(),
                 )
             ),
         );
@@ -158,7 +162,7 @@ class DefaultController extends Controller
         return $this->render('DembeloMain::default/imprint.html.twig');
     }
 
-    private function getArbitraryIdForHitchIndex($textnodeId, $hitchIndex)
+    private function getTextnodeForHitchIndex($textnodeId, $hitchIndex)
     {
         $textnodeRepository = $this->get('app.model_repository_textNode');
 
@@ -170,14 +174,14 @@ class DefaultController extends Controller
 
         $hitch = $textnode->getHitch($hitchIndex);
 
-        return $this->getArbitraryIdForTextnodeId($hitch['textnodeId']);
+        return $this->getTextnodeForTextnodeId($hitch['textnodeId']);
     }
 
-    private function getArbitraryIdForTextnodeId($textnodeId)
+    private function getTextnodeForTextnodeId($textnodeId)
     {
         $textnodeRepository = $this->get('app.model_repository_textNode');
         $linkedTextnode = $textnodeRepository->findOneActiveById($textnodeId);
 
-        return $linkedTextnode->getArbitraryId();
+        return $linkedTextnode;
     }
 }

@@ -121,6 +121,22 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
     }
 
     /**
+     * @inheritdoc
+     *
+     * @param string $topicId
+     *
+     * @return Textnode
+     */
+    public function getTextnodeToRead($topicId)
+    {
+        return $this->createQueryBuilder()
+            ->field('topicId')->equals(new \MongoId($topicId))
+            ->field('status')->equals(Textnode::STATUS_ACTIVE)
+            ->field('access')->equals(true)
+            ->getQuery()->getSingleResult();
+    }
+
+    /**
      * @param Textnode $object
      */
     protected function beforeSave($object)
