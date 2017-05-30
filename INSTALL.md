@@ -10,7 +10,7 @@ Falls man selber bereits einen Webserver mit PHP betreibt, bietet sich die Insta
 Voraussetzungen:
 
 * VirtualBox ([Webseite](https://www.virtualbox.org/)|[Installation](https://www.virtualbox.org/manual/ch02.html))
-* Vagrant([Webseite](https://www.vagrantup.com/)|[Download](https://www.vagrantup.com/downloads.html))
+* Vagrant ([Webseite](https://www.vagrantup.com/)|[Download](https://www.vagrantup.com/downloads.html))
 * git ([Webseite](https://git-scm.com/)|[Download](https://git-scm.com/downloads))
 * NFS-Server
   * unter Windows: `vagrant plugin install vagrant-winnfsd` ([mehr Informationen](https://github.com/GM-Alex/vagrant-winnfsd))
@@ -25,7 +25,7 @@ Voraussetzungen:
 7. Installiere externe PHP-Abhängigkeiten: `composer update`
 8. Kompiliere Bilder/JS/CSS: `php app/console assetic:dump --env=prod`
 9. Webserver neu starten: `/etc/init.d/nginx restart `
-10. Rufe Dembelo im Browser auf: [http://33.33.33.100](33.33.33.100)
+10. Rufe Dembelo im Browser auf: [http://33.33.33.102](33.33.33.102)
 11. Schließe bei Bedarf die Vagrantbox wieder: `vagrant halt`
 
 #### Starten des Servers
