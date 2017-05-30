@@ -562,6 +562,21 @@ class TextnodeTest extends WebTestCase
     }
 
     /**
+     * tests isFinanceNode();
+     */
+    public function testIsFinanceNode()
+    {
+        $hitch = [
+            'textnodeId' => 12,
+            'description' => 'foobar',
+            'status' => Textnode::HITCH_STATUS_ACTIVE,
+        ];
+        $this->assertTrue($this->textnode->isFinanceNode());
+        $this->textnode->appendHitch($hitch);
+        $this->assertFalse($this->textnode->isFinanceNode());
+    }
+
+    /**
      * tests clearHitches() method
      */
     public function testClearHitches()

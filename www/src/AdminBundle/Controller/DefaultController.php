@@ -374,26 +374,27 @@ class DefaultController extends Controller
      */
     public function textnodesAction()
     {
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:Textnode');
-
+        $repository = $this->get('app.model_repository_textNode');
         $textnodes = $repository->findAll();
 
-        $licenseeIndex = $this->buildLicenseeIndex($mongo);
-        $importfileIndex = $this->buildImportfileIndex($mongo);
+        $licenseeIndex = $this->buildLicenseeIndex();
+        $importfileIndex = $this->buildImportfileIndex();
 
         $output = array();
-        /* @var $user \DembeloMain\Document\Textnode */
+        /* @var $textnode \DembeloMain\Document\Textnode */
         foreach ($textnodes as $textnode) {
             $obj = new StdClass();
             $obj->id = $textnode->getId();
+            $obj->arbitraryId = $textnode->getArbitraryId();
             $obj->created = $textnode->getCreated()->format('d.m.Y, H:i:s');
             $obj->status = $textnode->getStatus() ? 'aktiv' : 'inaktiv';
-            $obj->access = $textnode->getAccess();
+            $obj->access = $textnode->getAccess() ? 'ja' : 'nein';
             $obj->licensee = $licenseeIndex[$textnode->getLicenseeId()];
             $obj->importfile = isset($importfileIndex[$textnode->getImportfileId()]) ? $importfileIndex[$textnode->getImportfileId()] : 'unbekannt';
             $obj->beginning = substr(htmlentities(strip_tags($textnode->getText())), 0, 200)."...";
+            $obj->financenode = $textnode->isFinanceNode() ? 'ja' : 'nein';
+            $obj->twineId = $textnode->getTwineId();
+            $obj->metadata = $this->formatMetadata($textnode->getMetadata());
             $output[] = $obj;
         }
 
@@ -465,10 +466,9 @@ class DefaultController extends Controller
         $item->setFilename($finalName);
     }
 
-    private function buildLicenseeIndex(\Doctrine\Bundle\MongoDBBundle\ManagerRegistry $mongo)
+    private function buildLicenseeIndex()
     {
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:Licensee');
+        $repository = $this->get('app.model_repository_licensee');
         $licensees = $repository->findAll();
         $index = [];
         foreach ($licensees as $licensee) {
@@ -478,10 +478,9 @@ class DefaultController extends Controller
         return $index;
     }
 
-    private function buildImportfileIndex(\Doctrine\Bundle\MongoDBBundle\ManagerRegistry $mongo)
+    private function buildImportfileIndex()
     {
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:Importfile');
+        $repository = $this->get('app.model_repository_importfile');
         $importfiles = $repository->findAll();
         $index = [];
         foreach ($importfiles as $importfile) {
@@ -513,5 +512,15 @@ class DefaultController extends Controller
         rename($file, $finalName);
         $item->setOriginalImageName($orgname);
         $item->setImageFilename($finalName);
+    }
+
+    private function formatMetadata(array $metadata)
+    {
+        $string = '';
+        foreach ($metadata as $key => $value) {
+            $string .= $key.': '.$value."\n";
+        }
+
+        return $string;
     }
 }

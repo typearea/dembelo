@@ -85,4 +85,11 @@ interface TextNodeRepositoryInterface
      * @return void
      */
     public function setHyphenatedText(Textnode $textnode);
+
+    /**
+     * gets the textnode object for the read controller action
+     * @param string $topicId
+     * @return Textnode
+     */
+    public function getTextnodeToRead($topicId);
 }

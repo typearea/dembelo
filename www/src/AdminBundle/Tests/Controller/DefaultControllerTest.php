@@ -25,9 +25,14 @@
 
 namespace AdminBundle\Tests\Controller;
 
+use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Licensee;
+use DembeloMain\Document\Textnode;
 use DembeloMain\Document\Topic;
 use DembeloMain\Document\User;
+use DembeloMain\Model\Repository\Doctrine\ODM\ImportfileRepository;
+use DembeloMain\Model\Repository\Doctrine\ODM\LicenseeRepository;
+use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
 use DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -387,6 +392,96 @@ class DefaultControllerTest extends WebTestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
         $this->assertJsonStringEqualsJsonString('[{"id":"someId","name":"someName"}]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
+    }
+
+    /**
+     * tests textnode action
+     */
+    public function testTextnodesAction()
+    {
+        $textnode = new Textnode();
+        $textnode->setId('someId');
+        $textnode->setCreated(new \DateTime("2017-01-01 12:00:00"));
+        $textnode->setStatus(1);
+        $textnode->setAccess(true);
+        $textnode->setLicenseeId('someLicenseeId');
+        $textnode->setArbitraryId("someArbitraryId");
+        $textnode->setTwineId('someTwineId');
+        $textnode->setMetadata(['key1' => 'val1', 'key2' => 'val2']);
+
+        $licensee = new Licensee();
+        $licensee->setId('someLicenseeId');
+        $licensee->setName('someLicenseeName');
+
+        $importfile = new Importfile();
+        $importfile->setId('someImportfileId');
+        $importfile->setName('someImportfileName');
+
+        $repository = $this->getMockBuilder(TextNodeRepository::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['findAll'])
+            ->getMock();
+
+        $repository->expects($this->once())
+            ->method('findAll')
+            ->willReturn([$textnode]);
+
+        $licenseeRepository = $this->getLicenseeRepositoryMock();
+        $licenseeRepository->expects($this->once())
+            ->method('findAll')
+            ->willReturn([$licensee]);
+
+        $importfileRepository = $this->getImportfileRepositoryMock();
+        $importfileRepository->expects($this->once())
+            ->method('findAll')
+            ->willReturn([$importfile]);
+
+
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $container->expects($this->at(0))
+            ->method('get')
+            ->with('app.model_repository_textNode')
+            ->willReturn($repository);
+        $container->expects($this->at(1))
+            ->method('get')
+            ->with('app.model_repository_licensee')
+            ->willReturn($licenseeRepository);
+        $container->expects($this->at(2))
+            ->method('get')
+            ->with('app.model_repository_importfile')
+            ->willReturn($importfileRepository);
+
+        $controller = new DefaultController();
+        $controller->setContainer($container);
+
+        /* @var $response \Symfony\Component\HttpFoundation\Response */
+        $response = $controller->textnodesAction();
+        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $expectedJson = '[{"id":"someId","status":"aktiv","created":"01.01.2017, 12:00:00",';
+        $expectedJson .= '"access":"ja","licensee":"someLicenseeName","importfile":"unbekannt","beginning":"...",';
+        $expectedJson .= '"financenode":"ja","arbitraryId":"someArbitraryId","twineId":"someTwineId",';
+        $expectedJson .= '"metadata":"key1: val1\nkey2: val2\n"}]';
+        $this->assertJsonStringEqualsJsonString($expectedJson, $response->getContent());
+    }
+
+    private function getLicenseeRepositoryMock()
+    {
+        $repository = $this->getMockBuilder(LicenseeRepository::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['findAll'])
+            ->getMock();
+
+        return $repository;
+    }
+
+    private function getImportfileRepositoryMock()
+    {
+        $repository = $this->getMockBuilder(ImportfileRepository::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['findAll'])
+            ->getMock();
+
+        return $repository;
     }
 
     /**

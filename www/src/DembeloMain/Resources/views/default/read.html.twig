@@ -33,7 +33,9 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
         <ul class="hitches">
             {% for hitch in hitches %}
                 <li class="hitch">
-                    {% if has_feature("paywall") %}
+                    {% if hitch.isFinanceNode %}
+                        <a href="{{ path('financenode', {textnodeArbitraryId: hitch.arbitraryId}) }}" class="hitch-link-collect">{{ hitch.description }}</a>
+                    {% elseif has_feature("paywall") %}
                         <a href="#" class="hitch-link" data-url="{{ path('paywall', {textnodeId: textnode.id, hitchIndex: hitch.index}) }}">{{ hitch.description }}</a>
                     {% else %}
                         <a href="{{ path('text', {textnodeArbitraryId: hitch.arbitraryId}) }}" class="hitch-link">{{ hitch.description }}</a>
