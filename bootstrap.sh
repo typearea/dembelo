@@ -19,8 +19,6 @@ apt-get -y install git curl vim ruby php7.1-fpm php7.1-cli php7.1-dev php7.1-gd 
 curl -s http://getcomposer.org/installer | php -- --install-dir=/usr/bin && mv /usr/bin/composer.phar /usr/bin/composer
 composer self-update
 
-# /usr/bin/pecl install --force mongodb
-
 gem install sass
 
 cp /vagrant/files/nginx/default /etc/nginx/sites-available/default
