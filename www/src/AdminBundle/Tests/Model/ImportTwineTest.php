@@ -754,7 +754,6 @@ class ImportTwineTest extends WebTestCase
         $returnValue = $importTwine->run($importfile);
 
         $this->assertTrue($returnValue);
-
     }
 
     private function getDummyImportfile(array $data = [])
