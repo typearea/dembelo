@@ -751,7 +751,9 @@ class ImportTwineTest extends WebTestCase
             });
 
         $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
-        $importTwine->run($importfile);
+        $returnValue = $importTwine->run($importfile);
+
+        $this->assertTrue($returnValue);
     }
 
     private function getDummyImportfile(array $data = [])

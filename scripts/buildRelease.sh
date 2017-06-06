@@ -10,7 +10,6 @@ git push --quiet git@github.com:typearea/dembelo.git $DEMBELO_VERSION
 git checkout-index -a -f --prefix release/
 cd release
 export SYMFONY_ENV=prod
-composer --working-dir="www" remove alcaeus/mongo-php-adapter mongodb/mongodb
 composer --working-dir="www" install --no-dev --optimize-autoloader
 php www/bin/console assetic:dump --env=prod
 rm www/app/config/parameters.yml

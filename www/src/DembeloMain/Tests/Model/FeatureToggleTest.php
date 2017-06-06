@@ -129,7 +129,7 @@ class FeatureToggleTest extends WebTestCase
      */
     public function testGetFeaturesReturnsAnArray()
     {
-        $this->assertInternalType(\PHPUnit_Framework_Constraint_IsType::TYPE_ARRAY, $this->featureToggle->getFeatures());
+        $this->assertInternalType('array', $this->featureToggle->getFeatures());
     }
 
     /**

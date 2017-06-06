@@ -1,19 +1,23 @@
 #!/usr/bin/env bash
 
-apt-get update
-apt-get -y install git curl vim ruby php5-fpm php5-cli php5-dev php5-gd php5-curl php-apc php5-mcrypt php5-xdebug php5-memcache php5-intl php5-tidy php5-imap php5-imagick php5-fpm mongodb nginx imagemagick libsasl2-dev pkg-config unzip
+apt-get -y install apt-transport-https lsb-release ca-certificates
 
-mkdir -p /etc/php5/cli/
-mkdir -p /etc/php5/fpm/
-cp /vagrant/files/php/cli/php.ini /etc/php5/cli/php.ini
-cp /vagrant/files/php/fpm/php.ini /etc/php5/fpm/php.ini
-cp /vagrant/files/php/fpm/php-fpm.conf /etc/php5/fpm/php-fpm.conf
-cp /vagrant/files/php/fpm/pool.d/www.conf /etc/php5/fpm/pool.d/www.conf
+# PHP7
+echo "deb https://packages.sury.org/php/ jessie main" > /etc/apt/sources.list.d/php.list
+wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+
+apt-get update
+apt-get -y install git curl vim ruby php7.1-fpm php7.1-cli php7.1-dev php7.1-gd php7.1-curl php7.1-mcrypt php7.1-xdebug php7.1-memcache php7.1-intl php7.1-tidy php7.1-imap php7.1-imagick php7.1-fpm mongodb nginx imagemagick libsasl2-dev pkg-config unzip php7.1-xml php7.1-mbstring php7.1-mongodb
+
+#mkdir -p /etc/php7/cli/
+#mkdir -p /etc/php7/fpm/
+#cp /vagrant/files/php/cli/php.ini /etc/php/7.1/cli/php.ini
+#cp /vagrant/files/php/fpm/php.ini /etc/php/7.1/fpm/php.ini
+#cp /vagrant/files/php/fpm/php-fpm.conf /etc/php/7.1/fpm/php-fpm.conf
+#cp /vagrant/files/php/fpm/pool.d/www.conf /etc/php/7.1/fpm/pool.d/www.conf
 
 curl -s http://getcomposer.org/installer | php -- --install-dir=/usr/bin && mv /usr/bin/composer.phar /usr/bin/composer
 composer self-update
-
-/usr/bin/pecl install --force mongodb
 
 gem install sass
 
@@ -21,12 +25,12 @@ cp /vagrant/files/nginx/default /etc/nginx/sites-available/default
 ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 service nginx restart
-service php5-fpm restart
+service php7.1-fpm restart
 
 cd /vagrant/www
 composer install
 
-app/console assetic:dump
-app/console cache:warmup
+bin/console assetic:dump
+bin/console cache:warmup
 
 vendor/squizlabs/php_codesniffer/scripts/phpcs --config-set installed_paths www/vendor/escapestudios/symfony2-coding-standard
