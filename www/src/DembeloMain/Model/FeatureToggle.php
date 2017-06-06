@@ -42,7 +42,7 @@ class FeatureToggle implements ContainerAwareInterface
      * @param string $featureKey
      * @return bool
      */
-    public function hasFeature($featureKey)
+    public function hasFeature(string $featureKey)
     {
         if (!isset($this->features[$featureKey])) {
             return false;
@@ -63,12 +63,12 @@ class FeatureToggle implements ContainerAwareInterface
      * returns an array of existing features
      * @return array
      */
-    public function getFeatures()
+    public function getFeatures() : array
     {
         return array_keys($this->features);
     }
 
-    private function buildParameterName($featureKey)
+    private function buildParameterName(string $featureKey) : string
     {
         return 'features.'.$featureKey;
     }
