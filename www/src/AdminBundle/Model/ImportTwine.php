@@ -89,7 +89,7 @@ class ImportTwine
      * @return bool
      * @throws Exception
      */
-    public function run(Importfile $importfile)
+    public function run(Importfile $importfile): bool
     {
         $this->importfile = $importfile;
 
@@ -124,7 +124,7 @@ class ImportTwine
         xml_parser_free($this->xmlParser);
     }
 
-    private function extractTwineFile()
+    private function extractTwineFile(): string
     {
         if (is_null($this->importfile->getFilename())) {
             throw new Exception('no filename available');
@@ -160,7 +160,7 @@ class ImportTwine
         return $extractedFile;
     }
 
-    private function checkTwineFile($fileHandler)
+    private function checkTwineFile($fileHandler): bool
     {
         $magicString = "<tw-storydata ";
         $magicStringLength = strlen($magicString);
@@ -204,7 +204,7 @@ class ImportTwine
         throw new Exception("File '".$this->importfile->getFilename()."' doesn't seem to be a Twine archive file.");
     }
 
-    private function initParser($fileHandler)
+    private function initParser($fileHandler): bool
     {
         xml_parser_set_option($this->xmlParser, XML_OPTION_CASE_FOLDING, 0);
 
@@ -258,7 +258,7 @@ class ImportTwine
         return true;
     }
 
-    private function startElementStoryData($name, array $attrs)
+    private function startElementStoryData(string $name, array $attrs)
     {
         if ($this->twineRelevant === true) {
             throw new Exception("Nested '".$name."' found in Twine archive file '".$this->importfile->getFilename()."'.");
@@ -295,7 +295,7 @@ class ImportTwine
         $this->twineRelevant = true;
     }
 
-    private function getTwineId($tagString, $textnodeTitle)
+    private function getTwineId(string $tagString, string $textnodeTitle): string
     {
         if (empty($tagString) || !is_string($tagString)) {
             throw new Exception('no ID given for Textnode "'.$textnodeTitle.'"');
@@ -317,7 +317,7 @@ class ImportTwine
         return $twineId;
     }
 
-    private function startElementPassageData($name, $attrs)
+    private function startElementPassageData(string $name, array $attrs)
     {
         if ($this->twineText !== false) {
             throw new Exception("Nested '".$name."' found in Twine archive file '".$this->importfile->getFilename()."'.");
@@ -375,7 +375,7 @@ class ImportTwine
         $this->twineText = true;
     }
 
-    private function startElement($parser, $name, $attrs)
+    private function startElement($parser, string $name, array $attrs)
     {
         if ($name === "tw-storydata") {
             $this->startElementStoryData($name, $attrs);
@@ -384,14 +384,14 @@ class ImportTwine
         }
     }
 
-    private function characterData($parser, $data)
+    private function characterData($parser, string $data)
     {
         if ($this->twineRelevant === true && $this->twineText === true) {
             $this->textnode->setText($this->textnode->getText().$data);
         }
     }
 
-    private function endElementStoryData($name)
+    private function endElementStoryData(string $name)
     {
         foreach ($this->textnodeMapping as $twineId => $dembeloId) {
             $textnode = $this->textnodeRepository->find($dembeloId);
@@ -580,7 +580,7 @@ class ImportTwine
      * @param string $name
      * @throws Exception
      */
-    private function endElement($parser, $name)
+    private function endElement($parser, string $name)
     {
         if ($name === "tw-storydata") {
             $this->endElementStoryData($name);
