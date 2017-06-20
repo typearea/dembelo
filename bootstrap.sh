@@ -27,6 +27,8 @@ ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 service nginx restart
 service php7.1-fpm restart
 
+systemctl enable php7.1-fpm
+
 cd /vagrant/www
 composer install
 
