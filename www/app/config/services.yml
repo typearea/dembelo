@@ -18,7 +18,7 @@ services:
 
     app.readpath:
         class: DembeloMain\Model\Readpath
-        arguments: ["@app.model_repository_read_path"]
+        arguments: ["@app.model_repository_read_path", "@session"]
 
     app.controller_dashboard:
         class: DembeloMain\Controller\Dashboard\DefaultController

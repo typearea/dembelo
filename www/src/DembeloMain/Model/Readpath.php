@@ -23,6 +23,7 @@ use DembeloMain\Document\Textnode;
 use DembeloMain\Document\User;
 use DembeloMain\Model\Repository\ReadPathRepositoryInterface;
 use DembeloMain\Document\Readpath as ReadpathDocument;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Class Readpath
@@ -32,13 +33,18 @@ class Readpath
 {
     private $readpathRepository;
 
+    /* @var Session */
+    private $session;
+
     /**
      * Readpath constructor.
      * @param ReadPathRepositoryInterface $readpathRepository
+     * @param Session $session
      */
-    public function __construct(ReadPathRepositoryInterface $readpathRepository)
+    public function __construct(ReadPathRepositoryInterface $readpathRepository, Session $session)
     {
         $this->readpathRepository = $readpathRepository;
+        $this->session = $session;
     }
 
     /**
@@ -50,14 +56,43 @@ class Readpath
     public function storeReadpath(Textnode $textnode, User $user = null)
     {
         if (is_null($user)) {
-            return;
+            $this->saveTextnodeToSession($textnode);
+        } else {
+            $this->saveTextnodeToDatabase($textnode, $user);
         }
+    }
 
+    public function getCurrentTextnodeId(User $user = null): ?string
+    {
+        if (is_null($user)) {
+            $readpath = $this->session->get('readpath');
+            if (!is_array($readpath)) {
+                return null;
+            }
+            return end($readpath);
+        } else {
+            return $this->readpathRepository->getCurrentTextnodeIdForUser($user);
+        }
+    }
+
+    private function saveTextnodeToDatabase(Textnode $textnode, User $user)
+    {
         $readpath = new ReadpathDocument();
         $readpath->setTextnodeId($textnode->getId());
         $readpath->setUserId($user->getId());
         $readpath->setTimestamp(new \MongoDate(time()));
 
         $this->readpathRepository->save($readpath);
+    }
+
+    private function saveTextnodeToSession($textnode)
+    {
+        $readpath = $this->session->get('readpath');
+        if (is_array($readpath)) {
+            $readpath[] = $textnode->getId();
+        } else {
+            $readpath = [$textnode->getId()];
+        }
+        $this->session->set('readpath', $readpath);
     }
 }

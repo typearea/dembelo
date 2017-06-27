@@ -29,6 +29,7 @@ use DembeloMain\Document\Textnode;
 use DembeloMain\Document\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -41,7 +42,7 @@ class DefaultController extends Controller
      *
      * @param string $topicId Topic ID from URL
      *
-     * @return string
+     * @return RedirectResponse
      */
     public function readTopicAction($topicId)
     {
@@ -150,6 +151,23 @@ class DefaultController extends Controller
         );
 
         return new Response(\json_encode($output));
+    }
+
+    /**
+     * @Route("/back", name="back")
+     *
+     * @return string
+     */
+    public function backAction()
+    {
+        // get current textnode from readpath
+        $readpath = $this->get('app.readpath');
+        $currentTextnode = $readpath->getCurrentTextnode();
+        //$readpath->
+        // if current textnode === access node => get other access node
+        // if current textnode !== access node => get previous node
+        $textnode = '';
+        return $this->redirectToRoute('text', array('textnodeArbitraryId' => $textnode->getArbitraryId()));
     }
 
     /**
