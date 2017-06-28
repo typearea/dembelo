@@ -104,4 +104,14 @@ class FavoriteManagerTest extends WebTestCase
         $this->assertEquals('textnodeId', $favMgr->getFavorite($this->topic));
         $this->assertEquals('textnodeId', $this->session->get('favorite_topicId'));
     }
+
+    /**
+     * tests getting a favorite via cookie when no favorite is set
+     */
+    public function testGetFavoriteReturningNull()
+    {
+        $favMgr = new FavoriteManager($this->session, $this->textnodeRepository);
+        $this->assertNull($favMgr->getFavorite($this->topic));
+        $this->assertNull($this->session->get('favorite_topicId'));
+    }
 }

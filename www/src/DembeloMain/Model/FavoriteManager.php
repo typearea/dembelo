@@ -63,7 +63,7 @@ class FavoriteManager
      * @param User|null $user
      * @return string
      */
-    public function getFavorite(Topic $topic, User $user = null): string
+    public function getFavorite(Topic $topic, User $user = null): ?string
     {
         if (is_null($user)) {
             return $this->session->get('favorite_'.$topic->getId());
