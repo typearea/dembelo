@@ -62,7 +62,7 @@ class UserController extends Controller
             ->add(
                 '_username',
                 EmailType::class,
-                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'E-Mail'))
+                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'Email'))
             )
             ->add(
                 'password',
