@@ -7,10 +7,8 @@ services:
     admin.import.twine:
         class: AdminBundle\Model\ImportTwine
         arguments: ["@app.model_repository_textNode", "@app.model_repository_topic"]
-#    service_name:
-#        class: DembeloMain\Directory\ClassName
-#        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
 
+    # @todo remove dependency from service container
     app.feature_toggle:
         class: DembeloMain\Model\FeatureToggle
         calls:
@@ -65,6 +63,7 @@ services:
             arguments:
                 - DembeloMain\Document\Importfile
 
+    # @todo remove dependency from service container
     app.twig_extension.version:
             class: DembeloMain\Twig\VersionExtension
             arguments: ["@service_container"]
@@ -72,6 +71,7 @@ services:
             tags:
                 - { name: twig.extension }
 
+    # @todo remove dependency from service container
     app.twig_extension.hasFeature:
                 class: DembeloMain\Twig\FeatureToggleExtension
                 arguments: ["@service_container"]
@@ -87,3 +87,7 @@ services:
     app.favoriteManager:
             class: DembeloMain\Model\FavoriteManager
             arguments: ["@session"]
+
+    app.readpathUndoService:
+                class: DembeloMain\Service\ReadpathUndoService
+                arguments: ["@session"]
