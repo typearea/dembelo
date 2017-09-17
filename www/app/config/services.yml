@@ -21,7 +21,22 @@ services:
     app.controller_dashboard:
         class: DembeloMain\Controller\Dashboard\DefaultController
         calls:
-                - [setContainer, ["@service_container"]]
+            - [setContainer, ["@service_container"]]
+
+    app.controller_default:
+        class: DembeloMain\Controller\DefaultController
+        arguments:
+            - "@app.feature_toggle"
+            - "@security.authorization_checker"
+            - "@app.model_repository_user"
+            - "@app.model_repository_textNode"
+            - "@templating"
+            - "@router"
+            - "@security.token_storage"
+            - "@app.readpath"
+            - "@app.favoriteManager"
+        class:
+            - [setContainer, ["@service_container"]]
 
     app.controller_admin_topic:
         class: AdminBundle\Controller\TopicController

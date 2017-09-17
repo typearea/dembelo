@@ -24,47 +24,122 @@
 
 namespace DembeloMain\Controller;
 
-use DembeloMain\Document\Readpath;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Document\User;
+use DembeloMain\Model\FavoriteManager;
+use DembeloMain\Model\FeatureToggle;
+use DembeloMain\Model\Readpath;
+use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use DembeloMain\Model\Repository\UserRepositoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * Class DefaultController
+ * @Route(service="app.controller_default")
  */
 class DefaultController extends Controller
 {
+    /**
+     * @var FeatureToggle
+     */
+    private $featureToggle;
+
+    /**
+     * @var AuthorizationCheckerInterface
+     */
+    private $authorizationChecker;
+
+    /**
+     * @var UserRepositoryInterface
+     */
+    private $userRepository;
+
+    /**
+     * @var TextNodeRepositoryInterface
+     */
+    private $textnodeRepository;
+
+    /**
+     * @var Templating
+     */
+    private $templating;
+
+    /**
+     * @var Router
+     */
+    private $router;
+
+    /**
+     * @var TokenStorage
+     */
+    private $tokenStorage;
+
+    /**
+     * @var Readpath
+     */
+    private $readpath;
+
+    /**
+     * @var FavoriteManager
+     */
+    private $favoriteManager;
+
+    public function __construct(
+        FeatureToggle $featureToggle,
+        AuthorizationCheckerInterface $authorizationChecker,
+        UserRepositoryInterface $userRepository,
+        TextNodeRepositoryInterface $textNodeRepository,
+        Templating $templating,
+        Router $router,
+        TokenStorage $tokenStorage,
+        Readpath $readpath,
+        FavoriteManager $favoriteManager
+    ) {
+        $this->featureToggle = $featureToggle;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->userRepository = $userRepository;
+        $this->textnodeRepository = $textNodeRepository;
+        $this->templating = $templating;
+        $this->router = $router;
+        $this->tokenStorage = $tokenStorage;
+        $this->readpath = $readpath;
+        $this->favoriteManager = $favoriteManager;
+    }
+
     /**
      * @Route("/themenfeld/{topicId}", name="themenfeld")
      *
      * @param string $topicId Topic ID from URL
      *
      * @return RedirectResponse
+     * @throws NotFoundHttpException
      */
     public function readTopicAction($topicId)
     {
         $textnodes = null;
 
-        if ($this->container->get('app.feature_toggle')->hasFeature('login_needed') && !$this->isGranted('ROLE_USER')) {
+        if ($this->featureToggle->hasFeature('login_needed') && !$this->authorizationChecker->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('login_route');
+        }
+
+        $textnode = $this->textnodeRepository->getTextnodeToRead($topicId);
+
+        if (is_null($textnode)) {
+            throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found.');
         }
 
         $user = $this->getUser();
         if ($user instanceof User) {
-            $userRepository = $this->get('app.model_repository_user');
             $user->setLastTopicId($topicId);
-            $userRepository->save($user);
-        }
-
-        $textnodeRepository = $this->get('app.model_repository_textNode');
-
-        $textnode = $textnodeRepository->getTextnodeToRead($topicId);
-
-        if (is_null($textnode)) {
-            throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found.');
+            $this->userRepository->save($user);
         }
 
         if ($textnode->isFinanceNode()) {
@@ -72,6 +147,26 @@ class DefaultController extends Controller
         }
 
         return $this->redirectToRoute('text', array('textnodeArbitraryId' => $textnode->getArbitraryId()));
+    }
+
+    protected function redirectToRoute($route, array $parameters = array(), $status = 302): RedirectResponse
+    {
+        $url = $this->router->generate($route, $parameters);
+        return new RedirectResponse($url, $status);
+    }
+
+    protected function getUser(): ?User
+    {
+        if (null === $token = $this->tokenStorage->getToken()) {
+            return null;
+        }
+
+        if (!is_object($user = $token->getUser())) {
+            // e.g. anonymous authentication
+            return null;
+        }
+
+        return $user;
     }
 
     /**
@@ -83,12 +178,11 @@ class DefaultController extends Controller
      */
     public function readTextnodeAction($textnodeArbitraryId)
     {
-        if ($this->container->get('app.feature_toggle')->hasFeature('login_needed') && !$this->isGranted('ROLE_USER')) {
+        if ($this->featureToggle->hasFeature('login_needed') && !$this->authorizationChecker->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('login_route');
         }
 
-        $textnodeRepository = $this->get('app.model_repository_textNode');
-        $textnode = $textnodeRepository->findOneActiveByArbitraryId($textnodeArbitraryId);
+        $textnode = $this->textnodeRepository->findOneActiveByArbitraryId($textnodeArbitraryId);
 
         if (is_null($textnode)) {
             throw $this->createNotFoundException('No Textnode with arbitrary ID \''.$textnode->getArbitraryId().'\' found.');
@@ -100,11 +194,11 @@ class DefaultController extends Controller
 
         $user = $this->getUser();
 
-        $this->get('app.readpath')->storeReadPath($textnode, $user);
-        $this->get('app.favoriteManager')->setFavorite($textnode, $user);
+        $this->readpath->storeReadPath($textnode, $user);
+        $this->favoriteManager->setFavorite($textnode, $user);
 
         if ($user instanceof User) {
-            $this->get('app.model_repository_user')->save($user);
+            $this->userRepository->save($user);
         }
 
         $hitches = [];
@@ -120,12 +214,12 @@ class DefaultController extends Controller
             ];
         }
 
-        return $this->render(
+        return $this->templating->renderResponse(
             'DembeloMain::default/read.html.twig',
-            array(
+            [
                 'textnode' => $textnode,
                 'hitches' => $hitches,
-            )
+            ]
         );
     }
 
@@ -177,14 +271,12 @@ class DefaultController extends Controller
      */
     public function imprintAction()
     {
-        return $this->render('DembeloMain::default/imprint.html.twig');
+        return $this->templating->renderResponse('DembeloMain::default/imprint.html.twig');
     }
 
-    private function getTextnodeForHitchIndex($textnodeId, $hitchIndex)
+    private function getTextnodeForHitchIndex($textnodeId, $hitchIndex): Textnode
     {
-        $textnodeRepository = $this->get('app.model_repository_textNode');
-
-        $textnode = $textnodeRepository->findOneActiveById($textnodeId);
+        $textnode = $this->textnodeRepository->findOneActiveById($textnodeId);
 
         if (is_null($textnode)) {
             throw $this->createNotFoundException('No Textnode with ID \''.$textnodeId.'\' found.');
@@ -195,10 +287,9 @@ class DefaultController extends Controller
         return $this->getTextnodeForTextnodeId($hitch['textnodeId']);
     }
 
-    private function getTextnodeForTextnodeId($textnodeId)
+    private function getTextnodeForTextnodeId($textnodeId): Textnode
     {
-        $textnodeRepository = $this->get('app.model_repository_textNode');
-        $linkedTextnode = $textnodeRepository->findOneActiveById($textnodeId);
+        $linkedTextnode = $this->textnodeRepository->findOneActiveById($textnodeId);
 
         return $linkedTextnode;
     }

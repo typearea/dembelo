@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -25,15 +27,19 @@
 
 namespace DembeloMain\Tests\Controller;
 
-use DembeloMain\Document\Topic;
-use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
-use Doctrine\ODM\MongoDB\DocumentRepository;
+use DembeloMain\Model\FavoriteManager;
+use DembeloMain\Model\FeatureToggle;
+use DembeloMain\Model\Readpath;
+use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use DembeloMain\Model\Repository\UserRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use DembeloMain\Controller\DefaultController;
-use DembeloMain\Document\Textnode;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+
 
 /**
  * Class DefaultControllerTest
@@ -41,179 +47,197 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 class DefaultControllerTest extends WebTestCase
 {
     /**
+     * @var DefaultController
+     */
+    private $controller;
+
+    /**
+     * @var FeatureToggle|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $featureToggleMock;
+
+    /**
+     * @var AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $authorizationCheckerMock;
+
+    /**
+     * @var UserRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $userRepositoryMock;
+
+    /**
+     * @var TextNodeRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $textnodeRepositoryMock;
+
+    /**
+     * @var Templating|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $templatingMock;
+
+    /**
+     * @var Router|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $routerMock;
+
+    /**
+     * @var TokenStorage|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $tokenStorageMock;
+
+    /**
+     * @var ReadPath|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $readpathMock;
+
+    /**
+     * @var FavoriteManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $favoriteManagerMock;
+
+    /**
+     * @inheritdoc
+     */
+    public function setUp(): void
+    {
+        $this->featureToggleMock = $this->createFeatureToggleMock();
+        $this->authorizationCheckerMock = $this->createAuthorizationCheckerMock();
+        $this->userRepositoryMock = $this->createUserRepositoryMock();
+        $this->textnodeRepositoryMock = $this->createTextnodeRepositoryMock();
+        $this->templatingMock = $this->createTemplatingMock();
+        $this->routerMock = $this->createRouterMock();
+        $this->tokenStorageMock = $this->createTokenStorageMock();
+        $this->readpathMock = $this->createReadpathMock();
+        $this->favoriteManagerMock = $this->createFavoriteManagerMock();
+
+        $this->controller = new DefaultController(
+            $this->featureToggleMock,
+            $this->authorizationCheckerMock,
+            $this->userRepositoryMock,
+            $this->textnodeRepositoryMock,
+            $this->templatingMock,
+            $this->routerMock,
+            $this->tokenStorageMock,
+            $this->readpathMock,
+            $this->favoriteManagerMock
+        );
+    }
+
+    /**
      * Tests the index action.
      */
-    public function testIndex()
+    public function testReadTopicActionWithLoggedOutUserAndEnabledLoginFeature(): void
     {
-        $this->assertTrue(true);
-    }
+        $topicId = 'someTopicId';
 
-    /**
-     * @todo Add a more extensive indexAction test, which checks the logic
-     *     for retrieving the topics if there isn't an active user session,
-     *     and the redirecting if a current textnode was saved.
-     */
-
-    /**
-     * Tests how the first textnode of a topic gets found based on the topic ID
-     *     without an active user session.
-     */
-    public function xtestReadTopicWithoutLogin()
-    {
-        $textnode = new Textnode();
-        $textnode->setId("55f5ab3708985c4b188b4577");
-        $textnode->setTopicId("foobar");
-        $textnode->setAccess(true);
-        $textnode->setStatus(Textnode::STATUS_ACTIVE);
-        $textnode->setText("Lorem ipsum dolor sit amet.");
-
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $authorizationChecker = $this->getMockBuilder('foobar')->setMethods(array('isGranted'))->getMock();
-        $tokenStorage = $this->getMockBuilder(TokenStorage::class)->disableOriginalConstructor()->getMock();
-        $mongo = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
-        $repository = $this->getMockBuilder(DocumentRepository::class)->disableOriginalConstructor()->getMock();
-        $router = $this->getMockBuilder(RouterInterface::class)->getMock();
-        $queryBuilder = $this->getMockBuilder("Doctrine\ODM\MongoDB\QueryBuilder")->setMethods(array('field', 'equals', 'getQuery', 'getSingleResult'))->getMock();
-
-        $container->expects($this->any())
-            ->method("has")
-            ->with($this->equalTo('security.authorization_checker'))
-            ->will($this->returnValue(true));
-        $container->expects($this->any())
-            ->method("get")
-            ->with($this->equalTo('doctrine_mongodb'))
-            ->will($this->returnValue($mongo));
-        $container->expects($this->at(2))
-            ->method("get")
-            ->with($this->equalTo('security.authorization_checker'))
-            ->will($this->returnValue($authorizationChecker));
-        $container->expects($this->never())
-            ->method("get")
-            ->with($this->equalTo('security.token_storage'))
-            ->will($this->returnValue($tokenStorage));
-
-        $mongo->expects($this->never())
-            ->method("getRepository")
-            ->with($this->equalTo('DembeloMain:Textnode'))
-            ->will($this->returnValue($repository));
-
-        $authorizationChecker->expects($this->once())
+        $this->featureToggleMock->expects(self::once())
+            ->method('hasFeature')
+            ->willReturn(true);
+        $this->authorizationCheckerMock->expects(self::any())
             ->method('isGranted')
-            ->with($this->equalTo('ROLE_USER'))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
+        $this->routerMock->expects(self::once())
+            ->method('generate')
+            ->with('login_route', []);
 
-        $queryBuilder->expects($this->never())
-            ->method('field')
-            ->with('topicId')
-            ->will($this->returnSelf());
-
-        $queryBuilder->expects($this->never())
-            ->method('equals')
-            ->will($this->returnSelf());
-
-        $queryBuilder->expects($this->never())
-            ->method('getQuery')
-            ->will($this->returnSelf());
-
-        $queryBuilder->expects($this->never())
-            ->method('getSingleResult')
-            ->will($this->returnValue($textnode));
-
-        $repository->expects($this->never())
-            ->method("createQueryBuilder")
-            ->will($this->returnValue($queryBuilder));
-
-        $container->expects($this->at(3))
-            ->method("get")
-            ->with($this->equalTo('router'))
-            ->will($this->returnValue($router));
-        $router->expects($this->once())
-            ->method("generate")
-            ->with("login_route", array())
-            ->will($this->returnValue("text/".$textnode->getId()));
-
-        $controller = new DefaultController();
-        $controller->setContainer($container);
-
-        $result = $controller->readTopicAction("55d2b934658f5cc23c3c986c");
-
-        $this->assertEquals('Symfony\Component\HttpFoundation\RedirectResponse', get_class($result));
-        $this->assertEquals('302', $result->getStatusCode());
-        $this->assertEquals('text/'.$textnode->getId(), $result->getTargetUrl());
+        $result = $this->controller->readTopicAction($topicId);
+        self::assertInstanceOf(RedirectResponse::class, $result);
     }
-
-    /** @todo Implement testReadTopicWithLogin(). */
 
     /**
-     * Tests the action of reading a textnode without an active
-     *     user session.
+     * Tests the index action.
+     *
+     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function xtestReadTextnodeWithoutLogin()
+    public function testReadTopicActionForInvalidTopicId(): void
     {
-        $container = $this->getMockBuilder("Symfony\Component\DependencyInjection\ContainerInterface")->getMock();
-        $mongo = $this->getMockBuilder("Doctrine\Bundle\MongoDBBundle\ManagerRegistry")->disableOriginalConstructor()->getMock();
-        $repository = $this->getMockBuilder("Doctrine\ODM\MongoDB\DocumentRepository")->disableOriginalConstructor()->getMock();
-        $authorizationChecker = $this->getMockBuilder('foobar')->setMethods(array('isGranted'))->getMock();
-        $tokenStorage = $this->getMockBuilder("Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage")->disableOriginalConstructor()->getMock();
-        $template = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface')->getMock();
-        $router = $this->getMockBuilder('\Symfony\Bundle\FrameworkBundle\Routing\Router')->disableOriginalConstructor()->getMock();
+        $topicId = 'someTopicId';
 
-        $router->expects($this->once())
-            ->method("generate")
-            ->with("login_route", array())
-            ->will($this->returnValue("renderresponse"));
+        $this->featureToggleMock->expects(self::once())
+            ->method('hasFeature')
+            ->willReturn(false);
+        $this->textnodeRepositoryMock->expects(self::once())
+            ->method('getTextnodeToRead')
+            ->with($topicId)
+            ->willReturn(null);
 
-        $textnodeId = 'asdaisliajslidj';
-
-        $container->expects($this->any())
-            ->method("has")
-            ->with($this->equalTo('security.authorization_checker'))
-            ->will($this->returnValue(true));
-
-
-        $container->expects($this->at(1))
-            ->method('get')
-            ->with($this->equalTo('security.authorization_checker'))
-            ->will($this->returnValue($authorizationChecker));
-
-        $container->expects($this->at(2))
-            ->method('get')
-            ->with($this->equalTo('router'))
-            ->will($this->returnValue($router));
-
-        $controller = new DefaultController();
-        $controller->setContainer($container);
-
-        $result = $controller->readTextnodeAction($textnodeId);
-
-        $this->assertEquals('Symfony\Component\HttpFoundation\RedirectResponse', get_class($result));
-        $this->assertEquals('302', $result->getStatusCode());
-        $this->assertEquals('renderresponse', $result->getTargetUrl());
+        $this->controller->readTopicAction($topicId);
     }
 
-    /** @todo Implement testReadTextnodeWithLogin(). */
-    public function xtestPaywallAction()
+    /**
+     * @return FeatureToggle|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createFeatureToggleMock(): FeatureToggle
     {
-        $textnodeId = 'textnode1';
-        $hitchIndex = 123;
-        $container = $this->getMockBuilder("Symfony\Component\DependencyInjection\ContainerInterface")->getMock();
-        $repository = $this->getMockBuilder("Doctrine\ODM\MongoDB\DocumentRepository")->disableOriginalConstructor()->getMock();
-        $service = $this->getMockBuilder("Doctrine\Bundle\MongoDBBundle\ManagerRegistry")->disableOriginalConstructor()->getMock();
-        $container->expects($this->once())
-            ->method("get")
-            ->with($this->equalTo('doctrine_mongodb'))
-            ->will($this->returnValue($service));
-        $service->expects($this->once())
-            ->method("getRepository")
-            ->with($this->equalTo('DembeloMain:Textnode'))
-            ->will($this->returnValue($repository));
+        return $this->createMock(FeatureToggle::class);
+    }
 
-        $controller = new DefaultController();
-        $controller->setContainer($container);
+    /**
+     * @return AuthorizationCheckerInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createAuthorizationCheckerMock(): AuthorizationCheckerInterface
+    {
+        return $this->createMock(AuthorizationCheckerInterface::class);
+    }
 
-        $response = $controller->paywallAction($textnodeId, $hitchIndex);
-        $json = $response->getContent();
-        $this->assertJson($json);
-        $json = json_decode($json);
+    /**
+     * @return UserRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createUserRepositoryMock(): UserRepositoryInterface
+    {
+        return $this->createMock(UserRepositoryInterface::class);
+    }
+
+    /**
+     * @return TextNodeRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createTextnodeRepositoryMock(): TextNodeRepositoryInterface
+    {
+        return $this->createMock(TextNodeRepositoryInterface::class);
+    }
+
+    /**
+     * @return Templating|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createTemplatingMock(): Templating
+    {
+        return $this->createMock(Templating::class);
+    }
+
+    /**
+     * @return Router|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createRouterMock(): Router
+    {
+        $mock = $this->createMock(Router::class);
+        $mock->expects(self::any())
+            ->method('generate')
+            ->willReturn('someUrl');
+        return $mock;
+    }
+
+    /**
+     * @return TokenStorage|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createTokenStorageMock(): TokenStorage
+    {
+        return $this->createMock(TokenStorage::class);
+    }
+
+    /**
+     * @return ReadPath|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createReadpathMock(): Readpath
+    {
+        return $this->createMock(Readpath::class);
+    }
+
+    /**
+     * @return FavoriteManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createFavoriteManagerMock(): FavoriteManager
+    {
+        return $this->createMock(FavoriteManager::class);
     }
 }
