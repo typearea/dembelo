@@ -26,8 +26,6 @@ use DembeloMain\Document\Textnode;
 /**
  * Interface TextNodeRepositoryInterface
  * @package DembeloMain\Model\Repository
- *
- * @method findOneActiveById(string $id): Textnode
  */
 interface TextNodeRepositoryInterface
 {
@@ -94,4 +92,10 @@ interface TextNodeRepositoryInterface
      * @return Textnode
      */
     public function getTextnodeToRead($topicId);
+
+    /**
+     * @param string $id
+     * @return Textnode|null
+     */
+    public function findOneActiveById(string $id): ?Textnode;
 }

@@ -39,7 +39,7 @@ class Readpath
     /**
      * Readpath constructor.
      * @param ReadPathRepositoryInterface $readpathRepository
-     * @param Session $session
+     * @param Session                     $session
      */
     public function __construct(ReadPathRepositoryInterface $readpathRepository, Session $session)
     {
@@ -62,6 +62,10 @@ class Readpath
         }
     }
 
+    /**
+     * @param User|null $user
+     * @return null|string
+     */
     public function getCurrentTextnodeId(User $user = null): ?string
     {
         if (is_null($user)) {
@@ -69,6 +73,7 @@ class Readpath
             if (!is_array($readpath)) {
                 return null;
             }
+
             return end($readpath);
         } else {
             return $this->readpathRepository->getCurrentTextnodeIdForUser($user);

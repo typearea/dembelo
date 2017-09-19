@@ -16,12 +16,16 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace DembeloMain\Service;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 
+/**
+ * Class ReadpathUndoService
+ * @package DembeloMain\Service
+ */
 class ReadpathUndoService
 {
     private const SESSION_KEY = 'readpathundo';
@@ -36,6 +40,10 @@ class ReadpathUndoService
      */
     private $session;
 
+    /**
+     * ReadpathUndoService constructor.
+     * @param Session $session
+     */
     public function __construct(Session $session)
     {
         $this->session = $session;
@@ -46,13 +54,25 @@ class ReadpathUndoService
                 'past' => [],
                 'present' => null,
                 'future' => [],
+                'undoAvoid' => null,
             ];
         }
-
     }
 
+    /**
+     * @param string $textnodeId
+     */
     public function add(string $textnodeId): void
     {
+        if ($textnodeId === $this->data['present']) {
+            return;
+        }
+        if ($this->data['undoAvoid'] === $textnodeId) {
+            $this->data['undoAvoid'] = null;
+            $this->persist();
+
+            return;
+        }
         if ($this->data['present'] !== null) {
             $this->data['past'][] = $this->data['present'];
         }
@@ -61,35 +81,43 @@ class ReadpathUndoService
         $this->persist();
     }
 
+    /**
+     * @return null|string
+     */
     public function getCurrentItem(): ?string
     {
         return $this->data['present'];
     }
 
     /**
-     * @throws \OutOfBoundsException
+     * @return bool
      */
-    public function undo(): void
+    public function undo(): bool
     {
         if (empty($this->data['past'])) {
-            throw new \OutOfBoundsException('nothing to be undone');
+            return false;
         }
         $this->data['future'][] = $this->data['present'];
         $this->data['present'] = array_pop($this->data['past']);
+        $this->data['undoAvoid'] = $this->data['present'];
         $this->persist();
+
+        return true;
     }
 
     /**
-     * @throws \OutOfBoundsException
+     * @return bool
      */
-    public function redo(): void
+    public function redo(): bool
     {
         if (empty($this->data['future'])) {
-            throw new \OutOfBoundsException('nothing to be redone');
+            return false;
         }
         $this->data['past'][] = $this->data['present'];
         $this->data['present'] = array_pop($this->data['future']);
         $this->persist();
+
+        return true;
     }
 
     private function persist(): void

@@ -7,7 +7,7 @@
         e.preventDefault();
     }
 
-    function submitPaywall() {
+    function submitPaywall(e) {
         var modalPaywall = document.querySelector('#modalPaywall'),
             url = modalPaywall.dataset.url,
             httpRequest = new XMLHttpRequest();
@@ -53,47 +53,4 @@
 
     initCloser();
     paywall();
-
-    /**$('.hitches a').click(function () {
-        var el = $(this);
-        $('#modalPaywall').find('.btn-primary').attr('data-url', el.data('url'));
-        $('#modalPaywall').modal('show');
-        return false;
-    });
-
-    $('#modalPaywall .btn-primary').click(function (event) {
-        var button = event.target,
-            url = $(button).attr('data-url'),
-            data = {};
-
-        $.getJSON(url, data, function (data, textStatus, jqXHR) {
-            window.location = data['url'];
-        });
-    });*/
-
-
-    /**var modal = document.querySelector('.modal'),
-        closeButtons = document.querySelectorAll('.close-modal');
-
-    // set open modal behaviour
-    document.querySelector('.open-modal').addEventListener('click', function () {
-        modal.classList.toggle('modal-open');
-    });
-
-    // set close modal behaviour
-    for (i = 0; i < closeButtons.length; ++i) {
-        closeButtons[i].addEventListener('click', function () {
-            modal.classList.toggle('modal-open');
-        });
-    }
-
-    // close modal if clicked outside content area
-    document.querySelector('.modal-inner').addEventListener('click', function () {
-        modal.classList.toggle('modal-open');
-    });
-
-    // prevent modal inner from closing parent when clicked
-    document.querySelector('.modal-content').addEventListener('click', function (e) {
-        e.stopPropagation();
-    });*/
 })();

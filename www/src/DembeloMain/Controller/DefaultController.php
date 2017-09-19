@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /* Copyright (C) 2015-2017 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -31,6 +33,7 @@ use DembeloMain\Model\FeatureToggle;
 use DembeloMain\Model\Readpath;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use DembeloMain\Model\Repository\UserRepositoryInterface;
+use DembeloMain\Service\ReadpathUndoService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -88,10 +91,28 @@ class DefaultController extends Controller
     private $readpath;
 
     /**
+     * @var ReadpathUndoService
+     */
+    private $readpathUndoService;
+
+    /**
      * @var FavoriteManager
      */
     private $favoriteManager;
 
+    /**
+     * DefaultController constructor.
+     * @param FeatureToggle $featureToggle
+     * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param UserRepositoryInterface $userRepository
+     * @param TextNodeRepositoryInterface $textNodeRepository
+     * @param Templating $templating
+     * @param Router $router
+     * @param TokenStorage $tokenStorage
+     * @param Readpath $readpath
+     * @param FavoriteManager $favoriteManager
+     * @param ReadpathUndoService $readpathUndoService
+     */
     public function __construct(
         FeatureToggle $featureToggle,
         AuthorizationCheckerInterface $authorizationChecker,
@@ -101,7 +122,8 @@ class DefaultController extends Controller
         Router $router,
         TokenStorage $tokenStorage,
         Readpath $readpath,
-        FavoriteManager $favoriteManager
+        FavoriteManager $favoriteManager,
+        ReadpathUndoService $readpathUndoService
     ) {
         $this->featureToggle = $featureToggle;
         $this->authorizationChecker = $authorizationChecker;
@@ -112,6 +134,7 @@ class DefaultController extends Controller
         $this->tokenStorage = $tokenStorage;
         $this->readpath = $readpath;
         $this->favoriteManager = $favoriteManager;
+        $this->readpathUndoService = $readpathUndoService;
     }
 
     /**
@@ -149,26 +172,6 @@ class DefaultController extends Controller
         return $this->redirectToRoute('text', array('textnodeArbitraryId' => $textnode->getArbitraryId()));
     }
 
-    protected function redirectToRoute($route, array $parameters = array(), $status = 302): RedirectResponse
-    {
-        $url = $this->router->generate($route, $parameters);
-        return new RedirectResponse($url, $status);
-    }
-
-    protected function getUser(): ?User
-    {
-        if (null === $token = $this->tokenStorage->getToken()) {
-            return null;
-        }
-
-        if (!is_object($user = $token->getUser())) {
-            // e.g. anonymous authentication
-            return null;
-        }
-
-        return $user;
-    }
-
     /**
      * @Route("/text/{textnodeArbitraryId}", name="text")
      *
@@ -185,7 +188,7 @@ class DefaultController extends Controller
         $textnode = $this->textnodeRepository->findOneActiveByArbitraryId($textnodeArbitraryId);
 
         if (is_null($textnode)) {
-            throw $this->createNotFoundException('No Textnode with arbitrary ID \''.$textnode->getArbitraryId().'\' found.');
+            throw $this->createNotFoundException('No Textnode with arbitrary ID \''.$textnodeArbitraryId.'\' found.');
         }
 
         if ($textnode->isFinanceNode()) {
@@ -196,6 +199,7 @@ class DefaultController extends Controller
 
         $this->readpath->storeReadPath($textnode, $user);
         $this->favoriteManager->setFavorite($textnode, $user);
+        $this->readpathUndoService->add($textnode->getId());
 
         if ($user instanceof User) {
             $this->userRepository->save($user);
@@ -206,6 +210,9 @@ class DefaultController extends Controller
         for ($i = 0; $i < $textnode->getHitchCount(); ++$i) {
             $hitch = $textnode->getHitch($i);
             $hitchedTextnode = $this->getTextnodeForTextnodeId($hitch['textnodeId']);
+            if (null === $hitchedTextnode) {
+                continue;
+            }
             $hitches[] = [
                 'index' => $i,
                 'description' => $hitch['description'],
@@ -235,14 +242,11 @@ class DefaultController extends Controller
     {
         $hitchedTextnode = $this->getTextnodeForHitchIndex($textnodeId, $hitchIndex);
 
-        $output = array(
-            'url' => $this->generateUrl(
-                'text',
-                array(
-                    'textnodeArbitraryId' => $hitchedTextnode->getArbitraryId(),
-                )
-            ),
-        );
+        $url = $this->router->generate('text', ['textnodeArbitraryId' => $hitchedTextnode->getArbitraryId()]);
+
+        $output = [
+            'url' => $url,
+        ];
 
         return new Response(\json_encode($output));
     }
@@ -254,14 +258,14 @@ class DefaultController extends Controller
      */
     public function backAction()
     {
-        // get current textnode from readpath
-        $readpath = $this->get('app.readpath');
-        $currentTextnode = $readpath->getCurrentTextnode();
-        //$readpath->
-        // if current textnode === access node => get other access node
-        // if current textnode !== access node => get previous node
-        $textnode = '';
-        return $this->redirectToRoute('text', array('textnodeArbitraryId' => $textnode->getArbitraryId()));
+        $this->readpathUndoService->undo();
+        $currentTextnodeId = $this->readpathUndoService->getCurrentItem();
+        $textnode = $this->textnodeRepository->find($currentTextnodeId);
+
+        return $this->redirectToRoute(
+            'text',
+            array('textnodeArbitraryId' => $textnode->getArbitraryId())
+        );
     }
 
     /**
@@ -274,7 +278,28 @@ class DefaultController extends Controller
         return $this->templating->renderResponse('DembeloMain::default/imprint.html.twig');
     }
 
-    private function getTextnodeForHitchIndex($textnodeId, $hitchIndex): Textnode
+    protected function redirectToRoute($route, array $parameters = array(), $status = 302): RedirectResponse
+    {
+        $url = $this->router->generate($route, $parameters);
+
+        return new RedirectResponse($url, $status);
+    }
+
+    protected function getUser(): ?User
+    {
+        if (null === $token = $this->tokenStorage->getToken()) {
+            return null;
+        }
+
+        if (!is_object($user = $token->getUser())) {
+            // e.g. anonymous authentication
+            return null;
+        }
+
+        return $user;
+    }
+
+    private function getTextnodeForHitchIndex($textnodeId, $hitchIndex): ?Textnode
     {
         $textnode = $this->textnodeRepository->findOneActiveById($textnodeId);
 
@@ -287,7 +312,7 @@ class DefaultController extends Controller
         return $this->getTextnodeForTextnodeId($hitch['textnodeId']);
     }
 
-    private function getTextnodeForTextnodeId($textnodeId): Textnode
+    private function getTextnodeForTextnodeId($textnodeId): ?Textnode
     {
         $linkedTextnode = $this->textnodeRepository->findOneActiveById($textnodeId);
 

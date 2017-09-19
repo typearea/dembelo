@@ -30,7 +30,10 @@ use DembeloMain\Model\Repository\ReadPathRepositoryInterface;
  */
 class ReadPathRepository extends AbstractRepository implements ReadPathRepositoryInterface
 {
-
+    /**
+     * @param User $user
+     * @return null|string
+     */
     public function getCurrentTextnodeIdForUser(User $user): ?string
     {
         $criteria = ['userId' => new \MongoId($user->getId())];
@@ -42,6 +45,7 @@ class ReadPathRepository extends AbstractRepository implements ReadPathRepositor
         if (empty($readpath)) {
             return null;
         }
+
         return $readpath[0]->getTextnodeId();
     }
 }

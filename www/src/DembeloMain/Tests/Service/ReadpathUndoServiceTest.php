@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace DembeloMain\Tests\Service;
 
@@ -38,6 +38,9 @@ class ReadpathUndoServiceTest extends WebTestCase
 
     private $session;
 
+    /**
+     * @inheritdoc
+     */
     public function setUp(): void
     {
         parent::setUp();
@@ -45,12 +48,18 @@ class ReadpathUndoServiceTest extends WebTestCase
         $this->undoStack = new ReadpathUndoService($this->session);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function tearDown(): void
     {
         parent::tearDown();
         $this->undoStack = null;
     }
 
+    /**
+     * tests add() to return same value with getCurrentItem()
+     */
     public function testAddAnItemWillReturnThisAsCurrentItem(): void
     {
         $item = 'someItem';
@@ -59,6 +68,7 @@ class ReadpathUndoServiceTest extends WebTestCase
     }
 
     /**
+     * tests add() throwing a typeError
      * @expectedException \TypeError
      */
     public function testAddAnIntegerWillThrowTypeError(): void
@@ -66,11 +76,17 @@ class ReadpathUndoServiceTest extends WebTestCase
         $this->undoStack->add(123);
     }
 
+    /**
+     * tests getCurrentItem with no current item
+     */
     public function testGetCurrentWithNoCurrentItem(): void
     {
         self::assertNull($this->undoStack->getCurrentItem());
     }
 
+    /**
+     * tests get current
+     */
     public function testGetCurrent(): void
     {
         $this->undoStack->add('first');
@@ -79,51 +95,56 @@ class ReadpathUndoServiceTest extends WebTestCase
         self::assertEquals('second', $this->undoStack->getCurrentItem());
     }
 
+    /**
+     * tests undo
+     */
     public function testUndo(): void
     {
         $this->undoStack->add('first');
         $this->undoStack->add('second');
-        $this->undoStack->undo();
+        self::assertTrue($this->undoStack->undo());
         self::assertEquals('first', $this->undoStack->getCurrentItem());
     }
 
     /**
-     * @expectedException \OutOfBoundsException
+     * tests undo() to return false when nothing can be undone
      */
-    public function testUndoThrowsExceptionWhenNothingCanBeUndone(): void
+    public function testUndoReturnsFalseWhenNothingCanBeUndone(): void
     {
-        $this->undoStack->undo();
+        self::assertFalse($this->undoStack->undo());
     }
 
     /**
-     * @expectedException \OutOfBoundsException
+     * tests undo() to return false when past stack is still empty
      */
-    public function testUndoThrowsExceptionWhenPastStackIsStillEmpty(): void
+    public function testUndoReturnsFalseWhenPastStackIsStillEmpty(): void
     {
         $this->undoStack->add('first');
-        $this->undoStack->undo();
+        self::assertFalse($this->undoStack->undo());
     }
 
     /**
-     * @expectedException \OutOfBoundsException
+     * tests redo() to return false when nothing can be undone
      */
-    public function testRedoThrowsExceptionWhenNothingCanBeRedone(): void
+    public function testRedoReturnFalseWhenNothingCanBeRedone(): void
     {
-        $this->undoStack->redo();
+        self::assertFalse($this->undoStack->redo());
     }
 
+    /**
+     * tests redo()
+     */
     public function testRedo(): void
     {
         $this->undoStack->add('first');
         $this->undoStack->add('second');
-        $this->undoStack->undo();
-        $this->undoStack->redo();
+        self::assertTrue($this->undoStack->undo());
+        self::assertTrue($this->undoStack->redo());
         self::assertEquals('second', $this->undoStack->getCurrentItem());
-
     }
 
     /**
-     * @expectedException \OutOfBoundsException
+     * tests add(), removing future values
      */
     public function testAddRemovingFutureValues(): void
     {
@@ -131,14 +152,43 @@ class ReadpathUndoServiceTest extends WebTestCase
         self::assertEquals('first', $this->undoStack->getCurrentItem());
         $this->undoStack->add('second');
         self::assertEquals('second', $this->undoStack->getCurrentItem());
-        $this->undoStack->undo();
+        self::assertTrue($this->undoStack->undo());
         self::assertEquals('first', $this->undoStack->getCurrentItem());
         $this->undoStack->add('third');
         self::assertEquals('third', $this->undoStack->getCurrentItem());
-        $this->undoStack->redo();
-
+        self::assertFalse($this->undoStack->redo());
     }
 
+    /**
+     * tests the ignoring of add() after an undo
+     */
+    public function testIgnoreAddAfterUndo(): void
+    {
+        $this->undoStack->add('first');
+        $this->undoStack->add('second');
+        $this->undoStack->add('third');
+        self::assertTrue($this->undoStack->undo());
+        self::assertEquals('second', $this->undoStack->getCurrentItem());
+        $this->undoStack->add('second');
+        self::assertTrue($this->undoStack->undo());
+        self::assertEquals('first', $this->undoStack->getCurrentItem());
+    }
+
+    /**
+     * tests duplicate entries avoiding
+     */
+    public function testAvoidDuplicateEntries(): void
+    {
+        $this->undoStack->add('first');
+        $this->undoStack->add('second');
+        $this->undoStack->add('second');
+        self::assertTrue($this->undoStack->undo());
+        self::assertSame('first', $this->undoStack->getCurrentItem());
+    }
+
+    /**
+     * tests a complex sequence
+     */
     public function testAComplexSequence(): void
     {
         $this->undoStack->add('first');
@@ -147,20 +197,23 @@ class ReadpathUndoServiceTest extends WebTestCase
         self::assertEquals('second', $this->undoStack->getCurrentItem());
         $this->undoStack->add('third');
         self::assertEquals('third', $this->undoStack->getCurrentItem());
-        $this->undoStack->undo();
+        self::assertTrue($this->undoStack->undo());
         self::assertEquals('second', $this->undoStack->getCurrentItem());
-        $this->undoStack->undo();
+        self::assertTrue($this->undoStack->undo());
         self::assertEquals('first', $this->undoStack->getCurrentItem());
-        $this->undoStack->redo();
+        self::assertTrue($this->undoStack->redo());
         self::assertEquals('second', $this->undoStack->getCurrentItem());
-        $this->undoStack->redo();
+        self::assertTrue($this->undoStack->redo());
         self::assertEquals('third', $this->undoStack->getCurrentItem());
-        $this->undoStack->undo();
+        self::assertTrue($this->undoStack->undo());
         self::assertEquals('second', $this->undoStack->getCurrentItem());
         $this->undoStack->add('fourth');
         self::assertEquals('fourth', $this->undoStack->getCurrentItem());
     }
 
+    /**
+     * tests add() from session
+     */
     public function testAddFromSession(): void
     {
         $this->undoStack->add('first');

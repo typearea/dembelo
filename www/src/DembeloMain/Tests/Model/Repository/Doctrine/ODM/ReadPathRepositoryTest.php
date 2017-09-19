@@ -19,9 +19,11 @@
  */
 
 namespace DembeloMain\Tests\Model\Repository\Doctrine\ODM;
+
 use DembeloMain\Document\Textnode;
 use DembeloMain\Document\User;
 use DembeloMain\Document\Readpath;
+use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
 
 /**
  * Class ReadPathRepositoryTest
@@ -42,7 +44,7 @@ class ReadPathRepositoryTest extends AbstractRepositoryTest
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         self::bootKernel();
 
@@ -60,7 +62,10 @@ class ReadPathRepositoryTest extends AbstractRepositoryTest
         $this->repository = $this->em->getRepository('DembeloMain:Readpath');
     }
 
-    public function testGetCurrentTextnodeIdForUserReturnsNullWhenReadpathIsEmpty()
+    /**
+     * tests getCurrentTextnodeId for user returns null when readpath is empty
+     */
+    public function testGetCurrentTextnodeIdForUserReturnsNullWhenReadpathIsEmpty(): void
     {
         $user = $this->createUser();
         $returnValue = $this->repository->getCurrentTextnodeIdForUser($user);
@@ -68,7 +73,10 @@ class ReadPathRepositoryTest extends AbstractRepositoryTest
         $this->assertNull($returnValue);
     }
 
-    public function testGetCurrentTextnodeIdForUserReturnsTextnodeId()
+    /**
+     * tests getCurrentTextnodeId for user returning textnodeId
+     */
+    public function testGetCurrentTextnodeIdForUserReturnsTextnodeId(): void
     {
         $user1 = $this->createUser();
         $user2 = $this->createUser();
@@ -99,7 +107,7 @@ class ReadPathRepositoryTest extends AbstractRepositoryTest
         $this->assertEquals($textnode2->getId(), $returnValue);
     }
 
-    private function createUser()
+    private function createUser(): User
     {
         $user = new User();
         $this->em->getRepository('DembeloMain:User')->save($user);
@@ -107,7 +115,7 @@ class ReadPathRepositoryTest extends AbstractRepositoryTest
         return $user;
     }
 
-    private function createTextnode($arbitraryId)
+    private function createTextnode($arbitraryId): Textnode
     {
         $textnode = new Textnode();
         $textnode->setArbitraryId($arbitraryId);

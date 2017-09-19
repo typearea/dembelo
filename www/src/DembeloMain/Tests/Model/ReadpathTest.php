@@ -37,6 +37,9 @@ class ReadpathTest extends WebTestCase
     /* @var Session */
     private $session;
 
+    /**
+     * @inheritdoc
+     */
     public function setUp()
     {
         $this->session = new Session(new MockArraySessionStorage());
@@ -104,6 +107,9 @@ class ReadpathTest extends WebTestCase
         $this->assertFalse($this->session->has('readpath'));
     }
 
+    /**
+     * tests getCurrentTextnodeId() for Session without readpath
+     */
     public function testGetCurrentTextnodeIdForSessionWithoutReadpath()
     {
         $readpathRepositoryMock = $this->getReadpathRepositoryMock();
@@ -112,6 +118,9 @@ class ReadpathTest extends WebTestCase
         $this->assertNull($returnValue);
     }
 
+    /**
+     * tests getCurrentTextnodeId for session with readpath
+     */
     public function testGetCurrentTextnodeIdForSessionWithReadpath()
     {
         $readpathRepositoryMock = $this->getReadpathRepositoryMock();
@@ -122,6 +131,9 @@ class ReadpathTest extends WebTestCase
         $this->assertEquals('id1', $returnValue);
     }
 
+    /**
+     * tests getCurrentTextnodeId for session with multiple readpath
+     */
     public function testGetCurrentTextnodeIdForSessionWithMultipleReadpath()
     {
         $readpathRepositoryMock = $this->getReadpathRepositoryMock();
@@ -132,6 +144,9 @@ class ReadpathTest extends WebTestCase
         $this->assertEquals('id2', $returnValue);
     }
 
+    /**
+     * tests getCurrentTextnodeId for usser without readpath
+     */
     public function testGetCurrentTextnodeIdForUserWithoutReadpath()
     {
         $userMockId = 'userId';
@@ -151,6 +166,9 @@ class ReadpathTest extends WebTestCase
         $this->assertNull($returnValue);
     }
 
+    /**
+     * testts getCurrentTextnodeId for user with readpath
+     */
     public function testGetCurrentTextnodeIdForUserWithReadpath()
     {
         $userMockId = 'userId';
