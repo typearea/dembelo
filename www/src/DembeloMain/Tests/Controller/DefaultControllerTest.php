@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-/* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
+/* Copyright (C) 2015-2017 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
  *
@@ -297,13 +297,14 @@ class DefaultControllerTest extends WebTestCase
     /**
      * tests back action
      */
-    public function testBackAction(): void
+    public function testBackActionSuccess(): void
     {
         $textnode = new Textnode();
         $textnode->setArbitraryId('someArbitraryId');
 
         $this->readpathUndoServiceMock->expects(self::once())
-            ->method('undo');
+            ->method('undo')
+            ->willReturn(true);
         $this->readpathUndoServiceMock->expects(self::once())
             ->method('getCurrentItem')
             ->willReturn(5);
@@ -316,6 +317,28 @@ class DefaultControllerTest extends WebTestCase
             ->with('text', ['textnodeArbitraryId' => 'someArbitraryId'])
             ->willReturn('someUrl');
 
+        $result = $this->controller->backAction();
+        self::assertInstanceOf(RedirectResponse::class, $result);
+        self::assertSame('someUrl', $result->getTargetUrl());
+    }
+
+    /**
+     * tests back action when undo() ist not successful
+     */
+    public function testBackActionUnsuccessful(): void
+    {
+        $textnode = new Textnode();
+        $textnode->setArbitraryId('someArbitraryId');
+
+        $this->readpathUndoServiceMock->expects(self::once())
+            ->method('undo')
+            ->willReturn(false);
+        $this->readpathUndoServiceMock->expects(self::never())
+            ->method('getCurrentItem');
+        $this->routerMock->expects(self::once())
+            ->method('generate')
+            ->with('mainpage')
+            ->willReturn('someUrl');
 
         $result = $this->controller->backAction();
         self::assertInstanceOf(RedirectResponse::class, $result);

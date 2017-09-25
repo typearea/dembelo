@@ -155,7 +155,7 @@ class DefaultController extends Controller
 
         $textnode = $this->textnodeRepository->getTextnodeToRead($topicId);
 
-        if (is_null($textnode)) {
+        if (null === $textnode) {
             throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found.');
         }
 
@@ -187,7 +187,7 @@ class DefaultController extends Controller
 
         $textnode = $this->textnodeRepository->findOneActiveByArbitraryId($textnodeArbitraryId);
 
-        if (is_null($textnode)) {
+        if (null === $textnode) {
             throw $this->createNotFoundException('No Textnode with arbitrary ID \''.$textnodeArbitraryId.'\' found.');
         }
 
@@ -258,7 +258,10 @@ class DefaultController extends Controller
      */
     public function backAction()
     {
-        $this->readpathUndoService->undo();
+        if (!$this->readpathUndoService->undo()) {
+            $topicId = $this->getUser()->getLastTopicId();
+            return $this->redirectToRoute('themenfeld', ['topicId' => $topicId]);
+        }
         $currentTextnodeId = $this->readpathUndoService->getCurrentItem();
         $textnode = $this->textnodeRepository->find($currentTextnodeId);
 
@@ -303,7 +306,7 @@ class DefaultController extends Controller
     {
         $textnode = $this->textnodeRepository->findOneActiveById($textnodeId);
 
-        if (is_null($textnode)) {
+        if (null === $textnode) {
             throw $this->createNotFoundException('No Textnode with ID \''.$textnodeId.'\' found.');
         }
 
@@ -314,8 +317,6 @@ class DefaultController extends Controller
 
     private function getTextnodeForTextnodeId($textnodeId): ?Textnode
     {
-        $linkedTextnode = $this->textnodeRepository->findOneActiveById($textnodeId);
-
-        return $linkedTextnode;
+        return  $this->textnodeRepository->findOneActiveById($textnodeId);
     }
 }
