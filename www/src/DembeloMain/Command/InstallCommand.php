@@ -166,7 +166,7 @@ class InstallCommand extends ContainerAwareCommand
         foreach ($licensees as $licenseeData) {
             $licensee = $repository->findOneByName($licenseeData['name']);
 
-            if (null ===$licensee) {
+            if (null === $licensee) {
                 $licensee = new Licensee();
                 $licensee->setName($licenseeData['name']);
                 $dm->persist($licensee);

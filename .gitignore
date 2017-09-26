@@ -10,7 +10,9 @@ www/web/css/
 www/web/images/
 www/web/js/
 www/uploads/twine/*
+www/uploads/*
 !www/uploads/twine/.gitkeep
+!www/uploads/topicimage/.gitkeep
 tmp
 www/coverage
 

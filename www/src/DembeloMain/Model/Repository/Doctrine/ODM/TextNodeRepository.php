@@ -65,7 +65,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
     /**
      * sets textnodes to status=inactive that are not in $existingTextnodeIds
      * @param Importfile $importfile
-     * @param array $existingTextnodeIds array of textnodeIds
+     * @param array      $existingTextnodeIds array of textnodeIds
      * @throws \Doctrine\ODM\MongoDB\MongoDBException
      */
     public function disableOrphanedNodes(Importfile $importfile, array $existingTextnodeIds)
