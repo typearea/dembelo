@@ -746,6 +746,9 @@ class ImportTwineTest extends WebTestCase
         $this->assertTrue($returnValue);
     }
 
+    /**
+     * tests run() with setting of metadata
+     */
     public function testRunWithMetadataSetting()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();

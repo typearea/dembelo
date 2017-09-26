@@ -27,6 +27,10 @@ use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+/**
+ * Class HitchParserTest
+ * @package AdminBundle\Service\TwineImport
+ */
 class HitchParserTest extends WebTestCase
 {
     /**
@@ -39,6 +43,9 @@ class HitchParserTest extends WebTestCase
      */
     private $textnodeRepositoryMock;
 
+    /**
+     * @inheritdoc
+     */
     public function setUp(): void
     {
         parent::setUp();
@@ -85,6 +92,9 @@ class HitchParserTest extends WebTestCase
         $this->hitchParser->parseDoubleArrowRight($content, $twineName, $name);
     }
 
+    /**
+     * tests parseDoubleArrowRight with a valid textnode id
+     */
     public function testParseDoubleArrowRightWithValidTextnodeIdOnRightPart(): void
     {
         $content = 'description-->textnodeId';
@@ -138,7 +148,7 @@ class HitchParserTest extends WebTestCase
         $name = 'someName';
 
         $mapping = [
-            'invalidKey' => 'textNodeId'
+            'invalidKey' => 'textNodeId',
         ];
 
         $this->hitchParser->setNodeNameMapping($mapping);
@@ -146,13 +156,16 @@ class HitchParserTest extends WebTestCase
         $this->hitchParser->parseSingleArrowRight($content, $name);
     }
 
+    /**
+     * tests singleArrowRight with a valid map name
+     */
     public function testSingleArrowRightWithValidMapName(): void
     {
         $content = 'description->key';
         $name = 'someName';
 
         $mapping = [
-            'key' => 'textnodeId'
+            'key' => 'textnodeId',
         ];
 
         $this->hitchParser->setNodeNameMapping($mapping);
@@ -206,6 +219,9 @@ class HitchParserTest extends WebTestCase
         $this->hitchParser->parseSingleArrowLeft($content, $name);
     }
 
+    /**
+     * tests parseSingleArrowLeft with a valid key
+     */
     public function testParseSingleArrowLeftWithValidKey(): void
     {
         $content = 'mapKey<-description';
@@ -253,6 +269,9 @@ class HitchParserTest extends WebTestCase
         $this->hitchParser->parseSimpleHitch($content, $name);
     }
 
+    /**
+     * tests parseSimpleHitch with a valid key
+     */
     public function testParseSimpleHitchWithValidKey(): void
     {
         $content = 'mapKey';

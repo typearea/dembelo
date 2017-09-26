@@ -19,11 +19,14 @@
 
 namespace AdminBundle\Service\TwineImport;
 
-
 use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use Exception;
 
+/**
+ * Class HitchParser
+ * @package AdminBundle\Service\TwineImport
+ */
 class HitchParser
 {
     /**
@@ -36,16 +39,30 @@ class HitchParser
      */
     private $nodeNameMapping;
 
+    /**
+     * HitchParser constructor.
+     * @param TextNodeRepositoryInterface $textNodeRepository
+     */
     public function __construct(TextNodeRepositoryInterface $textNodeRepository)
     {
         $this->textnodeRepository = $textNodeRepository;
     }
 
+    /**
+     * @param array $nodeNameMapping
+     */
     public function setNodeNameMapping(array $nodeNameMapping): void
     {
         $this->nodeNameMapping = $nodeNameMapping;
     }
 
+    /**
+     * @param string $content
+     * @param string $twineName
+     * @param string $name
+     * @return array
+     * @throws Exception
+     */
     public function parseDoubleArrowRight(string $content, string $twineName, string $name): array
     {
         $contentArray = explode("-->", $content, 2);
@@ -68,6 +85,12 @@ class HitchParser
         return $hitch;
     }
 
+    /**
+     * @param string $content
+     * @param string $name
+     * @return array
+     * @throws Exception
+     */
     public function parseSingleArrowRight(string $content, string $name): array
     {
         $contentArray = explode("->", $content, 2);
@@ -88,6 +111,12 @@ class HitchParser
         return $hitch;
     }
 
+    /**
+     * @param string $content
+     * @param string $name
+     * @return array
+     * @throws Exception
+     */
     public function parseSingleArrowLeft(string $content, string $name): array
     {
         $contentArray = explode("<-", $content, 2);
@@ -108,6 +137,12 @@ class HitchParser
         return $hitch;
     }
 
+    /**
+     * @param string $content
+     * @param string $name
+     * @return array
+     * @throws Exception
+     */
     public function parseSimpleHitch(string $content, string $name): array
     {
         if (strlen($content) <= 0) {

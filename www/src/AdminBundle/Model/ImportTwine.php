@@ -29,9 +29,7 @@ use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use DembeloMain\Model\Repository\TopicRepositoryInterface;
-use Doctrine\ODM\MongoDB\DocumentRepository;
 use Exception;
-use phpDocumentor\Reflection\DocBlock\Tags\Method;
 
 /**
  * Class ImportTwine
@@ -78,6 +76,7 @@ class ImportTwine
      * ImportTwine constructor.
      * @param TextnodeRepositoryInterface $textnodeRepository
      * @param TopicRepositoryInterface    $topicRepository
+     * @param HitchParser                 $hitchParser
      */
     public function __construct(
         TextNodeRepositoryInterface $textnodeRepository,
