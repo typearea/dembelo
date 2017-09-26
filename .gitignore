@@ -11,3 +11,6 @@ www/web/images/
 www/web/js/
 www/uploads/twine/*
 !www/uploads/twine/.gitkeep
+tmp
+www/coverage
+

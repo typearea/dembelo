@@ -221,7 +221,7 @@ class ImportCommandTest extends KernelTestCase
      * @param string $arg
      * @return null|\PHPUnit_Framework_MockObject_MockObject
      */
-    public function findOneByNameCallback($arg): Licensee
+    public function findOneByNameCallback($arg): ?Licensee
     {
         if ($arg === 'somelicensee') {
             $licenseeMock = $this->getMockBuilder('DembeloMain\Document\Licensee')->disableOriginalConstructor()->getMock();

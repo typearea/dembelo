@@ -1,7 +1,7 @@
 /**global: Navigation*/
 var Touch = function () {
     "use strict";
-    
+
     document.addEventListener('touchstart', handleTouchStart, false);
     document.addEventListener('touchmove', handleTouchMove, false);
 

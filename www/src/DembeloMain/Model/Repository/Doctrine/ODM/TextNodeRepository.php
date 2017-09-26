@@ -82,9 +82,9 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
 
     /**
      * @param string $arbitraryId textnode arbitrary id
-     * @return Textnode
+     * @return Textnode|null
      */
-    public function findOneActiveByArbitraryId($arbitraryId): Textnode
+    public function findOneActiveByArbitraryId($arbitraryId): ?Textnode
     {
         return $this->findOneBy(
             array(
