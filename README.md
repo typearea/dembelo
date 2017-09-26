@@ -3,6 +3,8 @@
 
 [![Build Status](https://travis-ci.org/typearea/dembelo.svg?branch=master)](https://travis-ci.org/typearea/dembelo) [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dembelo/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) 
 
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/typearea/dembelo/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/typearea/dembelo/?branch=master) [![Build Status](https://scrutinizer-ci.com/g/typearea/dembelo/badges/build.png?b=master)](https://scrutinizer-ci.com/g/typearea/dembelo/build-status/master) [![Code Coverage](https://scrutinizer-ci.com/g/typearea/dembelo/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/typearea/dembelo/?branch=master)
+
 ## Über Dembelo
 
 Dembelo ist Software für das Eintauchen in neue Unterhaltungsliteratur, welche keine herkömmliche lineare
