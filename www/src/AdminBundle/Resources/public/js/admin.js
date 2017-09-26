@@ -16,7 +16,7 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*global paths*/
+/** global: webix,paths,XMLHttpRequest*/
 
 define(function () {
     function showError(msg) {
@@ -345,7 +345,7 @@ define(function () {
                                                                 datatype: "json",
                                                                 columns: [
                                                                     {id: 'email', header: ['Email', {content: 'serverFilter'}], fillspace: true},
-                                                                    {id: 'status', header: ['Status', {content: 'serverSelectFilter'}], format: function (value) { if (value === 0) return 'inaktiv'; else return 'aktiv';}},
+                                                                    {id: 'status', header: ['Status', {content: 'serverSelectFilter'}], format: function (value) { if (value === 0) { return 'inaktiv'; } else { return 'aktiv'; }}},
                                                                     {id: 'roles', header: 'Rolle', format:function(value){ switch(value){case 'ROLE_ADMIN': return 'Admin';case 'ROLE_LICENSEE': return 'Lizenznehmer';} return 'Leser';}}
                                                                 ]
                                                             }

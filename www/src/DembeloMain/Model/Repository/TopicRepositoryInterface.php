@@ -45,8 +45,8 @@ interface TopicRepositoryInterface
     /**
      * @param array      $criteria
      * @param array|null $sort
-     * @param null       $limit
-     * @param null       $skip
+     * @param integer    $limit
+     * @param integer    $skip
      * @return Topic[]
      */
     public function findBy(array $criteria, array $sort = null, $limit = null, $skip = null);

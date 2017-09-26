@@ -42,11 +42,12 @@ class DefaultController extends Controller
      * @param string $topicId Topic ID from URL
      *
      * @return string
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @throws \LogicException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
     public function readTopicAction($topicId)
     {
-        $textnodes = null;
-
         if ($this->container->get('app.feature_toggle')->hasFeature('login_needed') && !$this->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('login_route');
         }

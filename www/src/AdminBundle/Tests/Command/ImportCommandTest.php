@@ -45,6 +45,8 @@ function file_exists($filename)
 
 namespace AdminBundle\Tests\Command;
 
+use DembeloMain\Document\Licensee;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use AdminBundle\Command\ImportCommand;
@@ -57,11 +59,25 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class ImportCommandTest extends KernelTestCase
 {
+    /**
+     * @var array
+     */
     private $mockObjects;
+
+    /**
+     * @var ContainerAwareCommand
+     */
     private $command;
+
+    /**
+     * @var CommandTester
+     */
     private $commandTester;
 
-    protected function setUp()
+    /**
+     * @inheritdoc
+     */
+    protected function setUp(): void
     {
         self::bootKernel();
         $application = new Application(self::$kernel);
@@ -75,7 +91,7 @@ class ImportCommandTest extends KernelTestCase
     /**
      * tests the execute method
      */
-    public function testExecute()
+    public function testExecute(): void
     {
         $this->mockObjects['importTwine']->expects($this->once())
             ->method('run')
@@ -103,7 +119,7 @@ class ImportCommandTest extends KernelTestCase
     /**
      * tests execute method with unreadable file
      */
-    public function testExecuteWithUnreadableFile()
+    public function testExecuteWithUnreadableFile(): void
     {
         $this->mockObjects['importTwine']->expects($this->never())
             ->method('run');
@@ -125,7 +141,7 @@ class ImportCommandTest extends KernelTestCase
     /**
      * tests execute() method with non existing file
      */
-    public function testExecuteWithFileNotExisting()
+    public function testExecuteWithFileNotExisting(): void
     {
         $this->mockObjects['importTwine']->expects($this->never())
             ->method('run');
@@ -147,7 +163,7 @@ class ImportCommandTest extends KernelTestCase
     /**
      * tests execute() method with exception thrown by importTwine
      */
-    public function testExecuteWithExeptionInImportTwine()
+    public function testExecuteWithExeptionInImportTwine(): void
     {
         $this->mockObjects['importTwine']->expects($this->once())
             ->method('run')
@@ -177,9 +193,9 @@ class ImportCommandTest extends KernelTestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Exception
      */
-    public function testExecuteWithLicenseeNotFound()
+    public function testExecuteWithLicenseeNotFound(): void
     {
         $this->mockObjects['importTwine']->expects($this->never())
             ->method('run');
@@ -205,7 +221,7 @@ class ImportCommandTest extends KernelTestCase
      * @param string $arg
      * @return null|\PHPUnit_Framework_MockObject_MockObject
      */
-    public function findOneByNameCallback($arg)
+    public function findOneByNameCallback($arg): ?Licensee
     {
         if ($arg === 'somelicensee') {
             $licenseeMock = $this->getMockBuilder('DembeloMain\Document\Licensee')->disableOriginalConstructor()->getMock();
@@ -219,7 +235,10 @@ class ImportCommandTest extends KernelTestCase
         return null;
     }
 
-    private function getMockObjects()
+    /**
+     * @return array
+     */
+    private function getMockObjects(): array
     {
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
 

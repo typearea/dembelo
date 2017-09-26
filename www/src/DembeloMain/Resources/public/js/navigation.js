@@ -1,4 +1,6 @@
+/**global: Toolbar*/
 var Navigation = function () {
+    "use strict";
     var isVisible = false;
     var navigationElement = document.getElementById('navigation');
     var toggleElement = document.getElementById('menu-icon');

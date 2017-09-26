@@ -36,6 +36,7 @@ class Story
     const STATUS_ACTIVE = 1;
 
     /**
+     * @var string
      * @MongoDB\Id
      */
     protected $id;
@@ -46,11 +47,13 @@ class Story
     protected $name;
 
     /**
+     * @var string
      * @MongoDB\ObjectId
      */
     protected $topicId;
 
     /**
+     * @var int
      * @MongoDB\Field(type="int")
      */
     protected $status;
@@ -64,7 +67,7 @@ class Story
     }
 
     /**
-     * @param mixed $id
+     * @param string $id
      */
     public function setId($id)
     {
@@ -72,7 +75,7 @@ class Story
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName()
     {
@@ -80,9 +83,9 @@ class Story
     }
 
     /**
-     * @param mixed $name
+     * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -104,17 +107,17 @@ class Story
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
 
     /**
-     * @param mixed $status
+     * @param int $status
      */
-    public function setStatus($status)
+    public function setStatus(int $status)
     {
         $this->status = $status;
     }
