@@ -283,13 +283,15 @@ class DefaultController extends Controller
 
         /* @var $user \DembeloMain\Document\User */
         $user = $repository->find($userId);
+        if (null === $user) {
+            return new Response(\json_encode(['error' => false]));
+        }
         $user->setActivationHash(sha1($user->getEmail().$user->getPassword().\time()));
 
         $dm->persist($user);
         $dm->flush();
 
-        $message = \Swift_Message::newInstance()
-            ->setSubject('waszulesen - Bestätigung der Email-Adresse')
+        $message = (new \Swift_Message('waszulesen - Bestätigung der Email-Adresse'))
             ->setFrom('system@waszulesen.de')
             ->setTo($user->getEmail())
             ->setBody(

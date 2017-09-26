@@ -1,15 +1,20 @@
-require.config({
-    baseUrl: "/bundles/admin/js/"
-});
+/** global: webix */
+(function () {
+    "use strict";
 
-require(["admin"], function (dembeloAdmin) {
+    require.config({
+        baseUrl: "/bundles/admin/js/"
+    });
 
-    webix.attachEvent("onBeforeAjax",
-        function(mode, url, data, request, headers){
-            headers["X-Requested-With"] = "XMLHttpRequest";
-        }
-    );
-    webix.ui(dembeloAdmin.getUiJson());
+    require(["admin"], function (dembeloAdmin) {
 
-    dembeloAdmin.init();
-});
+        webix.attachEvent("onBeforeAjax",
+            function (mode, url, data, request, headers) {
+                headers["X-Requested-With"] = "XMLHttpRequest";
+            }
+        );
+        webix.ui(dembeloAdmin.getUiJson());
+
+        dembeloAdmin.init();
+    });
+})();

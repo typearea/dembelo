@@ -29,6 +29,7 @@ use Hyphenator\Core as Hyphenator;
 /**
  * Class TextNodeRepository
  * @package DembeloMain\Model\Repository\Doctrine\ODM
+ * @method findOneBy(array $where): Textnode
  */
 class TextNodeRepository extends AbstractRepository implements TextNodeRepositoryInterface
 {
@@ -64,7 +65,8 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
     /**
      * sets textnodes to status=inactive that are not in $existingTextnodeIds
      * @param Importfile $importfile
-     * @param array      $existingTextnodeIds array of textnodeIds
+     * @param array $existingTextnodeIds array of textnodeIds
+     * @throws \Doctrine\ODM\MongoDB\MongoDBException
      */
     public function disableOrphanedNodes(Importfile $importfile, array $existingTextnodeIds)
     {
@@ -82,7 +84,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
      * @param string $arbitraryId textnode arbitrary id
      * @return Textnode
      */
-    public function findOneActiveByArbitraryId($arbitraryId)
+    public function findOneActiveByArbitraryId($arbitraryId): Textnode
     {
         return $this->findOneBy(
             array(
@@ -125,9 +127,9 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
      *
      * @param string $topicId
      *
-     * @return Textnode
+     * @return Textnode|null
      */
-    public function getTextnodeToRead($topicId)
+    public function getTextnodeToRead($topicId): ?Textnode
     {
         return $this->createQueryBuilder()
             ->field('topicId')->equals(new \MongoId($topicId))
@@ -142,7 +144,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
     protected function beforeSave($object)
     {
         parent::beforeSave($object);
-        if (is_null($object->getArbitraryId())) {
+        if (null === $object->getArbitraryId()) {
             $object->setArbitraryId($this->createArbitraryId($object));
         }
     }
@@ -152,7 +154,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
      *
      * @return string
      */
-    private function createArbitraryId($object)
+    private function createArbitraryId(Textnode $object): string
     {
         $id = substr(md5(time().$object->getTwineId().substr($object->getText(), 0, 100)), 0, 15);
         $exists = count($this->findBy(array('arbitraryId' => $id))) > 0;

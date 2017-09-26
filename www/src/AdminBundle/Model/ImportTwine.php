@@ -460,7 +460,6 @@ class ImportTwine
                         }
 
                         if (array_key_exists($content[0], $this->nodeNameMapping) !== true) {
-                            var_dump($this->nodeNameMapping);
                             throw new Exception("There is a textnode in the Twine archive file which references another textnode named '".$content[0]."', but this textnode doesn't exist within the same story.");
                         }
 
