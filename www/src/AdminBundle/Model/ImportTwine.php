@@ -24,13 +24,12 @@
 
 namespace AdminBundle\Model;
 
+use AdminBundle\Service\TwineImport\HitchParser;
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use DembeloMain\Model\Repository\TopicRepositoryInterface;
-use Doctrine\ODM\MongoDB\DocumentRepository;
 use Exception;
-use phpDocumentor\Reflection\DocBlock\Tags\Method;
 
 /**
  * Class ImportTwine
@@ -71,15 +70,22 @@ class ImportTwine
 
     private $textnodeMapping;
 
+    private $hitchParser;
+
     /**
      * ImportTwine constructor.
      * @param TextnodeRepositoryInterface $textnodeRepository
      * @param TopicRepositoryInterface    $topicRepository
+     * @param HitchParser                 $hitchParser
      */
-    public function __construct(TextNodeRepositoryInterface $textnodeRepository, TopicRepositoryInterface $topicRepository)
-    {
+    public function __construct(
+        TextNodeRepositoryInterface $textnodeRepository,
+        TopicRepositoryInterface $topicRepository,
+        HitchParser $hitchParser
+    ) {
         $this->textnodeRepository = $textnodeRepository;
         $this->topicRepository = $topicRepository;
+        $this->hitchParser = $hitchParser;
     }
 
     /**
@@ -93,7 +99,7 @@ class ImportTwine
     {
         $this->importfile = $importfile;
 
-        if (is_null($this->importfile->getLicenseeId())) {
+        if (null === $this->importfile->getLicenseeId()) {
             throw new Exception('no licensee available');
         }
 
@@ -126,14 +132,14 @@ class ImportTwine
 
     private function extractTwineFile(): string
     {
-        if (is_null($this->importfile->getFilename())) {
+        if (null === $this->importfile->getFilename()) {
             throw new Exception('no filename available');
         }
 
-        $extractedFile = $this->importfile->getFilename().'.extracted';
+        $extractedFilename = $this->importfile->getFilename().'.extracted';
 
         $fileHandle = fopen($this->importfile->getFilename(), 'r');
-        $extractedFileHandle = fopen($extractedFile, 'w');
+        $extractedFileHandle = fopen($extractedFilename, 'w');
         if ($fileHandle === false) {
             throw new Exception("Failed to read data from file '".$this->importfile->getFilename()."'.");
         }
@@ -157,7 +163,7 @@ class ImportTwine
         fclose($fileHandle);
         fclose($extractedFileHandle);
 
-        return $extractedFile;
+        return $extractedFilename;
     }
 
     private function checkTwineFile($fileHandler): bool
@@ -204,7 +210,7 @@ class ImportTwine
         throw new Exception("File '".$this->importfile->getFilename()."' doesn't seem to be a Twine archive file.");
     }
 
-    private function initParser($fileHandler): bool
+    private function setXmlHandler(): void
     {
         xml_parser_set_option($this->xmlParser, XML_OPTION_CASE_FOLDING, 0);
 
@@ -215,14 +221,33 @@ class ImportTwine
         if (xml_set_character_data_handler($this->xmlParser, array($this, "characterData")) !== true) {
             throw new Exception("Couldn't register character data event handler for the XML parser.");
         }
+    }
 
-        /** @todo This should be part of the Twine export. */
+    private function parseEnvelopeHeader(): void
+    {
         if (xml_parse($this->xmlParser, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<tw-archive>\n", false) !== 1) {
             $errorCode = xml_get_error_code($this->xmlParser);
             $errorDescription = xml_error_string($errorCode);
 
             throw new Exception("Error #".$errorCode.": '".$errorDescription."' occurred while the envelope head for the Twine archive was parsed.");
         }
+    }
+
+    private function parseEnvelopeFooter(): void
+    {
+        if (xml_parse($this->xmlParser, "\n</tw-archive>\n", true) !== 1) {
+            $errorCode = xml_get_error_code($this->xmlParser);
+            $errorDescription = xml_error_string($errorCode);
+
+            throw new Exception("Error #".$errorCode.": '".$errorDescription."' occurred while the envelope foot for the Twine archive was parsed.");
+        }
+    }
+
+    private function initParser($fileHandler)
+    {
+        $this->setXmlHandler();
+
+        $this->parseEnvelopeHeader();
 
         do {
             $buffer = fread($fileHandler, 4096);
@@ -241,12 +266,7 @@ class ImportTwine
             }
         } while (feof($fileHandler) === false);
 
-        if (xml_parse($this->xmlParser, "\n</tw-archive>\n", true) !== 1) {
-            $errorCode = xml_get_error_code($this->xmlParser);
-            $errorDescription = xml_error_string($errorCode);
-
-            throw new Exception("Error #".$errorCode.": '".$errorDescription."' occurred while the envelope foot for the Twine archive was parsed.");
-        }
+        $this->parseEnvelopeFooter();
 
         $this->parserFree();
 
@@ -286,7 +306,7 @@ class ImportTwine
 
         $topic = $this->topicRepository->find($this->topicId);
 
-        if (is_null($topic)) {
+        if (null === $topic) {
             throw new Exception("The Dembelo Topic with Id '".$this->topicId."', referenced by Twine story '".$attrs['name']."' in the Twine archive file '".$this->importfile->getFilename()."', doesn't exist.");
         }
 
@@ -340,7 +360,7 @@ class ImportTwine
         $this->twineTextnodeName = $attrs['name'];
 
         $this->textnode = $this->textnodeRepository->findByTwineId($this->importfile, $this->twineId);
-        if (is_null($this->textnode)) {
+        if (null === $this->textnode) {
             $this->textnode = new Textnode();
             $this->textnode->setCreated(date('Y-m-d H:i:s'));
             $this->textnode->setTopicId($this->topicId);
@@ -391,166 +411,134 @@ class ImportTwine
         }
     }
 
-    private function endElementStoryData(string $name)
+    private function endElementStoryDataForOneTextnode($name, $dembeloId)
     {
-        foreach ($this->textnodeMapping as $twineId => $dembeloId) {
-            $textnode = $this->textnodeRepository->find($dembeloId);
-            $twineName = array_search($dembeloId, $this->nodeNameMapping);
+        $textnode = $this->textnodeRepository->find($dembeloId);
+        $twineName = array_search($dembeloId, $this->nodeNameMapping);
 
-            if (is_null($textnode) === true) {
-                throw new Exception("The Dembelo Textnode with Id '".$dembeloId."' doesn't exist, but should by now.");
-            }
+        if (null === $textnode) {
+            throw new Exception("The Dembelo Textnode with Id '".$dembeloId."' doesn't exist, but should by now.");
+        }
 
-            /** @todo The links should be exported as XML as well instead of a custom Twine inline format. */
+        /** @todo The links should be exported as XML as well instead of a custom Twine inline format. */
 
-            $textnodeText = $textnode->getText();
-            $startPos = strpos($textnodeText, "[[", 0);
+        $textnodeText = $textnode->getText();
+        $startPos = strpos($textnodeText, "[[", 0);
 
-            if ($startPos !== false) {
-                $textnodeTextNew = substr($textnodeText, 0, $startPos);
+        if ($startPos !== false) {
+            $textnodeTextNew = substr($textnodeText, 0, $startPos);
 
-                while ($startPos !== false) {
-                    $endPos = strpos($textnodeText, "]]", $startPos + strlen("[["));
+            while ($startPos !== false) {
+                $endPos = strpos($textnodeText, "]]", $startPos + strlen("[["));
 
-                    if ($endPos === false) {
-                        throw new Exception("The Twine archive file '".$this->importfile->getFilename()."' has a textnode named '".$twineName."' which contains a malformed link that starts with '[[' but has no corresponding ']]'.");
+                if ($endPos === false) {
+                    throw new Exception("The Twine archive file '".$this->importfile->getFilename()."' has a textnode named '".$twineName."' which contains a malformed link that starts with '[[' but has no corresponding ']]'.");
+                }
+
+                $content = substr($textnodeText, $startPos + strlen("[["), $endPos - ($startPos + strlen("[[")));
+                $hitch = null;
+                $metadata = null;
+
+                $this->hitchParser->setNodeNameMapping($this->nodeNameMapping);
+
+                if (strpos($content, "-->") !== false) {
+                    $hitch = $this->hitchParser->parseDoubleArrowRight($content, $twineName, $name);
+                } elseif (strpos($content, "->") !== false) {
+                    $hitch = $this->hitchParser->parseSingleArrowRight($content, $name);
+                } elseif (strpos($content, "<-") !== false) {
+                    $hitch = $this->hitchParser->parseSingleArrowLeft($content, $name);
+                } elseif (strpos($content, ">:<") !== false) {
+                    $metadata = $this->parseColonArrows($textnode, $content, $name);
+                } else {
+                    $hitch = $this->hitchParser->parseSimpleHitch($content, $name);
+                }
+
+                if ($hitch !== null) {
+                    if ($textnode->getHitchCount() >= Textnode::HITCHES_MAXIMUM_COUNT) {
+                        throw new Exception("There is a textnode named '".$twineName."' in the Twine archive file which has more than ".Textnode::HITCHES_MAXIMUM_COUNT." links.");
                     }
 
-                    $content = substr($textnodeText, $startPos + strlen("[["), $endPos - ($startPos + strlen("[[")));
-                    $hitch = null;
-                    $metadata = null;
-
-                    if (strpos($content, "-->") !== false) {
-                        $content = explode("-->", $content, 2);
-
-                        if (strlen($content[0]) <= 0 || strlen($content[1]) <= 0) {
-                            throw new Exception("The Twine archive file '".$this->importfile->getFilename()."' contains a '".$name."' with the invalid element '[[".$content[0]."-->".$content[1]."]]'.");
-                        }
-
-                        $externalTextnode = $this->textnodeRepository->find($content[1]);
-
-                        if (is_null($externalTextnode)) {
-                            throw new Exception("There is a textnode named '".$twineName."' which references the external Dembelo Textnode '".$content[1]."', but a Dembelo Textnode with such an Id doesn't exist.");
-                        }
-
-                        $hitch = array();
-                        $hitch['description'] = $content[0];
-                        $hitch['textnodeId'] = $content[1];
-                        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-                    } elseif (strpos($content, "->") !== false) {
-                        $content = explode("->", $content, 2);
-
-                        if (strlen($content[0]) <= 0 || strlen($content[1]) <= 0) {
-                            throw new Exception("The Twine archive file contains a '".$name."' with the invalid element '[[".$content[0]."->".$content[1]."]]'.");
-                        }
-
-                        if (array_key_exists($content[1], $this->nodeNameMapping) !== true) {
-                            throw new Exception("There is a textnode which references another textnode named '".$content[1]."', but this textnode doesn't exist within the same story.");
-                        }
-
-                        $hitch = array();
-                        $hitch['description'] = $content[0];
-                        $hitch['textnodeId'] = $this->nodeNameMapping[$content[1]];
-                        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-                    } elseif (strpos($content, "<-") !== false) {
-                        $content = explode("<-", $content, 2);
-
-                        if (strlen($content[0]) <= 0 || strlen($content[1]) <= 0) {
-                            throw new Exception("The Twine archive file '".$this->importfile->getFilename()."' contains a '".$name."' with the invalid element '[[".$content[0]."<-".$content[1]."]]'.");
-                        }
-
-                        if (array_key_exists($content[0], $this->nodeNameMapping) !== true) {
-                            var_dump($this->nodeNameMapping);
-                            throw new Exception("There is a textnode in the Twine archive file which references another textnode named '".$content[0]."', but this textnode doesn't exist within the same story.");
-                        }
-
-                        $hitch = array();
-                        $hitch['description'] = $content[1];
-                        $hitch['textnodeId'] = $this->nodeNameMapping[$content[0]];
-                        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-                    } elseif (strpos($content, ">:<") !== false) {
-                        $content = explode(">:<", $content, 2);
-
-                        if (strlen($content[0]) <= 0 || strlen($content[1]) <= 0) {
-                            throw new Exception("The Twine archive file contains a '".$name."' with the invalid element '[[".$content[0].">:<".$content[1]."]]'.");
-                        }
-
-                        $metadata = $textnode->getMetadata();
-
-                        if (is_array($metadata) != true) {
-                            $metadata = array();
-                        }
-
-                        if (array_key_exists($content[0], $metadata) === true) {
-                            throw new Exception("There is a textnode in the Twine archive file which contains the metadata field '".$content[0]."' twice or would overwrite the already existing value of that field.");
-                        }
-
-                        $metadata[$content[0]] = $content[1];
-                    } else {
-                        if (strlen($content) <= 0) {
-                            throw new Exception("The Twine archive file contains a '".$name."' with the invalid element '[[".$content."]]'.");
-                        }
-
-                        if (array_key_exists($content, $this->nodeNameMapping) !== true) {
-                            throw new Exception("There is a textnode in the Twine archive file which references another textnode named '".$content."', but this textnode doesn't exist within the same story.");
-                        }
-
-                        $hitch = array();
-                        $hitch['description'] = $content;
-                        $hitch['textnodeId'] = $this->nodeNameMapping[$content];
-                        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-                    }
-
-                    if ($hitch !== null) {
-                        if ($textnode->getHitchCount() >= Textnode::HITCHES_MAXIMUM_COUNT) {
-                            throw new Exception("There is a textnode named '".$twineName."' in the Twine archive file which has more than ".Textnode::HITCHES_MAXIMUM_COUNT." links.");
-                        }
-
-                        if ($textnode->appendHitch($hitch) !== true) {
-                            throw new Exception("Failed to append hitch for the textnode named '".$twineName."' from the Twine archive file.");
-                        }
-                    }
-
-                    if ($metadata !== null) {
-                        $textnode->setMetadata($metadata);
-                    }
-
-                    $endPos += strlen("]]");
-                    $startPos = strpos($textnodeText, "[[", $endPos);
-
-                    if ($startPos !== false) {
-                        $textnodeTextNew .= substr($textnodeText, $endPos, $startPos - $endPos);
-                    } else {
-                        $textnodeTextNew .= substr($textnodeText, $endPos);
+                    if ($textnode->appendHitch($hitch) !== true) {
+                        throw new Exception("Failed to append hitch for the textnode named '".$twineName."' from the Twine archive file.");
                     }
                 }
-            } else {
-                $textnodeTextNew = $textnodeText;
+
+                if ($metadata !== null) {
+                    $textnode->setMetadata($metadata);
+                }
+
+                $endPos += strlen("]]");
+                $startPos = strpos($textnodeText, "[[", $endPos);
+
+                if ($startPos !== false) {
+                    $textnodeTextNew .= substr($textnodeText, $endPos, $startPos - $endPos);
+                } else {
+                    $textnodeTextNew .= substr($textnodeText, $endPos);
+                }
+            }
+        } else {
+            $textnodeTextNew = $textnodeText;
+        }
+
+        if (null !== $textnodeTextNew) {
+            $textnodeTextNew = $this->convertToPTags($textnodeTextNew);
+        }
+
+        $textnode->setText($textnodeTextNew);
+        $this->textnodeRepository->setHyphenatedText($textnode);
+    }
+
+    private function parseColonArrows(Textnode $textnode, string $content, string $name): array
+    {
+        $contentArray = explode(">:<", $content, 2);
+
+        if (strlen($contentArray[0]) <= 0 || strlen($contentArray[1]) <= 0) {
+            throw new Exception("The Twine archive file contains a '".$name."' with the invalid element '[[".$contentArray[0].">:<".$contentArray[1]."]]'.");
+        }
+
+        $metadata = $textnode->getMetadata();
+
+        if (is_array($metadata) != true) {
+            $metadata = array();
+        }
+
+        if (array_key_exists($contentArray[0], $metadata) === true) {
+            throw new Exception("There is a textnode in the Twine archive file which contains the metadata field '".$contentArray[0]."' twice or would overwrite the already existing value of that field.");
+        }
+
+        $metadata[$contentArray[0]] = $contentArray[1];
+
+        return $metadata;
+    }
+
+    private function convertToPTags(string $textnodeText): string
+    {
+        $textnodeTextLength = strlen($textnodeText);
+        $textnodeTextNew = "<p>";
+        $consumed = 0;
+        for ($i = 0; $i < $textnodeTextLength; $i++) {
+            if ($textnodeText[$i] === "\n" || $textnodeText[$i] === "\r") {
+                $consumed++;
+
+                continue;
+            }
+            if ($consumed > 0 && $i > $consumed) {
+                $textnodeTextNew .= "</p><p>";
             }
 
-            $textnodeText = $textnodeTextNew;
-            $textnodeTextLength = strlen($textnodeText);
-            $textnodeTextNew = "<p>";
+            $textnodeTextNew .= $textnodeText[$i];
             $consumed = 0;
+        }
 
-            for ($i = 0; $i < $textnodeTextLength; $i++) {
-                if ($textnodeText[$i] == "\n" || $textnodeText[$i] == "\r") {
-                    $consumed++;
+        $textnodeTextNew .= "</p>";
 
-                    continue;
-                }
-                if ($consumed > 0 && $i > $consumed) {
-                    $textnodeTextNew .= "</p><p>";
-                }
+        return $textnodeTextNew;
+    }
 
-                $textnodeTextNew .= $textnodeText[$i];
-                $consumed = 0;
-            }
-
-            $textnodeTextNew .= "</p>";
-
-            $textnode->setText($textnodeTextNew);
-            $this->textnodeRepository->setHyphenatedText($textnode);
+    private function endElementStoryData($name)
+    {
+        foreach ($this->textnodeMapping as $dembeloId) {
+            $this->endElementStoryDataForOneTextnode($name, $dembeloId);
         }
 
         $this->textnodeRepository->disableOrphanedNodes($this->importfile, array_values($this->textnodeMapping));

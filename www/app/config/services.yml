@@ -6,7 +6,14 @@ parameters:
 services:
     admin.import.twine:
         class: AdminBundle\Model\ImportTwine
+<<<<<<< HEAD
         arguments: ["@app.model_repository_textNode", "@app.model_repository_topic"]
+=======
+        arguments: ["@app.model_repository_textNode", "@app.model_repository_topic", "@app.twineImport.hitchparser"]
+#    service_name:
+#        class: DembeloMain\Directory\ClassName
+#        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+>>>>>>> master
 
     # @todo remove dependency from service container
     app.feature_toggle:
@@ -107,3 +114,7 @@ services:
     app.readpathUndoService:
                 class: DembeloMain\Service\ReadpathUndoService
                 arguments: ["@session"]
+
+    app.twineImport.hitchparser:
+            class: AdminBundle\Service\TwineImport\HitchParser
+            arguments: ["@app.model_repository_textNode"]

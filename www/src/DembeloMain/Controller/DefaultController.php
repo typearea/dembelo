@@ -147,8 +147,6 @@ class DefaultController extends Controller
      */
     public function readTopicAction($topicId)
     {
-        $textnodes = null;
-
         if ($this->featureToggle->hasFeature('login_needed') && !$this->authorizationChecker->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('login_route');
         }

@@ -47,9 +47,9 @@ class FavoriteManager
      * @param Textnode  $textnode
      * @param User|null $user
      */
-    public function setFavorite(Textnode $textnode, User $user = null)
+    public function setFavorite(Textnode $textnode, User $user = null): void
     {
-        if (is_null($user)) {
+        if (null === $user) {
             $this->session->set('favorite_'.$textnode->getTopicId(), $textnode->getArbitraryId());
 
             return;
@@ -65,7 +65,7 @@ class FavoriteManager
      */
     public function getFavorite(Topic $topic, User $user = null): ?string
     {
-        if (is_null($user)) {
+        if (null === $user) {
             return $this->session->get('favorite_'.$topic->getId());
         }
 

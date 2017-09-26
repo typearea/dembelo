@@ -144,10 +144,10 @@ class InstallCommand extends ContainerAwareCommand
         $this->createTopics($mongo, $dm);
         $output->writeln("Topics installed...");
 
-        $this->createTextnodes($mongo, $dm);
+        $this->createTextnodes();
         $output->writeln("Textnodes installed...");
 
-        $this->createHitches($mongo, $dm);
+        $this->createHitches($dm);
         $output->writeln("Hitches installed...");
     }
 
@@ -165,7 +165,7 @@ class InstallCommand extends ContainerAwareCommand
         foreach ($licensees as $licenseeData) {
             $licensee = $repository->findOneByName($licenseeData['name']);
 
-            if (is_null($licensee)) {
+            if (null === $licensee) {
                 $licensee = new Licensee();
                 $licensee->setName($licenseeData['name']);
                 $dm->persist($licensee);
@@ -280,7 +280,7 @@ class InstallCommand extends ContainerAwareCommand
         }
     }
 
-    private function createTextnodes(ManagerRegistry $mongo, DocumentManager $dm)
+    private function createTextnodes()
     {
         $loremIpsumLength = 3500;
 
@@ -377,7 +377,7 @@ class InstallCommand extends ContainerAwareCommand
         }
     }
 
-    private function createHitches(ManagerRegistry $mongo, DocumentManager $dm)
+    private function createHitches(DocumentManager $dm)
     {
         if (isset($this->dummyData['textnodes']) !== true) {
             return;
