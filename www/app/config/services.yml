@@ -6,7 +6,7 @@ parameters:
 services:
     admin.import.twine:
         class: AdminBundle\Model\ImportTwine
-        arguments: ["@app.model_repository_textNode", "@app.model_repository_topic"]
+        arguments: ["@app.model_repository_textNode", "@app.model_repository_topic", "@app.twineImport.hitchparser"]
 #    service_name:
 #        class: DembeloMain\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
@@ -93,3 +93,7 @@ services:
     app.favoriteManager:
             class: DembeloMain\Model\FavoriteManager
             arguments: ["@session"]
+
+    app.twineImport.hitchparser:
+            class: AdminBundle\Service\TwineImport\HitchParser
+            arguments: ["@app.model_repository_textNode"]

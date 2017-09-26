@@ -116,6 +116,7 @@ function xml_parser_free($parser)
 namespace AdminBundle\Tests\Model;
 
 use AdminBundle\Model\ImportTwine;
+use AdminBundle\Service\TwineImport\HitchParser;
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
@@ -160,7 +161,9 @@ class ImportTwineTest extends WebTestCase
 
         $importfile = $this->getDummyImportfile(['filename' => 'somefilename']);
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $hitchParserMock = $this->createHitchParserMock();
+
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -172,10 +175,11 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $dm = $this->getDmMock();
         $importfile = $this->getDummyImportfile();
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $importTwine->run($importfile);
         $dm->expects($this->never())
             ->method('persist');
@@ -191,13 +195,14 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $dm = $this->getDmMock();
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = ['erste Zeile', 'zweite Zeile'];
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $importTwine->run($importfile);
         $dm->expects($this->never())
             ->method('persist');
@@ -213,13 +218,14 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $dm = $this->getDmMock();
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [''];
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $importTwine->run($importfile);
         $dm->expects($this->never())
             ->method('persist');
@@ -236,13 +242,14 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $dm = $this->getDmMock();
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = ['<tw-storydata hurz>', 'zweite Zeile'];
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $retVal = $importTwine->run($importfile);
         $this->assertTrue($retVal);
         $dm->expects($this->never())
@@ -260,6 +267,7 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
@@ -287,7 +295,7 @@ class ImportTwineTest extends WebTestCase
             ->method('find')
             ->will($this->returnValue(true));
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $retVal = $importTwine->run($importfile);
         $this->assertTrue($retVal);
         $textnodeRepository->expects($this->never())
@@ -305,6 +313,7 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
@@ -335,7 +344,7 @@ class ImportTwineTest extends WebTestCase
                     && $textnode->getText() === "lorem ipsumlorem ipsum";
             }));
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $retVal = $importTwine->run($importfile);
         $this->assertTrue($retVal);
 
@@ -350,6 +359,7 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
@@ -381,7 +391,7 @@ class ImportTwineTest extends WebTestCase
                 && $textnode->getText() === "lorem ipsumlorem ipsum";
             }));
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $retVal = $importTwine->run($importfile);
         $this->assertTrue($retVal);
 
@@ -398,11 +408,12 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile(['licenseeId' => null]);
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
-        $retVal = $importTwine->run($importfile);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine->run($importfile);
     }
 
     /**
@@ -415,10 +426,11 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile(['filename' => null]);
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -430,6 +442,7 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
@@ -456,7 +469,7 @@ class ImportTwineTest extends WebTestCase
         $textnodeRepository->expects($this->never())
             ->method('save');
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -468,6 +481,7 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
@@ -494,7 +508,7 @@ class ImportTwineTest extends WebTestCase
         $textnodeRepository->expects($this->never())
             ->method('save');
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -506,6 +520,7 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
@@ -533,7 +548,7 @@ class ImportTwineTest extends WebTestCase
             ->method('findByTwineId')
             ->with($importfile, 'foobar');
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -545,6 +560,7 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
@@ -572,7 +588,7 @@ class ImportTwineTest extends WebTestCase
             ->method('findByTwineId')
             ->with($importfile, 'foobar');
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $importTwine->run($importfile);
 
         $this->assertTrue(self::$parserFreeCalled);
@@ -586,6 +602,7 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
@@ -619,7 +636,7 @@ class ImportTwineTest extends WebTestCase
             ->method('disableOrphanedNodes')
             ->with($importfile, [$textnode->getId()]);
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -631,6 +648,7 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
@@ -660,47 +678,7 @@ class ImportTwineTest extends WebTestCase
         $textnodeRepository->expects($this->once())
             ->method('save');
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
-        $importTwine->run($importfile);
-    }
-
-    /**
-     * @expectedException Exception
-     * @expectedExceptionMessage There is a textnode which references another textnode named 'someNodeName3', but this textnode doesn't exist within the same story.
-     */
-    public function testRunWithLinkToNonExistingTextnode()
-    {
-        $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
-
-        $importfile = $this->getDummyImportfile();
-
-        self::$freadStack = [
-            '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
-            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
-            '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
-            'lorem ipsum [[Linkdata->someNodeName3]]</tw-passagedata>',
-            '</tw-storydata>',
-        ];
-
-        self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
-
-        $textnode1 = new Textnode();
-        $textnode1->setText('lorem ipsum [[Linkdata->someNodeName3]]');
-
-        $textnodeRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue($textnode1));
-
-        $topicRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue(true));
-
-        $textnodeRepository->expects($this->any())
-            ->method('save');
-
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -712,6 +690,7 @@ class ImportTwineTest extends WebTestCase
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
         $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
@@ -735,6 +714,17 @@ class ImportTwineTest extends WebTestCase
         $textnode2 = new Textnode();
         $textnode2->setId('someId1');
 
+        $hitchParserMock->expects(self::once())
+            ->method('parseSingleArrowRight')
+            ->with('Linkdata->someNodeName2')
+            ->willReturn(
+                [
+                    'description' => 'some description',
+                    'textnodeId' => 'someTextnodeId',
+                    'status' => Textnode::HITCH_STATUS_ACTIVE,
+                ]
+            );
+
         $textnodeRepository->expects($this->any())
             ->method('find')
             ->will($this->returnValue($textnode1));
@@ -750,10 +740,135 @@ class ImportTwineTest extends WebTestCase
                 $textnode->setId('someTextnode'.$counter++);
             });
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository);
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
         $returnValue = $importTwine->run($importfile);
 
         $this->assertTrue($returnValue);
+    }
+
+    public function testRunWithMetadataSetting()
+    {
+        $textnodeRepository = $this->getTextnodeRepositoryMock();
+        $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
+
+        $importfile = $this->getDummyImportfile();
+
+        self::$freadStack = [
+            '<tw-storydata ',
+            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
+            'lorem ipsum [[Linkdata->someNodeName2]]</tw-passagedata>',
+            '<tw-passagedata pid="2" name="someNodeName2" tags="ID:someTwineId2" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata>',
+            '</tw-storydata>',
+        ];
+
+        self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
+
+        $textnode1 = new Textnode();
+        $textnode1->setText('lorem ipsum [[metakey>:<metavalue]]');
+        $textnode1->setId('someId0');
+
+        $textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode1));
+
+        $topicRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue(true));
+
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $returnValue = $importTwine->run($importfile);
+        self::assertTrue($returnValue);
+        $metadata = $textnode1->getMetadata();
+        self::assertInternalType('array', $metadata);
+        self::assertArrayHasKey('metakey', $metadata);
+        self::assertEquals('metavalue', $metadata['metakey']);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessageRegExp /invalid element.*>:</
+     */
+    public function testRunWithMetadataSettingForInvalidFormat()
+    {
+        $textnodeRepository = $this->getTextnodeRepositoryMock();
+        $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
+
+        $importfile = $this->getDummyImportfile();
+
+        self::$freadStack = [
+            '<tw-storydata ',
+            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
+            'lorem ipsum [[Linkdata->someNodeName2]]</tw-passagedata>',
+            '<tw-passagedata pid="2" name="someNodeName2" tags="ID:someTwineId2" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata>',
+            '</tw-storydata>',
+        ];
+
+        self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
+
+        $textnode1 = new Textnode();
+        $textnode1->setText('lorem ipsum [[>:<metavalue]]');
+        $textnode1->setId('someId0');
+
+        $textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode1));
+
+        $topicRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue(true));
+
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine->run($importfile);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessageRegExp /contains the metadata field/
+     */
+    public function testRunWithMetadataSettingForAnAlreadyExistingMetadataKey()
+    {
+        $textnodeRepository = $this->getTextnodeRepositoryMock();
+        $topicRepository = $this->getTopicRepositoryMock();
+        $hitchParserMock = $this->createHitchParserMock();
+
+        $importfile = $this->getDummyImportfile();
+
+        self::$freadStack = [
+            '<tw-storydata ',
+            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
+            'lorem ipsum [[Linkdata->someNodeName2]]</tw-passagedata>',
+            '<tw-passagedata pid="2" name="someNodeName2" tags="ID:someTwineId2" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata>',
+            '</tw-storydata>',
+        ];
+
+        self::$fgetsStack = ['<tw-storydata > hurz', 'zweite Zeile', 'dritte Zeile</tw-storydata>'];
+
+        $textnode1 = new Textnode();
+        $textnode1->setText('lorem ipsum [[metakey>:<metavalue]]');
+        $textnode1->setId('someId0');
+        $textnode1->setMetadata(['metakey' => 'someValue']);
+
+        $textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode1));
+
+        $topicRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue(true));
+
+        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine->run($importfile);
     }
 
     private function getDummyImportfile(array $data = [])
@@ -768,32 +883,37 @@ class ImportTwineTest extends WebTestCase
 
         $importfileData = array_merge($default, $data);
 
-
         $importfile = new Importfile();
-        if (!is_null($importfileData['filename'])) {
+        if (null !== $importfileData['filename']) {
             $importfile->setFilename($importfileData['filename']);
         }
-        if (!is_null($importfileData['licenseeId'])) {
+        if (null !== $importfileData['licenseeId']) {
             $importfile->setLicenseeId($importfileData['licenseeId']);
         }
-        if (!is_null($importfileData['author'])) {
+        if (null !== $importfileData['author']) {
             $importfile->setAuthor($importfileData['author']);
         }
-        if (!is_null($importfileData['publisher'])) {
+        if (null !== $importfileData['publisher']) {
             $importfile->setPublisher($importfileData['publisher']);
         }
-        if (!is_null($importfileData['id'])) {
+        if (null !== $importfileData['id']) {
             $importfile->setId($importfileData['id']);
         }
 
         return $importfile;
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|TextNodeRepositoryInterface
+     */
     private function getTextnodeRepositoryMock()
     {
         return $this->getMockBuilder(TextNodeRepository::class)->disableOriginalConstructor()->setMethods(['createQueryBuilder', 'field', 'equals', 'getQuery', 'save', 'find', 'findByTwineId', 'disableOrphanedNodes', 'setHyphenatedText'])->getMock();
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|TopicRepository
+     */
     private function getTopicRepositoryMock()
     {
         return $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['find'])->getMock();
@@ -802,5 +922,13 @@ class ImportTwineTest extends WebTestCase
     private function getDmMock()
     {
         return $this->getMockBuilder('dmMock')->setMethods(['flush', 'persist', 'find'])->getMock();
+    }
+
+    /**
+     * @return HitchParser|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createHitchParserMock(): HitchParser
+    {
+        return $this->createMock(HitchParser::class);
     }
 }
