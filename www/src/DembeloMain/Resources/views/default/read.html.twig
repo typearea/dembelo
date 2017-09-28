@@ -16,9 +16,8 @@ GNU Affero General Public License 3 for more details.
 You should have received a copy of the GNU Affero General Public License 3
 along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 #}
-
 {% extends 'DembeloMain::base.html.twig' %}
-
+{% set showBackButton=true %}
 {% block textnavclass %}{% endblock %}
 {% block textnavlink %}{{ path('reload') }}{% endblock %}
 
