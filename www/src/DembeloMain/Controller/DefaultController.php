@@ -102,16 +102,16 @@ class DefaultController extends Controller
 
     /**
      * DefaultController constructor.
-     * @param FeatureToggle $featureToggle
+     * @param FeatureToggle                 $featureToggle
      * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param UserRepositoryInterface $userRepository
-     * @param TextNodeRepositoryInterface $textNodeRepository
-     * @param Templating $templating
-     * @param Router $router
-     * @param TokenStorage $tokenStorage
-     * @param Readpath $readpath
-     * @param FavoriteManager $favoriteManager
-     * @param ReadpathUndoService $readpathUndoService
+     * @param UserRepositoryInterface       $userRepository
+     * @param TextNodeRepositoryInterface   $textNodeRepository
+     * @param Templating                    $templating
+     * @param Router                        $router
+     * @param TokenStorage                  $tokenStorage
+     * @param Readpath                      $readpath
+     * @param FavoriteManager               $favoriteManager
+     * @param ReadpathUndoService           $readpathUndoService
      */
     public function __construct(
         FeatureToggle $featureToggle,
@@ -258,6 +258,7 @@ class DefaultController extends Controller
     {
         if (!$this->readpathUndoService->undo()) {
             $topicId = $this->getUser()->getLastTopicId();
+
             return $this->redirectToRoute('themenfeld', ['topicId' => $topicId]);
         }
         $currentTextnodeId = $this->readpathUndoService->getCurrentItem();

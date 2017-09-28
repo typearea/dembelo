@@ -219,20 +219,20 @@ class ImportCommandTest extends KernelTestCase
      * method for returnCallback()
      *
      * @param string $arg
-     * @return null|\PHPUnit_Framework_MockObject_MockObject
+     * @return null|\PHPUnit_Framework_MockObject_MockObject|Licensee
      */
     public function findOneByNameCallback($arg): ?Licensee
     {
-        if ($arg === 'somelicensee') {
-            $licenseeMock = $this->getMockBuilder('DembeloMain\Document\Licensee')->disableOriginalConstructor()->getMock();
-            $licenseeMock->expects($this->once())
-                ->method('getId')
-                ->will($this->returnValue('licenseeId'));
-
-            return $licenseeMock;
+        if ($arg !== 'somelicensee') {
+            return null;
         }
 
-        return null;
+        $licenseeMock = $this->getMockBuilder(Licensee::class)->disableOriginalConstructor()->getMock();
+        $licenseeMock->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue('licenseeId'));
+
+        return $licenseeMock;
     }
 
     /**

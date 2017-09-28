@@ -907,7 +907,7 @@ class ImportTwineTest extends WebTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TextNodeRepositoryInterface
+     * @return \PHPUnit_Framework_MockObject_MockObject|TextNodeRepository
      */
     private function getTextnodeRepositoryMock()
     {
@@ -928,7 +928,7 @@ class ImportTwineTest extends WebTestCase
     }
 
     /**
-     * @return HitchParser|\PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|HitchParser
      */
     private function createHitchParserMock(): HitchParser
     {
