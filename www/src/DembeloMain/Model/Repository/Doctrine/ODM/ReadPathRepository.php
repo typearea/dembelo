@@ -20,6 +20,8 @@
 
 namespace DembeloMain\Model\Repository\Doctrine\ODM;
 
+use DembeloMain\Document\User;
+use DembeloMain\Document\Readpath;
 use DembeloMain\Model\Repository\ReadPathRepositoryInterface;
 
 /**
@@ -28,5 +30,22 @@ use DembeloMain\Model\Repository\ReadPathRepositoryInterface;
  */
 class ReadPathRepository extends AbstractRepository implements ReadPathRepositoryInterface
 {
+    /**
+     * @param User $user
+     * @return null|string
+     */
+    public function getCurrentTextnodeIdForUser(User $user): ?string
+    {
+        $criteria = ['userId' => new \MongoId($user->getId())];
+        $sort = ['timestamp' => 'DESC'];
+        /**
+         * @var $readpath Readpath
+         */
+        $readpath = $this->findBy($criteria, $sort, 1);
+        if (empty($readpath)) {
+            return null;
+        }
 
+        return $readpath[0]->getTextnodeId();
+    }
 }

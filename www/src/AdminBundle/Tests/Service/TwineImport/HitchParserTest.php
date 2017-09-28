@@ -293,7 +293,7 @@ class HitchParserTest extends WebTestCase
     }
 
     /**
-     * @return TextNodeRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|TextNodeRepositoryInterface
      */
     private function createTextnodeRepositoryMock(): TextNodeRepositoryInterface
     {

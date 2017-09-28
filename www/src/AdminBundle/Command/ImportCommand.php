@@ -91,7 +91,7 @@ class ImportCommand extends ContainerAwareCommand
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $importTwine = $this->getContainer()->get('admin.import.twine');
         $this->output = $output;

@@ -7,10 +7,8 @@ services:
     admin.import.twine:
         class: AdminBundle\Model\ImportTwine
         arguments: ["@app.model_repository_textNode", "@app.model_repository_topic", "@app.twineImport.hitchparser"]
-#    service_name:
-#        class: DembeloMain\Directory\ClassName
-#        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
 
+    # @todo remove dependency from service container
     app.feature_toggle:
         class: DembeloMain\Model\FeatureToggle
         calls:
@@ -18,12 +16,28 @@ services:
 
     app.readpath:
         class: DembeloMain\Model\Readpath
-        arguments: ["@app.model_repository_read_path"]
+        arguments: ["@app.model_repository_read_path", "@session"]
 
     app.controller_dashboard:
         class: DembeloMain\Controller\Dashboard\DefaultController
         calls:
-                - [setContainer, ["@service_container"]]
+            - [setContainer, ["@service_container"]]
+
+    app.controller_default:
+        class: DembeloMain\Controller\DefaultController
+        arguments:
+            - "@app.feature_toggle"
+            - "@security.authorization_checker"
+            - "@app.model_repository_user"
+            - "@app.model_repository_textNode"
+            - "@templating"
+            - "@router"
+            - "@security.token_storage"
+            - "@app.readpath"
+            - "@app.favoriteManager"
+            - "@app.readpathUndoService"
+        class:
+            - [setContainer, ["@service_container"]]
 
     app.controller_admin_topic:
         class: AdminBundle\Controller\TopicController
@@ -34,12 +48,6 @@ services:
         factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
         arguments:
             - DembeloMain\Document\Topic
-
-    app.model_repository_story:
-        class: DembeloMain\Model\Repository\Doctrine\ODM\StoryRepository
-        factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
-        arguments:
-            - DembeloMain\Document\Story
 
     app.model_repository_textNode:
         class: DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository
@@ -71,6 +79,7 @@ services:
             arguments:
                 - DembeloMain\Document\Importfile
 
+    # @todo remove dependency from service container
     app.twig_extension.version:
             class: DembeloMain\Twig\VersionExtension
             arguments: ["@service_container"]
@@ -78,6 +87,7 @@ services:
             tags:
                 - { name: twig.extension }
 
+    # @todo remove dependency from service container
     app.twig_extension.hasFeature:
                 class: DembeloMain\Twig\FeatureToggleExtension
                 arguments: ["@service_container"]
@@ -93,6 +103,10 @@ services:
     app.favoriteManager:
             class: DembeloMain\Model\FavoriteManager
             arguments: ["@session"]
+
+    app.readpathUndoService:
+                class: DembeloMain\Service\ReadpathUndoService
+                arguments: ["@session"]
 
     app.twineImport.hitchparser:
             class: AdminBundle\Service\TwineImport\HitchParser

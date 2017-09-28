@@ -92,4 +92,10 @@ interface TextNodeRepositoryInterface
      * @return Textnode
      */
     public function getTextnodeToRead($topicId);
+
+    /**
+     * @param string $id
+     * @return Textnode|null
+     */
+    public function findOneActiveById(string $id): ?Textnode;
 }

@@ -22,7 +22,6 @@ namespace DembeloMain\Model;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Document\Topic;
 use DembeloMain\Document\User;
-use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
@@ -62,9 +61,9 @@ class FavoriteManager
      * gets a favorite textnode for a topic
      * @param Topic     $topic
      * @param User|null $user
-     * @return string
+     * @return string|null
      */
-    public function getFavorite(Topic $topic, User $user = null): string
+    public function getFavorite(Topic $topic, User $user = null): ?string
     {
         if (null === $user) {
             return $this->session->get('favorite_'.$topic->getId());

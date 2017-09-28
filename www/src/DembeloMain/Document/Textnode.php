@@ -90,7 +90,7 @@ class Textnode
     /**
      * @MongoDB\Hash
      */
-    protected $hitches = array();
+    protected $hitches = [];
 
     /**
      * @MongoDB\ObjectId

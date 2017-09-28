@@ -49,7 +49,7 @@ class DefaultController extends Controller
      *
      * @return string
      */
-    public function indexAction()
+    public function indexAction(): string
     {
         $mainMenuData = [
             ['id' => "1", 'type' => "folder", 'value' => "Benutzer", 'css' => "folder_music"],
@@ -68,9 +68,9 @@ class DefaultController extends Controller
      * @Route("/users", name="admin_users")
      *
      * @param Request $request
-     * @return String
+     * @return Response
      */
-    public function usersAction(Request $request)
+    public function usersAction(Request $request): Response
     {
         $repository = $this->get('app.model_repository_user');
 
@@ -115,9 +115,9 @@ class DefaultController extends Controller
     /**
      * @Route("/licensees", name="admin_licensees")
      *
-     * @return String
+     * @return Response
      */
-    public function licenseesAction()
+    public function licenseesAction(): Response
     {
         $repository = $this->get('app.model_repository_licensee');
 
@@ -139,9 +139,9 @@ class DefaultController extends Controller
      * @Route("/licenseeSuggest", name="admin_licensee_suggest")
      *
      * @param Request $request
-     * @return String
+     * @return Response
      */
-    public function licenseeSuggestAction(Request $request)
+    public function licenseeSuggestAction(Request $request): Response
     {
         $filter = $request->query->get('filter');
 
@@ -168,9 +168,9 @@ class DefaultController extends Controller
     /**
      * @Route("/topics", name="admin_topics")
      *
-     * @return String
+     * @return Response
      */
-    public function topicsAction()
+    public function topicsAction(): Response
     {
         $mongo = $this->get('doctrine_mongodb');
         /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
@@ -194,9 +194,9 @@ class DefaultController extends Controller
      * @Route("/save", name="admin_formsave")
      *
      * @param Request $request
-     * @return String
+     * @return Response
      */
-    public function formsaveAction(Request $request)
+    public function formsaveAction(Request $request): Response
     {
         $params = $request->request->all();
 
@@ -268,9 +268,9 @@ class DefaultController extends Controller
      * @Route("/useractivationmail", name="admin_user_activation_mail")
      *
      * @param Request $request
-     * @return String
+     * @return Response
      */
-    public function useractivationmailAction(Request $request)
+    public function useractivationmailAction(Request $request): Response
     {
         $userId = $request->request->get('userId');
 
@@ -313,7 +313,7 @@ class DefaultController extends Controller
      *
      * @return Response
      */
-    public function importfilesAction()
+    public function importfilesAction(): Response
     {
         $mongo = $this->get('doctrine_mongodb');
         /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
@@ -343,7 +343,7 @@ class DefaultController extends Controller
      *
      * @return Response
      */
-    public function uploadImportfileAction()
+    public function uploadImportfileAction(): Response
     {
         $output = array();
 
@@ -374,7 +374,7 @@ class DefaultController extends Controller
      *
      * @return Response
      */
-    public function textnodesAction()
+    public function textnodesAction(): Response
     {
         $repository = $this->get('app.model_repository_textNode');
         $textnodes = $repository->findAll();
@@ -410,7 +410,7 @@ class DefaultController extends Controller
      *
      * @return Response
      */
-    public function importAction(Request $request)
+    public function importAction(Request $request): Response
     {
         $importfileId = $request->get('importfileId');
 
@@ -468,7 +468,7 @@ class DefaultController extends Controller
         $item->setFilename($finalName);
     }
 
-    private function buildLicenseeIndex()
+    private function buildLicenseeIndex(): array
     {
         $repository = $this->get('app.model_repository_licensee');
         $licensees = $repository->findAll();
@@ -480,7 +480,7 @@ class DefaultController extends Controller
         return $index;
     }
 
-    private function buildImportfileIndex()
+    private function buildImportfileIndex(): array
     {
         $repository = $this->get('app.model_repository_importfile');
         $importfiles = $repository->findAll();
@@ -516,7 +516,7 @@ class DefaultController extends Controller
         $item->setImageFilename($finalName);
     }
 
-    private function formatMetadata(array $metadata)
+    private function formatMetadata(array $metadata): string
     {
         $string = '';
         foreach ($metadata as $key => $value) {

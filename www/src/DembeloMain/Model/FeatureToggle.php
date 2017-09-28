@@ -63,12 +63,12 @@ class FeatureToggle implements ContainerAwareInterface
      * returns an array of existing features
      * @return array
      */
-    public function getFeatures() : array
+    public function getFeatures(): array
     {
         return array_keys($this->features);
     }
 
-    private function buildParameterName(string $featureKey) : string
+    private function buildParameterName(string $featureKey): string
     {
         return 'features.'.$featureKey;
     }

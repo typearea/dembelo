@@ -34,7 +34,7 @@ class UserRepository extends AbstractRepository implements UserRepositoryInterfa
      * @param string $email
      * @return User
      */
-    public function findByEmail($email)
+    public function findByEmail($email): ?User
     {
         /** @var User $user */
         $user = $this->findOneBy(array('email' => $email));

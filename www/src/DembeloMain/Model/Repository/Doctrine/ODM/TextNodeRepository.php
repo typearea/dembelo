@@ -98,7 +98,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
      * @param string $id Textnode Id
      * @return Textnode
      */
-    public function findOneActiveById($id)
+    public function findOneActiveById(string $id): ?Textnode
     {
         return $this->findOneBy(
             array(

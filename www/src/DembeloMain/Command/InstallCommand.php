@@ -31,7 +31,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use DembeloMain\Document\User;
 use DembeloMain\Document\Topic;
-use DembeloMain\Document\Story;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Console\Input\InputOption;

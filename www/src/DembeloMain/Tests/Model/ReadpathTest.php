@@ -25,6 +25,8 @@ use DembeloMain\Model\Readpath;
 use DembeloMain\Model\Repository\Doctrine\ODM\ReadPathRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use DembeloMain\Document\Readpath as ReadpathDocument;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Class ReadpathTest
@@ -32,18 +34,41 @@ use DembeloMain\Document\Readpath as ReadpathDocument;
  */
 class ReadpathTest extends WebTestCase
 {
+    /* @var Session */
+    private $session;
+
+    /**
+     * @inheritdoc
+     */
+    public function setUp()
+    {
+        $this->session = new Session(new MockArraySessionStorage());
+    }
+
     /**
      * tests the saving of a readpath node without a given user
      */
     public function testStoreReadpathWithoutUser()
     {
-        $textnodeMock = $this->getTextnodeMock();
+        $textnodeMock1 = $this->getTextnodeMock();
+        $textnodeMock1->expects($this->any())
+            ->method('getId')
+            ->willReturn('id1');
+        $textnodeMock2 = $this->getTextnodeMock();
+        $textnodeMock2->expects($this->any())
+            ->method('getId')
+            ->willReturn('id2');
         $readpathRepositoryMock = $this->getReadpathRepositoryMock();
         $readpathRepositoryMock->expects($this->never())
             ->method('save');
 
-        $readpath = new Readpath($readpathRepositoryMock);
-        $readpath->storeReadpath($textnodeMock);
+        $readpath = new Readpath($readpathRepositoryMock, $this->session);
+        $readpath->storeReadpath($textnodeMock1);
+        $this->assertContains($textnodeMock1->getId(), $this->session->get('readpath'));
+
+        $readpath->storeReadpath($textnodeMock2);
+        $this->assertContains($textnodeMock1->getId(), $this->session->get('readpath'));
+        $this->assertContains($textnodeMock2->getId(), $this->session->get('readpath'));
     }
 
     /**
@@ -76,8 +101,91 @@ class ReadpathTest extends WebTestCase
                 $this->assertLessThanOrEqual(1, abs($readpathDocument->getTimestamp()->sec-time()));
             });
 
-        $readpath = new Readpath($readpathRepositoryMock);
+        $readpath = new Readpath($readpathRepositoryMock, $this->session);
         $readpath->storeReadpath($textnodeMock, $userMock);
+
+        $this->assertFalse($this->session->has('readpath'));
+    }
+
+    /**
+     * tests getCurrentTextnodeId() for Session without readpath
+     */
+    public function testGetCurrentTextnodeIdForSessionWithoutReadpath()
+    {
+        $readpathRepositoryMock = $this->getReadpathRepositoryMock();
+        $readpath = new Readpath($readpathRepositoryMock, $this->session);
+        $returnValue = $readpath->getCurrentTextnodeId();
+        $this->assertNull($returnValue);
+    }
+
+    /**
+     * tests getCurrentTextnodeId for session with readpath
+     */
+    public function testGetCurrentTextnodeIdForSessionWithReadpath()
+    {
+        $readpathRepositoryMock = $this->getReadpathRepositoryMock();
+        $this->session->set('readpath', ['id1']);
+
+        $readpath = new Readpath($readpathRepositoryMock, $this->session);
+        $returnValue = $readpath->getCurrentTextnodeId();
+        $this->assertEquals('id1', $returnValue);
+    }
+
+    /**
+     * tests getCurrentTextnodeId for session with multiple readpath
+     */
+    public function testGetCurrentTextnodeIdForSessionWithMultipleReadpath()
+    {
+        $readpathRepositoryMock = $this->getReadpathRepositoryMock();
+        $this->session->set('readpath', ['id1', 'id2']);
+
+        $readpath = new Readpath($readpathRepositoryMock, $this->session);
+        $returnValue = $readpath->getCurrentTextnodeId();
+        $this->assertEquals('id2', $returnValue);
+    }
+
+    /**
+     * tests getCurrentTextnodeId for usser without readpath
+     */
+    public function testGetCurrentTextnodeIdForUserWithoutReadpath()
+    {
+        $userMockId = 'userId';
+
+        $readpathRepositoryMock = $this->getReadpathRepositoryMock();
+        $readpathRepositoryMock->expects($this->once())
+            ->method('getCurrentTextnodeIdForUser')
+            ->willReturn(null);
+
+        $userMock = $this->getUserMock();
+        $userMock->expects($this->any())
+            ->method('getId')
+            ->willReturn($userMockId);
+
+        $readpath = new Readpath($readpathRepositoryMock, $this->session);
+        $returnValue = $readpath->getCurrentTextnodeId($userMock);
+        $this->assertNull($returnValue);
+    }
+
+    /**
+     * testts getCurrentTextnodeId for user with readpath
+     */
+    public function testGetCurrentTextnodeIdForUserWithReadpath()
+    {
+        $userMockId = 'userId';
+
+        $readpathRepositoryMock = $this->getReadpathRepositoryMock();
+        $readpathRepositoryMock->expects($this->once())
+            ->method('getCurrentTextnodeIdForUser')
+            ->willReturn('someId');
+
+        $userMock = $this->getUserMock();
+        $userMock->expects($this->any())
+            ->method('getId')
+            ->willReturn($userMockId);
+
+        $readpath = new Readpath($readpathRepositoryMock, $this->session);
+        $returnValue = $readpath->getCurrentTextnodeId($userMock);
+        $this->assertEquals('someId', $returnValue);
     }
 
     private function getTextnodeMock()
@@ -89,7 +197,10 @@ class ReadpathTest extends WebTestCase
 
     private function getReadpathRepositoryMock()
     {
-        $readpath = $this->getMockBuilder(ReadPathRepository::class)->disableOriginalConstructor()->getMock();
+        $readpath = $this->getMockBuilder(ReadPathRepository::class)
+            ->setMethods(['save', 'getCurrentTextnodeIdForUser'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
         return $readpath;
     }

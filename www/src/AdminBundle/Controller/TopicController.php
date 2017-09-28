@@ -56,7 +56,7 @@ class TopicController extends Controller
      * @param Request $request
      * @return Response
      */
-    public function listAction(Request $request)
+    public function listAction(Request $request): Response
     {
         $filters = $request->query->get('filter');
 
@@ -86,7 +86,7 @@ class TopicController extends Controller
      *
      * @return Response
      */
-    public function uploadImageAction()
+    public function uploadImageAction(): Response
     {
         $output = array();
         $file = $_FILES['upload'];

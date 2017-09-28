@@ -21,6 +21,7 @@
 namespace DembeloMain\Model\Repository;
 
 use DembeloMain\Document\Readpath;
+use DembeloMain\Document\User;
 
 /**
  * Interface ReadPathRepositoryInterface
@@ -47,4 +48,10 @@ interface ReadPathRepositoryInterface
      * @return Readpath
      */
     public function save($readPath);
+
+    /**
+     * @param User $user
+     * @return null|string
+     */
+    public function getCurrentTextnodeIdForUser(User $user): ?string;
 }

@@ -40,7 +40,7 @@ interface UserRepositoryInterface
      * @param string $email
      * @return User
      */
-    public function findByEmail($email);
+    public function findByEmail($email): ?User;
 
     /**
      * Find all users
