@@ -325,7 +325,7 @@ class DefaultControllerTest extends WebTestCase
     /**
      * tests back action when undo() ist not successful
      */
-    public function testBackActionUnsuccessful(): void
+    public function testBackActionUnsuccessfulForGuestUser(): void
     {
         $textnode = new Textnode();
         $textnode->setArbitraryId('someArbitraryId');
@@ -345,6 +345,39 @@ class DefaultControllerTest extends WebTestCase
         self::assertSame('someUrl', $result->getTargetUrl());
     }
 
+    /**
+     * tests back action when undo() ist not successful
+     */
+    public function testBackActionUnsuccessfulForLoggedInUser(): void
+    {
+        $textnode = new Textnode();
+        $textnode->setArbitraryId('someArbitraryId');
+
+        $user = new User();
+        $user->setLastTopicId('someLastTopicId');
+
+        $tokenMock = $this->createTokenMock();
+        $tokenMock->expects(self::once())
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->tokenStorageMock->expects(self::once())
+            ->method('getToken')
+            ->willReturn($tokenMock);
+        $this->readpathUndoServiceMock->expects(self::once())
+            ->method('undo')
+            ->willReturn(false);
+        $this->readpathUndoServiceMock->expects(self::never())
+            ->method('getCurrentItem');
+        $this->routerMock->expects(self::once())
+            ->method('generate')
+            ->with('themenfeld', ['topicId' => 'someLastTopicId'])
+            ->willReturn('someUrl');
+
+        $result = $this->controller->backAction();
+        self::assertInstanceOf(RedirectResponse::class, $result);
+        self::assertSame('someUrl', $result->getTargetUrl());
+    }
     /**
      * tests readTextnodeAction with guest user and enabled login feature
      */

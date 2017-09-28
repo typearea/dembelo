@@ -252,12 +252,16 @@ class DefaultController extends Controller
     /**
      * @Route("/back", name="back")
      *
-     * @return string
+     * @return RedirectResponse
      */
     public function backAction()
     {
         if (!$this->readpathUndoService->undo()) {
-            $topicId = $this->getUser()->getLastTopicId();
+            $user = $this->getUser();
+            if (null === $user) {
+                return $this->redirectToRoute('mainpage');
+            }
+            $topicId = $user->getLastTopicId();
 
             return $this->redirectToRoute('themenfeld', ['topicId' => $topicId]);
         }
