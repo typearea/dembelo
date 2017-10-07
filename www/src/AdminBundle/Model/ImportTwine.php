@@ -320,12 +320,12 @@ class ImportTwine
         if (empty($tagString) || !is_string($tagString)) {
             throw new Exception('no ID given for Textnode "'.$textnodeTitle.'"');
         }
-        $tagArray = explode(" ", $tagString);
+        $tagArray = explode(' ', $tagString);
 
         $twineId = false;
 
         foreach ($tagArray as $tag) {
-            if (substr($tag, 0, 3) === 'ID:') {
+            if (0 === strpos($tag, 'ID:')) {
                 $twineId = substr($tag, 3);
             }
         }

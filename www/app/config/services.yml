@@ -39,6 +39,14 @@ services:
         class:
             - [setContainer, ["@service_container"]]
 
+    app.admin_controller_import:
+        class: AdminBundle\Controller\ImportController
+        arguments:
+            - "@app.model_repository_importfile"
+            - "@admin.import.twine"
+            - "@doctrine_mongodb"
+            - %twine_directory%
+
     app.controller_admin_topic:
         class: AdminBundle\Controller\TopicController
         arguments: ["@service_container", "@app.model_repository_topic"]
