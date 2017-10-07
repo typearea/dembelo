@@ -28,7 +28,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
-
 /**
  * Class ImportController
  * @package AdminBundle\Controller
@@ -56,6 +55,13 @@ class ImportController extends Controller
      */
     private $configTwineDirectory;
 
+    /**
+     * ImportController constructor.
+     * @param ImportfileRepository $importfileRepository
+     * @param ImportTwine $importTwine
+     * @param ManagerRegistry $mongoDb
+     * @param $configTwineDirectory
+     */
     public function __construct(
         ImportfileRepository $importfileRepository,
         ImportTwine $importTwine,
@@ -164,5 +170,4 @@ class ImportController extends Controller
 
         return new Response(\json_encode($output));
     }
-
 }

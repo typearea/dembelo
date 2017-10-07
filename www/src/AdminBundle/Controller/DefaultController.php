@@ -74,7 +74,7 @@ class DefaultController extends Controller
         $filters = $request->query->get('filter');
 
         $query = $repository->createQueryBuilder();
-        if (!is_null($filters)) {
+        if (null !== $filters) {
             foreach ($filters as $field => $value) {
                 if (empty($value) && $value !== '0') {
                     continue;
@@ -95,7 +95,7 @@ class DefaultController extends Controller
             $obj = new StdClass();
             $obj->id = $user->getId();
             $obj->email = $user->getEmail();
-            $obj->roles = join(', ', $user->getRoles());
+            $obj->roles = implode(', ', $user->getRoles());
             $obj->licenseeId = is_null($user->getLicenseeId()) ? '' : $user->getLicenseeId();
             $obj->gender = $user->getGender();
             $obj->status = $user->getStatus(); // === 0 ? 'inaktiv' : 'aktiv';
