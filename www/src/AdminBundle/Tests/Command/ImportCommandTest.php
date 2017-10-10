@@ -303,6 +303,7 @@ class ImportCommandTest extends KernelTestCase
         $repositoryTopic->expects($this->any())
             ->method('findOneByName')
             ->will($this->returnCallback([$this, 'findOneTopicByNameCallback']));
+
         return [
             'container' => $container,
             'service' => $service,

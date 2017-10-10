@@ -58,9 +58,9 @@ class ImportController extends Controller
     /**
      * ImportController constructor.
      * @param ImportfileRepository $importfileRepository
-     * @param ImportTwine $importTwine
-     * @param ManagerRegistry $mongoDb
-     * @param $configTwineDirectory
+     * @param ImportTwine          $importTwine
+     * @param ManagerRegistry      $mongoDb
+     * @param string               $configTwineDirectory
      */
     public function __construct(
         ImportfileRepository $importfileRepository,
