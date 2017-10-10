@@ -95,6 +95,7 @@ class ImportController extends Controller
             $importfileData['imported'] = $importfile->getImported();
             $importfileData['orgname'] = $importfile->getOriginalname();
             $importfileData['licenseeId'] = $importfile->getLicenseeId();
+            $importfileData['topicId'] = $importfile->getTopicId();
             $output[] = $importfileData;
         }
 

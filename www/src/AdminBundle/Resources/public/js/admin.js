@@ -509,6 +509,7 @@ define(function () {
                                                                         {view: "text", name: "author", label: "Autor"},
                                                                         {view: "text", name: "publisher", label: "Verlag"},
                                                                         {view: "combo", id: "userformlicensee", name: "licenseeId", label: "Lizenznehmer", suggest: paths.adminLicenceeSuggest},
+                                                                        {view: "combo", id: "importfiletopic", name: "topicId", label: "Themenfeld", suggest: paths.adminTopicSuggest},
                                                                         {view: "text", name: "orgname", label: "Datei", disabled: true},
                                                                         {
                                                                             view:"uploader",

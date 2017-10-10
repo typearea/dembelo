@@ -26,7 +26,6 @@
 namespace DembeloMain\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class Importfile
@@ -77,11 +76,16 @@ class Importfile
     protected $filename;
 
     /**
+     * @MongoDB\ObjectId
+     */
+    protected $topicId;
+
+    /**
      * gets the mongodb id
      *
-     * @return string
+     * @return string|null
      */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -91,7 +95,7 @@ class Importfile
      *
      * @param string $id
      */
-    public function setId($id)
+    public function setId(string $id): void
     {
         $this->id = $id;
     }
@@ -99,9 +103,9 @@ class Importfile
     /**
      * gets the name
      *
-     * @return string
+     * @return string|null
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -111,7 +115,7 @@ class Importfile
      *
      * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -119,9 +123,9 @@ class Importfile
     /**
      * gets the licensee ID
      *
-     * @return string
+     * @return string|null
      */
-    public function getLicenseeId()
+    public function getLicenseeId(): ?string
     {
         return $this->licenseeId;
     }
@@ -131,15 +135,15 @@ class Importfile
      *
      * @param string $licenseeId licensee ID
      */
-    public function setLicenseeId($licenseeId)
+    public function setLicenseeId(string $licenseeId): void
     {
         $this->licenseeId = $licenseeId;
     }
 
     /**
-     * @return integer
+     * @return integer|null
      */
-    public function getImported()
+    public function getImported(): ?int
     {
         return $this->imported;
     }
@@ -147,15 +151,15 @@ class Importfile
     /**
      * @param integer $imported
      */
-    public function setImported($imported)
+    public function setImported(?int $imported): void
     {
         $this->imported = $imported;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getAuthor()
+    public function getAuthor(): ?string
     {
         return $this->author;
     }
@@ -163,15 +167,15 @@ class Importfile
     /**
      * @param string $author
      */
-    public function setAuthor($author)
+    public function setAuthor(string $author): void
     {
         $this->author = $author;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPublisher()
+    public function getPublisher(): ?string
     {
         return $this->publisher;
     }
@@ -179,15 +183,15 @@ class Importfile
     /**
      * @param string $publisher
      */
-    public function setPublisher($publisher)
+    public function setPublisher(string $publisher): void
     {
         $this->publisher = $publisher;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getOriginalname()
+    public function getOriginalname(): ?string
     {
         return $this->originalname;
     }
@@ -195,15 +199,15 @@ class Importfile
     /**
      * @param string $originalname
      */
-    public function setOriginalname($originalname)
+    public function setOriginalname(string $originalname): void
     {
         $this->originalname = $originalname;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getFilename()
+    public function getFilename(): ?string
     {
         return $this->filename;
     }
@@ -211,8 +215,24 @@ class Importfile
     /**
      * @param string $filename
      */
-    public function setFilename($filename)
+    public function setFilename(string $filename): void
     {
         $this->filename = $filename;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTopicId(): ?string
+    {
+        return $this->topicId;
+    }
+
+    /**
+     * @param string $topicId
+     */
+    public function setTopicId(string $topicId): void
+    {
+        $this->topicId = $topicId;
     }
 }

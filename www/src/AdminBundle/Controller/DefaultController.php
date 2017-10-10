@@ -163,6 +163,36 @@ class DefaultController extends Controller
     }
 
     /**
+     * @Route("/topicSuggest", name="admin_topic_suggest")
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function topicSuggestAction(Request $request): Response
+    {
+        $filter = $request->query->get('filter');
+
+        $searchString = $filter['value'];
+
+        $mongo = $this->get('doctrine_mongodb');
+        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
+        $repository = $mongo->getRepository('DembeloMain:Topic');
+
+        /* @var $topics \DembeloMain\Document\Topic[] */
+        $topics = $repository->findBy(array('name' => new \MongoRegex('/'.$searchString.'/')), null, 10);
+
+        $output = [];
+        foreach ($topics as $topic) {
+            $output[] = array(
+                'id' => $topic->getId(),
+                'value' => $topic->getName(),
+            );
+        }
+
+        return new Response(\json_encode($output));
+    }
+
+    /**
      * @Route("/topics", name="admin_topics")
      *
      * @return Response
