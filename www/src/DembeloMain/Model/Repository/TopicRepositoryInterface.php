@@ -71,4 +71,10 @@ interface TopicRepositoryInterface
      * @return Topic
      */
     public function save($topic);
+
+    /**
+     * @param string $name
+     * @return Topic
+     */
+    public function findOneByName(string $name): Topic;
 }

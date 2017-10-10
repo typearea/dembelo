@@ -79,8 +79,8 @@ class ImportfileTest extends WebTestCase
     public function testImported()
     {
         $this->assertNull($this->importfile->getImported());
-        $this->importfile->setImported('someImported');
-        $this->assertEquals('someImported', $this->importfile->getImported());
+        $this->importfile->setImported(2);
+        $this->assertEquals(2, $this->importfile->getImported());
     }
 
     /**

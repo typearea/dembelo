@@ -45,7 +45,9 @@ function file_exists($filename)
 
 namespace AdminBundle\Tests\Command;
 
+use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Licensee;
+use DembeloMain\Document\Topic;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -95,11 +97,12 @@ class ImportCommandTest extends KernelTestCase
     {
         $this->mockObjects['importTwine']->expects($this->once())
             ->method('run')
-            ->will($this->returnCallback(function ($importfile) {
+            ->will($this->returnCallback(function (Importfile $importfile) {
                 return $importfile->getFilename() === 'somefile_readable_exists.html'
                 && $importfile->getLicenseeId() === 'licenseeId'
                 && $importfile->getAuthor() === 'someauthor'
-                && $importfile->getPublisher() === 'somepublisher';
+                && $importfile->getPublisher() === 'somepublisher'
+                && $importfile->getTopicId() === 'someTopic';
             }));
 
         $returnValue = $this->commandTester->execute(array(
@@ -108,6 +111,7 @@ class ImportCommandTest extends KernelTestCase
             '--licensee-name' => 'somelicensee',
             '--metadata-author' => 'someauthor',
             '--metadata-publisher' => 'somepublisher',
+            '--topic-name' => 'someTopic',
         ));
 
         // the output of the command in the console
@@ -130,6 +134,7 @@ class ImportCommandTest extends KernelTestCase
             '--licensee-name' => 'somelicensee',
             '--metadata-author' => 'someauthor',
             '--metadata-publisher' => 'somepublisher',
+            '--topic-name' => 'someTopic',
         ));
 
         // the output of the command in the console
@@ -152,6 +157,7 @@ class ImportCommandTest extends KernelTestCase
             '--licensee-name' => 'somelicensee',
             '--metadata-author' => 'someauthor',
             '--metadata-publisher' => 'somepublisher',
+            '--topic-name' => 'someTopic',
         ));
 
         // the output of the command in the console
@@ -167,11 +173,12 @@ class ImportCommandTest extends KernelTestCase
     {
         $this->mockObjects['importTwine']->expects($this->once())
             ->method('run')
-            ->will($this->returnCallback(function ($importfile) {
+            ->will($this->returnCallback(function (Importfile $importfile) {
                 return $importfile->getFilename() === 'somefile_readable_exists.html'
                 && $importfile->getLicenseeId() === 'licenseeId'
                 && $importfile->getAuthor() === 'someauthor'
-                && $importfile->getPublisher() === 'somepublisher';
+                && $importfile->getPublisher() === 'somepublisher'
+                && $importfile->getTopicId() === 'someTopic';
             }))
             ->will($this->throwException(new \Exception('dummy Exception')));
 
@@ -184,6 +191,7 @@ class ImportCommandTest extends KernelTestCase
             '--licensee-name' => 'somelicensee',
             '--metadata-author' => 'someauthor',
             '--metadata-publisher' => 'somepublisher',
+            '--topic-name' => 'someTopic',
         ));
 
         // the output of the command in the console
@@ -236,6 +244,27 @@ class ImportCommandTest extends KernelTestCase
     }
 
     /**
+     * method for returnCallback()
+     *
+     * @param string $arg
+     * @return null|\PHPUnit_Framework_MockObject_MockObject|Topic
+     */
+    public function findOneTopicByNameCallback($arg): ?Topic
+    {
+        if ($arg !== 'someTopic') {
+            return null;
+        }
+
+        $topicMock = $this->getMockBuilder(Topic::class)->disableOriginalConstructor()->getMock();
+        $topicMock->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue('topicId'));
+
+        return $topicMock;
+    }
+
+
+    /**
      * @return array
      */
     private function getMockObjects(): array
@@ -244,6 +273,7 @@ class ImportCommandTest extends KernelTestCase
 
         $service = $this->getMockBuilder('Doctrine\Bundle\MongoDBBundle\ManagerRegistry')->disableOriginalConstructor()->getMock();
         $repositoryLicensee = $this->getMockBuilder('repositoryLicenseeMock')->setMethods(['findOneByName'])->getMock();
+        $repositoryTopic = $this->getMockBuilder('repositoryTopicMock')->setMethods(['findOneByName'])->getMock();
         $importTwine = $this->getMockBuilder('AdminBundle\Model\ImportTwine')->disableOriginalConstructor()->setMethods(['run', 'parserFree'])->getMock();
         $dm = $this->getMockBuilder('dmMock')->setMethods(['flush', 'persist'])->getMock();
 
@@ -257,15 +287,22 @@ class ImportCommandTest extends KernelTestCase
             ->will($this->returnValue($service));
         $service->expects($this->any())
             ->method("getRepository")
-            ->with($this->equalTo('DembeloMain:Licensee'))
-            ->will($this->returnValue($repositoryLicensee));
+            ->willReturnCallback(function ($repositoryName) use ($repositoryLicensee, $repositoryTopic) {
+                if ($repositoryName === 'DembeloMain:Licensee') {
+                    return $repositoryLicensee;
+                } elseif ($repositoryName === 'DembeloMain:Topic') {
+                    return $repositoryTopic;
+                }
+            });
         $service->expects($this->any())
             ->method("getManager")
             ->will($this->returnValue($dm));
         $repositoryLicensee->expects($this->any())
             ->method('findOneByName')
             ->will($this->returnCallback([$this, 'findOneByNameCallback']));
-
+        $repositoryTopic->expects($this->any())
+            ->method('findOneByName')
+            ->will($this->returnCallback([$this, 'findOneTopicByNameCallback']));
         return [
             'container' => $container,
             'service' => $service,

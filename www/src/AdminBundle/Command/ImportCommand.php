@@ -26,6 +26,7 @@ namespace AdminBundle\Command;
 
 use DembeloMain\Document\Importfile;
 use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
+use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -55,6 +56,7 @@ class ImportCommand extends ContainerAwareCommand
     private $dm = null;
 
     private $licenseeId = null;
+    private $topicId = null;
     private $author = '';
     private $publisher = '';
 
@@ -76,6 +78,12 @@ class ImportCommand extends ContainerAwareCommand
                 'l',
                 InputOption::VALUE_REQUIRED,
                 'The name of the licensee to which the imported textnodes belong to.'
+            )
+            ->addOption(
+                'topic-name',
+                't',
+                InputOption::VALUE_REQUIRED,
+                'The name of the topic to which the imported textnodes belong to.'
             )
             ->addOption(
                 'metadata-author',
@@ -115,6 +123,7 @@ class ImportCommand extends ContainerAwareCommand
             $importfile->setLicenseeId($this->licenseeId);
             $importfile->setAuthor($this->author);
             $importfile->setPublisher($this->publisher);
+            $importfile->setTopicId($this->topicId);
 
             $this->dm->persist($importfile);
             $this->dm->flush();
@@ -150,9 +159,19 @@ class ImportCommand extends ContainerAwareCommand
          * @var $licensee \DembeloMain\Document\Licensee
          */
         $licensee = $repositoryLicensee->findOneByName($input->getOption('licensee-name'));
-        if (is_null($licensee)) {
+        if (null === $licensee) {
             throw new \Exception("<error>A Licensee named '".$input->getOption('licensee-name')."' doesn't exist.</error>");
         }
+
+        /**
+         * @var $repositoryTopic TopicRepositoryInterface
+         */
+        $repositoryTopic = $this->mongo->getRepository('DembeloMain:Topic');
+        $topic = $repositoryTopic->findOneByName($input->getOption('topic-name'));
+        if (null === $topic) {
+            throw new \Exception("<error>A Topic named '".$input->getOption('topic-name')."' doesn't exist.</error>");
+        }
+        $this->topicId = $topic->getId();
 
         $this->author = $input->getOption('metadata-author');
         $this->publisher = $input->getOption('metadata-publisher');
