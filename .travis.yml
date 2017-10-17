@@ -18,7 +18,7 @@ script:
 - ./www/bin/phpcs --config-set installed_paths www/vendor/escapestudios/symfony2-coding-standard
 - ./www/bin/phpcs --standard=symfony2 www/src
 - ./www/bin/phpunit -c www/app/
-- php ./scripts/coverage-checker.php www/var/logs/clover.xml 67
+- php ./scripts/coverage-checker.php www/var/logs/clover.xml 69
 install:
 - composer --working-dir="www" install
 - phpenv rehash

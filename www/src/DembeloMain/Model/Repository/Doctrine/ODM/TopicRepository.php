@@ -67,4 +67,13 @@ class TopicRepository extends AbstractRepository implements TopicRepositoryInter
 
         return $query->getQuery()->execute();
     }
+
+    /**
+     * @param string $name
+     * @return Topic
+     */
+    public function findOneByName(string $name): Topic
+    {
+        return $this->__call(__FUNCTION__, func_get_args());
+    }
 }

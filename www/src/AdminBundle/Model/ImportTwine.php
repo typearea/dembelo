@@ -28,7 +28,6 @@ use AdminBundle\Service\TwineImport\HitchParser;
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
-use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use Exception;
 
 /**
@@ -42,11 +41,6 @@ class ImportTwine
      */
     private $textnodeRepository;
 
-    /**
-     * @var TopicRepositoryInterface
-     */
-    private $topicRepository;
-
     private $xmlParser;
 
     /**
@@ -58,7 +52,6 @@ class ImportTwine
      * @var \DembeloMain\Document\Textnode
      */
     private $textnode = null;
-    private $topicId = null;
     private $nodeNameMapping = [];
     private $accessSet = false;
     private $twineId;
@@ -75,16 +68,13 @@ class ImportTwine
     /**
      * ImportTwine constructor.
      * @param TextnodeRepositoryInterface $textnodeRepository
-     * @param TopicRepositoryInterface    $topicRepository
      * @param HitchParser                 $hitchParser
      */
     public function __construct(
         TextNodeRepositoryInterface $textnodeRepository,
-        TopicRepositoryInterface $topicRepository,
         HitchParser $hitchParser
     ) {
         $this->textnodeRepository = $textnodeRepository;
-        $this->topicRepository = $topicRepository;
         $this->hitchParser = $hitchParser;
     }
 
@@ -296,20 +286,6 @@ class ImportTwine
             throw new Exception("There is a '".$name."' in the Twine archive file '".$this->importfile->getFilename()."' which is missing its 'name' attribute.");
         }
 
-        $twineStory = explode("-->", $attrs['name'], 2);
-
-        if (count($twineStory) !== 2) {
-            throw new Exception("There is a '".$name."' in the Twine archive file '".$this->importfile->getFilename()."' which has an incomplete 'name' attribute. Twine stories must use the naming schema '?-->story name', where '?' is an existing Dembelo Topic Id. Instead, '".$attrs['name']."' was found.");
-        }
-
-        $this->topicId = $twineStory[0];
-
-        $topic = $this->topicRepository->find($this->topicId);
-
-        if (null === $topic) {
-            throw new Exception("The Dembelo Topic with Id '".$this->topicId."', referenced by Twine story '".$attrs['name']."' in the Twine archive file '".$this->importfile->getFilename()."', doesn't exist.");
-        }
-
         $this->twineStartnodeId = $attrs['startnode'];
         $this->textnodeMapping = array();
         $this->twineRelevant = true;
@@ -320,12 +296,12 @@ class ImportTwine
         if (empty($tagString) || !is_string($tagString)) {
             throw new Exception('no ID given for Textnode "'.$textnodeTitle.'"');
         }
-        $tagArray = explode(" ", $tagString);
+        $tagArray = explode(' ', $tagString);
 
         $twineId = false;
 
         foreach ($tagArray as $tag) {
-            if (substr($tag, 0, 3) === 'ID:') {
+            if (0 === strpos($tag, 'ID:')) {
                 $twineId = substr($tag, 3);
             }
         }
@@ -363,7 +339,7 @@ class ImportTwine
         if (null === $this->textnode) {
             $this->textnode = new Textnode();
             $this->textnode->setCreated(date('Y-m-d H:i:s'));
-            $this->textnode->setTopicId($this->topicId);
+            $this->textnode->setTopicId($this->importfile->getTopicId());
             $this->textnode->setLicenseeId($this->importfile->getLicenseeId());
             $this->textnode->setImportfileId($this->importfile->getId());
             $this->textnode->setStatus(Textnode::STATUS_ACTIVE);

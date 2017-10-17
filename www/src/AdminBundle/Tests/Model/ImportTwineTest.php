@@ -120,10 +120,7 @@ use AdminBundle\Service\TwineImport\HitchParser;
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
-use DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository;
-use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DependencyInjection\Container;
 
 // @codingStandardsIgnoreEnd
 
@@ -157,29 +154,27 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithFopenIsFalse()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
 
         $importfile = $this->getDummyImportfile(['filename' => 'somefilename']);
 
         $hitchParserMock = $this->createHitchParserMock();
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Exception
      * @expectedExceptionMessage Failed to read data from file 'somefilename_readable'
      */
     public function testRunWithFreadReturnFalse()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $dm = $this->getDmMock();
         $importfile = $this->getDummyImportfile();
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $importTwine->run($importfile);
         $dm->expects($this->never())
             ->method('persist');
@@ -194,7 +189,6 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithWrongFileFormat()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $dm = $this->getDmMock();
@@ -202,7 +196,7 @@ class ImportTwineTest extends WebTestCase
 
         self::$freadStack = ['erste Zeile', 'zweite Zeile'];
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $importTwine->run($importfile);
         $dm->expects($this->never())
             ->method('persist');
@@ -217,7 +211,6 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithEmptyFirstLine()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $dm = $this->getDmMock();
@@ -225,7 +218,7 @@ class ImportTwineTest extends WebTestCase
 
         self::$freadStack = [''];
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $importTwine->run($importfile);
         $dm->expects($this->never())
             ->method('persist');
@@ -241,7 +234,6 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithCorrectButIncompleteData()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $dm = $this->getDmMock();
@@ -249,7 +241,7 @@ class ImportTwineTest extends WebTestCase
 
         self::$freadStack = ['<tw-storydata hurz>', 'zweite Zeile'];
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $retVal = $importTwine->run($importfile);
         $this->assertTrue($retVal);
         $dm->expects($this->never())
@@ -266,14 +258,13 @@ class ImportTwineTest extends WebTestCase
     public function testRunButNoTextnodeIsWritten()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName" tags="Freigegeben ID:foobar" position="104,30">lorem impsum',
             'lorem impsum</tw-passagedata></tw-storydata>',
@@ -291,11 +282,7 @@ class ImportTwineTest extends WebTestCase
             ->method('findByTwineId')
             ->will($this->returnValue(null));
 
-        $topicRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue(true));
-
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $retVal = $importTwine->run($importfile);
         $this->assertTrue($retVal);
         $textnodeRepository->expects($this->never())
@@ -312,14 +299,13 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithSingleNodeWithText()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben ID:foobar" position="104,30">lorem ipsum',
             'lorem ipsum</tw-passagedata></tw-storydata>',
@@ -333,10 +319,6 @@ class ImportTwineTest extends WebTestCase
             ->method('find')
             ->will($this->returnValue($textnode));
 
-        $topicRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue(true));
-
         $textnodeRepository->expects($this->once())
             ->method('save')
             ->with($this->callback(function ($textnode) {
@@ -344,7 +326,7 @@ class ImportTwineTest extends WebTestCase
                     && $textnode->getText() === "lorem ipsumlorem ipsum";
             }));
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $retVal = $importTwine->run($importfile);
         $this->assertTrue($retVal);
 
@@ -358,14 +340,13 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithUnfinishedLinkTag()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben ID:foobar" position="104,30">lorem ipsum',
             'lorem ipsum</tw-passagedata></tw-storydata>',
@@ -375,10 +356,6 @@ class ImportTwineTest extends WebTestCase
 
         $textnode = new Textnode();
         $textnode->setText('ein [[kaputter Link');
-
-        $topicRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue(true));
 
         $textnodeRepository->expects($this->any())
             ->method('find')
@@ -391,7 +368,7 @@ class ImportTwineTest extends WebTestCase
                 && $textnode->getText() === "lorem ipsumlorem ipsum";
             }));
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $retVal = $importTwine->run($importfile);
         $this->assertTrue($retVal);
 
@@ -407,12 +384,11 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithExceptionWhenNoLicenseeIsAvailable()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile(['licenseeId' => null]);
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -425,12 +401,11 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithExceptionWhenNoFilenameIsAvailable()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile(['filename' => null]);
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -441,14 +416,13 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithTextnodeWithoutTwineID()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben" position="104,30">lorem ipsum',
             'lorem ipsum</tw-passagedata></tw-storydata>',
@@ -462,14 +436,10 @@ class ImportTwineTest extends WebTestCase
             ->method('find')
             ->will($this->returnValue($textnode));
 
-        $topicRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue(true));
-
         $textnodeRepository->expects($this->never())
             ->method('save');
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -480,14 +450,13 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithTextnodeWithoutAnyTag()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="" position="104,30">lorem ipsum',
             'lorem ipsum</tw-passagedata></tw-storydata>',
@@ -501,14 +470,10 @@ class ImportTwineTest extends WebTestCase
             ->method('find')
             ->will($this->returnValue($textnode));
 
-        $topicRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue(true));
-
         $textnodeRepository->expects($this->never())
             ->method('save');
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -519,14 +484,13 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithTextnodeWithTwineID()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben ID:foobar" position="104,30">lorem ipsum',
             'lorem ipsum</tw-passagedata></tw-storydata>',
@@ -540,15 +504,11 @@ class ImportTwineTest extends WebTestCase
             ->method('find')
             ->will($this->returnValue($textnode));
 
-        $topicRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue(true));
-
         $textnodeRepository->expects($this->once())
             ->method('findByTwineId')
             ->with($importfile, 'foobar');
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -559,14 +519,13 @@ class ImportTwineTest extends WebTestCase
     public function testParserFree()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben ID:foobar" position="104,30">lorem ipsum',
             'lorem ipsum</tw-passagedata></tw-storydata>',
@@ -580,15 +539,11 @@ class ImportTwineTest extends WebTestCase
             ->method('find')
             ->will($this->returnValue($textnode));
 
-        $topicRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue(true));
-
         $textnodeRepository->expects($this->once())
             ->method('findByTwineId')
             ->with($importfile, 'foobar');
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $importTwine->run($importfile);
 
         $this->assertTrue(self::$parserFreeCalled);
@@ -601,14 +556,13 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithTextnodeDeletedInImportfile()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben ID:foobar" position="104,30">lorem ipsum',
             'lorem ipsum</tw-passagedata></tw-storydata>',
@@ -623,10 +577,6 @@ class ImportTwineTest extends WebTestCase
             ->method('find')
             ->will($this->returnValue($textnode));
 
-        $topicRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue(true));
-
         $textnodeRepository->expects($this->once())
             ->method('findByTwineId')
             ->with($importfile, 'foobar')
@@ -636,7 +586,7 @@ class ImportTwineTest extends WebTestCase
             ->method('disableOrphanedNodes')
             ->with($importfile, [$textnode->getId()]);
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -647,14 +597,13 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithDuplicateTwineId()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId" position="104,30">lorem ipsum',
             'lorem ipsum</tw-passagedata>',
@@ -671,14 +620,10 @@ class ImportTwineTest extends WebTestCase
             ->method('find')
             ->will($this->returnValue($textnode));
 
-        $topicRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue(true));
-
         $textnodeRepository->expects($this->once())
             ->method('save');
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -689,14 +634,13 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithLinkToAnotherTextnode()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
             'lorem ipsum [[Linkdata->someNodeName2]]</tw-passagedata>',
@@ -729,10 +673,6 @@ class ImportTwineTest extends WebTestCase
             ->method('find')
             ->will($this->returnValue($textnode1));
 
-        $topicRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue(true));
-
         $textnodeRepository->expects($this->any())
             ->method('save')
             ->willReturnCallback(function ($textnode) {
@@ -740,7 +680,7 @@ class ImportTwineTest extends WebTestCase
                 $textnode->setId('someTextnode'.$counter++);
             });
 
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $returnValue = $importTwine->run($importfile);
 
         $this->assertTrue($returnValue);
@@ -752,14 +692,13 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithMetadataSetting()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
             'lorem ipsum [[Linkdata->someNodeName2]]</tw-passagedata>',
@@ -778,11 +717,7 @@ class ImportTwineTest extends WebTestCase
             ->method('find')
             ->will($this->returnValue($textnode1));
 
-        $topicRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue(true));
-
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $returnValue = $importTwine->run($importfile);
         self::assertTrue($returnValue);
         $metadata = $textnode1->getMetadata();
@@ -798,14 +733,13 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithMetadataSettingForInvalidFormat()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
             'lorem ipsum [[Linkdata->someNodeName2]]</tw-passagedata>',
@@ -824,11 +758,7 @@ class ImportTwineTest extends WebTestCase
             ->method('find')
             ->will($this->returnValue($textnode1));
 
-        $topicRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue(true));
-
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -839,14 +769,13 @@ class ImportTwineTest extends WebTestCase
     public function testRunWithMetadataSettingForAnAlreadyExistingMetadataKey()
     {
         $textnodeRepository = $this->getTextnodeRepositoryMock();
-        $topicRepository = $this->getTopicRepositoryMock();
         $hitchParserMock = $this->createHitchParserMock();
 
         $importfile = $this->getDummyImportfile();
 
         self::$freadStack = [
             '<tw-storydata ',
-            '<tw-storydata name="someTopicId-->someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
             'lorem ipsum [[Linkdata->someNodeName2]]</tw-passagedata>',
@@ -866,11 +795,7 @@ class ImportTwineTest extends WebTestCase
             ->method('find')
             ->will($this->returnValue($textnode1));
 
-        $topicRepository->expects($this->any())
-            ->method('find')
-            ->will($this->returnValue(true));
-
-        $importTwine = new ImportTwine($textnodeRepository, $topicRepository, $hitchParserMock);
+        $importTwine = new ImportTwine($textnodeRepository, $hitchParserMock);
         $importTwine->run($importfile);
     }
 
@@ -912,14 +837,6 @@ class ImportTwineTest extends WebTestCase
     private function getTextnodeRepositoryMock()
     {
         return $this->getMockBuilder(TextNodeRepository::class)->disableOriginalConstructor()->setMethods(['createQueryBuilder', 'field', 'equals', 'getQuery', 'save', 'find', 'findByTwineId', 'disableOrphanedNodes', 'setHyphenatedText'])->getMock();
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|TopicRepository
-     */
-    private function getTopicRepositoryMock()
-    {
-        return $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['find'])->getMock();
     }
 
     private function getDmMock()
