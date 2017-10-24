@@ -10,10 +10,7 @@ body {
   padding-top: $toolbar-height;
   background: $sepia;
   overflow-x: hidden;
-  &.nav-active {
-    overflow-y: hidden;
-  }
-
+  
   main {
     padding-top: 20px;
   }
