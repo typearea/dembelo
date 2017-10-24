@@ -66,7 +66,7 @@ class ImportController extends Controller
         ImportfileRepository $importfileRepository,
         ImportTwine $importTwine,
         ManagerRegistry $mongoDb,
-        $configTwineDirectory
+        string $configTwineDirectory
     ) {
         $this->importfileRepository = $importfileRepository;
         $this->importTwine = $importTwine;

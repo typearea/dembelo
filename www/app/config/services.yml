@@ -39,6 +39,11 @@ services:
         class:
             - [setContainer, ["@service_container"]]
 
+    app.admin_controller_default:
+        class: AdminBundle\Controller\DefaultController
+        arguments:
+            - %twine_directory%
+
     app.admin_controller_import:
         class: AdminBundle\Controller\ImportController
         arguments:

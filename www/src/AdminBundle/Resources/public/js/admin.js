@@ -76,10 +76,13 @@ define(function () {
                     $$("topicuploadimagelist").clearAll();
                     $$('topicform').setValues({imageFileName: null}, true);
                 }
-                $$(id).save();
+
                 if (params['newId']) {
                     $$(type + 'grid').getSelectedItem().id = params['newId'];
+                    $$(type + 'form').setValues({id: params['newId']}, true);
                 }
+
+                $$(id).save();
 
                 webix.modalbox({
                     title: "Gespeichert",
@@ -109,7 +112,7 @@ define(function () {
     }
 
     function importfileImport() {
-        var importfileId = $$('importfilegrid').getSelectedId().id;
+        var importfileId = $$('importfilegrid').getSelectedItem().id;
 
         webix.ajax().post(window.paths.adminImport, {importfileId: importfileId}, {
             success: function (text) {
@@ -252,7 +255,7 @@ define(function () {
 
             $$('userform').bind($$('usergrid'));
             $$('userformrole').attachEvent('onChange', function (newValue) {
-                if (newValue == 'ROLE_LICENSEE') {
+                if (newValue === 'ROLE_LICENSEE') {
                     $$('userformlicensee').enable()
                 } else {
                     $$('userformlicensee').setValue('');
