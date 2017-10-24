@@ -209,7 +209,7 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
     /**
      * sets the roles
      *
-     * @param array $roles
+     * @param array|string $roles
      */
     public function setRoles($roles)
     {

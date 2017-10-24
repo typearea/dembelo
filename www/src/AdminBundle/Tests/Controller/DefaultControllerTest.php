@@ -28,14 +28,11 @@ namespace AdminBundle\Tests\Controller;
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Licensee;
 use DembeloMain\Document\Textnode;
-use DembeloMain\Document\Topic;
 use DembeloMain\Document\User;
 use DembeloMain\Model\Repository\Doctrine\ODM\ImportfileRepository;
 use DembeloMain\Model\Repository\Doctrine\ODM\LicenseeRepository;
 use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
-use DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
-use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AdminBundle\Controller\DefaultController;
@@ -50,13 +47,41 @@ use Symfony\Component\HttpFoundation\Response;
 class DefaultControllerTest extends WebTestCase
 {
     private $container;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|DocumentRepository
+     */
     private $repository;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     */
     private $service;
 
     /**
-     * tests the index action
+     * @var DefaultController
      */
-    public function testIndexAction()
+    private $controller;
+
+    /**
+     * @var string
+     */
+    private $twineDirectory;
+
+    /**
+     * @return void
+     */
+    public function setUp(): void
+    {
+        $this->twineDirectory = '/tmp/twineDirectory';
+        $this->controller = new DefaultController($this->twineDirectory);
+    }
+
+    /**
+     * tests the index action
+     * @return void
+     */
+    public function testIndexAction(): void
     {
         $client = static::createClient();
         $crawler = $client->request('GET', '/admin/');
@@ -67,36 +92,36 @@ class DefaultControllerTest extends WebTestCase
 
     /**
      * tests controller's userAction with no users in db
+     * @return void
      */
-    public function testUserAction()
+    public function testUserAction(): void
     {
         $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
         $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
         $queryMock = $this->getMockBuilder('foobar')->setMethods(array('execute', 'getQuery'))->getMock();
         $postArray = array();
         $postMock->expects($this->once())
-            ->method("get")
+            ->method('get')
             ->will($this->returnValue($postArray));
         $request->query = $postMock;
 
         $queryMock->expects($this->once())
-            ->method("getQuery")
+            ->method('getQuery')
             ->will($this->returnSelf());
 
         $queryMock->expects($this->once())
-            ->method("execute")
+            ->method('execute')
             ->will($this->returnValue(array()));
 
         $this->loadMongoContainer('user');
         $this->repository->expects($this->once())
-            ->method("createQueryBuilder")
+            ->method('createQueryBuilder')
             ->will($this->returnValue($queryMock));
 
-        $controller = new DefaultController();
-        $controller->setContainer($this->container);
+        $this->controller->setContainer($this->container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->usersAction($request);
+        $response = $this->controller->usersAction($request);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertJsonStringEqualsJsonString('[]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
@@ -104,26 +129,27 @@ class DefaultControllerTest extends WebTestCase
 
     /**
      * tests controller's userAction with two users in db
+     * @return void
      */
-    public function testUserActionWithUsers()
+    public function testUserActionWithUsers(): void
     {
         $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
         $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
         $queryMock = $this->getMockBuilder('foobar')->setMethods(['execute', 'getQuery'])->getMock();
         $postArray = array();
         $postMock->expects($this->once())
-            ->method("get")
+            ->method('get')
             ->will($this->returnValue($postArray));
         $request->query = $postMock;
 
         $queryMock->expects($this->once())
-            ->method("getQuery")
+            ->method('getQuery')
             ->will($this->returnSelf());
 
         $this->loadMongoContainer('user');
 
         $this->repository->expects($this->once())
-            ->method("createQueryBuilder")
+            ->method('createQueryBuilder')
             ->will($this->returnValue($queryMock));
 
         $user1 = new User();
@@ -143,14 +169,13 @@ class DefaultControllerTest extends WebTestCase
         );
 
         $queryMock->expects($this->once())
-            ->method("execute")
+            ->method('execute')
             ->will($this->returnValue($userArray));
 
-        $controller = new DefaultController();
-        $controller->setContainer($this->container);
+        $this->controller->setContainer($this->container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->usersAction($request);
+        $response = $this->controller->usersAction($request);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertJsonStringEqualsJsonString('[{"id":"id1","gender":null,"email":"email1","roles":"ROLE_ADMIN","licenseeId":"lic1","status":null,"source":null,"reason":null,"created":"'.date('Y-m-d H:i:s', 0).'","updated":"'.date('Y-m-d H:i:s', 0).'"},{"id":"id2","email":"email2","roles":"ROLE_USER","licenseeId":"lic2","status":null,"source":null,"reason":null,"gender":null,"created":"'.date('Y-m-d H:i:s', 0).'","updated":"'.date('Y-m-d H:i:s', 0).'"}]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
@@ -158,8 +183,9 @@ class DefaultControllerTest extends WebTestCase
 
     /**
      * tear down method
+     * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->container = null;
         $this->repository = null;
@@ -168,22 +194,22 @@ class DefaultControllerTest extends WebTestCase
 
     /**
      * tests the formsaveAction without parameters
+     * @return void
      */
-    public function testFormsaveActionWithoutParameters()
+    public function testFormsaveActionWithoutParameters(): void
     {
         $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
         $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
         $postArray = array();
         $postMock->expects($this->once())
-            ->method("all")
+            ->method('all')
             ->will($this->returnValue($postArray));
         $request->request = $postMock;
 
-        $controller = new DefaultController();
-        $controller->setContainer($this->container);
+        $this->controller->setContainer($this->container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->formsaveAction($request);
+        $response = $this->controller->formsaveAction($request);
         $this->assertInstanceOf(Response::class, $response);
         $json = $response->getContent();
         $this->assertJson($json);
@@ -193,8 +219,9 @@ class DefaultControllerTest extends WebTestCase
 
     /**
      * tests the formsaveAction with wrong parameters
+     * @return void
      */
-    public function testFormsaveActionWithWrongParameters()
+    public function testFormsaveActionWithWrongParameters(): void
     {
         $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
         $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
@@ -202,15 +229,14 @@ class DefaultControllerTest extends WebTestCase
             'formtype' => 'nonexistant',
         );
         $postMock->expects($this->once())
-            ->method("all")
+            ->method('all')
             ->will($this->returnValue($postArray));
         $request->request = $postMock;
 
-        $controller = new DefaultController();
-        $controller->setContainer($this->container);
+        $this->controller->setContainer($this->container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->formsaveAction($request);
+        $response = $this->controller->formsaveAction($request);
         $this->assertInstanceOf(Response::class, $response);
         $json = $response->getContent();
         $this->assertJson($json);
@@ -220,8 +246,9 @@ class DefaultControllerTest extends WebTestCase
 
     /**
      * tests the formsaveAction with an existing user
+     * @return void
      */
-    public function testFormsaveActionExistingUser()
+    public function testFormsaveActionExistingUser(): void
     {
         $user = new User();
         $user->setId('someId');
@@ -236,7 +263,7 @@ class DefaultControllerTest extends WebTestCase
             'id' => $user->getId(),
         );
         $postMock->expects($this->once())
-            ->method("all")
+            ->method('all')
             ->will($this->returnValue($postArray));
         $request->request = $postMock;
 
@@ -245,11 +272,10 @@ class DefaultControllerTest extends WebTestCase
             ->with($user->getId())
             ->will($this->returnValue($user));
 
-        $controller = new DefaultController();
-        $controller->setContainer($this->container);
+        $this->controller->setContainer($this->container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->formsaveAction($request);
+        $response = $this->controller->formsaveAction($request);
         $this->assertInstanceOf(Response::class, $response);
         $json = $response->getContent();
         $this->assertJson($json);
@@ -260,8 +286,9 @@ class DefaultControllerTest extends WebTestCase
 
     /**
      * tests the formsaveAction with a nonexisting user
+     * @return void
      */
-    public function testFormsaveActionNotExistingUser()
+    public function testFormsaveActionNotExistingUser(): void
     {
         $user = new User();
         $user->setId('someId');
@@ -276,7 +303,7 @@ class DefaultControllerTest extends WebTestCase
             'id' => $user->getId(),
         );
         $postMock->expects($this->once())
-            ->method("all")
+            ->method('all')
             ->will($this->returnValue($postArray));
         $request->request = $postMock;
 
@@ -285,11 +312,10 @@ class DefaultControllerTest extends WebTestCase
             ->with($user->getId())
             ->will($this->returnValue(null));
 
-        $controller = new DefaultController();
-        $controller->setContainer($this->container);
+        $this->controller->setContainer($this->container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->formsaveAction($request);
+        $response = $this->controller->formsaveAction($request);
         $this->assertInstanceOf(Response::class, $response);
         $json = $response->getContent();
         $this->assertJson($json);
@@ -299,8 +325,9 @@ class DefaultControllerTest extends WebTestCase
 
     /**
      * tests the formsaveAction without admin permission
+     * @return void
      */
-    public function testFormsaveActionWithoutAdminPermission()
+    public function testFormsaveActionWithoutAdminPermission(): void
     {
         $client = static::createClient();
         $crawler = $client->request('GET', '/admin/save');
@@ -312,8 +339,9 @@ class DefaultControllerTest extends WebTestCase
 
     /**
      * tests the formsaveAction with missing id parameter
+     * @return void
      */
-    public function testFormsaveActionWithMissingIdParameter()
+    public function testFormsaveActionWithMissingIdParameter(): void
     {
         $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
         $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
@@ -322,15 +350,14 @@ class DefaultControllerTest extends WebTestCase
             'name' => 'someLNName',
         );
         $postMock->expects($this->once())
-            ->method("all")
+            ->method('all')
             ->will($this->returnValue($postArray));
         $request->request = $postMock;
 
-        $controller = new DefaultController();
-        $controller->setContainer($this->container);
+        $this->controller->setContainer($this->container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->formsaveAction($request);
+        $response = $this->controller->formsaveAction($request);
         $this->assertInstanceOf(Response::class, $response);
         $json = $response->getContent();
         $this->assertJson($json);
@@ -340,8 +367,9 @@ class DefaultControllerTest extends WebTestCase
 
     /**
      * tests licenseeAction with no licensees
+     * @return void
      */
-    public function testLicenseeActionWithNoLicensees()
+    public function testLicenseeActionWithNoLicensees(): void
     {
         $repository = $this->getMockBuilder(LicenseeRepository::class)->disableOriginalConstructor()->setMethods(['findAll'])->getMock();
         $repository->expects($this->once())
@@ -354,20 +382,20 @@ class DefaultControllerTest extends WebTestCase
             ->with('app.model_repository_licensee')
             ->willReturn($repository);
 
-        $controller = new DefaultController();
-        $controller->setContainer($container);
+        $this->controller->setContainer($container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->licenseesAction();
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $response = $this->controller->licenseesAction();
+        $this->assertInstanceOf(Response::class, $response);
         $this->assertJsonStringEqualsJsonString('[]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
     }
 
     /**
      * tests licenseeAction() with one licensee
+     * @return void
      */
-    public function testLicenseeActionWithOneLicensee()
+    public function testLicenseeActionWithOneLicensee(): void
     {
         $licensee = new Licensee();
         $licensee->setName('someName');
@@ -384,28 +412,28 @@ class DefaultControllerTest extends WebTestCase
             ->with('app.model_repository_licensee')
             ->willReturn($repository);
 
-        $controller = new DefaultController();
-        $controller->setContainer($container);
+        $this->controller->setContainer($container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->licenseesAction();
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $response = $this->controller->licenseesAction();
+        $this->assertInstanceOf(Response::class, $response);
         $this->assertJsonStringEqualsJsonString('[{"id":"someId","name":"someName"}]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
     }
 
     /**
      * tests textnode action
+     * @return void
      */
-    public function testTextnodesAction()
+    public function testTextnodesAction(): void
     {
         $textnode = new Textnode();
         $textnode->setId('someId');
-        $textnode->setCreated(new \DateTime("2017-01-01 12:00:00"));
+        $textnode->setCreated(new \DateTime('2017-01-01 12:00:00'));
         $textnode->setStatus(1);
         $textnode->setAccess(true);
         $textnode->setLicenseeId('someLicenseeId');
-        $textnode->setArbitraryId("someArbitraryId");
+        $textnode->setArbitraryId('someArbitraryId');
         $textnode->setTwineId('someTwineId');
         $textnode->setMetadata(['key1' => 'val1', 'key2' => 'val2']);
 
@@ -451,12 +479,11 @@ class DefaultControllerTest extends WebTestCase
             ->with('app.model_repository_importfile')
             ->willReturn($importfileRepository);
 
-        $controller = new DefaultController();
-        $controller->setContainer($container);
+        $this->controller->setContainer($container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->textnodesAction();
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+        $response = $this->controller->textnodesAction();
+        $this->assertInstanceOf(Response::class, $response);
         $expectedJson = '[{"id":"someId","status":"aktiv","created":"01.01.2017, 12:00:00",';
         $expectedJson .= '"access":"ja","licensee":"someLicenseeName","importfile":"unbekannt","beginning":"...",';
         $expectedJson .= '"financenode":"ja","arbitraryId":"someArbitraryId","twineId":"someTwineId",';
@@ -464,7 +491,10 @@ class DefaultControllerTest extends WebTestCase
         $this->assertJsonStringEqualsJsonString($expectedJson, $response->getContent());
     }
 
-    private function getLicenseeRepositoryMock()
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|LicenseeRepository
+     */
+    private function getLicenseeRepositoryMock(): LicenseeRepository
     {
         $repository = $this->getMockBuilder(LicenseeRepository::class)
             ->disableOriginalConstructor()
@@ -474,7 +504,10 @@ class DefaultControllerTest extends WebTestCase
         return $repository;
     }
 
-    private function getImportfileRepositoryMock()
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ImportfileRepository
+     */
+    private function getImportfileRepositoryMock(): ImportfileRepository
     {
         $repository = $this->getMockBuilder(ImportfileRepository::class)
             ->disableOriginalConstructor()
@@ -486,8 +519,9 @@ class DefaultControllerTest extends WebTestCase
 
     /**
      * load mockoed container and mocked mongodb repository
+     * @return void
      */
-    private function loadMongoContainer($repository)
+    private function loadMongoContainer($repository): void
     {
         $this->loadMockedContainer();
         $this->loadMockedMongoRepository($repository);
@@ -495,21 +529,23 @@ class DefaultControllerTest extends WebTestCase
 
     /**
      * load mocked container
+     * @return void
      */
-    private function loadMockedContainer()
+    private function loadMockedContainer(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
     /**
      * load mocked mongodb repository
+     * @return void
      */
-    private function loadMockedMongoRepository($repository)
+    private function loadMockedMongoRepository($repository): void
     {
         $this->service = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
         $this->repository = $this->getMockBuilder(DocumentRepository::class)->disableOriginalConstructor()->getMock();
         $this->container->expects($this->once())
-            ->method("get")
+            ->method('get')
             ->with($this->equalTo('app.model_repository_'.$repository))
             ->will($this->returnValue($this->repository));
     }

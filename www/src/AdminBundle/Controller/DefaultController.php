@@ -37,9 +37,24 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 /**
  * Class DefaultController
+ * @Route(service="app.admin_controller_default")
  */
 class DefaultController extends Controller
 {
+
+    /**
+     * @var string
+     */
+    private $configTwineDirectory;
+
+    /**
+     * DefaultController constructor.
+     * @param string $configTwineDirectory
+     */
+    public function __construct(string $configTwineDirectory)
+    {
+        $this->configTwineDirectory = $configTwineDirectory;
+    }
 
     /**
      * @Route("/", name="admin_mainpage")
@@ -375,6 +390,8 @@ class DefaultController extends Controller
      * @param Importfile $item importfile instance
      * @param string $filename filename hash
      * @param string $orgname original name
+     * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     * @throws \RuntimeException
      */
     private function saveFile(Importfile $item, $filename, $orgname)
     {
@@ -382,13 +399,19 @@ class DefaultController extends Controller
             return;
         }
 
-        $directory = $this->container->getParameter('twine_directory');
+        $directory = $this->configTwineDirectory;
+        $file = $directory.$filename;
+        if (!file_exists($file)) {
+            return;
+        }
         $finalDirectory = $directory.$item->getLicenseeId().'/';
         if (!is_dir($finalDirectory)) {
-            mkdir($finalDirectory);
+            if (!mkdir($finalDirectory) && !is_dir($finalDirectory)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $finalDirectory));
+            }
         }
         $finalName = $finalDirectory.$item->getId();
-        $file = $directory.$filename;
+
         rename($file, $finalName);
 
         $item->setOriginalname($orgname);
