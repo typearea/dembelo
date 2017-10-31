@@ -83,9 +83,9 @@ class ImportTwine
     /**
      * ImportTwine constructor.
      * @param TextnodeRepositoryInterface $textnodeRepository
-     * @param HitchParser $hitchParser
-     * @param FileExtractor $fileExtractor
-     * @param FileCheck $fileCheck
+     * @param HitchParser                 $hitchParser
+     * @param FileExtractor               $fileExtractor
+     * @param FileCheck                   $fileCheck
      */
     public function __construct(
         TextNodeRepositoryInterface $textnodeRepository,
@@ -340,7 +340,7 @@ class ImportTwine
     {
         $textnodeTextNew = preg_replace_callback(
             '/\[\[(.*?)\]\]/',
-            function($matches) use ($textnode, $name) {
+            function ($matches) use ($textnode, $name) {
                 $content = $matches[1];
                 $hitch = null;
                 $metadata = null;

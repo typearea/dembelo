@@ -21,6 +21,10 @@ namespace AdminBundle\Service\TwineImport;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+/**
+ * Class FileCheckTest
+ * @package AdminBundle\Service\TwineImport
+ */
 class FileCheckTest extends WebTestCase
 {
     /**
@@ -46,7 +50,7 @@ class FileCheckTest extends WebTestCase
     {
         $tmpName = @tempnam('/tmp/phpunit', 'filecheck');
         $fileHandler = fopen($tmpName, 'r+');
-        fwrite($fileHandler, '  ' . "\n" . '<tw-storydata hurz');
+        fwrite($fileHandler, '  '."\n".'<tw-storydata hurz');
         fseek($fileHandler, 0);
 
         $fileCheck = new FileCheck();

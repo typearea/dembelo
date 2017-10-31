@@ -771,7 +771,7 @@ class ImportTwineTest extends WebTestCase
         ];
 
         $textnode1 = new Textnode();
-        $textnode1->setText('lorem ipsum' . "\n" . "foo bar");
+        $textnode1->setText('lorem ipsum'."\n"."foo bar");
         $textnode1->setId('someId0');
 
         $this->textnodeRepository->expects($this->any())

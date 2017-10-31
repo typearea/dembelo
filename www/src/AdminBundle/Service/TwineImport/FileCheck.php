@@ -28,12 +28,12 @@ class FileCheck
     private const OPENING_STRING = '<tw-storydata ';
 
     /**
-     * @param $fileHandler
-     * @param $filename
+     * @param resource $fileHandler
+     * @param string   $filename
      * @return bool
      * @throws \Exception
      */
-    public function check($fileHandler, $filename): bool
+    public function check($fileHandler, string $filename): bool
     {
         $magicStringLength = strlen(self::OPENING_STRING);
 
