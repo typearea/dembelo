@@ -302,48 +302,6 @@ class ImportTwineTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage The Twine archive file has a textnode which contains a malformed link that starts with '[[' but has no corresponding ']]'.
-     */
-    public function testRunWithUnfinishedLinkTag()
-    {
-        $importfile = $this->getDummyImportfile();
-
-        $this->fileExtractorMock->expects(self::any())
-            ->method('extract')
-            ->willReturn('readable.extracted');
-
-        self::$freadStack = [
-            '<tw-storydata ',
-            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
-            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
-            '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben ID:foobar" position="104,30">lorem ipsum',
-            'ein [[kaputter Link</tw-passagedata></tw-storydata>',
-        ];
-
-        $textnode = new Textnode();
-        $textnode->setId('someTextnodeId');
-
-        $this->textnodeRepository->expects($this->any())
-            ->method('find')
-            ->willReturn($textnode);
-
-        $this->textnodeRepository->expects($this->any())
-            ->method('findByTwineId')
-            ->willReturn($textnode);
-
-        $this->textnodeRepository->expects($this->any())
-            ->method('save')
-            ->with($this->callback(function ($textnode) {
-                return $textnode instanceof Textnode
-                && $textnode->getText() === "lorem ipsumein [[kaputter Link";
-            }));
-
-        $retVal = $this->importTwine->run($importfile);
-        $this->assertTrue($retVal);
-    }
-
-    /**
      * check if exception is thrown when no licensee is available
      *
      * @expectedException Exception
@@ -596,8 +554,6 @@ class ImportTwineTest extends WebTestCase
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
-            'lorem ipsum [[Linkdata->someNodeName2]]</tw-passagedata>',
-            '<tw-passagedata pid="2" name="someNodeName2" tags="ID:someTwineId2" position="104,30">lorem ipsum',
             'lorem ipsum</tw-passagedata>',
             '</tw-storydata>',
         ];
@@ -633,7 +589,213 @@ class ImportTwineTest extends WebTestCase
 
         $returnValue = $this->importTwine->run($importfile);
 
-        $this->assertTrue($returnValue);
+        self::assertTrue($returnValue);
+        self::assertEquals('<p>lorem ipsum</p>', $textnode1->getText());
+        self::assertEquals(1, $textnode1->getHitchCount());
+    }
+
+    /**
+     * tests a hitch to another textnode
+     * @throws \Exception
+     */
+    public function testRunWithLinkToAnotherTextnodeDoubleArrowRight()
+    {
+        $importfile = $this->getDummyImportfile();
+
+        $this->fileExtractorMock->expects(self::any())
+            ->method('extract')
+            ->willReturn('readable.extracted');
+
+        self::$freadStack = [
+            '<tw-storydata ',
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata>',
+            '</tw-storydata>',
+        ];
+
+        $textnode1 = new Textnode();
+        $textnode1->setText('lorem ipsum [[description1-->textnodeId1]]');
+        $textnode1->setId('someId0');
+
+        $this->hitchParserMock->expects(self::once())
+            ->method('parseDoubleArrowRight')
+            ->with('description1-->textnodeId1')
+            ->willReturn(
+                [
+                    'description' => 'description1',
+                    'textnodeId' => 'textnodeId1',
+                    'status' => Textnode::HITCH_STATUS_ACTIVE,
+                ]
+            );
+
+        $this->textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode1));
+
+        $this->textnodeRepository->expects($this->any())
+            ->method('save')
+            ->willReturnCallback(function ($textnode) {
+                static $counter = 0;
+                $textnode->setId('someTextnode'.$counter++);
+            });
+
+        $returnValue = $this->importTwine->run($importfile);
+
+        self::assertTrue($returnValue);
+        self::assertEquals('<p>lorem ipsum</p>', $textnode1->getText());
+        self::assertEquals(1, $textnode1->getHitchCount());
+    }
+
+    /**
+     * tests a hitch to another textnode
+     * @throws \Exception
+     */
+    public function testRunWithLinkToAnotherTextnodeSingleArrowLeft()
+    {
+        $importfile = $this->getDummyImportfile();
+
+        $this->fileExtractorMock->expects(self::any())
+            ->method('extract')
+            ->willReturn('readable.extracted');
+
+        self::$freadStack = [
+            '<tw-storydata ',
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata>',
+            '</tw-storydata>',
+        ];
+
+        $textnode1 = new Textnode();
+        $textnode1->setText('lorem ipsum [[description1<-textnodeId1]]');
+        $textnode1->setId('someId0');
+
+        $this->hitchParserMock->expects(self::once())
+            ->method('parseSingleArrowLeft')
+            ->with('description1<-textnodeId1')
+            ->willReturn(
+                [
+                    'description' => 'description1',
+                    'textnodeId' => 'textnodeId1',
+                    'status' => Textnode::HITCH_STATUS_ACTIVE,
+                ]
+            );
+
+        $this->textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode1));
+
+        $this->textnodeRepository->expects($this->any())
+            ->method('save')
+            ->willReturnCallback(function ($textnode) {
+                static $counter = 0;
+                $textnode->setId('someTextnode'.$counter++);
+            });
+
+        $returnValue = $this->importTwine->run($importfile);
+
+        self::assertTrue($returnValue);
+        self::assertEquals('<p>lorem ipsum</p>', $textnode1->getText());
+        self::assertEquals(1, $textnode1->getHitchCount());
+    }
+
+    /**
+     * tests a hitch to another textnode
+     * @throws \Exception
+     */
+    public function testRunWithLinkToAnotherTextnodeSimpleHitch()
+    {
+        $importfile = $this->getDummyImportfile();
+
+        $this->fileExtractorMock->expects(self::any())
+            ->method('extract')
+            ->willReturn('readable.extracted');
+
+        self::$freadStack = [
+            '<tw-storydata ',
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata>',
+            '</tw-storydata>',
+        ];
+
+        $textnode1 = new Textnode();
+        $textnode1->setText('lorem ipsum [[description1]]');
+        $textnode1->setId('someId0');
+
+        $this->hitchParserMock->expects(self::once())
+            ->method('parseSimpleHitch')
+            ->with('description1')
+            ->willReturn(
+                [
+                    'description' => 'description1',
+                    'textnodeId' => 'textnodeId1',
+                    'status' => Textnode::HITCH_STATUS_ACTIVE,
+                ]
+            );
+
+        $this->textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode1));
+
+        $this->textnodeRepository->expects($this->any())
+            ->method('save')
+            ->willReturnCallback(function ($textnode) {
+                static $counter = 0;
+                $textnode->setId('someTextnode'.$counter++);
+            });
+
+        $returnValue = $this->importTwine->run($importfile);
+
+        self::assertTrue($returnValue);
+        self::assertEquals('<p>lorem ipsum</p>', $textnode1->getText());
+        self::assertEquals(1, $textnode1->getHitchCount());
+    }
+
+    /**
+     * tests a hitch to another textnode
+     * @throws \Exception
+     */
+    public function testRunWithLineBreakInText()
+    {
+        $importfile = $this->getDummyImportfile();
+
+        $this->fileExtractorMock->expects(self::any())
+            ->method('extract')
+            ->willReturn('readable.extracted');
+
+        self::$freadStack = [
+            '<tw-storydata ',
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata>',
+            '</tw-storydata>',
+        ];
+
+        $textnode1 = new Textnode();
+        $textnode1->setText('lorem ipsum' . "\n" . "foo bar");
+        $textnode1->setId('someId0');
+
+        $this->textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode1));
+
+        $this->textnodeRepository->expects($this->any())
+            ->method('save')
+            ->willReturnCallback(function ($textnode) {
+                static $counter = 0;
+                $textnode->setId('someTextnode'.$counter++);
+            });
+
+        $returnValue = $this->importTwine->run($importfile);
+
+        self::assertTrue($returnValue);
+        self::assertEquals('<p>lorem ipsum</p><p>foo bar</p>', $textnode1->getText());
     }
 
     /**
@@ -700,7 +862,9 @@ class ImportTwineTest extends WebTestCase
 
         $returnValue = $this->importTwine->run($importfile);
 
-        $this->assertTrue($returnValue);
+        self::assertTrue($returnValue);
+        self::assertEquals('<p>lorem ipsum</p>', $textnode1->getText());
+        self::assertEquals(2, $textnode1->getHitchCount());
     }
 
     /**

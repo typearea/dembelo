@@ -373,56 +373,31 @@ class ImportTwine
 
     private function parseText(Textnode $textnode, string $text, string $name): ?string
     {
-        $startPos = strpos($text, '[[', 0);
+        $textnodeTextNew = preg_replace_callback(
+            '/\[\[(.*?)\]\]/',
+            function($matches) use ($textnode, $name) {
+                $content = $matches[1];
+                $hitch = null;
+                $metadata = null;
+                if (strpos($content, '-->') !== false) {
+                    $hitch = $this->hitchParser->parseDoubleArrowRight($content, $name);
+                } elseif (strpos($content, '->') !== false) {
+                    $hitch = $this->hitchParser->parseSingleArrowRight($content, $name);
+                } elseif (strpos($content, '<-') !== false) {
+                    $hitch = $this->hitchParser->parseSingleArrowLeft($content, $name);
+                } elseif (strpos($content, '>:<') !== false) {
+                    $metadata = $this->parseColonArrows($textnode, $content, $name);
+                    $textnode->setMetadata($metadata);
+                } else {
+                    $hitch = $this->hitchParser->parseSimpleHitch($content, $name);
+                }
 
-        if ($startPos === false) {
-            return $text;
-        }
+                $this->appendHitchToTextnode($textnode, $hitch);
+            },
+            $text
+        );
 
-        $textnodeTextNew = substr($text, 0, $startPos);
-
-        while ($startPos !== false) {
-            $endPos = strpos($text, ']]', $startPos + strlen('[['));
-
-            if ($endPos === false) {
-                throw new \Exception('The Twine archive file has a textnode which contains a malformed link that starts with \'[[\' but has no corresponding \']]\'.');
-            }
-
-            $content = substr($text, $startPos + strlen("[["), $endPos - ($startPos + strlen("[[")));
-            $hitch = null;
-            $metadata = null;
-
-            $this->hitchParser->setNodeNameMapping($this->nodeNameMapping);
-
-            if (strpos($content, '-->') !== false) {
-                $hitch = $this->hitchParser->parseDoubleArrowRight($content, $name);
-            } elseif (strpos($content, '->') !== false) {
-                $hitch = $this->hitchParser->parseSingleArrowRight($content, $name);
-            } elseif (strpos($content, '<-') !== false) {
-                $hitch = $this->hitchParser->parseSingleArrowLeft($content, $name);
-            } elseif (strpos($content, '>:<') !== false) {
-                $metadata = $this->parseColonArrows($textnode, $content, $name);
-            } else {
-                $hitch = $this->hitchParser->parseSimpleHitch($content, $name);
-            }
-
-            $this->appendHitchToTextnode($textnode, $hitch);
-
-            if ($metadata !== null) {
-                $textnode->setMetadata($metadata);
-            }
-
-            $endPos += strlen(']]');
-            $startPos = strpos($text, '[[', $endPos);
-
-            if ($startPos !== false) {
-                $textnodeTextNew .= substr($text, $endPos, $startPos - $endPos);
-            } else {
-                $textnodeTextNew .= substr($text, $endPos);
-            }
-        }
-
-        return $textnodeTextNew;
+        return trim($textnodeTextNew);
     }
 
     /**
