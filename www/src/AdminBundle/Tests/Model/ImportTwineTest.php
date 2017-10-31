@@ -637,6 +637,73 @@ class ImportTwineTest extends WebTestCase
     }
 
     /**
+     * tests a hitch to multiple other textnodes
+     * @throws \Exception
+     */
+    public function testRunWithLinkToMultipleOtherTextnodes()
+    {
+        $importfile = $this->getDummyImportfile();
+
+        $this->fileExtractorMock->expects(self::any())
+            ->method('extract')
+            ->willReturn('readable.extracted');
+
+        self::$freadStack = [
+            '<tw-storydata ',
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata>',
+            '</tw-storydata>',
+        ];
+
+        $textnode1 = new Textnode();
+        $textnode1->setText('lorem ipsum [[Linkdata->someNodeName2]] [[Linkdata2->someNodeName3]]');
+        $textnode1->setId('someId0');
+
+        $textnode2 = new Textnode();
+        $textnode2->setId('someId1');
+
+        $textnode3 = new Textnode();
+        $textnode3->setId('someId2');
+
+        $this->hitchParserMock->expects(self::any())
+            ->method('parseSingleArrowRight')
+            ->willReturnCallback(function ($content, $name) {
+                if ($content !== 'Linkdata->someNodeName2') {
+                    return [
+                        'description' => 'some description',
+                        'textnodeId' => 'someTextnodeId1',
+                        'status' => Textnode::HITCH_STATUS_ACTIVE,
+                    ];
+                }
+                if ($content !== 'Linkdata2->someNodeName3') {
+                    return [
+                        'description' => 'some description',
+                        'textnodeId' => 'someTextnodeId2',
+                        'status' => Textnode::HITCH_STATUS_ACTIVE,
+                    ];
+                }
+                self:: fail();
+            });
+
+        $this->textnodeRepository->expects($this->any())
+            ->method('find')
+            ->will($this->returnValue($textnode1));
+
+        $this->textnodeRepository->expects($this->any())
+            ->method('save')
+            ->willReturnCallback(function ($textnode) {
+                static $counter = 0;
+                $textnode->setId('someTextnode'.$counter++);
+            });
+
+        $returnValue = $this->importTwine->run($importfile);
+
+        $this->assertTrue($returnValue);
+    }
+
+    /**
      * tests run() with setting of metadata
      */
     public function testRunWithMetadataSetting()
