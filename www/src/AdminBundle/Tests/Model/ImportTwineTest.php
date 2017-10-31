@@ -69,28 +69,19 @@ function feof()
 }
 
 /**
- * mock function
- *
- * @return int
- */
-function fseek()
-{
-    return 0;
-}
-
-/**
  * @param Resource $parser
+ * @return void
  */
 function xml_parser_free($parser)
 {
     ImportTwineTest::$parserFreeCalled = true;
-
-    return \xml_parser_free($parser);
+    \xml_parser_free($parser);
 }
 
 namespace AdminBundle\Tests\Model;
 
 use AdminBundle\Model\ImportTwine;
+use AdminBundle\Service\TwineImport\FileCheck;
 use AdminBundle\Service\TwineImport\FileExtractor;
 use AdminBundle\Service\TwineImport\HitchParser;
 use DembeloMain\Document\Importfile;
@@ -133,6 +124,11 @@ class ImportTwineTest extends WebTestCase
     private $fileExtractorMock;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|FileCheck
+     */
+    private $fileCheckMock;
+
+    /**
      * resets some variables
      */
     public function setUp()
@@ -144,11 +140,13 @@ class ImportTwineTest extends WebTestCase
         $this->textnodeRepository = $this->getTextnodeRepositoryMock();
         $this->hitchParserMock = $this->createHitchParserMock();
         $this->fileExtractorMock = $this->createFileExtractorMock();
+        $this->fileCheckMock = $this->createFileCheckMock();
 
         $this->importTwine = new ImportTwine(
             $this->textnodeRepository,
             $this->hitchParserMock,
-            $this->fileExtractorMock
+            $this->fileExtractorMock,
+            $this->fileCheckMock
         );
     }
 
@@ -160,6 +158,10 @@ class ImportTwineTest extends WebTestCase
     {
         $dm = $this->getDmMock();
         $importfile = $this->getDummyImportfile();
+
+        $this->fileCheckMock->expects(self::once())
+            ->method('check')
+            ->willThrowException(new \Exception('File \'somefilename_readable\' isn\'t a Twine archive file'));
 
         $this->fileExtractorMock->expects(self::any())
             ->method('extract')
@@ -175,13 +177,17 @@ class ImportTwineTest extends WebTestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Exception
      * @expectedExceptionMessage File 'somefilename_readable' seems to be empty.
      */
     public function testRunWithEmptyFirstLine()
     {
         $dm = $this->getDmMock();
         $importfile = $this->getDummyImportfile();
+
+        $this->fileCheckMock->expects(self::once())
+            ->method('check')
+            ->willThrowException(new \Exception('Failed asserting that exception message \'File \'somefilename_readable\' isn\'t a Twine archive file\' contains \'File \'somefilename_readable\' seems to be empty.'));
 
         $this->fileExtractorMock->expects(self::any())
             ->method('extract')
@@ -210,7 +216,7 @@ class ImportTwineTest extends WebTestCase
             ->method('extract')
             ->willReturn('readable.extracted');
 
-        self::$freadStack = ['<tw-storydata hurz>', 'zweite Zeile'];
+        self::$freadStack = ['zweite Zeile'];
 
         $retVal = $this->importTwine->run($importfile);
         $this->assertTrue($retVal);
@@ -234,7 +240,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName" tags="Freigegeben ID:foobar" position="104,30">lorem impsum',
@@ -272,7 +277,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben ID:foobar" position="104,30">lorem ipsum',
@@ -340,7 +344,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben" position="104,30">lorem ipsum',
@@ -372,7 +375,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="" position="104,30">lorem ipsum',
@@ -404,7 +406,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben ID:foobar" position="104,30">lorem ipsum',
@@ -439,7 +440,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben ID:foobar" position="104,30">lorem ipsum',
@@ -476,7 +476,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="Freigegeben ID:foobar" position="104,30">lorem ipsum',
@@ -515,7 +514,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId" position="104,30">lorem ipsum',
@@ -550,7 +548,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
@@ -607,7 +604,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
@@ -661,7 +657,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
@@ -715,7 +710,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
@@ -769,7 +763,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
@@ -811,7 +804,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
@@ -879,7 +871,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
@@ -922,7 +913,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
@@ -960,7 +950,6 @@ class ImportTwineTest extends WebTestCase
             ->willReturn('readable.extracted');
 
         self::$freadStack = [
-            '<tw-storydata ',
             '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
             '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
             '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
@@ -1044,5 +1033,13 @@ class ImportTwineTest extends WebTestCase
     private function createFileExtractorMock(): FileExtractor
     {
         return $this->createMock(FileExtractor::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|FileCheck
+     */
+    private function createFileCheckMock(): FileCheck
+    {
+        return $this->createMock(FileCheck::class);
     }
 }

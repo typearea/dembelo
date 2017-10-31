@@ -24,6 +24,7 @@
 
 namespace AdminBundle\Model;
 
+use AdminBundle\Service\TwineImport\FileCheck;
 use AdminBundle\Service\TwineImport\FileExtractor;
 use AdminBundle\Service\TwineImport\HitchParser;
 use DembeloMain\Document\Importfile;
@@ -75,19 +76,27 @@ class ImportTwine
     private $fileExtractor;
 
     /**
+     * @var FileCheck
+     */
+    private $fileCheck;
+
+    /**
      * ImportTwine constructor.
      * @param TextnodeRepositoryInterface $textnodeRepository
-     * @param HitchParser                 $hitchParser
-     * @param FileExtractor               $fileExtractor
+     * @param HitchParser $hitchParser
+     * @param FileExtractor $fileExtractor
+     * @param FileCheck $fileCheck
      */
     public function __construct(
         TextNodeRepositoryInterface $textnodeRepository,
         HitchParser $hitchParser,
-        FileExtractor $fileExtractor
+        FileExtractor $fileExtractor,
+        FileCheck $fileCheck
     ) {
         $this->textnodeRepository = $textnodeRepository;
         $this->hitchParser = $hitchParser;
         $this->fileExtractor = $fileExtractor;
+        $this->fileCheck = $fileCheck;
     }
 
     /**
@@ -118,7 +127,7 @@ class ImportTwine
 
         $this->xmlParser = xml_parser_create("UTF-8");
 
-        $this->checkTwineFile($fileHandler);
+        $this->fileCheck->check($fileHandler, $this->importfile->getFilename());
 
         if (!$this->initParser($fileHandler)) {
             return false;
@@ -133,50 +142,6 @@ class ImportTwine
     public function parserFree(): void
     {
         xml_parser_free($this->xmlParser);
-    }
-
-    private function checkTwineFile($fileHandler): bool
-    {
-        $magicString = '<tw-storydata ';
-        $magicStringLength = strlen($magicString);
-
-        $peekData = fread($fileHandler, 1024);
-
-        if ($peekData === false) {
-            throw new Exception("Failed to read data from file '".$this->importfile->getFilename()."'.");
-        }
-
-        $peekDataLength = strlen($peekData);
-
-        if ($peekDataLength <= 0) {
-            throw new Exception("File '".$this->importfile->getFilename()."' seems to be empty.");
-        }
-
-        for ($i = 0; $i < $peekDataLength; $i++) {
-            if ($peekData[$i] === ' ' ||
-                $peekData[$i] === '\n' ||
-                $peekData[$i] === '\r' ||
-                $peekData[$i] === '\t') {
-                // Consume whitespace.
-                continue;
-            }
-
-            if ($peekDataLength - $i < $magicStringLength) {
-                throw new Exception("File '".$this->importfile->getFilename()."' isn't a Twine archive file.");
-            }
-
-            if (substr($peekData, $i, $magicStringLength) !== $magicString) {
-                throw new Exception("File '".$this->importfile->getFilename()."' isn't a Twine archive file.");
-            }
-
-            if (fseek($fileHandler, 0) !== 0) {
-                throw new Exception("Couldn't reset reading position after the magic string in the Twine archive file '".$this->importfile->getFilename()."' was checked.");
-            }
-
-            return true;
-        }
-
-        throw new Exception("File '".$this->importfile->getFilename()."' doesn't seem to be a Twine archive file.");
     }
 
     private function setXmlHandler(): void

@@ -10,6 +10,7 @@ services:
             - "@app.model_repository_textNode"
             - "@app.twineImport.hitchparser"
             - "@app.twineImport.fileextractor"
+            - "@app.twineImport.filecheck"
 
     # @todo remove dependency from service container
     app.feature_toggle:
@@ -130,3 +131,6 @@ services:
 
     app.twineImport.fileextractor:
             class: AdminBundle\Service\TwineImport\FileExtractor
+
+    app.twineImport.filecheck:
+            class: AdminBundle\Service\TwineImport\FileCheck
