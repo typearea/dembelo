@@ -40,8 +40,9 @@ function fopen($filename)
 /**
  * mock function
  */
-function fclose()
+function fclose(): bool
 {
+    return ImportTwineTest::$fcloseReturnValue;
 }
 
 /**
@@ -101,6 +102,7 @@ class ImportTwineTest extends WebTestCase
 
     public static $freadStack = [];
     public static $parserFreeCalled = false;
+    public static $fcloseReturnValue = true;
     private $mocks;
 
     /**
@@ -136,6 +138,7 @@ class ImportTwineTest extends WebTestCase
         self::$freadStack = [];
         $this->mocks = [];
         self::$parserFreeCalled = false;
+        self::$fcloseReturnValue = true;
 
         $this->textnodeRepository = $this->getTextnodeRepositoryMock();
         $this->hitchParserMock = $this->createHitchParserMock();
@@ -151,7 +154,30 @@ class ImportTwineTest extends WebTestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Exception
+     * @expectedExceptionMessageRegExp /Couldn't open file/
+     */
+    public function testRunWithUnreadableFile()
+    {
+        $dm = $this->getDmMock();
+        $importfile = $this->getDummyImportfile();
+
+        $this->fileCheckMock->expects(self::never())
+            ->method('check');
+
+        $this->fileExtractorMock->expects(self::any())
+            ->method('extract')
+            ->willReturn('file.extracted');
+
+        $this->importTwine->run($importfile);
+        $dm->expects($this->never())
+            ->method('persist');
+        $dm->expects($this->never())
+            ->method('flush');
+    }
+
+    /**
+     * @expectedException \Exception
      * @expectedExceptionMessage File 'somefilename_readable' isn't a Twine archive file
      */
     public function testRunWithWrongFileFormat()
