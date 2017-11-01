@@ -957,6 +957,36 @@ class ImportTwineTest extends WebTestCase
     }
 
     /**
+     * @return void
+     * @expectedException \Exception
+     * @expectedExceptionMessage There is a 'tw-passagedata' in the Twine archive file 'somefilename_readable' which hasn't a numeric value in its 'pid' attribute ('nonnumeric' was found instead).
+     */
+    public function testRunWithNonNumericPid(): void
+    {
+        $importfile = $this->getDummyImportfile();
+
+        $this->fileExtractorMock->expects(self::any())
+            ->method('extract')
+            ->willReturn('readable.extracted');
+
+        self::$freadStack = [
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="nonnumeric" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata>',
+            '</tw-storydata>',
+        ];
+
+        $this->textnodeRepository->expects($this->never())
+            ->method('find');
+
+        $this->textnodeRepository->expects($this->never())
+            ->method('findByTwineId');
+
+        $this->importTwine->run($importfile);
+    }
+
+    /**
      * @expectedException \Exception
      * @expectedExceptionMessageRegExp /invalid element.*>:</
      */
