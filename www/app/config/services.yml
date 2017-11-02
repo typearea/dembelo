@@ -7,10 +7,11 @@ services:
     admin.import.twine:
         class: AdminBundle\Model\ImportTwine
         arguments:
-            - "@app.model_repository_textNode"
-            - "@app.twineImport.hitchparser"
             - "@app.twineImport.fileextractor"
             - "@app.twineImport.filecheck"
+            - "@app.twineImport.storyDataParser"
+            - "@app.twineImport.passageDataParser"
+            - "@app.twineImport.parserContext"
 
     # @todo remove dependency from service container
     app.feature_toggle:
@@ -134,3 +135,17 @@ services:
 
     app.twineImport.filecheck:
             class: AdminBundle\Service\TwineImport\FileCheck
+
+    app.twineImport.storyDataParser:
+        class: AdminBundle\Service\TwineImport\StoryDataParser
+        arguments:
+            - "@app.twineImport.hitchparser"
+            - "@app.model_repository_textNode"
+
+    app.twineImport.passageDataParser:
+        class: AdminBundle\Service\TwineImport\PassageDataParser
+        arguments:
+            - "@app.model_repository_textNode"
+
+    app.twineImport.parserContext:
+        class: AdminBundle\Service\TwineImport\ParserContext
