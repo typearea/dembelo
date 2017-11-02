@@ -987,6 +987,38 @@ class ImportTwineTest extends WebTestCase
     }
 
     /**
+     * @return void
+     * @expectedException \Exception
+     * @expectedExceptionMessage Nested 'tw-passagedata' found in Twine archive file 'somefilename_readable
+     */
+    public function testRunWithNestedPassageData(): void
+    {
+        $importfile = $this->getDummyImportfile();
+
+        $this->fileExtractorMock->expects(self::any())
+            ->method('extract')
+            ->willReturn('readable.extracted');
+
+        self::$freadStack = [
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<script role="script" id="twine-user-script" type="text/twine-javascript"></script>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">',
+            '<tw-passagedata pid="2" name="someNodeName2" tags="ID:someTwineId2" position="104,40">Lorem Ipsum',
+            'lorem ipsum</tw-passagedata>',
+            '</tw-passagedata>',
+            '</tw-storydata>',
+        ];
+
+        $this->textnodeRepository->expects($this->never())
+            ->method('find');
+
+        $this->textnodeRepository->expects($this->once())
+            ->method('findByTwineId');
+
+        $this->importTwine->run($importfile);
+    }
+
+    /**
      * @expectedException \Exception
      * @expectedExceptionMessageRegExp /invalid element.*>:</
      */
@@ -1060,7 +1092,75 @@ class ImportTwineTest extends WebTestCase
         $this->importTwine->run($importfile);
     }
 
-    private function getDummyImportfile(array $data = [])
+    /**
+     * @return void
+     * @expectedException \Exception
+     * @expectedExceptionMessageRegExp /Error .* occurred while parsing the Twine archive file 'somefilename_readable'/
+     */
+    public function testRunWithParserException(): void
+    {
+        self::$freadStack = [
+            '<tw-storydata name="someStoryName" startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<tw-passagedata pid"1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata>',
+            '</tw-storydata>',
+        ];
+
+        $textnode1 = new Textnode();
+        $textnode1->setId('someId0');
+
+        $this->textnodeRepository->expects($this->any())
+            ->method('findByTwineId')
+            ->willReturn($textnode1);
+
+        $this->textnodeRepository->expects($this->any())
+            ->method('find')
+            ->willReturn($textnode1);
+
+        $this->fileExtractorMock->expects(self::any())
+            ->method('extract')
+            ->willReturn('readable.extracted');
+
+        $importfile = $this->getDummyImportfile();
+
+        $this->importTwine->run($importfile);
+    }
+
+    /**
+     * @return void
+     * @expectedException \Exception
+     * @expectedExceptionMessage There is a 'tw-storydata' in the Twine archive file 'somefilename_readable' which is missing its 'name' attribute
+     */
+    public function testRunWithInvalidStoryDataElement(): void
+    {
+        self::$freadStack = [
+            '<tw-storydata startnode="1" creator="Twine" creator-version="2.0.8" ifid="8E30D51C-4980-4161-B57F-B11C752E879A" format="Harlowe" options=""><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css"></style>'."\n",
+            '<tw-passagedata pid="1" name="someNodeName1" tags="ID:someTwineId1" position="104,30">lorem ipsum',
+            'lorem ipsum</tw-passagedata>',
+            '</tw-storydata>',
+        ];
+
+        $textnode1 = new Textnode();
+        $textnode1->setId('someId0');
+
+        $this->textnodeRepository->expects($this->any())
+            ->method('findByTwineId')
+            ->willReturn($textnode1);
+
+        $this->textnodeRepository->expects($this->any())
+            ->method('find')
+            ->willReturn($textnode1);
+
+        $this->fileExtractorMock->expects(self::any())
+            ->method('extract')
+            ->willReturn('readable.extracted');
+
+        $importfile = $this->getDummyImportfile();
+
+        $this->importTwine->run($importfile);
+    }
+
+    private function getDummyImportfile(array $data = []): Importfile
     {
         $default = [
             'filename'   => 'somefilename_readable',

@@ -184,19 +184,8 @@ class ImportTwine
         $this->parseEnvelopeHeader();
 
         do {
-            $buffer = fread($fileHandler, 4096);
-
-            if ($buffer === false) {
+            if (!$this->parseLine($fileHandler)) {
                 break;
-            }
-            if (xml_parse($this->xmlParser, $buffer, false) !== 1) {
-                $errorCode = xml_get_error_code($this->xmlParser);
-                $errorDescription = xml_error_string($errorCode);
-                $errorRowNumber = xml_get_current_line_number($this->xmlParser);
-                $errorColumnNumber = xml_get_current_column_number($this->xmlParser);
-                $errorByteIndex = xml_get_current_byte_index($this->xmlParser);
-
-                throw new Exception("Error #".$errorCode.": '".$errorDescription."' occurred while parsing the Twine archive file '".$this->importfile->getFilename()."' in line ".$errorRowNumber.", character ".$errorColumnNumber." (at byte index ".$errorByteIndex.").");
             }
         } while (feof($fileHandler) === false);
 
@@ -212,32 +201,66 @@ class ImportTwine
         return true;
     }
 
+    private function parseLine($fileHandler): bool
+    {
+        $buffer = fread($fileHandler, 4096);
+
+        if ($buffer === false) {
+            return false;
+        }
+        if (xml_parse($this->xmlParser, $buffer, false) !== 1) {
+            $this->throwParserException();
+        }
+
+        return true;
+    }
+
+    private function throwParserException(): void
+    {
+        $errorCode = xml_get_error_code($this->xmlParser);
+        $errorDescription = xml_error_string($errorCode);
+        $errorRowNumber = xml_get_current_line_number($this->xmlParser);
+        $errorColumnNumber = xml_get_current_column_number($this->xmlParser);
+        $errorByteIndex = xml_get_current_byte_index($this->xmlParser);
+
+        throw new Exception('Error #'.$errorCode.': \''.$errorDescription."' occurred while parsing the Twine archive file '".$this->importfile->getFilename()."' in line ".$errorRowNumber.", character ".$errorColumnNumber." (at byte index ".$errorByteIndex.").");
+    }
+
     /**
      * @param string $name
-     * @param array $attrs
+     * @param array $attributes
      * @throws Exception
      */
-    private function startElementStoryData(string $name, array $attrs): void
+    private function startElementStoryData(string $name, array $attributes): void
+    {
+        if (!$this->checkElementStoryData($name, $attributes)) {
+            return;
+        }
+
+        $this->twineStartnodeId = $attributes['startnode'];
+        $this->textnodeMapping = [];
+        $this->twineRelevant = true;
+    }
+
+    private function checkElementStoryData(string $name, array $attributes): bool
     {
         if ($this->twineRelevant === true) {
             throw new Exception("Nested '".$name."' found in Twine archive file '".$this->importfile->getFilename()."'.");
         }
 
-        if (isset($attrs['startnode']) !== true) {
-            return;
+        if (isset($attributes['startnode']) !== true) {
+            return false;
         }
 
-        if (is_numeric($attrs['startnode']) !== true) {
-            return;
+        if (is_numeric($attributes['startnode']) !== true) {
+            return false;
         }
 
-        if (isset($attrs['name']) !== true) {
+        if (isset($attributes['name']) !== true) {
             throw new Exception("There is a '".$name."' in the Twine archive file '".$this->importfile->getFilename()."' which is missing its 'name' attribute.");
         }
 
-        $this->twineStartnodeId = $attrs['startnode'];
-        $this->textnodeMapping = [];
-        $this->twineRelevant = true;
+        return true;
     }
 
     private function getTwineId(string $tagString, string $textnodeTitle): string
@@ -260,6 +283,19 @@ class ImportTwine
         }
 
         return $twineId;
+    }
+
+    private function createTextnode(): Textnode
+    {
+        $textnode = new Textnode();
+        $textnode->setCreated(date('Y-m-d H:i:s'));
+        $textnode->setTopicId($this->importfile->getTopicId());
+        $textnode->setLicenseeId($this->importfile->getLicenseeId());
+        $textnode->setImportfileId($this->importfile->getId());
+        $textnode->setStatus(Textnode::STATUS_ACTIVE);
+        $textnode->setTwineId($this->twineId);
+
+        return $textnode;
     }
 
     private function startElementPassageData(string $name, array $attrs): void
@@ -286,13 +322,7 @@ class ImportTwine
 
         $this->textnode = $this->textnodeRepository->findByTwineId($this->importfile, $this->twineId);
         if (null === $this->textnode) {
-            $this->textnode = new Textnode();
-            $this->textnode->setCreated(date('Y-m-d H:i:s'));
-            $this->textnode->setTopicId($this->importfile->getTopicId());
-            $this->textnode->setLicenseeId($this->importfile->getLicenseeId());
-            $this->textnode->setImportfileId($this->importfile->getId());
-            $this->textnode->setStatus(Textnode::STATUS_ACTIVE);
-            $this->textnode->setTwineId($this->twineId);
+            $this->textnode = $this->createTextnode();
         } else {
             $this->textnode->setText('');
             $this->textnode->clearHitches();
@@ -311,7 +341,7 @@ class ImportTwine
                 $this->textnode->setAccess(true);
                 $this->accessSet = true;
             } else {
-                throw new Exception('There is more than one \''.$name.'\' in the Twine archive file \''.$this->importfile->getFilename().'\' with the startnode value \''.$attrs['pid'].'\' in its \'pid\' attribute.');
+                throw new \Exception('There is more than one \''.$name.'\' in the Twine archive file \''.$this->importfile->getFilename().'\' with the startnode value \''.$attrs['pid'].'\' in its \'pid\' attribute.');
             }
         } else {
             $this->textnode->setAccess(false);
@@ -420,17 +450,13 @@ class ImportTwine
         $contentArray = explode(">:<", $content, 2);
 
         if (strlen($contentArray[0]) <= 0 || strlen($contentArray[1]) <= 0) {
-            throw new Exception("The Twine archive file contains a '".$name."' with the invalid element '[[".$contentArray[0].">:<".$contentArray[1]."]]'.");
+            throw new \Exception("The Twine archive file contains a '".$name."' with the invalid element '[[".$contentArray[0].">:<".$contentArray[1]."]]'.");
         }
 
-        $metadata = $textnode->getMetadata();
-
-        if (is_array($metadata) !== true) {
-            $metadata = array();
-        }
+        $metadata = $textnode->getMetadata() ?? [];
 
         if (array_key_exists($contentArray[0], $metadata) === true) {
-            throw new Exception("There is a textnode in the Twine archive file which contains the metadata field '".$contentArray[0]."' twice or would overwrite the already existing value of that field.");
+            throw new \Exception("There is a textnode in the Twine archive file which contains the metadata field '".$contentArray[0]."' twice or would overwrite the already existing value of that field.");
         }
 
         $metadata[$contentArray[0]] = $contentArray[1];
