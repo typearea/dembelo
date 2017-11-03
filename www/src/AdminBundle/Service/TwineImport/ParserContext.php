@@ -78,7 +78,6 @@ class ParserContext
         if (null === $this->importfile->getFilename()) {
             throw new \Exception('no filename available');
         }
-
     }
 
     /**
@@ -89,6 +88,9 @@ class ParserContext
         return $this->importfile;
     }
 
+    /**
+     * @return string
+     */
     public function getFilename(): string
     {
         return $this->importfile->getFilename();

@@ -19,7 +19,6 @@
 
 namespace AdminBundle\Tests\Service\TwineImport;
 
-
 use AdminBundle\Service\TwineImport\ParserContext;
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
@@ -141,7 +140,6 @@ class ParserContextTest extends TestCase
         self::assertEquals($expectedTextnodeMapping, $parserContext->getTextnodeMapping());
         $parserContext->clearTextnodeMapping();
         self::assertEquals([], $parserContext->getTextnodeMapping());
-
     }
 
     /**

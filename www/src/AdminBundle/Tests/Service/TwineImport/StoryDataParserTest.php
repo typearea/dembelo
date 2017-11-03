@@ -23,6 +23,10 @@ use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class StoryDataParserTest
+ * @package AdminBundle\Service\TwineImport
+ */
 class StoryDataParserTest extends TestCase
 {
     /**
@@ -119,7 +123,7 @@ class StoryDataParserTest extends TestCase
         $tagName = 'storyPassage';
         $attributes = [
             'startnode' => 1,
-            'name' => 'someName'
+            'name' => 'someName',
         ];
 
         $parserContext = $this->createParserContextMock();

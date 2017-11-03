@@ -19,7 +19,6 @@
 
 namespace AdminBundle\Service\TwineImport;
 
-
 use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 
@@ -59,7 +58,7 @@ class PassageDataParser
 
     /**
      * @param string $name
-     * @param array $attrs
+     * @param array  $attrs
      * @throws \Exception
      */
     public function startElement(string $name, array $attrs): void
@@ -98,7 +97,7 @@ class PassageDataParser
             ]
         );
 
-        if ((int)$attrs['pid'] === $this->parserContext->getTwineStartnodeId()) {
+        if ((int) $attrs['pid'] === $this->parserContext->getTwineStartnodeId()) {
             if (!$this->parserContext->isAccessSet()) {
                 $textnode->setAccess(true);
                 $this->parserContext->setAccessSet(true);

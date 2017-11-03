@@ -45,7 +45,7 @@ class StoryDataParser
 
     /**
      * StoryDataParser constructor.
-     * @param HitchParser $hitchParser
+     * @param HitchParser                 $hitchParser
      * @param TextNodeRepositoryInterface $textnodeRepository
      */
     public function __construct(HitchParser $hitchParser, TextNodeRepositoryInterface $textnodeRepository)
@@ -65,7 +65,7 @@ class StoryDataParser
 
     /**
      * @param string $name
-     * @param array $attributes
+     * @param array  $attributes
      * @throws \Exception
      */
     public function startElement(string $name, array $attributes): void
@@ -74,7 +74,7 @@ class StoryDataParser
             return;
         }
 
-        $this->parserContext->setTwineStartnodeId((int)$attributes['startnode']);
+        $this->parserContext->setTwineStartnodeId((int) $attributes['startnode']);
         $this->parserContext->clearTextnodeMapping();
         $this->parserContext->setTwineRelevant(true);
     }
