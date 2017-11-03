@@ -329,7 +329,7 @@ class Textnode
     {
         $hitchCount = count($this->hitches);
 
-        if ($hitchCount >= Textnode::HITCHES_MAXIMUM_COUNT) {
+        if ($hitchCount >= self::HITCHES_MAXIMUM_COUNT) {
             return false;
         }
 
@@ -345,12 +345,12 @@ class Textnode
             return false;
         }
 
-        if ($hitch['status'] !== Textnode::HITCH_STATUS_INACTIVE &&
-            $hitch['status'] !== Textnode::HITCH_STATUS_ACTIVE) {
+        if ($hitch['status'] !== self::HITCH_STATUS_INACTIVE &&
+            $hitch['status'] !== self::HITCH_STATUS_ACTIVE) {
             return false;
         }
 
-        if (is_null($hitch['textnodeId']) === true) {
+        if (null === $hitch['textnodeId']) {
             return false;
         }
 
