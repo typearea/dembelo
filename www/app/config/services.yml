@@ -47,7 +47,16 @@ services:
     app.admin_controller_default:
         class: AdminBundle\Controller\DefaultController
         arguments:
+            - "@templating"
+            - "@app.model_repository_user"
+            - "@app.model_repository_licensee"
+            - "@app.model_repository_topic"
+            - "@app.model_repository_importfile"
+            - "@app.model_repository_textNode"
+            - "@security.password_encoder"
             - %twine_directory%
+            - %topic_image_directory%
+            - "@mailer"
 
     app.admin_controller_import:
         class: AdminBundle\Controller\ImportController
