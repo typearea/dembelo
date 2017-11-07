@@ -25,15 +25,24 @@
 
 namespace AdminBundle\Controller;
 
+use DembeloMain\Document\Licensee;
 use DembeloMain\Model\Repository\Doctrine\ODM\AbstractRepository;
 use DembeloMain\Document\Importfile;
+use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
+use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
+use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use DembeloMain\Model\Repository\TopicRepositoryInterface;
+use DembeloMain\Model\Repository\UserRepositoryInterface;
+use Doctrine\ORM\QueryBuilder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use StdClass;
 use DembeloMain\Document\Topic;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
 
 /**
  * Class DefaultController
@@ -48,18 +57,91 @@ class DefaultController extends Controller
     private $configTwineDirectory;
 
     /**
-     * DefaultController constructor.
-     * @param string $configTwineDirectory
+     * @var Templating
      */
-    public function __construct(string $configTwineDirectory)
-    {
+    private $templating;
+
+    /**
+     * @var UserRepositoryInterface
+     */
+    private $userRepository;
+
+    /**
+     * @var LicenseeRepositoryInterface
+     */
+    private $licenseeRepository;
+
+    /**
+     * @var TopicRepositoryInterface
+     */
+    private $topicRepository;
+
+    /**
+     * @var ImportfileRepositoryInterface
+     */
+    private $importfileRepository;
+
+    /**
+     * @var UserPasswordEncoder
+     */
+    private $userPasswordEncoder;
+
+    /**
+     * @var \Swift_Mailer
+     */
+    private $mailer;
+
+    /**
+     * @var TextNodeRepositoryInterface
+     */
+    private $textNodeRepository;
+    /**
+     * @var string
+     */
+    private $topicImageDirectory;
+
+    /**
+     * DefaultController constructor.
+     * @param Templating                    $templating
+     * @param UserRepositoryInterface       $userRepository
+     * @param LicenseeRepositoryInterface   $licenseeRepository
+     * @param TopicRepositoryInterface      $topicRepository
+     * @param ImportfileRepositoryInterface $importfileRepository
+     * @param TextNodeRepositoryInterface   $textNodeRepository
+     * @param UserPasswordEncoder           $userPasswordEncoder
+     * @param string                        $configTwineDirectory
+     * @param string                        $topicImageDirectory
+     * @param \Swift_Mailer                 $mailer
+     */
+    public function __construct(
+        Templating $templating,
+        UserRepositoryInterface $userRepository,
+        LicenseeRepositoryInterface $licenseeRepository,
+        TopicRepositoryInterface $topicRepository,
+        ImportfileRepositoryInterface $importfileRepository,
+        TextNodeRepositoryInterface $textNodeRepository,
+        UserPasswordEncoder $userPasswordEncoder,
+        string $configTwineDirectory,
+        string $topicImageDirectory,
+        \Swift_Mailer $mailer
+    ) {
         $this->configTwineDirectory = $configTwineDirectory;
+        $this->userRepository = $userRepository;
+        $this->templating = $templating;
+        $this->licenseeRepository = $licenseeRepository;
+        $this->topicRepository = $topicRepository;
+        $this->importfileRepository = $importfileRepository;
+        $this->userPasswordEncoder = $userPasswordEncoder;
+        $this->mailer = $mailer;
+        $this->textNodeRepository = $textNodeRepository;
+        $this->topicImageDirectory = $topicImageDirectory;
     }
 
     /**
      * @Route("/", name="admin_mainpage")
      *
      * @return Response
+     * @throws \RuntimeException
      */
     public function indexAction(): Response
     {
@@ -73,7 +155,12 @@ class DefaultController extends Controller
 
         $jsonEncoder = new JsonEncoder();
 
-        return $this->render('AdminBundle::index.html.twig', array('mainMenuData' => $jsonEncoder->encode($mainMenuData, 'json')));
+        return $this->templating->renderResponse(
+            'AdminBundle::index.html.twig',
+            [
+                'mainMenuData' => $jsonEncoder->encode($mainMenuData, 'json'),
+            ]
+        );
     }
 
     /**
@@ -81,14 +168,14 @@ class DefaultController extends Controller
      *
      * @param Request $request
      * @return Response
+     * @throws \InvalidArgumentException
      */
     public function usersAction(Request $request): Response
     {
-        $repository = $this->get('app.model_repository_user');
-
         $filters = $request->query->get('filter');
 
-        $query = $repository->createQueryBuilder();
+        /* @var $query QueryBuilder */
+        $query = $this->userRepository->createQueryBuilder();
         if (null !== $filters) {
             foreach ($filters as $field => $value) {
                 if (empty($value) && $value !== '0') {
@@ -128,12 +215,11 @@ class DefaultController extends Controller
      * @Route("/licensees", name="admin_licensees")
      *
      * @return Response
+     * @throws \InvalidArgumentException
      */
     public function licenseesAction(): Response
     {
-        $repository = $this->get('app.model_repository_licensee');
-
-        $licensees = $repository->findAll();
+        $licensees = $this->licenseeRepository->findAll();
 
         $output = array();
         /* @var $licensee \DembeloMain\Document\Licensee */
@@ -152,6 +238,7 @@ class DefaultController extends Controller
      *
      * @param Request $request
      * @return Response
+     * @throws \InvalidArgumentException
      */
     public function licenseeSuggestAction(Request $request): Response
     {
@@ -159,14 +246,10 @@ class DefaultController extends Controller
 
         $searchString = $filter['value'];
 
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:Licensee');
+        /* @var $licensees Licensee[] */
+        $licensees = $this->licenseeRepository->findBy(['name' => new \MongoRegex('/'.$searchString.'/')], null, 10);
 
-        $licensees = $repository->findBy(array('name' => new \MongoRegex('/'.$searchString.'/')), null, 10);
-
-        $output = array();
-        /* @var $licensee \DembeloMain\Document\Licensee */
+        $output = [];
         foreach ($licensees as $licensee) {
             $output[] = array(
                 'id' => $licensee->getId(),
@@ -182,6 +265,7 @@ class DefaultController extends Controller
      *
      * @param Request $request
      * @return Response
+     * @throws \InvalidArgumentException
      */
     public function topicSuggestAction(Request $request): Response
     {
@@ -189,12 +273,8 @@ class DefaultController extends Controller
 
         $searchString = $filter['value'];
 
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:Topic');
-
         /* @var $topics \DembeloMain\Document\Topic[] */
-        $topics = $repository->findBy(array('name' => new \MongoRegex('/'.$searchString.'/')), null, 10);
+        $topics = $this->topicRepository->findBy(array('name' => new \MongoRegex('/'.$searchString.'/')), null, 10);
 
         $output = [];
         foreach ($topics as $topic) {
@@ -211,16 +291,13 @@ class DefaultController extends Controller
      * @Route("/topics", name="admin_topics")
      *
      * @return Response
+     * @throws \InvalidArgumentException
      */
     public function topicsAction(): Response
     {
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $repository \Doctrine\ODM\MongoDB\DocumentRepository */
-        $repository = $mongo->getRepository('DembeloMain:Topic');
+        $users = $this->topicRepository->findAll();
 
-        $users = $repository->findAll();
-
-        $output = array();
+        $output = [];
         /* @var $user \DembeloMain\Document\Topic */
         foreach ($users as $user) {
             $obj = new StdClass();
@@ -237,6 +314,7 @@ class DefaultController extends Controller
      *
      * @param Request $request
      * @return Response
+     * @throws \InvalidArgumentException
      */
     public function formsaveAction(Request $request): Response
     {
@@ -251,7 +329,22 @@ class DefaultController extends Controller
         $formtype = $params['formtype'];
 
         /* @var $repository AbstractRepository */
-        $repository = $this->get('app.model_repository_'.$formtype);
+        switch ($formtype) {
+            case 'user':
+                $repository = $this->userRepository;
+                break;
+            case 'topic':
+                $repository = $this->topicRepository;
+                break;
+            case 'licensee':
+                $repository = $this->licenseeRepository;
+                break;
+            case 'importfile':
+                $repository = $this->importfileRepository;
+                break;
+            default:
+                throw new \Exception('unknown formtype ['.$formtype.']');
+        }
 
         if (isset($params['id']) && $params['id'] == 'new') {
             $className = $repository->getClassName();
@@ -270,8 +363,7 @@ class DefaultController extends Controller
             if ($param == 'password' && empty($value)) {
                 continue;
             } elseif ($param == 'password') {
-                $encoder = $this->get('security.password_encoder');
-                $value = $encoder->encodePassword($item, $value);
+                $value = $this->userPasswordEncoder->encodePassword($item, $value);
             } elseif ($param == 'licenseeId' && $value === '') {
                 $value = null;
             } elseif ($param === 'imported' && $value === '') {
@@ -316,22 +408,14 @@ class DefaultController extends Controller
     {
         $userId = $request->request->get('userId');
 
-        /* @var $mongo \Doctrine\Bundle\MongoDBBundle\ManagerRegistry */
-        $mongo = $this->get('doctrine_mongodb');
-        /* @var $dm \Doctrine\ODM\MongoDB\DocumentManager*/
-        $dm = $mongo->getManager();
-
-        $repository = $mongo->getRepository('DembeloMain:User');
-
         /* @var $user \DembeloMain\Document\User */
-        $user = $repository->find($userId);
+        $user = $this->userRepository->find($userId);
         if (null === $user) {
             return new Response(\json_encode(['error' => false]));
         }
         $user->setActivationHash(sha1($user->getEmail().$user->getPassword().\time()));
 
-        $dm->persist($user);
-        $dm->flush();
+        $this->userRepository->save($user);
 
         $message = (new \Swift_Message('waszulesen - Bestätigung der Email-Adresse'))
             ->setFrom('system@waszulesen.de')
@@ -345,7 +429,7 @@ class DefaultController extends Controller
                 'text/html'
             );
 
-        $this->get('mailer')->send($message);
+        $this->mailer->send($message);
 
         return new Response(\json_encode(['error' => false]));
     }
@@ -354,16 +438,16 @@ class DefaultController extends Controller
      * @Route("/textnodes", name="admin_textnodes")
      *
      * @return Response
+     * @throws \InvalidArgumentException
      */
     public function textnodesAction(): Response
     {
-        $repository = $this->get('app.model_repository_textNode');
-        $textnodes = $repository->findAll();
+        $textnodes = $this->textNodeRepository->findAll();
 
         $licenseeIndex = $this->buildLicenseeIndex();
         $importfileIndex = $this->buildImportfileIndex();
 
-        $output = array();
+        $output = [];
         /* @var $textnode \DembeloMain\Document\Textnode */
         foreach ($textnodes as $textnode) {
             $obj = new StdClass();
@@ -420,11 +504,10 @@ class DefaultController extends Controller
 
     private function buildLicenseeIndex(): array
     {
-        $repository = $this->get('app.model_repository_licensee');
-        $licensees = $repository->findAll();
+        $licensees = $this->licenseeRepository->findAll();
         $index = [];
         foreach ($licensees as $licensee) {
-            $index[$licensee->getID()] = $licensee->getName();
+            $index[$licensee->getId()] = $licensee->getName();
         }
 
         return $index;
@@ -432,8 +515,7 @@ class DefaultController extends Controller
 
     private function buildImportfileIndex(): array
     {
-        $repository = $this->get('app.model_repository_importfile');
-        $importfiles = $repository->findAll();
+        $importfiles = $this->importfileRepository->findAll();
         $index = [];
         foreach ($importfiles as $importfile) {
             $index[$importfile->getID()] = $importfile->getName();
@@ -454,7 +536,7 @@ class DefaultController extends Controller
         if (empty($filename) || empty($orgname)) {
             return;
         }
-        $directory = $this->container->getParameter('topic_image_directory');
+        $directory = $this->topicImageDirectory;
         $finalDirectory = $directory.$item->getId().'/';
         if (!is_dir($finalDirectory)) {
             mkdir($finalDirectory);

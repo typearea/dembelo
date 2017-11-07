@@ -22,12 +22,13 @@ namespace DembeloMain\Model\Repository;
 
 use DembeloMain\Document\Readpath;
 use DembeloMain\Document\User;
+use Doctrine\Common\Persistence\ObjectRepository;
 
 /**
  * Interface ReadPathRepositoryInterface
  * @package DembeloMain\Model\Repository
  */
-interface ReadPathRepositoryInterface
+interface ReadPathRepositoryInterface extends ObjectRepository
 {
     /**
      * Find a read path by id

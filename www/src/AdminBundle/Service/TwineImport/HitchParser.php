@@ -58,14 +58,13 @@ class HitchParser
 
     /**
      * @param string $content
-     * @param string $twineName
      * @param string $name
      * @return array
      * @throws Exception
      */
-    public function parseDoubleArrowRight(string $content, string $twineName, string $name): array
+    public function parseDoubleArrowRight(string $content, string $name): array
     {
-        $contentArray = explode("-->", $content, 2);
+        $contentArray = explode('-->', $content, 2);
 
         if (strlen($contentArray[0]) <= 0 || strlen($contentArray[1]) <= 0) {
             throw new Exception("The Twine archive file contains a '".$name."' with the invalid element '[[".$contentArray[0]."-->".$contentArray[1]."]]'.");
@@ -74,7 +73,7 @@ class HitchParser
         $externalTextnode = $this->textnodeRepository->find($contentArray[1]);
 
         if (null === $externalTextnode) {
-            throw new Exception("There is a textnode named '".$twineName."' which references the external Dembelo Textnode '".$contentArray[1]."', but a Dembelo Textnode with such an Id doesn't exist.");
+            throw new Exception("There is a textnode which references the external Dembelo Textnode '".$contentArray[1]."', but a Dembelo Textnode with such an Id doesn't exist.");
         }
 
         $hitch = array();

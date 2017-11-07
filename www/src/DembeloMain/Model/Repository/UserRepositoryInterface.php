@@ -21,12 +21,13 @@
 namespace DembeloMain\Model\Repository;
 
 use DembeloMain\Document\User;
+use Doctrine\Common\Persistence\ObjectRepository;
 
 /**
  * Interface UserRepositoryInterface
  * @package DembeloMain\Model\Repository
  */
-interface UserRepositoryInterface
+interface UserRepositoryInterface extends ObjectRepository
 {
     /**
      * Find a user by id

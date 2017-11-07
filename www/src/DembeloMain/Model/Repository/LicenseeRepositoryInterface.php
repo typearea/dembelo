@@ -21,12 +21,13 @@
 namespace DembeloMain\Model\Repository;
 
 use DembeloMain\Document\Licensee;
+use Doctrine\Common\Persistence\ObjectRepository;
 
 /**
  * Interface LicenseeRepositoryInterface
  * @package DembeloMain\Model\Repository
  */
-interface LicenseeRepositoryInterface
+interface LicenseeRepositoryInterface extends ObjectRepository
 {
     /**
      * Find a licensee by id

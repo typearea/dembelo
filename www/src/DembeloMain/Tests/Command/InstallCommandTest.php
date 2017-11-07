@@ -84,6 +84,9 @@ class InstallCommandTest extends KernelTestCase
             'findByEmail',
             'findAll',
             'save',
+            'findBy',
+            'findOneBy',
+            'getClassName',
         ];
         $this->userRepositoryMock = $this->getMockBuilder(UserRepositoryInterface::class)->setMethods($methods)->getMock();
     }

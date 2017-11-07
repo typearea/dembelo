@@ -22,12 +22,13 @@ namespace DembeloMain\Model\Repository;
 
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
+use Doctrine\Common\Persistence\ObjectRepository;
 
 /**
  * Interface TextNodeRepositoryInterface
  * @package DembeloMain\Model\Repository
  */
-interface TextNodeRepositoryInterface
+interface TextNodeRepositoryInterface extends ObjectRepository
 {
     /**
      * Find a text node by id
