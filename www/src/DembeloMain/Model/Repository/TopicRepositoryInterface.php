@@ -21,12 +21,13 @@
 namespace DembeloMain\Model\Repository;
 
 use DembeloMain\Document\Topic;
+use Doctrine\Common\Persistence\ObjectRepository;
 
 /**
  * Interface TopicRepositoryInterface
  * @package DembeloMain\Model\Repository
  */
-interface TopicRepositoryInterface
+interface TopicRepositoryInterface extends ObjectRepository
 {
 
     /**
