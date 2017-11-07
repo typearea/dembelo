@@ -24,19 +24,14 @@
       top: -6px;
     }
 
-    .menu-icon, .back-icon, .back-icon-inactive {
+    .menu-icon, .back-icon {
       cursor: pointer;
       display: inline-block;
       color: $white;
       margin-right: 8px;
     }
 
-    .back-icon-inactive {
-      cursor: auto;
-      color: $grey;
-    }
-
-    .back-icon, .back-icon-inactive {
+    .back-icon {
       float: right;
     }
   }
