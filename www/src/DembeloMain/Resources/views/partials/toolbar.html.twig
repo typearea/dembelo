@@ -1,19 +1,19 @@
 <header id="toolbar">
     <div class="container">
+        <div id="menu-icon" class="menu-icon">
+            <i class="ion-navicon-round"></i>
+        </div>
         {% if showBackButton is defined and showBackButton %}
-        <a href="{{ path('back') }}">
+            <a href="{{ path('back') }}">
             <div id="back-icon" class="back-icon">
-                <i class="ion-ios-rewind"></i> <span class="title">Zurück</span>
+                <i class="ion-android-arrow-dropup-circle"></i>
             </div>
         </a>
         {% else %}
-        <div id="back-icon-inactive" class="back-icon-inactive">
-            <i class="ion-ios-rewind"></i> <span class="title">Zurück</span>
+            <div id="back-icon-inactive" class="back-icon-inactive">
+            <i class="ion-android-arrow-dropup-circle"></i>
         </div>
         {% endif %}
-        <div id="menu-icon" class="menu-icon">
-            <i class="ion-navicon-round"></i> <span class="title">Menü</span>
-        </div>
 
     </div>
 </header>
