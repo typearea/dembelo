@@ -102,10 +102,16 @@ class DefaultController extends Controller
 
     /**
      * DefaultController constructor.
-     * @param Templating $templating
-     * @param UserRepositoryInterface $userRepository
-     * @param LicenseeRepositoryInterface $licenseeRepository
-     * @param string $configTwineDirectory
+     * @param Templating                    $templating
+     * @param UserRepositoryInterface       $userRepository
+     * @param LicenseeRepositoryInterface   $licenseeRepository
+     * @param TopicRepositoryInterface      $topicRepository
+     * @param ImportfileRepositoryInterface $importfileRepository
+     * @param TextNodeRepositoryInterface   $textNodeRepository
+     * @param UserPasswordEncoder           $userPasswordEncoder
+     * @param string                        $configTwineDirectory
+     * @param string                        $topicImageDirectory
+     * @param \Swift_Mailer                 $mailer
      */
     public function __construct(
         Templating $templating,
@@ -323,7 +329,7 @@ class DefaultController extends Controller
         $formtype = $params['formtype'];
 
         /* @var $repository AbstractRepository */
-        switch($formtype) {
+        switch ($formtype) {
             case 'user':
                 $repository = $this->userRepository;
                 break;
