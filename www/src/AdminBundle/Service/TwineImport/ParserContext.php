@@ -64,6 +64,11 @@ class ParserContext
     private $accessSet = false;
 
     /**
+     * @var array
+     */
+    private $nodenameMapping = [];
+
+    /**
      * @param Importfile $importfile
      * @throws \Exception
      */
@@ -197,5 +202,22 @@ class ParserContext
     public function setAccessSet(bool $accessSet): void
     {
         $this->accessSet = $accessSet;
+    }
+
+    /**
+     * @return array
+     */
+    public function getNodenameMapping(): array
+    {
+        return $this->nodenameMapping;
+    }
+
+    /**
+     * @param array $nodenameMapping
+     * @return void
+     */
+    public function setNodenameMapping(array $nodenameMapping): void
+    {
+        $this->nodenameMapping = $nodenameMapping;
     }
 }

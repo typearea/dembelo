@@ -333,7 +333,7 @@ class PassageDataParserTest extends TestCase
         $textnodeMock = $this->createMock(Textnode::class);
 
         $parserContext = $this->createParserContextMock();
-        $parserContext->expects(self::once())
+        $parserContext->expects(self::any())
             ->method('getCurrentTextnode')
             ->willReturn($textnodeMock);
         $parserContext->expects(self::once())

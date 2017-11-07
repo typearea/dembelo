@@ -171,6 +171,9 @@ class StoryDataParser
                 $content = $matches[1];
                 $hitch = null;
                 $metadata = null;
+
+                $this->hitchParser->setNodeNameMapping($this->parserContext->getNodenameMapping());
+
                 if (strpos($content, '-->') !== false) {
                     $hitch = $this->hitchParser->parseDoubleArrowRight($content, $name);
                 } elseif (strpos($content, '->') !== false) {

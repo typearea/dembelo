@@ -39,6 +39,11 @@ class PassageDataParser
     private $textnodeRepository;
 
     /**
+     * @var string
+     */
+    private $twineTextnodeName;
+
+    /**
      * PassageDataParser constructor.
      * @param TextNodeRepositoryInterface $textNodeRepository
      */
@@ -89,9 +94,11 @@ class PassageDataParser
             $textnode->clearHitches();
         }
 
+        $this->twineTextnodeName = $attrs['name'];
+
         $textnode->setMetadata(
             [
-                'Titel' => $attrs['name'],
+                'Titel' => $this->twineTextnodeName,
                 'Autor' => $this->parserContext->getImportfile()->getAuthor(),
                 'Verlag' => $this->parserContext->getImportfile()->getPublisher(),
             ]
@@ -119,6 +126,10 @@ class PassageDataParser
     public function endElement(): void
     {
         $this->textnodeRepository->save($this->parserContext->getCurrentTextnode());
+
+        $nodenameMapping = $this->parserContext->getNodenameMapping();
+        $nodenameMapping[$this->twineTextnodeName] = $this->parserContext->getCurrentTextnode()->getId();
+        $this->parserContext->setNodenameMapping($nodenameMapping);
 
         $this->parserContext->setTwineText(false);
     }
