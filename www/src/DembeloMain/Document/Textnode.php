@@ -128,17 +128,18 @@ class Textnode
     }
 
     /**
-     * @return String
+     * @return String|null
      */
-    public function getTopicId()
+    public function getTopicId(): ?string
     {
         return $this->topicId;
     }
 
     /**
      * @param String $topicId
+     * @return void
      */
-    public function setTopicId($topicId)
+    public function setTopicId($topicId): void
     {
         $this->topicId = $topicId;
     }
@@ -146,15 +147,16 @@ class Textnode
     /**
      * @return integer
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
 
     /**
      * @param integer $status
+     * @return void
      */
-    public function setStatus($status)
+    public function setStatus(int $status): void
     {
         $this->status = $status;
     }
@@ -164,7 +166,7 @@ class Textnode
      *
      * @return string
      */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -173,8 +175,9 @@ class Textnode
      * sets the mongoDB id
      *
      * @param string $id
+     * @return void
      */
-    public function setId($id)
+    public function setId(string $id): void
     {
         $this->id = $id;
     }
@@ -193,8 +196,9 @@ class Textnode
      * sets the textnode's text
      *
      * @param string $text
+     * @return void
      */
-    public function setText($text)
+    public function setText(string $text): void
     {
         $this->text = $text;
     }
@@ -204,7 +208,7 @@ class Textnode
      *
      * @return string
      */
-    public function getTextHyphenated()
+    public function getTextHyphenated(): ?string
     {
         return $this->textHyphenated;
     }
@@ -214,7 +218,7 @@ class Textnode
      *
      * @param string $textHyphenated
      */
-    public function setTextHyphenated($textHyphenated)
+    public function setTextHyphenated($textHyphenated): void
     {
         $this->textHyphenated = $textHyphenated;
     }
@@ -224,7 +228,7 @@ class Textnode
      *
      * @return array
      */
-    public function getMetadata()
+    public function getMetadata(): ?array
     {
         return $this->metadata;
     }
@@ -325,7 +329,7 @@ class Textnode
     {
         $hitchCount = count($this->hitches);
 
-        if ($hitchCount >= Textnode::HITCHES_MAXIMUM_COUNT) {
+        if ($hitchCount >= self::HITCHES_MAXIMUM_COUNT) {
             return false;
         }
 
@@ -341,12 +345,12 @@ class Textnode
             return false;
         }
 
-        if ($hitch['status'] !== Textnode::HITCH_STATUS_INACTIVE &&
-            $hitch['status'] !== Textnode::HITCH_STATUS_ACTIVE) {
+        if ($hitch['status'] !== self::HITCH_STATUS_INACTIVE &&
+            $hitch['status'] !== self::HITCH_STATUS_ACTIVE) {
             return false;
         }
 
-        if (is_null($hitch['textnodeId']) === true) {
+        if (null === $hitch['textnodeId']) {
             return false;
         }
 

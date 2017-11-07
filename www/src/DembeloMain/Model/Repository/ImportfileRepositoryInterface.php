@@ -20,12 +20,13 @@
 namespace DembeloMain\Model\Repository;
 
 use DembeloMain\Document\Importfile;
+use Doctrine\Common\Persistence\ObjectRepository;
 
 /**
  * Interface ImportfileRepositoryInterface
  * @package DembeloMain\Model\Repository
  */
-interface ImportfileRepositoryInterface
+interface ImportfileRepositoryInterface extends ObjectRepository
 {
     /**
      * Save an importfile

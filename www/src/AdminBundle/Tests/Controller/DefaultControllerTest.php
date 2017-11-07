@@ -18,7 +18,6 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * @package AdminBundle
  */
@@ -32,27 +31,23 @@ use DembeloMain\Document\User;
 use DembeloMain\Model\Repository\Doctrine\ODM\ImportfileRepository;
 use DembeloMain\Model\Repository\Doctrine\ODM\LicenseeRepository;
 use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
+use DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository;
+use DembeloMain\Model\Repository\Doctrine\ODM\UserRepository;
+use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
-use Doctrine\ODM\MongoDB\DocumentRepository;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AdminBundle\Controller\DefaultController;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
 /**
  * Class DefaultControllerTest
  */
 class DefaultControllerTest extends WebTestCase
 {
-    private $container;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|DocumentRepository
-     */
-    private $repository;
-
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
      */
@@ -69,12 +64,78 @@ class DefaultControllerTest extends WebTestCase
     private $twineDirectory;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|EngineInterface
+     */
+    private $templatingMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|UserRepository
+     */
+    private $userRepositoryMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|LicenseeRepository
+     */
+    private $licenseeRepositoryMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|TopicRepository
+     */
+    private $topicRepositoryMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ImportfileRepositoryInterface
+     */
+    private $importfileRepositoryMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|TextNodeRepository
+     */
+    private $textnodeRepositoryMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|UserPasswordEncoder
+     */
+    private $userPasswordEncoderMock;
+
+    /**
+     * @var string
+     */
+    private $topicImageDirectory;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|\Swift_Mailer
+     */
+    private $mailerMock;
+
+    /**
      * @return void
      */
     public function setUp(): void
     {
         $this->twineDirectory = '/tmp/twineDirectory';
-        $this->controller = new DefaultController($this->twineDirectory);
+        $this->templatingMock = $this->createTemplatingMock();
+        $this->userRepositoryMock = $this->createUserRepositoryMock();
+        $this->licenseeRepositoryMock = $this->createLicenseeRepositoryMock();
+        $this->topicRepositoryMock = $this->createTopicRepositoryMock();
+        $this->importfileRepositoryMock = $this->createImportfileRepositoryMock();
+        $this->textnodeRepositoryMock = $this->createTextnodeRepositoryMock();
+        $this->userPasswordEncoderMock = $this->createUserPasswordEncoderMock();
+        $this->topicImageDirectory = 'tmp/topicImageDirectory';
+        $this->mailerMock = $this->createMailerMock();
+
+        $this->controller = new DefaultController(
+            $this->templatingMock,
+            $this->userRepositoryMock,
+            $this->licenseeRepositoryMock,
+            $this->topicRepositoryMock,
+            $this->importfileRepositoryMock,
+            $this->textnodeRepositoryMock,
+            $this->userPasswordEncoderMock,
+            $this->twineDirectory,
+            $this->topicImageDirectory,
+            $this->mailerMock
+        );
     }
 
     /**
@@ -113,12 +174,9 @@ class DefaultControllerTest extends WebTestCase
             ->method('execute')
             ->will($this->returnValue(array()));
 
-        $this->loadMongoContainer('user');
-        $this->repository->expects($this->once())
+        $this->userRepositoryMock->expects($this->once())
             ->method('createQueryBuilder')
             ->will($this->returnValue($queryMock));
-
-        $this->controller->setContainer($this->container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $this->controller->usersAction($request);
@@ -146,9 +204,7 @@ class DefaultControllerTest extends WebTestCase
             ->method('getQuery')
             ->will($this->returnSelf());
 
-        $this->loadMongoContainer('user');
-
-        $this->repository->expects($this->once())
+        $this->userRepositoryMock->expects($this->once())
             ->method('createQueryBuilder')
             ->will($this->returnValue($queryMock));
 
@@ -172,8 +228,6 @@ class DefaultControllerTest extends WebTestCase
             ->method('execute')
             ->will($this->returnValue($userArray));
 
-        $this->controller->setContainer($this->container);
-
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $this->controller->usersAction($request);
         $this->assertInstanceOf(Response::class, $response);
@@ -187,8 +241,6 @@ class DefaultControllerTest extends WebTestCase
      */
     public function tearDown(): void
     {
-        $this->container = null;
-        $this->repository = null;
         $this->service = null;
     }
 
@@ -205,8 +257,6 @@ class DefaultControllerTest extends WebTestCase
             ->method('all')
             ->will($this->returnValue($postArray));
         $request->request = $postMock;
-
-        $this->controller->setContainer($this->container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $this->controller->formsaveAction($request);
@@ -233,8 +283,6 @@ class DefaultControllerTest extends WebTestCase
             ->will($this->returnValue($postArray));
         $request->request = $postMock;
 
-        $this->controller->setContainer($this->container);
-
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $this->controller->formsaveAction($request);
         $this->assertInstanceOf(Response::class, $response);
@@ -255,7 +303,6 @@ class DefaultControllerTest extends WebTestCase
         $user->setEmail('some@email.de');
         $user->setRoles('ROLE_USER');
 
-        $this->loadMongoContainer('user');
         $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
         $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
         $postArray = array(
@@ -267,12 +314,10 @@ class DefaultControllerTest extends WebTestCase
             ->will($this->returnValue($postArray));
         $request->request = $postMock;
 
-        $this->repository->expects($this->once())
+        $this->userRepositoryMock->expects($this->once())
             ->method('find')
             ->with($user->getId())
             ->will($this->returnValue($user));
-
-        $this->controller->setContainer($this->container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $this->controller->formsaveAction($request);
@@ -295,7 +340,6 @@ class DefaultControllerTest extends WebTestCase
         $user->setEmail('some@email.de');
         $user->setRoles('ROLE_USER');
 
-        $this->loadMongoContainer('user');
         $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
         $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
         $postArray = array(
@@ -307,12 +351,10 @@ class DefaultControllerTest extends WebTestCase
             ->will($this->returnValue($postArray));
         $request->request = $postMock;
 
-        $this->repository->expects($this->once())
+        $this->userRepositoryMock->expects($this->once())
             ->method('find')
             ->with($user->getId())
             ->will($this->returnValue(null));
-
-        $this->controller->setContainer($this->container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $this->controller->formsaveAction($request);
@@ -354,8 +396,6 @@ class DefaultControllerTest extends WebTestCase
             ->will($this->returnValue($postArray));
         $request->request = $postMock;
 
-        $this->controller->setContainer($this->container);
-
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $this->controller->formsaveAction($request);
         $this->assertInstanceOf(Response::class, $response);
@@ -371,18 +411,9 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testLicenseeActionWithNoLicensees(): void
     {
-        $repository = $this->getMockBuilder(LicenseeRepository::class)->disableOriginalConstructor()->setMethods(['findAll'])->getMock();
-        $repository->expects($this->once())
+        $this->licenseeRepositoryMock->expects($this->once())
             ->method('findAll')
             ->willReturn([]);
-
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $container->expects($this->once())
-            ->method('get')
-            ->with('app.model_repository_licensee')
-            ->willReturn($repository);
-
-        $this->controller->setContainer($container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $this->controller->licenseesAction();
@@ -401,18 +432,9 @@ class DefaultControllerTest extends WebTestCase
         $licensee->setName('someName');
         $licensee->setId('someId');
 
-        $repository = $this->getMockBuilder(LicenseeRepository::class)->disableOriginalConstructor()->setMethods(['findAll'])->getMock();
-        $repository->expects($this->once())
+        $this->licenseeRepositoryMock->expects($this->once())
             ->method('findAll')
             ->willReturn([$licensee]);
-
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $container->expects($this->once())
-            ->method('get')
-            ->with('app.model_repository_licensee')
-            ->willReturn($repository);
-
-        $this->controller->setContainer($container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $this->controller->licenseesAction();
@@ -445,41 +467,17 @@ class DefaultControllerTest extends WebTestCase
         $importfile->setId('someImportfileId');
         $importfile->setName('someImportfileName');
 
-        $repository = $this->getMockBuilder(TextNodeRepository::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['findAll'])
-            ->getMock();
-
-        $repository->expects($this->once())
+        $this->textnodeRepositoryMock->expects($this->once())
             ->method('findAll')
             ->willReturn([$textnode]);
 
-        $licenseeRepository = $this->getLicenseeRepositoryMock();
-        $licenseeRepository->expects($this->once())
+        $this->licenseeRepositoryMock->expects($this->once())
             ->method('findAll')
             ->willReturn([$licensee]);
 
-        $importfileRepository = $this->getImportfileRepositoryMock();
-        $importfileRepository->expects($this->once())
+        $this->importfileRepositoryMock->expects($this->once())
             ->method('findAll')
             ->willReturn([$importfile]);
-
-
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $container->expects($this->at(0))
-            ->method('get')
-            ->with('app.model_repository_textNode')
-            ->willReturn($repository);
-        $container->expects($this->at(1))
-            ->method('get')
-            ->with('app.model_repository_licensee')
-            ->willReturn($licenseeRepository);
-        $container->expects($this->at(2))
-            ->method('get')
-            ->with('app.model_repository_importfile')
-            ->willReturn($importfileRepository);
-
-        $this->controller->setContainer($container);
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
         $response = $this->controller->textnodesAction();
@@ -494,7 +492,7 @@ class DefaultControllerTest extends WebTestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|LicenseeRepository
      */
-    private function getLicenseeRepositoryMock(): LicenseeRepository
+    private function createLicenseeRepositoryMock(): LicenseeRepository
     {
         $repository = $this->getMockBuilder(LicenseeRepository::class)
             ->disableOriginalConstructor()
@@ -507,7 +505,7 @@ class DefaultControllerTest extends WebTestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|ImportfileRepository
      */
-    private function getImportfileRepositoryMock(): ImportfileRepository
+    private function createImportfileRepositoryMock(): ImportfileRepository
     {
         $repository = $this->getMockBuilder(ImportfileRepository::class)
             ->disableOriginalConstructor()
@@ -518,35 +516,50 @@ class DefaultControllerTest extends WebTestCase
     }
 
     /**
-     * load mockoed container and mocked mongodb repository
-     * @return void
+     * @return \PHPUnit_Framework_MockObject_MockObject|EngineInterface
      */
-    private function loadMongoContainer($repository): void
+    private function createTemplatingMock(): EngineInterface
     {
-        $this->loadMockedContainer();
-        $this->loadMockedMongoRepository($repository);
+        return $this->createMock(EngineInterface::class);
     }
 
     /**
-     * load mocked container
-     * @return void
+     * @return UserRepository|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function loadMockedContainer(): void
+    private function createUserRepositoryMock(): UserRepository
     {
-        $this->container = $this->createMock(ContainerInterface::class);
+        return $this->createMock(UserRepository::class);
     }
 
     /**
-     * load mocked mongodb repository
-     * @return void
+     * @return TopicRepository|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function loadMockedMongoRepository($repository): void
+    private function createTopicRepositoryMock(): TopicRepository
     {
-        $this->service = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
-        $this->repository = $this->getMockBuilder(DocumentRepository::class)->disableOriginalConstructor()->getMock();
-        $this->container->expects($this->once())
-            ->method('get')
-            ->with($this->equalTo('app.model_repository_'.$repository))
-            ->will($this->returnValue($this->repository));
+        return $this->createMock(TopicRepository::class);
+    }
+
+    /**
+     * @return TextNodeRepository|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createTextnodeRepositoryMock(): TextNodeRepository
+    {
+        return $this->createMock(TextNodeRepository::class);
+    }
+
+    /**
+     * @return UserPasswordEncoder|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createUserPasswordEncoderMock(): UserPasswordEncoder
+    {
+        return $this->createMock(UserPasswordEncoder::class);
+    }
+
+    /**
+     * @return \Swift_Mailer|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createMailerMock(): \Swift_Mailer
+    {
+        return $this->createMock(\Swift_Mailer::class);
     }
 }
