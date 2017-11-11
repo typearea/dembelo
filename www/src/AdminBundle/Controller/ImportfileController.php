@@ -33,7 +33,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
  * @package AdminBundle\Controller
  * @Route(service="app.admin_controller_import")
  */
-class ImportController extends Controller
+class ImportfileController extends Controller
 {
     /**
      * @var ImportfileRepository
@@ -123,7 +123,7 @@ class ImportController extends Controller
         $importfile = $this->importfileRepository->find($importfileId);
         try {
             if (null === $importfile) {
-                throw new \Exception('file with id ['.$importfileId.'] not found');
+                throw new \RuntimeException('file with id ['.$importfileId.'] not found');
             }
             $returnValue = $this->importTwine->run($importfile);
 

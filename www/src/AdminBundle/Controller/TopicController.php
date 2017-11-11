@@ -60,7 +60,7 @@ class TopicController extends Controller
     {
         $filters = $request->query->get('filter');
 
-        if (is_null($filters)) {
+        if (null === $filters) {
             $topics = $this->topicRepository->findBy([], ['sortKey' => 'ASC']);
         } else {
             $topics = $this->topicRepository->findFiltered($filters, ['sortKey', 'ASC']);
@@ -76,6 +76,33 @@ class TopicController extends Controller
             $item['sortKey'] = $topic->getSortKey();
             $item['originalImageName'] = $topic->getOriginalImageName();
             $output[] = $item;
+        }
+
+        return new Response(\json_encode($output));
+    }
+
+    /**
+     * @Route("/topicSuggest", name="admin_topic_suggest")
+     *
+     * @param Request $request
+     * @return Response
+     * @throws \InvalidArgumentException
+     */
+    public function topicSuggestAction(Request $request): Response
+    {
+        $filter = $request->query->get('filter');
+
+        $searchString = $filter['value'];
+
+        /* @var $topics \DembeloMain\Document\Topic[] */
+        $topics = $this->topicRepository->findBy(array('name' => new \MongoRegex('/'.$searchString.'/')), null, 10);
+
+        $output = [];
+        foreach ($topics as $topic) {
+            $output[] = array(
+                'id' => $topic->getId(),
+                'value' => $topic->getName(),
+            );
         }
 
         return new Response(\json_encode($output));

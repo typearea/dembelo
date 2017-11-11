@@ -52,14 +52,30 @@ services:
             - "@app.model_repository_licensee"
             - "@app.model_repository_topic"
             - "@app.model_repository_importfile"
-            - "@app.model_repository_textNode"
             - "@security.password_encoder"
             - %twine_directory%
             - %topic_image_directory%
+
+    app.admin_controller_user:
+        class: AdminBundle\Controller\UserController
+        arguments:
+            - "@app.model_repository_user"
             - "@mailer"
 
-    app.admin_controller_import:
-        class: AdminBundle\Controller\ImportController
+    app.admin_controller_licensee:
+            class: AdminBundle\Controller\LicenseeController
+            arguments:
+                - "@app.model_repository_licensee"
+
+    app.admin_controller_textnode:
+            class: AdminBundle\Controller\TextnodeController
+            arguments:
+                - "@app.model_repository_textnode"
+                - "@app.model_repository_importfile"
+                - "@app.model_repository_licensee"
+
+    app.admin_controller_importfile:
+        class: AdminBundle\Controller\ImportfileController
         arguments:
             - "@app.model_repository_importfile"
             - "@admin.import.twine"
