@@ -19,24 +19,53 @@
 
 namespace AdminBundle\Tests\Controller;
 
+use AdminBundle\Controller\UserController;
+use DembeloMain\Document\User;
+use DembeloMain\Model\Repository\UserRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class UserControllerTest extends WebTestCase
 {
+    /**
+     * @var UserController
+     */
+    private $controller;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|UserRepositoryInterface
+     */
+    private $userRepositoryMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|\Swift_Mailer
+     */
+    private $mailerMock;
+
+    /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        $this->userRepositoryMock = $this->createUserRepositoryMock();
+        $this->mailerMock = $this->createMailerMock();
+
+        $this->controller = new UserController(
+            $this->userRepositoryMock,
+            $this->mailerMock
+        );
+    }
+
     /**
      * tests controller's userAction with no users in db
      * @return void
      */
     public function testUserAction(): void
     {
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
+        $requestMock = $this->createRequestMock();
         $queryMock = $this->getMockBuilder('foobar')->setMethods(array('execute', 'getQuery'))->getMock();
-        $postArray = array();
-        $postMock->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($postArray));
-        $request->query = $postMock;
 
         $queryMock->expects($this->once())
             ->method('getQuery')
@@ -51,7 +80,7 @@ class UserControllerTest extends WebTestCase
             ->will($this->returnValue($queryMock));
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->usersAction($request);
+        $response = $this->controller->usersAction($requestMock);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertJsonStringEqualsJsonString('[]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
@@ -63,14 +92,8 @@ class UserControllerTest extends WebTestCase
      */
     public function testUserActionWithUsers(): void
     {
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
+        $requestMock = $this->createRequestMock();
         $queryMock = $this->getMockBuilder('foobar')->setMethods(['execute', 'getQuery'])->getMock();
-        $postArray = array();
-        $postMock->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($postArray));
-        $request->query = $postMock;
 
         $queryMock->expects($this->once())
             ->method('getQuery')
@@ -101,9 +124,39 @@ class UserControllerTest extends WebTestCase
             ->will($this->returnValue($userArray));
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->usersAction($request);
+        $response = $this->controller->usersAction($requestMock);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertJsonStringEqualsJsonString('[{"id":"id1","gender":null,"email":"email1","roles":"ROLE_ADMIN","licenseeId":"lic1","status":null,"source":null,"reason":null,"created":"'.date('Y-m-d H:i:s', 0).'","updated":"'.date('Y-m-d H:i:s', 0).'"},{"id":"id2","email":"email2","roles":"ROLE_USER","licenseeId":"lic2","status":null,"source":null,"reason":null,"gender":null,"created":"'.date('Y-m-d H:i:s', 0).'","updated":"'.date('Y-m-d H:i:s', 0).'"}]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
+    }
+
+    /**
+     * @return UserRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createUserRepositoryMock(): UserRepositoryInterface
+    {
+        return $this->createMock(UserRepositoryInterface::class);
+    }
+
+    /**
+     * @return \Swift_Mailer|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createMailerMock(): \Swift_Mailer
+    {
+        return $this->createMock(\Swift_Mailer::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|Request
+     */
+    private function createRequestMock()
+    {
+        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
+        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
+        $postArray = [];
+        $postMock->expects($this->once())
+            ->method('get')
+            ->will($this->returnValue($postArray));
+        $request->query = $postMock;
     }
 }
