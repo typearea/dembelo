@@ -19,10 +19,38 @@
 
 namespace AdminBundle\Tests\Controller;
 
+use AdminBundle\Controller\LicenseeController;
+use DembeloMain\Document\Licensee;
+use DembeloMain\Model\Repository\Doctrine\ODM\LicenseeRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Class LicenseeControllerTest
+ * @package AdminBundle\Tests\Controller
+ */
 class LicenseeControllerTest extends WebTestCase
 {
+    /**
+     * @var LicenseeController
+     */
+    private $controller;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|LicenseeRepository
+     */
+    private $licenseeRepositoryMock;
+
+    /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        $this->licenseeRepositoryMock = $this->createLicenseeRepositoryMock();
+
+        $this->controller = new LicenseeController($this->licenseeRepositoryMock);
+    }
+
     /**
      * tests licenseeAction with no licensees
      * @return void
@@ -59,5 +87,18 @@ class LicenseeControllerTest extends WebTestCase
         $this->assertInstanceOf(Response::class, $response);
         $this->assertJsonStringEqualsJsonString('[{"id":"someId","name":"someName"}]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|LicenseeRepository
+     */
+    private function createLicenseeRepositoryMock(): LicenseeRepository
+    {
+        $repository = $this->getMockBuilder(LicenseeRepository::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['findAll'])
+            ->getMock();
+
+        return $repository;
     }
 }
