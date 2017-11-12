@@ -19,10 +19,54 @@
 
 namespace AdminBundle\Tests\Controller;
 
+use AdminBundle\Controller\TextnodeController;
+use DembeloMain\Document\Importfile;
+use DembeloMain\Document\Licensee;
+use DembeloMain\Document\Textnode;
+use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
+use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
+use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class TextnodeControllerTest extends WebTestCase
 {
+    /**
+     * @var TextnodeController
+     */
+    private $controller;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|TextNodeRepositoryInterface
+     */
+    private $textnodeRepositoryMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ImportfileRepositoryInterface
+     */
+    private $importfileRepositoryMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|LicenseeRepositoryInterface
+     */
+    private $licenseeRepositoryMock;
+
+    /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        $this->textnodeRepositoryMock = $this->createTextnodeRepositoryMock();
+        $this->importfileRepositoryMock = $this->createImportfileRepositoryMock();
+        $this->licenseeRepositoryMock = $this->createLicenseeRepositoryMock();
+
+        $this->controller = new TextnodeController(
+            $this->textnodeRepositoryMock,
+            $this->importfileRepositoryMock,
+            $this->licenseeRepositoryMock
+        );
+    }
+
     /**
      * tests textnode action
      * @return void
@@ -67,5 +111,39 @@ class TextnodeControllerTest extends WebTestCase
         $expectedJson .= '"financenode":"ja","arbitraryId":"someArbitraryId","twineId":"someTwineId",';
         $expectedJson .= '"metadata":"key1: val1\nkey2: val2\n"}]';
         $this->assertJsonStringEqualsJsonString($expectedJson, $response->getContent());
+    }
+
+    /**
+     * @return TextNodeRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createTextnodeRepositoryMock(): TextNodeRepositoryInterface
+    {
+        return $this->createMock(TextNodeRepositoryInterface::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ImportfileRepositoryInterface
+     */
+    private function createImportfileRepositoryMock(): ImportfileRepositoryInterface
+    {
+        $repository = $this->getMockBuilder(ImportfileRepositoryInterface::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['findAll'])
+            ->getMock();
+
+        return $repository;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|LicenseeRepositoryInterface
+     */
+    private function createLicenseeRepositoryMock(): LicenseeRepositoryInterface
+    {
+        $repository = $this->getMockBuilder(LicenseeRepositoryInterface::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['findAll'])
+            ->getMock();
+
+        return $repository;
     }
 }
