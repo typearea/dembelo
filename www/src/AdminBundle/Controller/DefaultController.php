@@ -207,7 +207,7 @@ class DefaultController extends Controller
                 $value = null;
             }
             $method = 'set'.ucfirst($param);
-            if (method_exists($item, $method)) {    
+            if (method_exists($item, $method)) {
                 $item->$method($value);
             }
         }
