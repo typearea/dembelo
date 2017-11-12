@@ -29,6 +29,10 @@ use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Class TextnodeControllerTest
+ * @package AdminBundle\Tests\Controller
+ */
 class TextnodeControllerTest extends WebTestCase
 {
     /**
@@ -128,7 +132,7 @@ class TextnodeControllerTest extends WebTestCase
     {
         $repository = $this->getMockBuilder(ImportfileRepositoryInterface::class)
             ->disableOriginalConstructor()
-            ->setMethods(['findAll'])
+            ->setMethods(['findAll', 'save', 'find', 'findBy', 'findOneBy', 'getClassName'])
             ->getMock();
 
         return $repository;
@@ -141,7 +145,7 @@ class TextnodeControllerTest extends WebTestCase
     {
         $repository = $this->getMockBuilder(LicenseeRepositoryInterface::class)
             ->disableOriginalConstructor()
-            ->setMethods(['findAll'])
+            ->setMethods(['findAll', 'save', 'find', 'findBy', 'findOneBy', 'getClassName', 'findOneByName'])
             ->getMock();
 
         return $repository;

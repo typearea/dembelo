@@ -39,7 +39,7 @@ class LicenseeController extends Controller
 
     /**
      * UserController constructor.
-     * @param LicenseeRepositoryInterface       $licenseeRepository
+     * @param LicenseeRepositoryInterface $licenseeRepository
      */
     public function __construct(
         LicenseeRepositoryInterface $licenseeRepository

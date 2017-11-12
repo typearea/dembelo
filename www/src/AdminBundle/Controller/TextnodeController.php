@@ -49,9 +49,9 @@ class TextnodeController extends Controller
 
     /**
      * TextnodeController constructor.
-     * @param TextnodeRepositoryInterface $textnodeRepository
+     * @param TextnodeRepositoryInterface   $textnodeRepository
      * @param ImportfileRepositoryInterface $importfileRepository
-     * @param LicenseeRepositoryInterface $licenseeRepository
+     * @param LicenseeRepositoryInterface   $licenseeRepository
      */
     public function __construct(
         TextnodeRepositoryInterface $textnodeRepository,

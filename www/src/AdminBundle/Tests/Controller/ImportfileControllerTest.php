@@ -21,11 +21,14 @@ namespace AdminBundle\Tests\Controller;
 
 use AdminBundle\Controller\ImportfileController;
 use AdminBundle\Model\ImportTwine;
-use DembeloMain\Model\Repository\Doctrine\ODM\ImportfileRepository;
 use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+/**
+ * Class ImportfileControllerTest
+ * @package AdminBundle\Tests\Controller
+ */
 class ImportfileControllerTest extends WebTestCase
 {
     /**
@@ -71,13 +74,22 @@ class ImportfileControllerTest extends WebTestCase
     }
 
     /**
+     * @todo to be replaced by real tests
+     * @return void
+     */
+    public function testVoid(): void
+    {
+        self::assertTrue(true);
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|ImportfileRepositoryInterface
      */
     private function createImportfileRepositoryMock(): ImportfileRepositoryInterface
     {
         $repository = $this->getMockBuilder(ImportfileRepositoryInterface::class)
             ->disableOriginalConstructor()
-            ->setMethods(['findAll'])
+            ->setMethods(['findAll', 'save', 'find', 'findBy', 'findOneBy', 'getClassName'])
             ->getMock();
 
         return $repository;

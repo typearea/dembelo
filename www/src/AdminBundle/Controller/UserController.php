@@ -44,8 +44,8 @@ class UserController extends Controller
 
     /**
      * UserController constructor.
-     * @param UserRepositoryInterface       $userRepository
-     * @param \Swift_Mailer                 $mailer
+     * @param UserRepositoryInterface $userRepository
+     * @param \Swift_Mailer           $mailer
      */
     public function __construct(
         UserRepositoryInterface $userRepository,
@@ -128,7 +128,6 @@ class UserController extends Controller
             ->setTo($user->getEmail())
             ->setBody(
                 $this->renderView(
-                // app/Resources/views/Emails/registration.html.twig
                     'AdminBundle::Emails/registration.txt.twig',
                     array('hash' => $user->getActivationHash())
                 ),

@@ -22,6 +22,7 @@ namespace AdminBundle\Tests\Controller;
 use AdminBundle\Controller\TopicController;
 use DembeloMain\Document\Topic;
 use DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository;
+use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -34,26 +35,38 @@ use Symfony\Component\HttpFoundation\Response;
 class TopicControllerTest extends WebTestCase
 {
     /**
+     * @var TopicController
+     */
+    private $controller;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|TopicRepositoryInterface
+     */
+    private $topicRepositoryMock;
+
+    /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        $this->topicRepositoryMock = $this->createTopicRepositoryMock();
+        $this->controller = new TopicController(
+            $this->topicRepositoryMock
+        );
+    }
+
+    /**
      * tests topicAction() with no topics
      */
     public function testListActionWithNoTopics()
     {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-
-        $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findBy'])->getMock();
-        $repository->expects($this->once())
-            ->method('findBy')
-            ->willReturn([]);
-
         $parameterBag = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->setMethods(['get'])->getMock();
 
-        $request = $this->getMockBuilder(Request::class)->getMock();
-        $request->query = $parameterBag;
-
-        $controller = new TopicController($container, $repository);
+        $requestMock = $this->getMockBuilder(Request::class)->getMock();
+        $requestMock->query = $parameterBag;
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->listAction($request);
+        $response = $this->controller->listAction($requestMock);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertJsonStringEqualsJsonString('[]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
@@ -71,22 +84,17 @@ class TopicControllerTest extends WebTestCase
         $topic->setSortKey(123);
         $topic->setOriginalImageName("someImageName");
 
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-
-        $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findBy'])->getMock();
-        $repository->expects($this->once())
+        $this->topicRepositoryMock->expects($this->once())
             ->method('findBy')
             ->willReturn([$topic]);
 
         $parameterBag = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->setMethods(['get'])->getMock();
 
-        $request = $this->getMockBuilder(Request::class)->getMock();
-        $request->query = $parameterBag;
-
-        $controller = new TopicController($container, $repository);
+        $requestMock = $this->getMockBuilder(Request::class)->getMock();
+        $requestMock->query = $parameterBag;
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->listAction($request);
+        $response = $this->controller->listAction($requestMock);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertJsonStringEqualsJsonString('[{"id":"someId","name":"someName","status":"1","sortKey":123,"originalImageName":"someImageName"}]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
@@ -104,13 +112,10 @@ class TopicControllerTest extends WebTestCase
         $topic->setSortKey(123);
         $topic->setOriginalImageName("someImageName");
 
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-
-        $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findBy', 'findFiltered'])->getMock();
-        $repository->expects($this->never())
+        $this->topicRepositoryMock->expects($this->never())
             ->method('findBy')
             ->willReturn([$topic]);
-        $repository->expects($this->once())
+        $this->topicRepositoryMock->expects($this->once())
             ->method('findFiltered')
             ->with(['status' => '1'])
             ->willReturn([$topic]);
@@ -121,13 +126,11 @@ class TopicControllerTest extends WebTestCase
             ->with('filter')
             ->willReturn(['status' => '1']);
 
-        $request = $this->getMockBuilder(Request::class)->getMock();
-        $request->query = $parameterBag;
-
-        $controller = new TopicController($container, $repository);
+        $requestMock = $this->getMockBuilder(Request::class)->getMock();
+        $requestMock->query = $parameterBag;
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->listAction($request);
+        $response = $this->controller->listAction($requestMock);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertJsonStringEqualsJsonString('[{"id":"someId","name":"someName","status":"1","sortKey":123,"originalImageName":"someImageName"}]', $response->getContent());
         $this->assertEquals('200', $response->getStatusCode());
@@ -138,21 +141,19 @@ class TopicControllerTest extends WebTestCase
      */
     public function testUploadImageActionWithNoFileError()
     {
-        $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findBy'])->getMock();
+        $parameterBag = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->setMethods(['get'])->getMock();
+        $parameterBag->expects($this->never())
+            ->method('get');
 
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $container->expects($this->never())
-            ->method('getParameter')
-            ->with('topic_image_directory');
-
-        $controller = new TopicController($container, $repository);
+        $requestMock = $this->getMockBuilder(Request::class)->getMock();
+        $requestMock->query = $parameterBag;
 
         $_FILES['upload'] = [
             'error' => UPLOAD_ERR_NO_FILE,
         ];
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->uploadImageAction();
+        $response = $this->controller->uploadImageAction($requestMock);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertJsonStringEqualsJsonString('{"status":"error"}', $response->getContent());
     }
@@ -162,15 +163,14 @@ class TopicControllerTest extends WebTestCase
      */
     public function testUploadImageActionWithNoError()
     {
-        $repository = $this->getMockBuilder(TopicRepository::class)->disableOriginalConstructor()->setMethods(['findBy'])->getMock();
-
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $container->expects($this->once())
-            ->method('getParameter')
+        $parameterBag = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->setMethods(['get'])->getMock();
+        $parameterBag->expects($this->once())
+            ->method('get')
             ->with('topic_image_directory')
             ->willReturn('someDirectory');
 
-        $controller = new TopicController($container, $repository);
+        $requestMock = $this->getMockBuilder(Request::class)->getMock();
+        $requestMock->query = $parameterBag;
 
         $_FILES['upload'] = [
             'error' => UPLOAD_ERR_OK,
@@ -179,19 +179,17 @@ class TopicControllerTest extends WebTestCase
         ];
 
         /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $controller->uploadImageAction();
+        $response = $this->controller->uploadImageAction($requestMock);
         $this->assertInstanceOf(Response::class, $response);
         $decoded = json_decode($response->getContent());
         $this->assertEquals('someName', $decoded->originalImageName);
     }
 
     /**
-     * tear down method
-     */
-    public function tearDown()
+    * @return TopicRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+    */
+    private function createTopicRepositoryMock(): TopicRepositoryInterface
     {
-        $this->container = null;
-        $this->repository = null;
-        $this->service = null;
+        return $this->createMock(TopicRepositoryInterface::class);
     }
 }

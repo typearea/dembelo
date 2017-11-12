@@ -27,6 +27,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
+/**
+ * Class UserControllerTest
+ * @package AdminBundle\Tests\Controller
+ */
 class UserControllerTest extends WebTestCase
 {
     /**
@@ -135,7 +139,10 @@ class UserControllerTest extends WebTestCase
      */
     private function createUserRepositoryMock(): UserRepositoryInterface
     {
-        return $this->createMock(UserRepositoryInterface::class);
+        return $this->getMockBuilder(UserRepositoryInterface::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['createQueryBuilder', 'find', 'findByEmail', 'findAll', 'save', 'findBy', 'findOneBy', 'getClassName'])
+            ->getMock();
     }
 
     /**
@@ -151,12 +158,14 @@ class UserControllerTest extends WebTestCase
      */
     private function createRequestMock()
     {
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
+        $requestMock = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
         $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
         $postArray = [];
         $postMock->expects($this->once())
             ->method('get')
             ->will($this->returnValue($postArray));
-        $request->query = $postMock;
+        $requestMock->query = $postMock;
+
+        return $requestMock;
     }
 }

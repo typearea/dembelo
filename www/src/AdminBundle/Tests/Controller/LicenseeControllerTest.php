@@ -96,7 +96,7 @@ class LicenseeControllerTest extends WebTestCase
     {
         $repository = $this->getMockBuilder(LicenseeRepository::class)
             ->disableOriginalConstructor()
-            ->setMethods(['findAll'])
+            ->setMethods(['findAll', 'save', 'find', 'findBy', 'findOneBy', 'getClassName', 'findOneByName'])
             ->getMock();
 
         return $repository;

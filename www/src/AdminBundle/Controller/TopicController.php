@@ -41,12 +41,10 @@ class TopicController extends Controller
 
     /**
      * TopicController constructor.
-     * @param ContainerInterface       $container
      * @param TopicRepositoryInterface $topicRepository
      */
-    public function __construct(ContainerInterface $container, TopicRepositoryInterface $topicRepository)
+    public function __construct(TopicRepositoryInterface $topicRepository)
     {
-        $this->container = $container;
         $this->topicRepository = $topicRepository;
     }
 
@@ -66,7 +64,11 @@ class TopicController extends Controller
             $topics = $this->topicRepository->findFiltered($filters, ['sortKey', 'ASC']);
         }
 
-        $output = array();
+        if (null === $topics) {
+            return new Response(\json_encode([]));
+        }
+
+        $output = [] ;
         /* @var $topic \DembeloMain\Document\Topic */
         foreach ($topics as $topic) {
             $item = [];
@@ -111,18 +113,20 @@ class TopicController extends Controller
     /**
      * @Route("/topic/uploadimage", name="admin_topics_image")
      *
+     * @param Request $request
      * @return Response
+     * @throws \InvalidArgumentException
      */
-    public function uploadImageAction(): Response
+    public function uploadImageAction(Request $request): Response
     {
-        $output = array();
+        $output = [];
         $file = $_FILES['upload'];
         if ($file['error'] !== UPLOAD_ERR_OK) {
             $output['status'] = 'error';
 
             return new Response(\json_encode($output));
         }
-        $directory = $this->getParameter('topic_image_directory');
+        $directory = $request->query->get('topic_image_directory');
         $filename = md5(uniqid().$file['name']);
         move_uploaded_file($file["tmp_name"], $directory.$filename);
         $output['imageFileName'] = $filename;
