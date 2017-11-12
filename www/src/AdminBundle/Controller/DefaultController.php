@@ -33,6 +33,7 @@ use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use DembeloMain\Model\Repository\UserRepositoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use DembeloMain\Document\Topic;
@@ -87,15 +88,21 @@ class DefaultController extends Controller
     private $topicImageDirectory;
 
     /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
+    /**
      * DefaultController constructor.
-     * @param Templating                    $templating
-     * @param UserRepositoryInterface       $userRepository
-     * @param LicenseeRepositoryInterface   $licenseeRepository
-     * @param TopicRepositoryInterface      $topicRepository
+     * @param Templating $templating
+     * @param UserRepositoryInterface $userRepository
+     * @param LicenseeRepositoryInterface $licenseeRepository
+     * @param TopicRepositoryInterface $topicRepository
      * @param ImportfileRepositoryInterface $importfileRepository
-     * @param UserPasswordEncoder           $userPasswordEncoder
-     * @param string                        $configTwineDirectory
-     * @param string                        $topicImageDirectory
+     * @param UserPasswordEncoder $userPasswordEncoder
+     * @param string $configTwineDirectory
+     * @param string $topicImageDirectory
+     * @param Filesystem $filesystem
      */
     public function __construct(
         Templating $templating,
@@ -105,7 +112,8 @@ class DefaultController extends Controller
         ImportfileRepositoryInterface $importfileRepository,
         UserPasswordEncoder $userPasswordEncoder,
         string $configTwineDirectory,
-        string $topicImageDirectory
+        string $topicImageDirectory,
+        Filesystem $filesystem
     ) {
         $this->configTwineDirectory = $configTwineDirectory;
         $this->userRepository = $userRepository;
@@ -115,6 +123,7 @@ class DefaultController extends Controller
         $this->importfileRepository = $importfileRepository;
         $this->userPasswordEncoder = $userPasswordEncoder;
         $this->topicImageDirectory = $topicImageDirectory;
+        $this->filesystem = $filesystem;
     }
 
     /**
@@ -157,13 +166,10 @@ class DefaultController extends Controller
     {
         $params = $request->request->all();
 
-        if (!isset($params['formtype']) || !in_array($params['formtype'], array('user', 'licensee', 'topic', 'importfile', 'textnode'), true)) {
-            return new Response(\json_encode(array('error' => true)));
-        }
         if (!isset($params['id'])) {
             return new Response(\json_encode(array('error' => true)));
         }
-        $formtype = $params['formtype'];
+        $formtype = $params['formtype'] ?? '';
 
         /* @var $repository AbstractRepository */
         switch ($formtype) {
@@ -180,7 +186,7 @@ class DefaultController extends Controller
                 $repository = $this->importfileRepository;
                 break;
             default:
-                throw new \RuntimeException('unknown formtype ['.$formtype.']');
+                return new Response(\json_encode(array('error' => true)));
         }
 
         if (isset($params['id']) && $params['id'] === 'new') {
@@ -217,12 +223,24 @@ class DefaultController extends Controller
         }
         $repository->save($item);
 
-        if ($formtype === 'topic' && array_key_exists('imageFileName', $params) && null !== $params['imageFileName']) {
+        if (
+            $formtype === 'topic'
+            && array_key_exists('imageFileName', $params)
+            && !empty($params['imageFileName'])
+            && array_key_exists('originalImageName', $params)
+            && !empty($params['originalImageName'])
+        ) {
             $this->saveTopicImage($item, $params['imageFileName'], $params['originalImageName']);
             $repository->save($item);
         }
 
-        if ($item instanceof Importfile && array_key_exists('filename', $params)) {
+        if (
+            $item instanceof Importfile
+            && array_key_exists('filename', $params)
+            && array_key_exists('orgname', $params)
+            && !empty($params['filename'])
+            && !empty($params['orgname'])
+        ) {
             $this->saveFile($item, $params['filename'], $params['orgname']);
             $repository->save($item);
         }
@@ -243,27 +261,20 @@ class DefaultController extends Controller
      * @param string $orgname original name
      * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @throws \RuntimeException
+     * @throws \Symfony\Component\Filesystem\Exception\IOException
      */
     private function saveFile(Importfile $item, $filename, $orgname)
     {
-        if (empty($filename) || empty($orgname)) {
-            return;
-        }
-
         $directory = $this->configTwineDirectory;
         $file = $directory.$filename;
-        if (!file_exists($file)) {
+        if (!$this->filesystem->exists($file)) {
             return;
         }
         $finalDirectory = $directory.$item->getLicenseeId().'/';
-        if (!is_dir($finalDirectory)) {
-            if (!mkdir($finalDirectory) && !is_dir($finalDirectory)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $finalDirectory));
-            }
-        }
+        $this->filesystem->mkdir($finalDirectory);
         $finalName = $finalDirectory.$item->getId();
 
-        rename($file, $finalName);
+        $this->filesystem->rename($file, $finalName);
 
         $item->setOriginalname($orgname);
         $item->setFilename($finalName);
@@ -277,21 +288,15 @@ class DefaultController extends Controller
      * @param string $orgname original name
      * @throws \RuntimeException
      */
-    private function saveTopicImage(Topic $item, $filename, $orgname)
+    private function saveTopicImage(Topic $item, string $filename, string $orgname)
     {
-        if (empty($filename) || empty($orgname)) {
-            return;
-        }
         $directory = $this->topicImageDirectory;
         $finalDirectory = $directory.$item->getId().'/';
-        if (!is_dir($finalDirectory)) {
-            if (!mkdir($finalDirectory) && !is_dir($finalDirectory)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $finalDirectory));
-            }
-        }
+        $this->filesystem->mkdir($finalDirectory);
+
         $finalName = $finalDirectory.$orgname;
         $file = $directory.$filename;
-        rename($file, $finalName);
+        $this->filesystem->rename($file, $finalName);
         $item->setOriginalImageName($orgname);
         $item->setImageFilename($finalName);
     }
