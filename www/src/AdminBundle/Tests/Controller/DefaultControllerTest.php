@@ -24,9 +24,6 @@
 
 namespace AdminBundle\Tests\Controller;
 
-use DembeloMain\Document\Importfile;
-use DembeloMain\Document\Licensee;
-use DembeloMain\Document\Textnode;
 use DembeloMain\Document\User;
 use DembeloMain\Model\Repository\Doctrine\ODM\ImportfileRepository;
 use DembeloMain\Model\Repository\Doctrine\ODM\LicenseeRepository;
@@ -104,11 +101,6 @@ class DefaultControllerTest extends WebTestCase
     private $topicImageDirectory;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|\Swift_Mailer
-     */
-    private $mailerMock;
-
-    /**
      * @return void
      */
     public function setUp(): void
@@ -121,8 +113,7 @@ class DefaultControllerTest extends WebTestCase
         $this->importfileRepositoryMock = $this->createImportfileRepositoryMock();
         $this->textnodeRepositoryMock = $this->createTextnodeRepositoryMock();
         $this->userPasswordEncoderMock = $this->createUserPasswordEncoderMock();
-        $this->topicImageDirectory = 'tmp/topicImageDirectory';
-        $this->mailerMock = $this->createMailerMock();
+        $this->topicImageDirectory = '/tmp/topicImageDirectory';
 
         $this->controller = new DefaultController(
             $this->templatingMock,
@@ -132,8 +123,7 @@ class DefaultControllerTest extends WebTestCase
             $this->importfileRepositoryMock,
             $this->userPasswordEncoderMock,
             $this->twineDirectory,
-            $this->topicImageDirectory,
-            $this->mailerMock
+            $this->topicImageDirectory
         );
     }
 
@@ -384,13 +374,5 @@ class DefaultControllerTest extends WebTestCase
     private function createUserPasswordEncoderMock(): UserPasswordEncoder
     {
         return $this->createMock(UserPasswordEncoder::class);
-    }
-
-    /**
-     * @return \Swift_Mailer|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private function createMailerMock(): \Swift_Mailer
-    {
-        return $this->createMock(\Swift_Mailer::class);
     }
 }
