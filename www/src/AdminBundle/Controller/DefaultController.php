@@ -148,6 +148,7 @@ class DefaultController extends Controller
      *
      * @param Request $request
      * @return Response
+     * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @throws \Exception
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
@@ -202,28 +203,26 @@ class DefaultController extends Controller
 
             if ($param === 'password') {
                 $value = $this->userPasswordEncoder->encodePassword($item, $value);
-            } elseif ($param === 'licenseeId' && $value === '') {
-                $value = null;
-            } elseif ($param === 'imported' && $value === '') {
+            } elseif ($value === '' && in_array($param, ['licenseeId', 'imported'], true)) {
                 $value = null;
             }
             $method = 'set'.ucfirst($param);
-            if (method_exists($item, $method)) {
+            if (method_exists($item, $method)) {    
                 $item->$method($value);
             }
         }
-        //var_dump($item);die();
+
         if (method_exists($item, 'setMetadata')) {
             $item->setMetadata('updated', time());
         }
         $repository->save($item);
 
-        if ($formtype === 'topic' && array_key_exists('imageFileName', $params) && !is_null($params['imageFileName'])) {
+        if ($formtype === 'topic' && array_key_exists('imageFileName', $params) && null !== $params['imageFileName']) {
             $this->saveTopicImage($item, $params['imageFileName'], $params['originalImageName']);
             $repository->save($item);
         }
 
-        if ($formtype === 'importfile' && array_key_exists('filename', $params)) {
+        if ($item instanceof Importfile && array_key_exists('filename', $params)) {
             $this->saveFile($item, $params['filename'], $params['orgname']);
             $repository->save($item);
         }
