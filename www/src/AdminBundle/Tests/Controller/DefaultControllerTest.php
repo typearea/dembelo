@@ -130,12 +130,20 @@ class DefaultControllerTest extends WebTestCase
             $this->licenseeRepositoryMock,
             $this->topicRepositoryMock,
             $this->importfileRepositoryMock,
-            $this->textnodeRepositoryMock,
             $this->userPasswordEncoderMock,
             $this->twineDirectory,
             $this->topicImageDirectory,
             $this->mailerMock
         );
+    }
+
+    /**
+     * tear down method
+     * @return void
+     */
+    public function tearDown(): void
+    {
+        $this->service = null;
     }
 
     /**
@@ -149,99 +157,6 @@ class DefaultControllerTest extends WebTestCase
 
         $this->assertEquals(302, $client->getResponse()->getStatusCode());
         $this->assertTrue($crawler->filter('html:contains("login")')->count() > 0);
-    }
-
-    /**
-     * tests controller's userAction with no users in db
-     * @return void
-     */
-    public function testUserAction(): void
-    {
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
-        $queryMock = $this->getMockBuilder('foobar')->setMethods(array('execute', 'getQuery'))->getMock();
-        $postArray = array();
-        $postMock->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($postArray));
-        $request->query = $postMock;
-
-        $queryMock->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnSelf());
-
-        $queryMock->expects($this->once())
-            ->method('execute')
-            ->will($this->returnValue(array()));
-
-        $this->userRepositoryMock->expects($this->once())
-            ->method('createQueryBuilder')
-            ->will($this->returnValue($queryMock));
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->usersAction($request);
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertJsonStringEqualsJsonString('[]', $response->getContent());
-        $this->assertEquals('200', $response->getStatusCode());
-    }
-
-    /**
-     * tests controller's userAction with two users in db
-     * @return void
-     */
-    public function testUserActionWithUsers(): void
-    {
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
-        $queryMock = $this->getMockBuilder('foobar')->setMethods(['execute', 'getQuery'])->getMock();
-        $postArray = array();
-        $postMock->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($postArray));
-        $request->query = $postMock;
-
-        $queryMock->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnSelf());
-
-        $this->userRepositoryMock->expects($this->once())
-            ->method('createQueryBuilder')
-            ->will($this->returnValue($queryMock));
-
-        $user1 = new User();
-        $user1->setEmail('email1');
-        $user1->setId('id1');
-        $user1->setRoles('ROLE_ADMIN');
-        $user1->setLicenseeId('lic1');
-        $user2 = new User();
-        $user2->setEmail('email2');
-        $user2->setId('id2');
-        $user2->setRoles('ROLE_USER');
-        $user2->setLicenseeId('lic2');
-
-        $userArray = array(
-            $user1,
-            $user2,
-        );
-
-        $queryMock->expects($this->once())
-            ->method('execute')
-            ->will($this->returnValue($userArray));
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->usersAction($request);
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertJsonStringEqualsJsonString('[{"id":"id1","gender":null,"email":"email1","roles":"ROLE_ADMIN","licenseeId":"lic1","status":null,"source":null,"reason":null,"created":"'.date('Y-m-d H:i:s', 0).'","updated":"'.date('Y-m-d H:i:s', 0).'"},{"id":"id2","email":"email2","roles":"ROLE_USER","licenseeId":"lic2","status":null,"source":null,"reason":null,"gender":null,"created":"'.date('Y-m-d H:i:s', 0).'","updated":"'.date('Y-m-d H:i:s', 0).'"}]', $response->getContent());
-        $this->assertEquals('200', $response->getStatusCode());
-    }
-
-    /**
-     * tear down method
-     * @return void
-     */
-    public function tearDown(): void
-    {
-        $this->service = null;
     }
 
     /**
@@ -403,90 +318,6 @@ class DefaultControllerTest extends WebTestCase
         $this->assertJson($json);
         $json = json_decode($json);
         $this->assertTrue($json->error);
-    }
-
-    /**
-     * tests licenseeAction with no licensees
-     * @return void
-     */
-    public function testLicenseeActionWithNoLicensees(): void
-    {
-        $this->licenseeRepositoryMock->expects($this->once())
-            ->method('findAll')
-            ->willReturn([]);
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->licenseesAction();
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertJsonStringEqualsJsonString('[]', $response->getContent());
-        $this->assertEquals('200', $response->getStatusCode());
-    }
-
-    /**
-     * tests licenseeAction() with one licensee
-     * @return void
-     */
-    public function testLicenseeActionWithOneLicensee(): void
-    {
-        $licensee = new Licensee();
-        $licensee->setName('someName');
-        $licensee->setId('someId');
-
-        $this->licenseeRepositoryMock->expects($this->once())
-            ->method('findAll')
-            ->willReturn([$licensee]);
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->licenseesAction();
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertJsonStringEqualsJsonString('[{"id":"someId","name":"someName"}]', $response->getContent());
-        $this->assertEquals('200', $response->getStatusCode());
-    }
-
-    /**
-     * tests textnode action
-     * @return void
-     */
-    public function testTextnodesAction(): void
-    {
-        $textnode = new Textnode();
-        $textnode->setId('someId');
-        $textnode->setCreated(new \DateTime('2017-01-01 12:00:00'));
-        $textnode->setStatus(1);
-        $textnode->setAccess(true);
-        $textnode->setLicenseeId('someLicenseeId');
-        $textnode->setArbitraryId('someArbitraryId');
-        $textnode->setTwineId('someTwineId');
-        $textnode->setMetadata(['key1' => 'val1', 'key2' => 'val2']);
-
-        $licensee = new Licensee();
-        $licensee->setId('someLicenseeId');
-        $licensee->setName('someLicenseeName');
-
-        $importfile = new Importfile();
-        $importfile->setId('someImportfileId');
-        $importfile->setName('someImportfileName');
-
-        $this->textnodeRepositoryMock->expects($this->once())
-            ->method('findAll')
-            ->willReturn([$textnode]);
-
-        $this->licenseeRepositoryMock->expects($this->once())
-            ->method('findAll')
-            ->willReturn([$licensee]);
-
-        $this->importfileRepositoryMock->expects($this->once())
-            ->method('findAll')
-            ->willReturn([$importfile]);
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->textnodesAction();
-        $this->assertInstanceOf(Response::class, $response);
-        $expectedJson = '[{"id":"someId","status":"aktiv","created":"01.01.2017, 12:00:00",';
-        $expectedJson .= '"access":"ja","licensee":"someLicenseeName","importfile":"unbekannt","beginning":"...",';
-        $expectedJson .= '"financenode":"ja","arbitraryId":"someArbitraryId","twineId":"someTwineId",';
-        $expectedJson .= '"metadata":"key1: val1\nkey2: val2\n"}]';
-        $this->assertJsonStringEqualsJsonString($expectedJson, $response->getContent());
     }
 
     /**
