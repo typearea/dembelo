@@ -19,9 +19,67 @@
 
 namespace AdminBundle\Tests\Controller;
 
+use AdminBundle\Controller\ImportfileController;
+use AdminBundle\Model\ImportTwine;
+use DembeloMain\Model\Repository\Doctrine\ODM\ImportfileRepository;
+use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
+use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ImportfileControllerTest extends WebTestCase
 {
+    /**
+     * @var ImportfileController
+     */
+    private $controller;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ImportfileRepositoryInterface
+     */
+    private $importfileRepositoryMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ImportTwine
+     */
+    private $importTwineMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
+     */
+    private $mongoDbMock;
+
+    /**
+     * @var string
+     */
+    private $configTwineDirectory = '/tmp/phpunit-configTwineDirectory/';
+
+    /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        $this->importfileRepositoryMock = $this->createImportfileRepositoryMock();
+        $this->importTwineMock = $this->createMock(ImportTwine::class);
+        $this->mongoDbMock = $this->createMock(ManagerRegistry::class);
+
+        $this->controller = new ImportfileController(
+            $this->importfileRepositoryMock,
+            $this->importTwineMock,
+            $this->mongoDbMock,
+            $this->configTwineDirectory
+        );
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|ImportfileRepositoryInterface
+     */
+    private function createImportfileRepositoryMock(): ImportfileRepositoryInterface
+    {
+        $repository = $this->getMockBuilder(ImportfileRepositoryInterface::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['findAll'])
+            ->getMock();
+
+        return $repository;
+    }
 }
