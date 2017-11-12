@@ -34,7 +34,7 @@ services:
             - "@app.feature_toggle"
             - "@security.authorization_checker"
             - "@app.model_repository_user"
-            - "@app.model_repository_textNode"
+            - "@app.model_repository_textnode"
             - "@templating"
             - "@router"
             - "@security.token_storage"
@@ -92,7 +92,7 @@ services:
         arguments:
             - DembeloMain\Document\Topic
 
-    app.model_repository_textNode:
+    app.model_repository_textnode:
         class: DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository
         factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
         arguments:
@@ -153,7 +153,7 @@ services:
 
     app.twineImport.hitchparser:
             class: AdminBundle\Service\TwineImport\HitchParser
-            arguments: ["@app.model_repository_textNode"]
+            arguments: ["@app.model_repository_textnode"]
 
     app.twineImport.fileextractor:
             class: AdminBundle\Service\TwineImport\FileExtractor
@@ -165,12 +165,12 @@ services:
         class: AdminBundle\Service\TwineImport\StoryDataParser
         arguments:
             - "@app.twineImport.hitchparser"
-            - "@app.model_repository_textNode"
+            - "@app.model_repository_textnode"
 
     app.twineImport.passageDataParser:
         class: AdminBundle\Service\TwineImport\PassageDataParser
         arguments:
-            - "@app.model_repository_textNode"
+            - "@app.model_repository_textnode"
 
     app.twineImport.parserContext:
         class: AdminBundle\Service\TwineImport\ParserContext
