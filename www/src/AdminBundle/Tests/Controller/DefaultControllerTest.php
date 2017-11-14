@@ -143,6 +143,7 @@ class DefaultControllerTest extends TestCase
             ->willReturnCallback(function (string $template, array $arguments) {
                 self::assertEquals('AdminBundle::index.html.twig', $template);
                 self::assertArrayHasKey('mainMenuData', $arguments);
+
                 return new Response();
             });
         self::assertInstanceOf(Response::class, $this->controller->indexAction());
@@ -194,7 +195,7 @@ class DefaultControllerTest extends TestCase
             'formtype' => 'user',
             'id' => 'new',
             'email' => 'someEmail',
-            'password' => 'somePassword'
+            'password' => 'somePassword',
         ];
         $requestMock = $this->createRequestMock($params);
 
@@ -313,7 +314,7 @@ class DefaultControllerTest extends TestCase
             'formtype' => 'importfile',
             'id' => 'someId',
             'filename' => 'someFilename',
-            'orgname' => 'someOrgName'
+            'orgname' => 'someOrgName',
         ];
         $requestMock = $this->createRequestMock($params);
 

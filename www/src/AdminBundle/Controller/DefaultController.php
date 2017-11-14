@@ -95,15 +95,15 @@ class DefaultController extends Controller
 
     /**
      * DefaultController constructor.
-     * @param Templating $templating
-     * @param UserRepositoryInterface $userRepository
-     * @param LicenseeRepositoryInterface $licenseeRepository
-     * @param TopicRepositoryInterface $topicRepository
+     * @param Templating                    $templating
+     * @param UserRepositoryInterface       $userRepository
+     * @param LicenseeRepositoryInterface   $licenseeRepository
+     * @param TopicRepositoryInterface      $topicRepository
      * @param ImportfileRepositoryInterface $importfileRepository
-     * @param UserPasswordEncoder $userPasswordEncoder
-     * @param string $configTwineDirectory
-     * @param string $topicImageDirectory
-     * @param Filesystem $filesystem
+     * @param UserPasswordEncoder           $userPasswordEncoder
+     * @param string                        $configTwineDirectory
+     * @param string                        $topicImageDirectory
+     * @param Filesystem                    $filesystem
      */
     public function __construct(
         Templating $templating,
@@ -225,8 +225,7 @@ class DefaultController extends Controller
         }
         $repository->save($item);
 
-        if (
-            $item instanceof Topic
+        if ($item instanceof Topic
             && array_key_exists('imageFileName', $params)
             && array_key_exists('originalImageName', $params)
             && !empty($params['imageFileName'])
@@ -236,8 +235,7 @@ class DefaultController extends Controller
             $repository->save($item);
         }
 
-        if (
-            $item instanceof Importfile
+        if ($item instanceof Importfile
             && array_key_exists('filename', $params)
             && array_key_exists('orgname', $params)
             && !empty($params['filename'])
