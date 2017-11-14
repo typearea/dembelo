@@ -25,6 +25,7 @@
 
 namespace AdminBundle\Controller;
 
+use DembeloMain\Document\User;
 use DembeloMain\Model\Repository\Doctrine\ODM\AbstractRepository;
 use DembeloMain\Document\Importfile;
 use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
@@ -157,6 +158,7 @@ class DefaultController extends Controller
      *
      * @param Request $request
      * @return Response
+     * @throws \Symfony\Component\Filesystem\Exception\IOException
      * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @throws \Exception
      * @throws \RuntimeException
@@ -207,7 +209,7 @@ class DefaultController extends Controller
                 continue;
             }
 
-            if ($param === 'password') {
+            if ($item instanceof User && $param === 'password') {
                 $value = $this->userPasswordEncoder->encodePassword($item, $value);
             } elseif ($value === '' && in_array($param, ['licenseeId', 'imported'], true)) {
                 $value = null;
@@ -224,10 +226,10 @@ class DefaultController extends Controller
         $repository->save($item);
 
         if (
-            $formtype === 'topic'
+            $item instanceof Topic
             && array_key_exists('imageFileName', $params)
-            && !empty($params['imageFileName'])
             && array_key_exists('originalImageName', $params)
+            && !empty($params['imageFileName'])
             && !empty($params['originalImageName'])
         ) {
             $this->saveTopicImage($item, $params['imageFileName'], $params['originalImageName']);
