@@ -284,7 +284,7 @@ class InstallCommand extends ContainerAwareCommand
     {
         $loremIpsumLength = 3500;
 
-        $repository = $this->getContainer()->get('app.model_repository_textNode');
+        $repository = $this->getContainer()->get('app.model_repository_textnode');
 
         $allAccessNodes = $repository->findByAccess(true);
         if (count($allAccessNodes) >= 7) {

@@ -21,6 +21,7 @@ namespace AdminBundle\Controller;
 
 use AdminBundle\Model\ImportTwine;
 use DembeloMain\Model\Repository\Doctrine\ODM\ImportfileRepository;
+use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -33,10 +34,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
  * @package AdminBundle\Controller
  * @Route(service="app.admin_controller_import")
  */
-class ImportController extends Controller
+class ImportfileController extends Controller
 {
     /**
-     * @var ImportfileRepository
+     * @var ImportfileRepositoryInterface
      */
     private $importfileRepository;
 
@@ -57,13 +58,13 @@ class ImportController extends Controller
 
     /**
      * ImportController constructor.
-     * @param ImportfileRepository $importfileRepository
-     * @param ImportTwine          $importTwine
-     * @param ManagerRegistry      $mongoDb
-     * @param string               $configTwineDirectory
+     * @param ImportfileRepositoryInterface $importfileRepository
+     * @param ImportTwine                   $importTwine
+     * @param ManagerRegistry               $mongoDb
+     * @param string                        $configTwineDirectory
      */
     public function __construct(
-        ImportfileRepository $importfileRepository,
+        ImportfileRepositoryInterface $importfileRepository,
         ImportTwine $importTwine,
         ManagerRegistry $mongoDb,
         string $configTwineDirectory
@@ -123,7 +124,7 @@ class ImportController extends Controller
         $importfile = $this->importfileRepository->find($importfileId);
         try {
             if (null === $importfile) {
-                throw new \Exception('file with id ['.$importfileId.'] not found');
+                throw new \RuntimeException('file with id ['.$importfileId.'] not found');
             }
             $returnValue = $this->importTwine->run($importfile);
 

@@ -26,7 +26,7 @@ namespace AdminBundle\Tests\Controller;
 
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Licensee;
-use DembeloMain\Document\Textnode;
+use DembeloMain\Document\Topic;
 use DembeloMain\Document\User;
 use DembeloMain\Model\Repository\Doctrine\ODM\ImportfileRepository;
 use DembeloMain\Model\Repository\Doctrine\ODM\LicenseeRepository;
@@ -34,10 +34,10 @@ use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
 use DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository;
 use DembeloMain\Model\Repository\Doctrine\ODM\UserRepository;
 use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
-use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AdminBundle\Controller\DefaultController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,13 +46,8 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 /**
  * Class DefaultControllerTest
  */
-class DefaultControllerTest extends WebTestCase
+class DefaultControllerTest extends TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
-     */
-    private $service;
-
     /**
      * @var DefaultController
      */
@@ -104,9 +99,9 @@ class DefaultControllerTest extends WebTestCase
     private $topicImageDirectory;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|\Swift_Mailer
+     * @var \PHPUnit_Framework_MockObject_MockObject|Filesystem
      */
-    private $mailerMock;
+    private $filesystemMock;
 
     /**
      * @return void
@@ -121,8 +116,8 @@ class DefaultControllerTest extends WebTestCase
         $this->importfileRepositoryMock = $this->createImportfileRepositoryMock();
         $this->textnodeRepositoryMock = $this->createTextnodeRepositoryMock();
         $this->userPasswordEncoderMock = $this->createUserPasswordEncoderMock();
-        $this->topicImageDirectory = 'tmp/topicImageDirectory';
-        $this->mailerMock = $this->createMailerMock();
+        $this->topicImageDirectory = '/tmp/topicImageDirectory';
+        $this->filesystemMock = $this->createFilesystemMock();
 
         $this->controller = new DefaultController(
             $this->templatingMock,
@@ -130,11 +125,10 @@ class DefaultControllerTest extends WebTestCase
             $this->licenseeRepositoryMock,
             $this->topicRepositoryMock,
             $this->importfileRepositoryMock,
-            $this->textnodeRepositoryMock,
             $this->userPasswordEncoderMock,
             $this->twineDirectory,
             $this->topicImageDirectory,
-            $this->mailerMock
+            $this->filesystemMock
         );
     }
 
@@ -144,349 +138,213 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testIndexAction(): void
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/admin/');
+        $this->templatingMock->expects(self::once())
+            ->method('renderResponse')
+            ->willReturnCallback(function (string $template, array $arguments) {
+                self::assertEquals('AdminBundle::index.html.twig', $template);
+                self::assertArrayHasKey('mainMenuData', $arguments);
 
-        $this->assertEquals(302, $client->getResponse()->getStatusCode());
-        $this->assertTrue($crawler->filter('html:contains("login")')->count() > 0);
+                return new Response();
+            });
+        self::assertInstanceOf(Response::class, $this->controller->indexAction());
     }
 
     /**
-     * tests controller's userAction with no users in db
      * @return void
      */
-    public function testUserAction(): void
+    public function testFormsaveActionForInvalidFormType(): void
     {
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
-        $queryMock = $this->getMockBuilder('foobar')->setMethods(array('execute', 'getQuery'))->getMock();
-        $postArray = array();
-        $postMock->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($postArray));
-        $request->query = $postMock;
-
-        $queryMock->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnSelf());
-
-        $queryMock->expects($this->once())
-            ->method('execute')
-            ->will($this->returnValue(array()));
-
-        $this->userRepositoryMock->expects($this->once())
-            ->method('createQueryBuilder')
-            ->will($this->returnValue($queryMock));
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->usersAction($request);
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertJsonStringEqualsJsonString('[]', $response->getContent());
-        $this->assertEquals('200', $response->getStatusCode());
-    }
-
-    /**
-     * tests controller's userAction with two users in db
-     * @return void
-     */
-    public function testUserActionWithUsers(): void
-    {
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
-        $queryMock = $this->getMockBuilder('foobar')->setMethods(['execute', 'getQuery'])->getMock();
-        $postArray = array();
-        $postMock->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($postArray));
-        $request->query = $postMock;
-
-        $queryMock->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnSelf());
-
-        $this->userRepositoryMock->expects($this->once())
-            ->method('createQueryBuilder')
-            ->will($this->returnValue($queryMock));
-
-        $user1 = new User();
-        $user1->setEmail('email1');
-        $user1->setId('id1');
-        $user1->setRoles('ROLE_ADMIN');
-        $user1->setLicenseeId('lic1');
-        $user2 = new User();
-        $user2->setEmail('email2');
-        $user2->setId('id2');
-        $user2->setRoles('ROLE_USER');
-        $user2->setLicenseeId('lic2');
-
-        $userArray = array(
-            $user1,
-            $user2,
+        $params = [
+            'formtype' => 'invalid',
+            'id' => 'someId',
+        ];
+        $requestMock = $this->createRequestMock($params);
+        $result = $this->controller->formsaveAction($requestMock);
+        self::assertInstanceOf(Response::class, $result);
+        $json = $result->getContent();
+        self::assertJsonStringEqualsJsonString(
+            '{"error":true}',
+            $json
         );
-
-        $queryMock->expects($this->once())
-            ->method('execute')
-            ->will($this->returnValue($userArray));
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->usersAction($request);
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertJsonStringEqualsJsonString('[{"id":"id1","gender":null,"email":"email1","roles":"ROLE_ADMIN","licenseeId":"lic1","status":null,"source":null,"reason":null,"created":"'.date('Y-m-d H:i:s', 0).'","updated":"'.date('Y-m-d H:i:s', 0).'"},{"id":"id2","email":"email2","roles":"ROLE_USER","licenseeId":"lic2","status":null,"source":null,"reason":null,"gender":null,"created":"'.date('Y-m-d H:i:s', 0).'","updated":"'.date('Y-m-d H:i:s', 0).'"}]', $response->getContent());
-        $this->assertEquals('200', $response->getStatusCode());
     }
 
     /**
-     * tear down method
      * @return void
      */
-    public function tearDown(): void
+    public function testFormsaveActionForMissingId(): void
     {
-        $this->service = null;
-    }
-
-    /**
-     * tests the formsaveAction without parameters
-     * @return void
-     */
-    public function testFormsaveActionWithoutParameters(): void
-    {
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
-        $postArray = array();
-        $postMock->expects($this->once())
-            ->method('all')
-            ->will($this->returnValue($postArray));
-        $request->request = $postMock;
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->formsaveAction($request);
-        $this->assertInstanceOf(Response::class, $response);
-        $json = $response->getContent();
-        $this->assertJson($json);
-        $json = json_decode($json);
-        $this->assertTrue($json->error);
-    }
-
-    /**
-     * tests the formsaveAction with wrong parameters
-     * @return void
-     */
-    public function testFormsaveActionWithWrongParameters(): void
-    {
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
-        $postArray = array(
-            'formtype' => 'nonexistant',
-        );
-        $postMock->expects($this->once())
-            ->method('all')
-            ->will($this->returnValue($postArray));
-        $request->request = $postMock;
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->formsaveAction($request);
-        $this->assertInstanceOf(Response::class, $response);
-        $json = $response->getContent();
-        $this->assertJson($json);
-        $json = json_decode($json);
-        $this->assertTrue($json->error);
-    }
-
-    /**
-     * tests the formsaveAction with an existing user
-     * @return void
-     */
-    public function testFormsaveActionExistingUser(): void
-    {
-        $user = new User();
-        $user->setId('someId');
-        $user->setEmail('some@email.de');
-        $user->setRoles('ROLE_USER');
-
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
-        $postArray = array(
+        $params = [
             'formtype' => 'user',
-            'id' => $user->getId(),
+        ];
+        $requestMock = $this->createRequestMock($params);
+        $result = $this->controller->formsaveAction($requestMock);
+        self::assertInstanceOf(Response::class, $result);
+        $json = $result->getContent();
+        self::assertJsonStringEqualsJsonString(
+            '{"error":true}',
+            $json
         );
-        $postMock->expects($this->once())
-            ->method('all')
-            ->will($this->returnValue($postArray));
-        $request->request = $postMock;
-
-        $this->userRepositoryMock->expects($this->once())
-            ->method('find')
-            ->with($user->getId())
-            ->will($this->returnValue($user));
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->formsaveAction($request);
-        $this->assertInstanceOf(Response::class, $response);
-        $json = $response->getContent();
-        $this->assertJson($json);
-        $json = json_decode($json);
-        $this->assertFalse($json->error);
-        $this->assertEquals($user->getId(), $json->newId);
     }
 
     /**
-     * tests the formsaveAction with a nonexisting user
      * @return void
      */
-    public function testFormsaveActionNotExistingUser(): void
+    public function testFormsaveActionForNewUser(): void
     {
-        $user = new User();
-        $user->setId('someId');
-        $user->setEmail('some@email.de');
-        $user->setRoles('ROLE_USER');
-
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
-        $postArray = array(
+        $params = [
             'formtype' => 'user',
-            'id' => $user->getId(),
+            'id' => 'new',
+            'email' => 'someEmail',
+            'password' => 'somePassword',
+        ];
+        $requestMock = $this->createRequestMock($params);
+
+        $this->userRepositoryMock->expects(self::once())
+            ->method('getClassName')
+            ->willReturn(User::class);
+        $this->userRepositoryMock->expects(self::once())
+            ->method('save')
+            ->willReturnCallback(function (User $user) {
+                self::assertEquals('someEmail', $user->getEmail());
+                self::assertEquals('somePasswordEncoded', $user->getPassword());
+                $user->setId('someId');
+            });
+        $this->userPasswordEncoderMock->expects(self::once())
+            ->method('encodePassword')
+            ->with(self::anything(), 'somePassword')
+            ->willReturn('somePasswordEncoded');
+
+        $result = $this->controller->formsaveAction($requestMock);
+
+        self::assertInstanceOf(Response::class, $result);
+        $json = $result->getContent();
+        self::assertJsonStringEqualsJsonString(
+            '{"error":false,"newId":"someId"}',
+            $json
         );
-        $postMock->expects($this->once())
-            ->method('all')
-            ->will($this->returnValue($postArray));
-        $request->request = $postMock;
+    }
 
-        $this->userRepositoryMock->expects($this->once())
+    /**
+     * @return void
+     */
+    public function testFormsaveActionForExistingTopic(): void
+    {
+        $params = [
+            'formtype' => 'topic',
+            'id' => 'someId',
+            'imageFileName' => 'someImageFileName',
+            'originalImageName' => 'someOriginalImageFileName',
+        ];
+        $requestMock = $this->createRequestMock($params);
+
+        $topicMock = $this->createMock(Topic::class);
+        $topicMock->expects(self::any())
+            ->method('getId')
+            ->willReturn('someId');
+
+        $this->topicRepositoryMock->expects(self::never())
+            ->method('getClassName');
+        $this->topicRepositoryMock->expects(self::once())
             ->method('find')
-            ->with($user->getId())
-            ->will($this->returnValue(null));
+            ->with('someId')
+            ->willReturn($topicMock);
+        $this->topicRepositoryMock->expects(self::exactly(2))
+            ->method('save')
+            ->with($topicMock);
+        $this->userPasswordEncoderMock->expects(self::never())
+            ->method('encodePassword');
 
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->formsaveAction($request);
-        $this->assertInstanceOf(Response::class, $response);
-        $json = $response->getContent();
-        $this->assertJson($json);
-        $json = json_decode($json);
-        $this->assertTrue($json->error);
+        $targetFileName = $this->topicImageDirectory.'someId/someOriginalImageFileName';
+        $this->filesystemMock->expects(self::once())
+            ->method('rename')
+            ->with(self::anything(), $targetFileName);
+
+        $result = $this->controller->formsaveAction($requestMock);
+
+        self::assertInstanceOf(Response::class, $result);
+        $json = $result->getContent();
+        self::assertJsonStringEqualsJsonString(
+            '{"error":false,"newId":"someId"}',
+            $json
+        );
     }
 
     /**
-     * tests the formsaveAction without admin permission
      * @return void
      */
-    public function testFormsaveActionWithoutAdminPermission(): void
+    public function testFormsaveActionForExistingLicensee(): void
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/admin/save');
-
-
-        $this->assertEquals(302, $client->getResponse()->getStatusCode());
-        $this->assertTrue($crawler->filter('html:contains("login")')->count() > 0);
-    }
-
-    /**
-     * tests the formsaveAction with missing id parameter
-     * @return void
-     */
-    public function testFormsaveActionWithMissingIdParameter(): void
-    {
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $postMock = $this->getMockBuilder(ParameterBag::class)->disableOriginalConstructor()->getMock();
-        $postArray = array(
+        $params = [
             'formtype' => 'licensee',
-            'name' => 'someLNName',
+            'id' => 'someId',
+        ];
+        $requestMock = $this->createRequestMock($params);
+
+        $licenseeMock = $this->createMock(Licensee::class);
+        $licenseeMock->expects(self::any())
+            ->method('getId')
+            ->willReturn('someId');
+
+        $this->licenseeRepositoryMock->expects(self::never())
+            ->method('getClassName');
+        $this->licenseeRepositoryMock->expects(self::once())
+            ->method('find')
+            ->with('someId')
+            ->willReturn($licenseeMock);
+        $this->licenseeRepositoryMock->expects(self::once())
+            ->method('save')
+            ->with($licenseeMock);
+
+        $result = $this->controller->formsaveAction($requestMock);
+
+        self::assertInstanceOf(Response::class, $result);
+        $json = $result->getContent();
+        self::assertJsonStringEqualsJsonString(
+            '{"error":false,"newId":"someId"}',
+            $json
         );
-        $postMock->expects($this->once())
-            ->method('all')
-            ->will($this->returnValue($postArray));
-        $request->request = $postMock;
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->formsaveAction($request);
-        $this->assertInstanceOf(Response::class, $response);
-        $json = $response->getContent();
-        $this->assertJson($json);
-        $json = json_decode($json);
-        $this->assertTrue($json->error);
     }
 
     /**
-     * tests licenseeAction with no licensees
      * @return void
      */
-    public function testLicenseeActionWithNoLicensees(): void
+    public function testFormsaveActionForExistingImportfile(): void
     {
-        $this->licenseeRepositoryMock->expects($this->once())
-            ->method('findAll')
-            ->willReturn([]);
+        $params = [
+            'formtype' => 'importfile',
+            'id' => 'someId',
+            'filename' => 'someFilename',
+            'orgname' => 'someOrgName',
+        ];
+        $requestMock = $this->createRequestMock($params);
 
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->licenseesAction();
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertJsonStringEqualsJsonString('[]', $response->getContent());
-        $this->assertEquals('200', $response->getStatusCode());
-    }
+        $importfileMock = $this->createMock(Importfile::class);
+        $importfileMock->expects(self::any())
+            ->method('getId')
+            ->willReturn('someId');
 
-    /**
-     * tests licenseeAction() with one licensee
-     * @return void
-     */
-    public function testLicenseeActionWithOneLicensee(): void
-    {
-        $licensee = new Licensee();
-        $licensee->setName('someName');
-        $licensee->setId('someId');
+        $this->importfileRepositoryMock->expects(self::never())
+            ->method('getClassName');
+        $this->importfileRepositoryMock->expects(self::once())
+            ->method('find')
+            ->with('someId')
+            ->willReturn($importfileMock);
+        $this->importfileRepositoryMock->expects(self::exactly(2))
+            ->method('save')
+            ->with($importfileMock);
 
-        $this->licenseeRepositoryMock->expects($this->once())
-            ->method('findAll')
-            ->willReturn([$licensee]);
+        $this->filesystemMock->expects(self::once())
+            ->method('exists')
+            ->willReturn(true);
 
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->licenseesAction();
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertJsonStringEqualsJsonString('[{"id":"someId","name":"someName"}]', $response->getContent());
-        $this->assertEquals('200', $response->getStatusCode());
-    }
+        $result = $this->controller->formsaveAction($requestMock);
 
-    /**
-     * tests textnode action
-     * @return void
-     */
-    public function testTextnodesAction(): void
-    {
-        $textnode = new Textnode();
-        $textnode->setId('someId');
-        $textnode->setCreated(new \DateTime('2017-01-01 12:00:00'));
-        $textnode->setStatus(1);
-        $textnode->setAccess(true);
-        $textnode->setLicenseeId('someLicenseeId');
-        $textnode->setArbitraryId('someArbitraryId');
-        $textnode->setTwineId('someTwineId');
-        $textnode->setMetadata(['key1' => 'val1', 'key2' => 'val2']);
-
-        $licensee = new Licensee();
-        $licensee->setId('someLicenseeId');
-        $licensee->setName('someLicenseeName');
-
-        $importfile = new Importfile();
-        $importfile->setId('someImportfileId');
-        $importfile->setName('someImportfileName');
-
-        $this->textnodeRepositoryMock->expects($this->once())
-            ->method('findAll')
-            ->willReturn([$textnode]);
-
-        $this->licenseeRepositoryMock->expects($this->once())
-            ->method('findAll')
-            ->willReturn([$licensee]);
-
-        $this->importfileRepositoryMock->expects($this->once())
-            ->method('findAll')
-            ->willReturn([$importfile]);
-
-        /* @var $response \Symfony\Component\HttpFoundation\Response */
-        $response = $this->controller->textnodesAction();
-        $this->assertInstanceOf(Response::class, $response);
-        $expectedJson = '[{"id":"someId","status":"aktiv","created":"01.01.2017, 12:00:00",';
-        $expectedJson .= '"access":"ja","licensee":"someLicenseeName","importfile":"unbekannt","beginning":"...",';
-        $expectedJson .= '"financenode":"ja","arbitraryId":"someArbitraryId","twineId":"someTwineId",';
-        $expectedJson .= '"metadata":"key1: val1\nkey2: val2\n"}]';
-        $this->assertJsonStringEqualsJsonString($expectedJson, $response->getContent());
+        self::assertInstanceOf(Response::class, $result);
+        $json = $result->getContent();
+        self::assertJsonStringEqualsJsonString(
+            '{"error":false,"newId":"someId"}',
+            $json
+        );
     }
 
     /**
@@ -494,12 +352,7 @@ class DefaultControllerTest extends WebTestCase
      */
     private function createLicenseeRepositoryMock(): LicenseeRepository
     {
-        $repository = $this->getMockBuilder(LicenseeRepository::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['findAll'])
-            ->getMock();
-
-        return $repository;
+        return $this->createMock(LicenseeRepository::class);
     }
 
     /**
@@ -507,12 +360,7 @@ class DefaultControllerTest extends WebTestCase
      */
     private function createImportfileRepositoryMock(): ImportfileRepository
     {
-        $repository = $this->getMockBuilder(ImportfileRepository::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['findAll'])
-            ->getMock();
-
-        return $repository;
+        return $this->createMock(ImportfileRepository::class);
     }
 
     /**
@@ -556,10 +404,29 @@ class DefaultControllerTest extends WebTestCase
     }
 
     /**
-     * @return \Swift_Mailer|\PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|Request
      */
-    private function createMailerMock(): \Swift_Mailer
+    private function createRequestMock($params): Request
     {
-        return $this->createMock(\Swift_Mailer::class);
+        $parameterBagMock = $this->createMock(ParameterBag::class);
+        $parameterBagMock->expects(self::any())
+            ->method('all')
+            ->willReturn($params);
+
+        /**
+         * @var $mock \PHPUnit_Framework_MockObject_MockObject|Request
+         */
+        $mock = $this->createMock(Request::class);
+        $mock->request = $parameterBagMock;
+
+        return $mock;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|Filesystem
+     */
+    private function createFilesystemMock(): Filesystem
+    {
+        return $this->createMock(Filesystem::class);
     }
 }

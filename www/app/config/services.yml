@@ -34,7 +34,7 @@ services:
             - "@app.feature_toggle"
             - "@security.authorization_checker"
             - "@app.model_repository_user"
-            - "@app.model_repository_textNode"
+            - "@app.model_repository_textnode"
             - "@templating"
             - "@router"
             - "@security.token_storage"
@@ -52,14 +52,31 @@ services:
             - "@app.model_repository_licensee"
             - "@app.model_repository_topic"
             - "@app.model_repository_importfile"
-            - "@app.model_repository_textNode"
             - "@security.password_encoder"
             - %twine_directory%
             - %topic_image_directory%
+            - "@filesystem"
+
+    app.admin_controller_user:
+        class: AdminBundle\Controller\UserController
+        arguments:
+            - "@app.model_repository_user"
             - "@mailer"
 
-    app.admin_controller_import:
-        class: AdminBundle\Controller\ImportController
+    app.admin_controller_licensee:
+            class: AdminBundle\Controller\LicenseeController
+            arguments:
+                - "@app.model_repository_licensee"
+
+    app.admin_controller_textnode:
+            class: AdminBundle\Controller\TextnodeController
+            arguments:
+                - "@app.model_repository_textnode"
+                - "@app.model_repository_importfile"
+                - "@app.model_repository_licensee"
+
+    app.admin_controller_importfile:
+        class: AdminBundle\Controller\ImportfileController
         arguments:
             - "@app.model_repository_importfile"
             - "@admin.import.twine"
@@ -68,7 +85,7 @@ services:
 
     app.controller_admin_topic:
         class: AdminBundle\Controller\TopicController
-        arguments: ["@service_container", "@app.model_repository_topic"]
+        arguments: ["@app.model_repository_topic"]
 
     app.model_repository_topic:
         class: DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository
@@ -76,7 +93,7 @@ services:
         arguments:
             - DembeloMain\Document\Topic
 
-    app.model_repository_textNode:
+    app.model_repository_textnode:
         class: DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository
         factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
         arguments:
@@ -137,7 +154,7 @@ services:
 
     app.twineImport.hitchparser:
             class: AdminBundle\Service\TwineImport\HitchParser
-            arguments: ["@app.model_repository_textNode"]
+            arguments: ["@app.model_repository_textnode"]
 
     app.twineImport.fileextractor:
             class: AdminBundle\Service\TwineImport\FileExtractor
@@ -149,12 +166,12 @@ services:
         class: AdminBundle\Service\TwineImport\StoryDataParser
         arguments:
             - "@app.twineImport.hitchparser"
-            - "@app.model_repository_textNode"
+            - "@app.model_repository_textnode"
 
     app.twineImport.passageDataParser:
         class: AdminBundle\Service\TwineImport\PassageDataParser
         arguments:
-            - "@app.model_repository_textNode"
+            - "@app.model_repository_textnode"
 
     app.twineImport.parserContext:
         class: AdminBundle\Service\TwineImport\ParserContext
