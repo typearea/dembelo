@@ -1,13 +1,19 @@
 {% extends 'DembeloMain::base.html.twig' %}
 {% block title %}
-    Fehler: {{ status_text }}
+    Ups... Da ist etwas schief gelaufen!
 {% endblock %}
 {% block body %}
-    <h1>Es ist ein Fehler aufgetreten</h1>
-    <h2>"{{ status_code }} {{ status_text }}".</h2>
-
-    <div>
-        Leider ist ein unerwarteter Fehler ist aufgetreten. Wir entschuldigen die Umstände und beheben umgehend das Problem.
-        Bitte versuchen Sie es später erneut.
-    </div>
+    <h1>Ups... Da ist etwas schief gelaufen!</h1>
+    <h2>Ein Techniker wurde informiert.</h2>
+    <p>
+        Leider ist ein unerwarteter Fehler ist aufgetreten.
+    </p>
+    <p>
+        Versuch es nochmal und gehe zur
+        <a href="{{ path('mainpage') }}">Startseite</a> zurück. <br />
+        Falls du meinst, hier auf einen Fehler im System gestoßen zu sein, laden
+        wir dich herzlichst zur Mitarbeit auf
+        <a href="https://www.github.com/typearea/dembelo" target="_blank">github</a>
+        ein.
+    </p>
 {% endblock %}

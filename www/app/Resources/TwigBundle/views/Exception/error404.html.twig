@@ -1,11 +1,18 @@
 {% extends 'DembeloMain::base.html.twig' %}
-{% block title %}404 Seite nicht gefunden{% endblock %}
+{% block title %}Ups... Da ist etwas schief gelaufen!{% endblock %}
 
 {% block body %}
-    <h1>Seite nicht gefunden</h1>
-
+    <h1>Ups... Da ist etwas schief gelaufen!</h1>
+    <h2>Ein Techniker wurde informiert.</h2>
     <p>
-        Die angeforderte Seite konnte leider nicht gefunden werden. Bitte überprüfen Sie die URL auf Tippfehler oder kehren Sie zur
-        <a href="{{ path('mainpage') }}">Startseite</a> zurück.
+        Die angeforderte Seite konnte leider nicht gefunden werden.
+    </p>
+    <p>
+        Versuch es nochmal und gehe zur
+        <a href="{{ path('mainpage') }}">Startseite</a> zurück. <br />
+        Falls du meinst, hier auf einen Fehler im System gestoßen zu sein, laden
+        wir dich herzlichst zur Mitarbeit auf
+        <a href="https://www.github.com/typearea/dembelo" target="_blank">github</a>
+        ein.
     </p>
 {% endblock %}
