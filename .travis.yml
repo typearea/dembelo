@@ -2,7 +2,7 @@ language: php
 php:
 - 7.1
 before_install:
-- export DEMBELO_VERSION="v1.4-$TRAVIS_BUILD_NUMBER"
+- export DEMBELO_VERSION="v1.5.0-$TRAVIS_BUILD_NUMBER"
 - export RELEASE_FILENAME="dembelo_$DEMBELO_VERSION.zip"
 - export MONGOEXTENSION="mongodb.so"
 - export SENSIOLABS_ENABLE_NEW_DIRECTORY_STRUCTURE=true
