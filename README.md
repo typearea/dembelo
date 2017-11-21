@@ -18,21 +18,22 @@ System einzupflegen.
 Dembelo ist freie Software lizenziert unter der GNU Affero General Public License 3 und jeder späteren
 Version der Lizenz, so wie diese von der Free Software Foundation herausgegeben werden.
 
+## Links
+* [Blog des Projektes](http://blog.waszulesen.de)
+* [Dembelo-Git-Repository](http://github.com/typearea)
+* [Gattland](http://www.waszulesen.de)
+* [Facebook](https://www.facebook.com/gattland)
+* [Twitter](https://twitter.com/waszulesen)
+
 ## Installation
 * [INSTALL.md](https://github.com/typearea/dembelo/blob/master/INSTALL.md)
-
-## Links
-* [Webseite des Projekts](http://dembelo.de)
-* [Dembelo-Git-Repository](http://github.com:typearea)
-
-## Dank an:
-[github.com/irmantas/symfony2-vagrant](https://github.com/irmantas/symfony2-vagrant) für die Vagrant/Puppet/Composer-Basis.
 
 ## Helfen/Mitarbeit
 * Wir laden dazu ein, dembelo zu [forken](https://help.github.com/articles/fork-a-repo/) und [Pull-Requests](https://help.github.com/articles/using-pull-requests/) zu erstellen, damit wir eure Arbeit nach Dembelo-Master übernehmen können.
 * Wir nutzen die ["Issues"](https://github.com/typearea/dembelo/issues) in unserem github-Repository zur Planung der Weiterentwicklung, nutzt bitte die Meilenstein-Ansicht.
 * Im [Wiki](https://github.com/typearea/dembelo/wiki) findet sich eine Spezifikation und Konzeptionsthemen.
 * Tretet mit uns per Mail in Kontakt: tina.giesler@typearea.de
+* Wer uns finanziell unterstützen will, kann dies gerne über [paypal.me/waszulesen](https://www.paypal.me/waszulesen) tun.
 
 ## Entwicklung
 
@@ -43,6 +44,6 @@ Version der Lizenz, so wie diese von der Free Software Foundation herausgegeben 
 
     cd /vagrant/www
     ./bin/phpcs --config-set installed_paths vendor/escapestudios/symfony2-coding-standard
-    ./bin/phpcs --standard=symfony2 src
+    ./bin/phpcs
 
 
