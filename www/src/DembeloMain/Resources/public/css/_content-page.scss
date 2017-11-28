@@ -20,6 +20,19 @@
   #social-sharing-bar {
     margin: 10px;
     height: 24px;
+
+    #facebook-sharebutton {
+      width: 62px;
+      height: 20px;
+      padding: 0;
+      line-height: 22px;
+      border: 0px;
+      cursor: pointer;
+    }
+
+    #facebook-sharebutton:hover {
+      border: 0px;
+    }
   }
 
 }
