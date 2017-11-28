@@ -45,10 +45,11 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
     {% endif %}
 
     <div id="social-sharing-bar">
-        <div class="fb-share-button"
-             data-href="{{ app.request.uri }}"
-             data-layout="button">
-        </div>
+        <a id="facebook-sharebutton" class="window-opener" data-href="https://www.facebook.com/sharer/sharer.php?kid_directed_site=0&sdk=joey&u={{ url('text', {textnodeArbitraryId: textnode.arbitraryId}) }}&display=popup&ref=plugin&src=share_button" target="_blank">
+            {% image '@DembeloMain/Resources/public/images/share-facebook.png' %}
+            <img src="{{ asset_url }}" alt="diesen Textknoten auf Facebook teilen"/>
+            {% endimage %}
+        </a>
     </div>
 
     {{ include('DembeloMain::default/read.metadata.html.twig') }}
