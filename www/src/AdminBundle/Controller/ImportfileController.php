@@ -20,7 +20,6 @@
 namespace AdminBundle\Controller;
 
 use AdminBundle\Model\ImportTwine;
-use DembeloMain\Model\Repository\Doctrine\ODM\ImportfileRepository;
 use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use InvalidArgumentException;
@@ -32,7 +31,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 /**
  * Class ImportController
  * @package AdminBundle\Controller
- * @Route(service="app.admin_controller_import")
+ * @Route(service="app.admin_controller_importfile")
  */
 class ImportfileController extends Controller
 {
