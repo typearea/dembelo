@@ -87,11 +87,16 @@ class PassageDataParser
         }
 
         $textnode = $this->textnodeRepository->findByTwineId($this->parserContext->getImportfile(), $twineId);
+
         if (null === $textnode) {
             $textnode = $this->createTextnode($twineId);
         } else {
             $textnode->setText('');
             $textnode->clearHitches();
+        }
+
+        if (null === $textnode->getId()) {
+            $this->textnodeRepository->save($textnode);
         }
 
         $this->twineTextnodeName = $attrs['name'];
