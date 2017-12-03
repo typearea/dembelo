@@ -280,7 +280,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testAppendHitchMoreThanMaximum()
     {
-        for ($i = 0; $i < Textnode::HITCHES_MAXIMUM_COUNT + 1; $i++) {
+        for ($i = 0; $i < Textnode::HITCHES_MAXIMUM_COUNT + 1; $i += $i) {
             $hitch = array();
             $hitch['textnodeId'] = $i;
             $hitch['description'] = "Continue.";

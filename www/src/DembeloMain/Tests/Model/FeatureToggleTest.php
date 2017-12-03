@@ -25,7 +25,6 @@ use Symfony\Component\DependencyInjection\Container;
 
 /**
  * Class FeatureToggleTest
- * @package DembeloMain\Tests\Model
  */
 class FeatureToggleTest extends WebTestCase
 {

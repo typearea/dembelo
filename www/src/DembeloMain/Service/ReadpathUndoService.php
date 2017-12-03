@@ -24,7 +24,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Class ReadpathUndoService
- * @package DembeloMain\Service
  */
 class ReadpathUndoService
 {
@@ -120,6 +119,9 @@ class ReadpathUndoService
         return true;
     }
 
+    /**
+     * @return void
+     */
     private function persist(): void
     {
         $this->session->set(self::SESSION_KEY, $this->data);

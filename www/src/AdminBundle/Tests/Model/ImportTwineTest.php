@@ -17,10 +17,6 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * @package AdminBundle\Test
- */
-
 // @codingStandardsIgnoreStart
 namespace AdminBundle\Model;
 
@@ -84,21 +80,17 @@ namespace AdminBundle\Tests\Model;
 use AdminBundle\Model\ImportTwine;
 use AdminBundle\Service\TwineImport\FileCheck;
 use AdminBundle\Service\TwineImport\FileExtractor;
-use AdminBundle\Service\TwineImport\HitchParser;
 use AdminBundle\Service\TwineImport\ParserContext;
 use AdminBundle\Service\TwineImport\PassageDataParser;
 use AdminBundle\Service\TwineImport\StoryDataParser;
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
-use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
-use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 // @codingStandardsIgnoreEnd
 
 /**
  * Class ImportTwineTest
- * @package AdminBundle\Tests\Model
  */
 class ImportTwineTest extends WebTestCase
 {
@@ -163,7 +155,9 @@ class ImportTwineTest extends WebTestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage Couldn't open file 'someFilename'
      */
     public function testRunThrowsExceptionWhenFopenFails(): void

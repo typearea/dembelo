@@ -25,8 +25,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Class VersionExtension
  * This twig extensions adds a function "version()" to twig that reads the dembelo version number
- *
- * @package DembeloMain\Twig
  */
 class FeatureToggleExtension extends Twig_Extension
 {
@@ -58,6 +56,7 @@ class FeatureToggleExtension extends Twig_Extension
     /**
      * checks the featureToggle Service for feature existance
      * @param string $featureKey name of feature
+     *
      * @return bool
      */
     public function hasFeature($featureKey)

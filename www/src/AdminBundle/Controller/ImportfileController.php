@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace AdminBundle\Controller;
 
 use AdminBundle\Model\ImportTwine;
@@ -30,7 +29,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 /**
  * Class ImportController
- * @package AdminBundle\Controller
  * @Route(service="app.admin_controller_importfile")
  */
 class ImportfileController extends Controller
@@ -62,12 +60,8 @@ class ImportfileController extends Controller
      * @param ManagerRegistry               $mongoDb
      * @param string                        $configTwineDirectory
      */
-    public function __construct(
-        ImportfileRepositoryInterface $importfileRepository,
-        ImportTwine $importTwine,
-        ManagerRegistry $mongoDb,
-        string $configTwineDirectory
-    ) {
+    public function __construct(ImportfileRepositoryInterface $importfileRepository, ImportTwine $importTwine, ManagerRegistry $mongoDb, string $configTwineDirectory)
+    {
         $this->importfileRepository = $importfileRepository;
         $this->importTwine = $importTwine;
         $this->mongoDb = $mongoDb;
@@ -78,6 +72,7 @@ class ImportfileController extends Controller
      * @Route("/importfiles", name="admin_importfiles")
      *
      * @return Response
+     *
      * @throws InvalidArgumentException
      */
     public function importfilesAction(): Response
@@ -108,6 +103,7 @@ class ImportfileController extends Controller
      * @param Request $request
      *
      * @return Response
+     *
      * @throws \Doctrine\ODM\MongoDB\Mapping\MappingException
      * @throws \Doctrine\ODM\MongoDB\LockException
      * @throws InvalidArgumentException
@@ -123,7 +119,7 @@ class ImportfileController extends Controller
         $importfile = $this->importfileRepository->find($importfileId);
         try {
             if (null === $importfile) {
-                throw new \RuntimeException('file with id ['.$importfileId.'] not found');
+                throw new \RuntimeException(sprintf('file with id [%s] not found', $importfileId));
             }
             $returnValue = $this->importTwine->run($importfile);
 
@@ -146,6 +142,7 @@ class ImportfileController extends Controller
      * @Route("/uploadimportfile", name="admin_upload_file")
      *
      * @return Response
+     *
      * @throws InvalidArgumentException
      */
     public function uploadImportfileAction(): Response

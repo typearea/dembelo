@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -30,12 +29,12 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
 /**
  * Class DefaultController
- * @package DembeloMain\Controller\Dashboard
  */
 class DefaultController extends Controller
 {
     /**
      * @Route("/", name="mainpage")
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function indexAction()

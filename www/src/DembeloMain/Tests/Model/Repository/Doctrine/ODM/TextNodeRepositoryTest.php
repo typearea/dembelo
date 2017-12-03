@@ -26,7 +26,6 @@ use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
 
 /**
  * Class TextNodeRepositoryTest
- * @package DembeloMain\Tests\Model\Repository\Doctrine\ODM
  */
 class TextNodeRepositoryTest extends AbstractRepositoryTest
 {
@@ -271,6 +270,9 @@ class TextNodeRepositoryTest extends AbstractRepositoryTest
         $this->assertEquals('Tisch&shy;bein', $textnode->getTextHyphenated());
     }
 
+    /**
+     * @return Importfile
+     */
     private function createImportfile()
     {
         $importfile = new Importfile();

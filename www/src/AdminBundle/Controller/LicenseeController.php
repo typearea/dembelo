@@ -41,9 +41,8 @@ class LicenseeController extends Controller
      * UserController constructor.
      * @param LicenseeRepositoryInterface $licenseeRepository
      */
-    public function __construct(
-        LicenseeRepositoryInterface $licenseeRepository
-    ) {
+    public function __construct(LicenseeRepositoryInterface $licenseeRepository)
+    {
         $this->licenseeRepository = $licenseeRepository;
     }
 
@@ -51,6 +50,7 @@ class LicenseeController extends Controller
      * @Route("/licensees", name="admin_licensees")
      *
      * @return Response
+     *
      * @throws \InvalidArgumentException
      */
     public function licenseesAction(): Response
@@ -73,7 +73,9 @@ class LicenseeController extends Controller
      * @Route("/licenseeSuggest", name="admin_licensee_suggest")
      *
      * @param Request $request
+     *
      * @return Response
+     *
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
      */

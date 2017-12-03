@@ -24,13 +24,13 @@ use Doctrine\Common\Persistence\ObjectRepository;
 
 /**
  * Interface ImportfileRepositoryInterface
- * @package DembeloMain\Model\Repository
  */
 interface ImportfileRepositoryInterface extends ObjectRepository
 {
     /**
      * Save an importfile
      * @param Importfile $importfile
+     *
      * @return Importfile
      */
     public function save($importfile);

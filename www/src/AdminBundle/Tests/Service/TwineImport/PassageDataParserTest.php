@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Textnode;
@@ -25,7 +24,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Class PassageDataParserTest
- * @package AdminBundle\Service\TwineImport
  */
 class PassageDataParserTest extends TestCase
 {
@@ -187,7 +185,9 @@ class PassageDataParserTest extends TestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage Nested 'someTagName' found in Twine archive file ''
      */
     public function testStartElementForNestedPassageDatas(): void
@@ -210,7 +210,9 @@ class PassageDataParserTest extends TestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage There is a 'someTagName' in the Twine archive file '' which is missing its 'pid' attribute.
      */
     public function testStartElementForMissingPIDAttribute(): void
@@ -232,7 +234,9 @@ class PassageDataParserTest extends TestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage There is a 'someTagName' in the Twine archive file '' which hasn't a numeric value in its 'pid' attribute ('someNonNumericPid' was found instead).
      */
     public function testStartElementForNonNumericPIDAttribute(): void
@@ -255,7 +259,9 @@ class PassageDataParserTest extends TestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage There is a 'someTagName' in the Twine archive file '' which has a non unique 'id' tag [someId], in node 'someName'
      */
     public function testStartElementForNonUniquePIDAttribute(): void
@@ -281,7 +287,9 @@ class PassageDataParserTest extends TestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage no ID given for Textnode "someName"
      */
     public function testStartElementForMissingTwineIdTag(): void
@@ -304,7 +312,9 @@ class PassageDataParserTest extends TestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage no ID given for Textnode "someName"
      */
     public function testStartElementForInvalidTwineIdTag(): void

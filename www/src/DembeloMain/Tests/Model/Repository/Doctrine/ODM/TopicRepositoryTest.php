@@ -26,7 +26,6 @@ use Doctrine\MongoDB\ArrayIterator;
 
 /**
  * Class TopicRepositoryTest
- * @package DembeloMain\Tests\Model\Repository\Doctrine\ODM
  */
 class TopicRepositoryTest extends AbstractRepositoryTest
 {

@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -28,7 +27,6 @@ use Hyphenator\Core as Hyphenator;
 
 /**
  * Class TextNodeRepository
- * @package DembeloMain\Model\Repository\Doctrine\ODM
  * @method findOneBy(array $where): Textnode
  */
 class TextNodeRepository extends AbstractRepository implements TextNodeRepositoryInterface
@@ -37,6 +35,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
      * finds textnodes by importfileId
      *
      * @param string $importfileId
+     *
      * @return Textnode[]
      */
     public function findByImportfileId($importfileId)
@@ -48,6 +47,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
      * finds a textnode by importfileId and twineId
      * @param Importfile $importfile
      * @param string     $twineId
+     *
      * @return Textnode
      */
     public function findByTwineId(Importfile $importfile, $twineId)
@@ -66,6 +66,9 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
      * sets textnodes to status=inactive that are not in $existingTextnodeIds
      * @param Importfile $importfile
      * @param array      $existingTextnodeIds array of textnodeIds
+     *
+     * @return void
+     *
      * @throws \Doctrine\ODM\MongoDB\MongoDBException
      */
     public function disableOrphanedNodes(Importfile $importfile, array $existingTextnodeIds)
@@ -82,6 +85,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
 
     /**
      * @param string $arbitraryId textnode arbitrary id
+     *
      * @return Textnode|null
      */
     public function findOneActiveByArbitraryId($arbitraryId): ?Textnode
@@ -96,6 +100,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
 
     /**
      * @param string $id Textnode Id
+     *
      * @return Textnode
      */
     public function findOneActiveById(string $id): ?Textnode
@@ -112,8 +117,10 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
      * @inheritdoc
      *
      * @param Textnode $textnode
+     *
+     * @return
      */
-    public function setHyphenatedText(Textnode $textnode)
+    public function setHyphenatedText(Textnode $textnode): void
     {
         $hyphenator = new Hyphenator();
         $hyphenator->registerPatterns('de');
@@ -140,6 +147,8 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
 
     /**
      * @param Textnode $object
+     *
+     * @return void
      */
     protected function beforeSave($object)
     {

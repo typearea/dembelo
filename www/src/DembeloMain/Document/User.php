@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -17,12 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
-
-/**
- * @package DembeloMain
- */
-
 namespace DembeloMain\Document;
 
 use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique as MongoDBUnique;
@@ -36,7 +29,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Class User
  *
  * @MongoDB\Document
+ *
  * @MongoDBUnique(fields="email")
+ *
  * @MongoDB\Document(repositoryClass="\DembeloMain\Model\Repository\Doctrine\ODM\UserRepository")
  */
 class User implements UserInterface, \Serializable, AdvancedUserInterface
@@ -48,6 +43,7 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
 
     /**
      * @MongoDB\Field(type="string")
+     *
      * @Assert\NotBlank()
      * @Assert\Email()
      */
@@ -55,12 +51,14 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
 
     /**
      * @MongoDB\Field(type="string")
+     *
      * @Assert\NotBlank()
      */
     protected $password;
 
     /**
      * @MongoDB\Collection
+     *
      * @Assert\NotBlank()
      */
     protected $roles;
@@ -92,6 +90,7 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
 
     /**
      * @MongoDB\Field(type="int")
+     *
      * @Assert\NotBlank()
      */
     protected $status;
@@ -235,7 +234,7 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
      *     reading.
      *
      * @param string $textnodeId ID of the textnode the user is
-     *     currently reading.
+     *                           currently reading.
      */
     public function setCurrentTextnode($textnodeId)
     {
@@ -501,6 +500,7 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
     /**
      * gets favorite textnode for topic
      * @param String $topicId
+     *
      * @return null|String
      */
     public function getFavorite($topicId)

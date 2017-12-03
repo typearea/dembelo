@@ -92,17 +92,19 @@ class ImportCommandTest extends KernelTestCase
 
     /**
      * tests the execute method
+     *
+     * @return void
      */
-    public function testExecute(): void
+    public function testExecute()
     {
         $this->mockObjects['importTwine']->expects($this->once())
             ->method('run')
-            ->will($this->returnCallback(function (Importfile $importfile) {
+            ->will($this->returnCallback(function (Importfile $importfile): bool {
                 return $importfile->getFilename() === 'somefile_readable_exists.html'
-                && $importfile->getLicenseeId() === 'licenseeId'
-                && $importfile->getAuthor() === 'someauthor'
-                && $importfile->getPublisher() === 'somepublisher'
-                && $importfile->getTopicId() === 'someTopic';
+                    && $importfile->getLicenseeId() === 'licenseeId'
+                    && $importfile->getAuthor() === 'someauthor'
+                    && $importfile->getPublisher() === 'somepublisher'
+                    && $importfile->getTopicId() === 'someTopic';
             }));
 
         $returnValue = $this->commandTester->execute(array(
@@ -169,11 +171,11 @@ class ImportCommandTest extends KernelTestCase
     /**
      * tests execute() method with exception thrown by importTwine
      */
-    public function testExecuteWithExeptionInImportTwine(): void
+    public function testExecuteWithExeptionInImportTwine()
     {
         $this->mockObjects['importTwine']->expects($this->once())
             ->method('run')
-            ->will($this->returnCallback(function (Importfile $importfile) {
+            ->will($this->returnCallback(function (Importfile $importfile): bool {
                 return $importfile->getFilename() === 'somefile_readable_exists.html'
                 && $importfile->getLicenseeId() === 'licenseeId'
                 && $importfile->getAuthor() === 'someauthor'
@@ -227,11 +229,12 @@ class ImportCommandTest extends KernelTestCase
      * method for returnCallback()
      *
      * @param string $arg
+     *
      * @return null|\PHPUnit_Framework_MockObject_MockObject|Licensee
      */
     public function findOneByNameCallback($arg): ?Licensee
     {
-        if ($arg !== 'somelicensee') {
+        if ('somelicensee' !== $arg) {
             return null;
         }
 
@@ -247,11 +250,12 @@ class ImportCommandTest extends KernelTestCase
      * method for returnCallback()
      *
      * @param string $arg
+     *
      * @return null|\PHPUnit_Framework_MockObject_MockObject|Topic
      */
     public function findOneTopicByNameCallback($arg): ?Topic
     {
-        if ($arg !== 'someTopic') {
+        if ('someTopic' !== $arg) {
             return null;
         }
 
@@ -262,7 +266,6 @@ class ImportCommandTest extends KernelTestCase
 
         return $topicMock;
     }
-
 
     /**
      * @return array
@@ -288,9 +291,10 @@ class ImportCommandTest extends KernelTestCase
         $service->expects($this->any())
             ->method("getRepository")
             ->willReturnCallback(function ($repositoryName) use ($repositoryLicensee, $repositoryTopic) {
-                if ($repositoryName === 'DembeloMain:Licensee') {
+                if ('DembeloMain:Licensee' === $repositoryName) {
                     return $repositoryLicensee;
-                } elseif ($repositoryName === 'DembeloMain:Topic') {
+                }
+                if ('DembeloMain:Topic' === $repositoryName) {
                     return $repositoryTopic;
                 }
             });

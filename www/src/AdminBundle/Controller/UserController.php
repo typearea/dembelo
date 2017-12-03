@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace AdminBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -47,10 +46,8 @@ class UserController extends Controller
      * @param UserRepositoryInterface $userRepository
      * @param \Swift_Mailer           $mailer
      */
-    public function __construct(
-        UserRepositoryInterface $userRepository,
-        \Swift_Mailer $mailer
-    ) {
+    public function __construct(UserRepositoryInterface $userRepository, \Swift_Mailer $mailer)
+    {
         $this->userRepository = $userRepository;
         $this->mailer = $mailer;
     }
@@ -59,7 +56,9 @@ class UserController extends Controller
      * @Route("/users", name="admin_users")
      *
      * @param Request $request
+     *
      * @return Response
+     *
      * @throws \InvalidArgumentException
      */
     public function usersAction(Request $request): Response
@@ -70,10 +69,10 @@ class UserController extends Controller
         $query = $this->userRepository->createQueryBuilder();
         if (null !== $filters) {
             foreach ($filters as $field => $value) {
-                if (empty($value) && $value !== '0') {
+                if (empty($value) && '0' !== $value) {
                     continue;
                 }
-                if ($field === 'status') {
+                if ('status' === $field) {
                     //$value = $value === 'aktiv' ? 1 : 0;
                     $query->field($field)->equals((int) $value);
                 } else {
@@ -107,7 +106,9 @@ class UserController extends Controller
      * @Route("/useractivationmail", name="admin_user_activation_mail")
      *
      * @param Request $request
+     *
      * @return Response
+     *
      * @throws \InvalidArgumentException
      */
     public function useractivationmailAction(Request $request): Response

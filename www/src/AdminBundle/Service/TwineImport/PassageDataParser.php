@@ -24,7 +24,6 @@ use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 
 /**
  * Class PassageDataParser
- * @package AdminBundle\Service\TwineImport
  */
 class PassageDataParser
 {
@@ -54,6 +53,7 @@ class PassageDataParser
 
     /**
      * @param ParserContext $parserContext
+     *
      * @return void
      */
     public function setParserContext(ParserContext $parserContext): void
@@ -64,26 +64,27 @@ class PassageDataParser
     /**
      * @param string $name
      * @param array  $attrs
+     *
      * @throws \Exception
      */
     public function startElement(string $name, array $attrs): void
     {
         if ($this->parserContext->isTwineText()) {
-            throw new \Exception("Nested '".$name."' found in Twine archive file '".$this->parserContext->getFilename()."'.");
+            throw new \Exception(sprintf("Nested '%s' found in Twine archive file '%s'.", $name, $this->parserContext->getFilename()));
         }
 
         if (isset($attrs['pid']) !== true) {
-            throw new \Exception("There is a '".$name."' in the Twine archive file '".$this->parserContext->getFilename()."' which is missing its 'pid' attribute.");
+            throw new \Exception(sprintf("There is a '%s' in the Twine archive file '%s' which is missing its 'pid' attribute.", $name, $this->parserContext->getFilename()));
         }
 
         if (is_numeric($attrs['pid']) !== true) {
-            throw new \Exception("There is a '".$name."' in the Twine archive file '".$this->parserContext->getFilename()."' which hasn't a numeric value in its 'pid' attribute ('".$attrs['pid']."' was found instead).");
+            throw new \Exception(sprintf("There is a '%s' in the Twine archive file '%s' which hasn't a numeric value in its 'pid' attribute ('%s' was found instead).", $name, $this->parserContext->getFilename(), $attrs['pid']));
         }
 
         $twineId = $this->getTwineId($attrs['tags'], $attrs['name']);
 
         if (array_key_exists($twineId, $this->parserContext->getTextnodeMapping()) === true) {
-            throw new \Exception("There is a '".$name."' in the Twine archive file '".$this->parserContext->getFilename()."' which has a non unique 'id' tag [".$twineId."], in node '".$attrs['name']."'");
+            throw new \Exception(sprintf("There is a '%s' in the Twine archive file '%s' which has a non unique 'id' tag [%s], in node '%s'", $name, $this->parserContext->getFilename(), $twineId, $attrs['name']));
         }
 
         $textnode = $this->textnodeRepository->findByTwineId($this->parserContext->getImportfile(), $twineId);
@@ -114,7 +115,7 @@ class PassageDataParser
                 $textnode->setAccess(true);
                 $this->parserContext->setAccessSet(true);
             } else {
-                throw new \Exception('There is more than one \''.$name.'\' in the Twine archive file \''.$this->parserContext->getFilename().'\' with the startnode value \''.$attrs['pid'].'\' in its \'pid\' attribute.');
+                throw new \Exception(sprintf('There is more than one \'%s\' in the Twine archive file \'%s\' with the startnode value \'%s\' in its \'pid\' attribute.', $name, $this->parserContext->getFilename(), $attrs['pid']));
             }
         } else {
             $textnode->setAccess(false);
@@ -139,6 +140,11 @@ class PassageDataParser
         $this->parserContext->setTwineText(false);
     }
 
+    /**
+     * @param string $twineId
+     *
+     * @return Textnode
+     */
     private function createTextnode(string $twineId): Textnode
     {
         $textnode = new Textnode();
@@ -152,10 +158,18 @@ class PassageDataParser
         return $textnode;
     }
 
+    /**
+     * @param string $tagString
+     * @param string $textnodeTitle
+     *
+     * @return string
+     *
+     * @throws \Exception
+     */
     private function getTwineId(string $tagString, string $textnodeTitle): string
     {
         if (empty($tagString)) {
-            throw new \Exception('no ID given for Textnode "'.$textnodeTitle.'"');
+            throw new \Exception(sprintf('no ID given for Textnode "%s"', $textnodeTitle));
         }
         $tagArray = explode(' ', $tagString);
 
@@ -167,8 +181,8 @@ class PassageDataParser
             }
         }
 
-        if ($twineId === false) {
-            throw new \Exception('no ID given for Textnode "'.$textnodeTitle.'"');
+        if (false === $twineId) {
+            throw new \Exception(sprintf('no ID given for Textnode "%s"', $textnodeTitle));
         }
 
         return $twineId;

@@ -25,13 +25,13 @@ use Doctrine\Common\Persistence\ObjectRepository;
 
 /**
  * Interface UserRepositoryInterface
- * @package DembeloMain\Model\Repository
  */
 interface UserRepositoryInterface extends ObjectRepository
 {
     /**
      * Find a user by id
      * @param string $id
+     *
      * @return User
      */
     public function find($id);
@@ -39,6 +39,7 @@ interface UserRepositoryInterface extends ObjectRepository
     /**
      * Find a user by email
      * @param string $email
+     *
      * @return User
      */
     public function findByEmail($email): ?User;
@@ -52,6 +53,7 @@ interface UserRepositoryInterface extends ObjectRepository
     /**
      * Save a user
      * @param User $user
+     *
      * @return User
      */
     public function save($user);

@@ -30,7 +30,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Class FavoriteManagerTest
- * @package DembeloMain\Test\Model
  */
 class FavoriteManagerTest extends WebTestCase
 {

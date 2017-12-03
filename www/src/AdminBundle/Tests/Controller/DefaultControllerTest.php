@@ -136,11 +136,11 @@ class DefaultControllerTest extends TestCase
      * tests the index action
      * @return void
      */
-    public function testIndexAction(): void
+    public function testIndexAction()
     {
         $this->templatingMock->expects(self::once())
             ->method('renderResponse')
-            ->willReturnCallback(function (string $template, array $arguments) {
+            ->willReturnCallback(function (string $template, array $arguments): Response {
                 self::assertEquals('AdminBundle::index.html.twig', $template);
                 self::assertArrayHasKey('mainMenuData', $arguments);
 
@@ -404,7 +404,9 @@ class DefaultControllerTest extends TestCase
     }
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Request
+     * @param \PHPUnit_Framework_MockObject_MockObject|Request $params
+     *
+     * @return Request
      */
     private function createRequestMock($params): Request
     {

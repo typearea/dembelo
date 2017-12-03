@@ -25,7 +25,6 @@ use DembeloMain\Model\Repository\Doctrine\ODM\UserRepository;
 
 /**
  * Class UserRepositoryTest
- * @package DembeloMain\Tests\Model\Repository\Doctrine\ODM
  */
 class UserRepositoryTest extends AbstractRepositoryTest
 {

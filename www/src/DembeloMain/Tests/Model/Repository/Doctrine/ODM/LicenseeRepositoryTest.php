@@ -22,9 +22,7 @@ namespace DembeloMain\Tests\Model\Repository\Doctrine\ODM;
 
 /**
  * Class LicenseeRepositoryTest
- * @package DembeloMain\Tests\Model\Repository\Doctrine\ODM
  */
 class LicenseeRepositoryTest extends AbstractRepositoryTest
 {
-
 }

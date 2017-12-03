@@ -23,14 +23,13 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Class ScriptHandler
- * @package DembeloMain\Composer
  */
 class ScriptHandler
 {
     /**
-     * build Symlinks
+     * @return void
      */
-    public static function buildSymLinks()
+    public static function buildSymLinks(): void
     {
         $fs = new Filesystem();
 

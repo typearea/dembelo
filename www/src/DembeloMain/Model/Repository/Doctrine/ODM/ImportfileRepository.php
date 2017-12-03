@@ -22,9 +22,7 @@ use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
 
 /**
  * Class ImportfileRepository
- * @package DembeloMain\Model\Repository\Doctrine\ODM
  */
 class ImportfileRepository extends AbstractRepository implements ImportfileRepositoryInterface
 {
-
 }

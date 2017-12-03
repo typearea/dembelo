@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace AdminBundle\Tests\Service\TwineImport;
 
 use AdminBundle\Service\TwineImport\ParserContext;
@@ -26,7 +25,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Class ParserContextTest
- * @package AdminBundle\Tests\Service\TwineImport
  */
 class ParserContextTest extends TestCase
 {
@@ -51,6 +49,7 @@ class ParserContextTest extends TestCase
 
     /**
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage no licensee available
      */
     public function testInitWithoutLicenseeId(): void
@@ -70,6 +69,7 @@ class ParserContextTest extends TestCase
 
     /**
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage no filename available
      */
     public function testInitWithoutFilename(): void

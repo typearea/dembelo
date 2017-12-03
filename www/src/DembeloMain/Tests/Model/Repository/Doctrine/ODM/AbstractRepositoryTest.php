@@ -29,7 +29,6 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
  * Class AbstractRepositoryTest
- * @package DembeloMain\Tests\Model\Repository\Doctrine\ODM
  */
 abstract class AbstractRepositoryTest extends KernelTestCase
 {

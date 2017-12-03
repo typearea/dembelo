@@ -16,20 +16,20 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace AdminBundle\Service\TwineImport;
 
 use PHPUnit\Framework\TestCase;
 
 /**
  * Class FileExtractorTest
- * @package AdminBundle\Service\TwineImport
  */
 class FileExtractorTest extends TestCase
 {
     /**
      * @return void
+     *
      * @expectedException \InvalidArgumentException
+     *
      * @expectedExceptionMessage Failed to read data from file [invalidFilename].
      */
     public function testExtractForInvalidFile(): void

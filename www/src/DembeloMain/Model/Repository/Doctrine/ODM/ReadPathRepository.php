@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -26,12 +25,12 @@ use DembeloMain\Model\Repository\ReadPathRepositoryInterface;
 
 /**
  * Class ReadPathRepository
- * @package DembeloMain\Model\Repository\Doctrine\ODM
  */
 class ReadPathRepository extends AbstractRepository implements ReadPathRepositoryInterface
 {
     /**
      * @param User $user
+     *
      * @return null|string
      */
     public function getCurrentTextnodeIdForUser(User $user): ?string
@@ -39,10 +38,10 @@ class ReadPathRepository extends AbstractRepository implements ReadPathRepositor
         $criteria = ['userId' => new \MongoId($user->getId())];
         $sort = ['timestamp' => 'DESC'];
         /**
-         * @var $readpath Readpath
+         * @var $readpath Readpath[]
          */
         $readpath = $this->findBy($criteria, $sort, 1);
-        if (empty($readpath)) {
+        if (null === $readpath) {
             return null;
         }
 

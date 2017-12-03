@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2015 Michael Giesler
  *
  * This file is part of Dembelo.
@@ -32,11 +31,12 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Story
 {
-    const STATUS_INACTIVE = 0;
-    const STATUS_ACTIVE = 1;
+    public const STATUS_INACTIVE = 0;
+    public const STATUS_ACTIVE = 1;
 
     /**
      * @var string
+     *
      * @MongoDB\Id
      */
     protected $id;
@@ -48,12 +48,14 @@ class Story
 
     /**
      * @var string
+     *
      * @MongoDB\ObjectId
      */
     protected $topicId;
 
     /**
      * @var int
+     *
      * @MongoDB\Field(type="int")
      */
     protected $status;

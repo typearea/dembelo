@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -25,13 +24,13 @@ use Doctrine\Common\Persistence\ObjectRepository;
 
 /**
  * Interface LicenseeRepositoryInterface
- * @package DembeloMain\Model\Repository
  */
 interface LicenseeRepositoryInterface extends ObjectRepository
 {
     /**
      * Find a licensee by id
      * @param string $id
+     *
      * @return Licensee
      */
     public function find($id);
@@ -45,12 +44,14 @@ interface LicenseeRepositoryInterface extends ObjectRepository
     /**
      * Save a licensee
      * @param Licensee $licensee
+     *
      * @return Licensee
      */
     public function save($licensee);
 
     /**
      * @param string $name
+     *
      * @return Licensee
      */
     public function findOneByName($name);

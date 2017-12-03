@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -25,13 +24,13 @@ use DembeloMain\Model\Repository\UserRepositoryInterface;
 
 /**
  * Class UserRepository
- * @package DembeloMain\Model\Repository\Doctrine\ODM
  */
 class UserRepository extends AbstractRepository implements UserRepositoryInterface
 {
     /**
      * Find a user by email
      * @param string $email
+     *
      * @return User
      */
     public function findByEmail($email): ?User

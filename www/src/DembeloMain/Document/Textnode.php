@@ -137,6 +137,7 @@ class Textnode
 
     /**
      * @param String $topicId
+     *
      * @return void
      */
     public function setTopicId($topicId): void
@@ -154,6 +155,7 @@ class Textnode
 
     /**
      * @param integer $status
+     *
      * @return void
      */
     public function setStatus(int $status): void
@@ -175,6 +177,7 @@ class Textnode
      * sets the mongoDB id
      *
      * @param string $id
+     *
      * @return void
      */
     public function setId(string $id): void
@@ -196,6 +199,7 @@ class Textnode
      * sets the textnode's text
      *
      * @param string $text
+     *
      * @return void
      */
     public function setText(string $text): void
@@ -267,7 +271,7 @@ class Textnode
      * sets the access parameter
      *
      * @param bool $access true if this Textnode is a start textnode
-     *     from which a reading path begins.
+     *                     from which a reading path begins.
      */
     public function setAccess($access)
     {

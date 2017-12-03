@@ -26,7 +26,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Class FavoriteManager
- * @package DembeloMain\Model
  */
 class FavoriteManager
 {
@@ -61,6 +60,7 @@ class FavoriteManager
      * gets a favorite textnode for a topic
      * @param Topic     $topic
      * @param User|null $user
+     *
      * @return string|null
      */
     public function getFavorite(Topic $topic, User $user = null): ?string

@@ -1,7 +1,4 @@
 <?php
-
-declare(strict_types = 1);
-
 /* Copyright (C) 2015-2017 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -20,9 +17,7 @@ declare(strict_types = 1);
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * @package DembeloMain
- */
+declare(strict_types = 1);
 
 namespace DembeloMain\Controller;
 
@@ -113,18 +108,8 @@ class DefaultController extends Controller
      * @param FavoriteManager               $favoriteManager
      * @param ReadpathUndoService           $readpathUndoService
      */
-    public function __construct(
-        FeatureToggle $featureToggle,
-        AuthorizationCheckerInterface $authorizationChecker,
-        UserRepositoryInterface $userRepository,
-        TextNodeRepositoryInterface $textNodeRepository,
-        Templating $templating,
-        Router $router,
-        TokenStorage $tokenStorage,
-        Readpath $readpath,
-        FavoriteManager $favoriteManager,
-        ReadpathUndoService $readpathUndoService
-    ) {
+    public function __construct(FeatureToggle $featureToggle, AuthorizationCheckerInterface $authorizationChecker, UserRepositoryInterface $userRepository, TextNodeRepositoryInterface $textNodeRepository, Templating $templating, Router $router, TokenStorage $tokenStorage, Readpath $readpath, FavoriteManager $favoriteManager, ReadpathUndoService $readpathUndoService)
+    {
         $this->featureToggle = $featureToggle;
         $this->authorizationChecker = $authorizationChecker;
         $this->userRepository = $userRepository;
@@ -143,6 +128,7 @@ class DefaultController extends Controller
      * @param string $topicId Topic ID from URL
      *
      * @return RedirectResponse
+     *
      * @throws NotFoundHttpException
      */
     public function readTopicAction($topicId)
@@ -154,7 +140,7 @@ class DefaultController extends Controller
         $textnode = $this->textnodeRepository->getTextnodeToRead($topicId);
 
         if (null === $textnode) {
-            throw $this->createNotFoundException('No Textnode for Topic \''.$topicId.'\' found.');
+            throw $this->createNotFoundException(sprintf('No Textnode for Topic \'%s\' found.', $topicId));
         }
 
         $user = $this->getUser();
@@ -186,7 +172,7 @@ class DefaultController extends Controller
         $textnode = $this->textnodeRepository->findOneActiveByArbitraryId($textnodeArbitraryId);
 
         if (null === $textnode) {
-            throw $this->createNotFoundException('No Textnode with arbitrary ID \''.$textnodeArbitraryId.'\' found.');
+            throw $this->createNotFoundException(sprintf('No Textnode with arbitrary ID \'%s\' found.', $textnodeArbitraryId));
         }
 
         if ($textnode->isFinanceNode()) {
@@ -284,6 +270,13 @@ class DefaultController extends Controller
         return $this->templating->renderResponse('DembeloMain::default/imprint.html.twig');
     }
 
+    /**
+     * @param string $route
+     * @param array  $parameters
+     * @param int    $status
+     *
+     * @return RedirectResponse
+     */
     protected function redirectToRoute($route, array $parameters = array(), $status = 302): RedirectResponse
     {
         $url = $this->router->generate($route, $parameters);
@@ -291,6 +284,9 @@ class DefaultController extends Controller
         return new RedirectResponse($url, $status);
     }
 
+    /**
+     * @return User|null
+     */
     protected function getUser(): ?User
     {
         if (null === $token = $this->tokenStorage->getToken()) {
@@ -305,12 +301,18 @@ class DefaultController extends Controller
         return $user;
     }
 
+    /**
+     * @param string $textnodeId
+     * @param int    $hitchIndex
+     *
+     * @return Textnode|null
+     */
     private function getTextnodeForHitchIndex($textnodeId, $hitchIndex): ?Textnode
     {
         $textnode = $this->textnodeRepository->findOneActiveById($textnodeId);
 
         if (null === $textnode) {
-            throw $this->createNotFoundException('No Textnode with ID \''.$textnodeId.'\' found.');
+            throw $this->createNotFoundException(sprintf('No Textnode with ID \'%s\' found.', $textnodeId));
         }
 
         $hitch = $textnode->getHitch($hitchIndex);
@@ -318,6 +320,11 @@ class DefaultController extends Controller
         return $this->getTextnodeForTextnodeId($hitch['textnodeId']);
     }
 
+    /**
+     * @param string $textnodeId
+     *
+     * @return Textnode|null
+     */
     private function getTextnodeForTextnodeId($textnodeId): ?Textnode
     {
         return  $this->textnodeRepository->findOneActiveById($textnodeId);

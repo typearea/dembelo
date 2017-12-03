@@ -46,7 +46,10 @@ class InstallCommandTest extends KernelTestCase
     private $userRepositoryMock;
     private $passwordEncoderMock;
 
-    protected function setUp()
+    /**
+     * @return void
+     */
+    protected function setUp(): void
     {
         self::bootKernel();
         $application = new Application(self::$kernel);
@@ -59,8 +62,9 @@ class InstallCommandTest extends KernelTestCase
 
     /**
      * tests the install
+     * @return void
      */
-    public function testRunConfigure()
+    public function testRunConfigure(): void
     {
         $returnValue = $this->commandTester->execute(array(
             'command' => $this->command->getName(),
@@ -76,6 +80,9 @@ class InstallCommandTest extends KernelTestCase
         $this->assertEquals(0, $returnValue);
     }
 
+    /**
+     * @return void
+     */
     private function getUserRepositoryMock()
     {
         $methods = [
@@ -91,6 +98,9 @@ class InstallCommandTest extends KernelTestCase
         $this->userRepositoryMock = $this->getMockBuilder(UserRepositoryInterface::class)->setMethods($methods)->getMock();
     }
 
+    /**
+     * @return void
+     */
     private function getPasswordEncoderMock()
     {
         $methods = [
@@ -104,6 +114,9 @@ class InstallCommandTest extends KernelTestCase
             ->willReturn('encodedPassword');
     }
 
+    /**
+     * @return \PHPUnit\Framework\MockObject\MockObject
+     */
     private function getContainerMock()
     {
         $this->getUserRepositoryMock();

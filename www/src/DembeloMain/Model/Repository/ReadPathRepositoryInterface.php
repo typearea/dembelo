@@ -26,13 +26,13 @@ use Doctrine\Common\Persistence\ObjectRepository;
 
 /**
  * Interface ReadPathRepositoryInterface
- * @package DembeloMain\Model\Repository
  */
 interface ReadPathRepositoryInterface extends ObjectRepository
 {
     /**
      * Find a read path by id
      * @param string $id
+     *
      * @return Readpath
      */
     public function find($id);
@@ -46,12 +46,14 @@ interface ReadPathRepositoryInterface extends ObjectRepository
     /**
      * Save a read path
      * @param Readpath $readPath
+     *
      * @return Readpath
      */
     public function save($readPath);
 
     /**
      * @param User $user
+     *
      * @return null|string
      */
     public function getCurrentTextnodeIdForUser(User $user): ?string;

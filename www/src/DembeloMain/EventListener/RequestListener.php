@@ -23,13 +23,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Class RequestListener
- * @package DembeloMain\EventListener
  */
 class RequestListener
 {
     /**
      * modifies response when session does not exist in ajax call
      * @param GetResponseEvent $event
+     *
+     * @return void
      */
     public function onRequest(GetResponseEvent $event)
     {

@@ -21,18 +21,18 @@ namespace AdminBundle\Service\TwineImport;
 
 /**
  * Class FileExtractor
- * @package AdminBundle\Service\TwineImport
  */
 class FileExtractor
 {
     /**
      * @param string $filename
+     *
      * @return string
      */
     public function extract(string $filename): string
     {
         if (!is_readable($filename)) {
-            throw new \InvalidArgumentException('Failed to read data from file ['.$filename.'].');
+            throw new \InvalidArgumentException(sprintf('Failed to read data from file [%s].', $filename));
         }
         $extractedFilename = $filename.'.extracted';
         $fileHandle = fopen($filename, 'r');

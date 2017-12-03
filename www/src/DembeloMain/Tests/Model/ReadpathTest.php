@@ -30,7 +30,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Class ReadpathTest
- * @package DembeloMain\Tests\Model
  */
 class ReadpathTest extends WebTestCase
 {
@@ -167,7 +166,7 @@ class ReadpathTest extends WebTestCase
     }
 
     /**
-     * testts getCurrentTextnodeId for user with readpath
+     * tests getCurrentTextnodeId for user with readpath
      */
     public function testGetCurrentTextnodeIdForUserWithReadpath()
     {
@@ -188,6 +187,9 @@ class ReadpathTest extends WebTestCase
         $this->assertEquals('someId', $returnValue);
     }
 
+    /**
+     * @return \PHPUnit\Framework\MockObject\MockObject
+     */
     private function getTextnodeMock()
     {
         $textnode = $this->getMockBuilder(Textnode::class)->getMock();
@@ -195,6 +197,9 @@ class ReadpathTest extends WebTestCase
         return $textnode;
     }
 
+    /**
+     * @return \PHPUnit\Framework\MockObject\MockObject
+     */
     private function getReadpathRepositoryMock()
     {
         $readpath = $this->getMockBuilder(ReadPathRepository::class)
@@ -205,6 +210,9 @@ class ReadpathTest extends WebTestCase
         return $readpath;
     }
 
+    /**
+     * @return \PHPUnit\Framework\MockObject\MockObject
+     */
     private function getUserMock()
     {
         $user = $this->getMockBuilder(User::class)->getMock();
