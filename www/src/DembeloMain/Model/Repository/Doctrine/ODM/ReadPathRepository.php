@@ -41,7 +41,7 @@ class ReadPathRepository extends AbstractRepository implements ReadPathRepositor
          * @var $readpath Readpath[]
          */
         $readpath = $this->findBy($criteria, $sort, 1);
-        if (null === $readpath) {
+        if (!is_array($readpath) || empty($readpath)) {
             return null;
         }
 

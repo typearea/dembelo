@@ -23,6 +23,7 @@ namespace DembeloMain\Tests\Model\Repository\Doctrine\ODM;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Document\User;
 use DembeloMain\Document\Readpath;
+use DembeloMain\Model\Repository\Doctrine\ODM\ReadPathRepository;
 use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
 
 /**
@@ -36,7 +37,7 @@ class ReadPathRepositoryTest extends AbstractRepositoryTest
     private $em;
 
     /**
-     * @var TextNodeRepository
+     * @var ReadPathRepository
      */
     private $repository;
 

@@ -123,14 +123,14 @@ class UserControllerTest extends WebTestCase
     {
         $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
         $mock = $this->getMockBuilder('foobar')
-            ->setMethods(array('get', 'renderResponse', 'createBuilder', 'add', 'getForm', 'handleRequest', 'isSubmitted', 'isValid', 'getManager', 'createView'))
+            ->setMethods(array('get', 'renderResponse', 'createBuilder', 'add', 'getForm', 'handleRequest', 'isSubmitted', 'isValid', 'getManager', 'createView', 'render'))
             ->getMock();
         $container = $this->getMockBuilder("Symfony\Component\DependencyInjection\ContainerInterface")->getMock();
         $container->expects($this->any())
             ->method("get")
             ->will($this->returnValue($mock));
         $mock->expects($this->once())
-            ->method('renderResponse')
+            ->method('render')
             ->with('DembeloMain::user/register.html.twig', array('form' => 'createViewReturnValue'));
         $mock->expects($this->any())
             ->method('createBuilder')
