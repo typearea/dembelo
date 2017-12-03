@@ -53,7 +53,7 @@ class UserControllerTest extends WebTestCase
         $loginUrl = '/login';
 
         $mock = $this->getMockBuilder('foobar')
-            ->setMethods(array('get', 'getLastAuthenticationError', 'getLastUsername', 'createBuilder', 'setAction', 'generate', 'add', 'getForm', 'createView', 'renderResponse'))
+            ->setMethods(array('get', 'getLastAuthenticationError', 'getLastUsername', 'createBuilder', 'setAction', 'generate', 'add', 'getForm', 'createView', 'renderResponse', 'render'))
             ->getMock();
         $container = $this->getMockBuilder("Symfony\Component\DependencyInjection\ContainerInterface")->getMock();
         $container->expects($this->any())
@@ -80,7 +80,7 @@ class UserControllerTest extends WebTestCase
             ->method('getLastAuthenticationError')
             ->will($this->returnValue($authErr));
         $mock->expects($this->once())
-            ->method('renderResponse')
+            ->method('render')
             ->with('DembeloMain::user/login.html.twig', array('error' => $authErr, 'form' => $formView));
         $mock->expects($this->once())
             ->method('generate')
