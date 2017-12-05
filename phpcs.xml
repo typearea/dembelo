@@ -2,5 +2,5 @@
 <ruleset name="Dembelo Standard" namespace="Dembelo\CS\Standard">
     <description>The Dembelo coding standard</description>
     <file>./www/src</file>
-    <rule ref="./www/vendor/escapestudios/symfony2-coding-standard/Symfony2/ruleset.xml"/>
+    <rule ref="./www/vendor/escapestudios/symfony2-coding-standard/Symfony/ruleset.xml"/>
 </ruleset>

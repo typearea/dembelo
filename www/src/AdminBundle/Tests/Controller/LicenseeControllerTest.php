@@ -27,7 +27,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class LicenseeControllerTest
- * @package AdminBundle\Tests\Controller
  */
 class LicenseeControllerTest extends WebTestCase
 {

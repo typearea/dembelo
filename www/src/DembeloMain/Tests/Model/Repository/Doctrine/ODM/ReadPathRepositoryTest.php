@@ -23,11 +23,11 @@ namespace DembeloMain\Tests\Model\Repository\Doctrine\ODM;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Document\User;
 use DembeloMain\Document\Readpath;
+use DembeloMain\Model\Repository\Doctrine\ODM\ReadPathRepository;
 use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
 
 /**
  * Class ReadPathRepositoryTest
- * @package DembeloMain\Tests\Model\Repository\Doctrine\ODM
  */
 class ReadPathRepositoryTest extends AbstractRepositoryTest
 {
@@ -37,7 +37,7 @@ class ReadPathRepositoryTest extends AbstractRepositoryTest
     private $em;
 
     /**
-     * @var TextNodeRepository
+     * @var ReadPathRepository
      */
     private $repository;
 
@@ -107,6 +107,9 @@ class ReadPathRepositoryTest extends AbstractRepositoryTest
         $this->assertEquals($textnode2->getId(), $returnValue);
     }
 
+    /**
+     * @return User
+     */
     private function createUser(): User
     {
         $user = new User();
@@ -115,6 +118,11 @@ class ReadPathRepositoryTest extends AbstractRepositoryTest
         return $user;
     }
 
+    /**
+     * @param string $arbitraryId
+     *
+     * @return Textnode
+     */
     private function createTextnode($arbitraryId): Textnode
     {
         $textnode = new Textnode();

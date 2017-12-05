@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -25,12 +24,12 @@ use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
 
 /**
  * Class LicenseeRepository
- * @package DembeloMain\Model\Repository\Doctrine\ODM
  */
 class LicenseeRepository extends AbstractRepository implements LicenseeRepositoryInterface
 {
     /**
      * @param string $name
+     *
      * @return Licensee
      */
     public function findOneByName($name)

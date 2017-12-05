@@ -46,12 +46,12 @@ class Importfile
     protected $name;
 
     /**
-     * @MongoDB\ObjectId
+     * @MongoDB\Field(type="object_id")
      */
     protected $licenseeId;
 
     /**
-     * @MongoDB\Timestamp
+     * @MongoDB\Field(type="timestamp")
      */
     protected $imported;
 
@@ -76,7 +76,7 @@ class Importfile
     protected $filename;
 
     /**
-     * @MongoDB\ObjectId
+     * @MongoDB\Field(type="object_id")
      */
     protected $topicId;
 

@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace AdminBundle\Tests\Controller;
 
 use AdminBundle\Controller\ImportfileController;
@@ -27,7 +26,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * Class ImportfileControllerTest
- * @package AdminBundle\Tests\Controller
  */
 class ImportfileControllerTest extends WebTestCase
 {
@@ -75,6 +73,7 @@ class ImportfileControllerTest extends WebTestCase
 
     /**
      * @todo to be replaced by real tests
+     *
      * @return void
      */
     public function testVoid(): void

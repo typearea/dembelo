@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace AdminBundle\Controller;
 
 use DembeloMain\Model\Repository\TopicRepositoryInterface;
@@ -33,7 +32,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TopicController extends Controller
 {
-
     /**
      * @var TopicRepositoryInterface
      */
@@ -52,6 +50,7 @@ class TopicController extends Controller
      * @Route("/topic/list", name="admin_topics")
      *
      * @param Request $request
+     *
      * @return Response
      */
     public function listAction(Request $request): Response
@@ -87,7 +86,9 @@ class TopicController extends Controller
      * @Route("/topicSuggest", name="admin_topic_suggest")
      *
      * @param Request $request
+     *
      * @return Response
+     *
      * @throws \InvalidArgumentException
      */
     public function topicSuggestAction(Request $request): Response
@@ -114,7 +115,9 @@ class TopicController extends Controller
      * @Route("/topic/uploadimage", name="admin_topics_image")
      *
      * @param Request $request
+     *
      * @return Response
+     *
      * @throws \InvalidArgumentException
      */
     public function uploadImageAction(Request $request): Response

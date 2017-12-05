@@ -16,11 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/**
- * @package AdminBundle\Test
- */
-
 namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Textnode;
@@ -29,7 +24,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * Class HitchParserTest
- * @package AdminBundle\Service\TwineImport
  */
 class HitchParserTest extends WebTestCase
 {

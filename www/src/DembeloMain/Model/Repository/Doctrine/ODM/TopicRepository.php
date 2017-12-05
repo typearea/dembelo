@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -25,11 +24,9 @@ use DembeloMain\Model\Repository\TopicRepositoryInterface;
 
 /**
  * Class TopicRepository
- * @package DembeloMain\Model\Repository\Doctrine\ODM
  */
 class TopicRepository extends AbstractRepository implements TopicRepositoryInterface
 {
-
     /**
      * Find all active topics
      * @return Topic[]
@@ -43,6 +40,7 @@ class TopicRepository extends AbstractRepository implements TopicRepositoryInter
      * finds filtered topics
      * @param array $filters
      * @param array $orderBy
+     *
      * @return mixed
      */
     public function findFiltered(array $filters = array(), array $orderBy = array())
@@ -50,10 +48,10 @@ class TopicRepository extends AbstractRepository implements TopicRepositoryInter
         $query = $this->createQueryBuilder();
 
         foreach ($filters as $field => $value) {
-            if (empty($value) && $value !== '0') {
+            if (empty($value) && '0' !== $value) {
                 continue;
             }
-            if ($field === 'status') {
+            if ('status' === $field) {
                 //$value = $value === 'aktiv' ? 1 : 0;
                 $query->field($field)->equals((int) $value);
             } else {
@@ -70,6 +68,7 @@ class TopicRepository extends AbstractRepository implements TopicRepositoryInter
 
     /**
      * @param string $name
+     *
      * @return Topic
      */
     public function findOneByName(string $name): Topic

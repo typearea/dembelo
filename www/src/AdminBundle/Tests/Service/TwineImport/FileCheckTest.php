@@ -16,14 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace AdminBundle\Service\TwineImport;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * Class FileCheckTest
- * @package AdminBundle\Service\TwineImport
  */
 class FileCheckTest extends WebTestCase
 {
@@ -61,6 +59,7 @@ class FileCheckTest extends WebTestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
      */
     public function testCheckWithTooShortPeekData(): void
@@ -77,6 +76,7 @@ class FileCheckTest extends WebTestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
      */
     public function testCheckWithWrongPeekData(): void
@@ -93,6 +93,7 @@ class FileCheckTest extends WebTestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
      */
     public function testCheckWithEmptyPeekData(): void
@@ -108,6 +109,7 @@ class FileCheckTest extends WebTestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
      */
     public function testCheckWithOnlyWhitespacePeekData(): void

@@ -21,16 +21,20 @@ namespace AdminBundle\Service\TwineImport;
 
 /**
  * Class FileCheck
- * @package AdminBundle\Service\TwineImport
  */
 class FileCheck
 {
+    /**
+     * @var string
+     */
     private const OPENING_STRING = '<tw-storydata ';
 
     /**
      * @param resource $fileHandler
      * @param string   $filename
+     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function check($fileHandler, string $filename): bool
@@ -39,17 +43,17 @@ class FileCheck
 
         $peekData = fread($fileHandler, 1024);
 
-        if ($peekData === false) {
-            throw new \Exception("Failed to read data from file '".$filename."'.");
+        if (false === $peekData) {
+            throw new \Exception(sprintf("Failed to read data from file '%s'.", $filename));
         }
 
         $peekDataLength = strlen($peekData);
 
         if ($peekDataLength <= 0) {
-            throw new \Exception("File '".$filename."' seems to be empty.");
+            throw new \Exception(sprintf("File '%s' seems to be empty.", $filename));
         }
 
-        for ($i = 0; $i < $peekDataLength; $i++) {
+        for ($i = 0; $i < $peekDataLength; ++$i) {
             if ($peekData[$i] === ' ' ||
                 $peekData[$i] === "\n" ||
                 $peekData[$i] === "\r" ||
@@ -59,20 +63,20 @@ class FileCheck
             }
 
             if ($peekDataLength - $i < $magicStringLength) {
-                throw new \Exception("File '".$filename."' isn't a Twine archive file.");
+                throw new \Exception(sprintf("File '%s' isn't a Twine archive file.", $filename));
             }
 
             if (substr($peekData, $i, $magicStringLength) !== self::OPENING_STRING) {
-                throw new \Exception("File '".$filename."' isn't a Twine archive file.");
+                throw new \Exception(sprintf("File '%s' isn't a Twine archive file.", $filename));
             }
 
             if (fseek($fileHandler, 0) !== 0) {
-                throw new \Exception("Couldn't reset reading position after the magic string in the Twine archive file '".$filename."' was checked.");
+                throw new \Exception(sprintf("Couldn't reset reading position after the magic string in the Twine archive file '%s' was checked.", $filename));
             }
 
             return true;
         }
 
-        throw new \Exception("File '".$filename."' doesn't seem to be a Twine archive file.");
+        throw new \Exception(sprintf("File '%s' doesn't seem to be a Twine archive file.", $filename));
     }
 }

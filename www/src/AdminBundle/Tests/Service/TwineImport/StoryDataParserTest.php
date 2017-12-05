@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Textnode;
@@ -25,7 +24,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Class StoryDataParserTest
- * @package AdminBundle\Service\TwineImport
  */
 class StoryDataParserTest extends TestCase
 {
@@ -56,7 +54,9 @@ class StoryDataParserTest extends TestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage Nested 'storyPassage' found in Twine archive file 'someFilename'.
      */
     public function testStartElementForNestedStoryData(): void
@@ -94,7 +94,9 @@ class StoryDataParserTest extends TestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage There is a 'storyPassage' in the Twine archive file 'someFilename' which is missing its 'name' attribute.
      */
     public function testStartElementForMissingNameAttribute(): void
@@ -145,7 +147,9 @@ class StoryDataParserTest extends TestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage The Dembelo Textnode with Id 'someTextnodeId' doesn't exist, but should by now.
      */
     public function testEndElementForNotExistingTextnodeId(): void
@@ -272,7 +276,9 @@ class StoryDataParserTest extends TestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage There is a textnode in the Twine archive file which has more than 8 links.
      */
     public function testEndElementExceedingMaximumHitchCount(): void
@@ -314,7 +320,9 @@ class StoryDataParserTest extends TestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage Failed to append hitch for a textnode
      */
     public function testEndElementForFailingAppendHitch(): void
@@ -354,7 +362,9 @@ class StoryDataParserTest extends TestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage The Twine archive file contains a 'someName' with the invalid element '[[>:<value]]'.
      */
     public function testEndElementForInvalidMetadataField(): void
@@ -386,7 +396,9 @@ class StoryDataParserTest extends TestCase
 
     /**
      * @return void
+     *
      * @expectedException \Exception
+     *
      * @expectedExceptionMessage There is a textnode in the Twine archive file which contains the metadata field 'key' twice or would overwrite the already existing value of that field.
      */
     public function testEndElementForAlreadyExistingMetadata(): void
@@ -394,8 +406,6 @@ class StoryDataParserTest extends TestCase
         $textnodeMapping = [
             'someTwineId' => 'someTextnodeId',
         ];
-
-        $someHitch = [];
 
         /* @var $textnode \PHPUnit_Framework_MockObject_MockObject|Textnode */
         $textnodeMock = $this->createMock(Textnode::class);

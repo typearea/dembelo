@@ -16,12 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
-
-/**
- * @package DembeloMain
- */
-
 namespace DembeloMain\Command;
 
 use DembeloMain\Document\Licensee;
@@ -37,14 +31,19 @@ use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Class InstallCommand
- * @package DembeloMain
  */
 class InstallCommand extends ContainerAwareCommand
 {
 
+    /**
+     * @var array
+     */
     private $dummyData = array();
 
-    protected function configure()
+    /**
+     * @return void
+     */
+    protected function configure(): void
     {
         $this
             ->setName('dembelo:install')
@@ -63,9 +62,14 @@ class InstallCommand extends ContainerAwareCommand
             );
     }
 
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return int|null|void
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         if ($input->getOption('purge-db')) {
             $this->purgeDB();
             $output->writeln("<info>Database cleared</info>");
@@ -80,11 +84,11 @@ class InstallCommand extends ContainerAwareCommand
             $this->installDummyData($output);
             $output->writeln("<info>Dummy data installed</info>");
         }
-        //$mongo = $this->getContainer()->get('doctrine_mongodb');
-        //$dm = $mongo->getManager();
-        //$dm->flush();
     }
 
+    /**
+     * @return void
+     */
     protected function purgeDB()
     {
         $collectionClasses = array(
@@ -104,12 +108,20 @@ class InstallCommand extends ContainerAwareCommand
         }
     }
 
+    /**
+     * @param OutputInterface $output
+     *
+     * @return void
+     */
     protected function installDefaultUsers(OutputInterface $output)
     {
         $this->installAdminUser();
         $output->writeln('admin user installed');
     }
 
+    /**
+     * @return void
+     */
     protected function installAdminUser()
     {
         $users = array(
@@ -128,7 +140,12 @@ class InstallCommand extends ContainerAwareCommand
         $this->installUsers($users);
     }
 
-    protected function installDummyData(OutputInterface $output)
+    /**
+     * @param OutputInterface $output
+     *
+     * @return void
+     */
+    protected function installDummyData(OutputInterface $output): void
     {
 
         $mongo = $this->getContainer()->get('doctrine_mongodb');
@@ -151,6 +168,12 @@ class InstallCommand extends ContainerAwareCommand
         $output->writeln("Hitches installed...");
     }
 
+    /**
+     * @param ManagerRegistry $mongo
+     * @param DocumentManager $dm
+     *
+     * @return void
+     */
     private function createLicensees(ManagerRegistry $mongo, DocumentManager $dm)
     {
         $repository = $mongo->getRepository('DembeloMain:Licensee');
@@ -174,6 +197,9 @@ class InstallCommand extends ContainerAwareCommand
         }
     }
 
+    /**
+     * @return void
+     */
     private function createUsers()
     {
         $users = array(
@@ -202,6 +228,13 @@ class InstallCommand extends ContainerAwareCommand
         $this->installUsers($users);
     }
 
+    /**
+     * @param array $users
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
     private function installUsers(array $users)
     {
         /* @var \DembeloMain\Model\Repository\UserRepositoryInterface */
@@ -239,6 +272,12 @@ class InstallCommand extends ContainerAwareCommand
         }
     }
 
+    /**
+     * @param ManagerRegistry $mongo
+     * @param DocumentManager $dm
+     *
+     * @return void
+     */
     private function createTopics(ManagerRegistry $mongo, DocumentManager $dm)
     {
         $repository = $mongo->getRepository('DembeloMain:Topic');
@@ -274,12 +313,15 @@ class InstallCommand extends ContainerAwareCommand
                 $topicFolder = $imagesTargetFolder.'/'.$topic->getId().'/';
                 mkdir($topicFolder);
                 copy($imagesSrcFolder.$imagename, $topicFolder.'/'.$imagename);
-                $sortKey++;
+                ++$sortKey;
             }
             $this->dummyData['topics'][] = $topic;
         }
     }
 
+    /**
+     * @return void
+     */
     private function createTextnodes()
     {
         $loremIpsumLength = 3500;
@@ -377,6 +419,11 @@ class InstallCommand extends ContainerAwareCommand
         }
     }
 
+    /**
+     * @param DocumentManager $dm
+     *
+     * @return void
+     */
     private function createHitches(DocumentManager $dm)
     {
         if (isset($this->dummyData['textnodes']) !== true) {
@@ -406,6 +453,9 @@ class InstallCommand extends ContainerAwareCommand
         $dm->persist($this->dummyData['textnodes'][0]);
     }
 
+    /**
+     * @return void
+     */
     private function cleanImageDirectories()
     {
         $topicImageDirectory = $this->getContainer()->getParameter('topic_image_directory').'/';

@@ -26,13 +26,13 @@ use Doctrine\Common\Persistence\ObjectRepository;
 
 /**
  * Interface TextNodeRepositoryInterface
- * @package DembeloMain\Model\Repository
  */
 interface TextNodeRepositoryInterface extends ObjectRepository
 {
     /**
      * Find a text node by id
      * @param string $id
+     *
      * @return Textnode
      */
     public function find($id);
@@ -46,6 +46,7 @@ interface TextNodeRepositoryInterface extends ObjectRepository
     /**
      * Save a text node
      * @param Textnode $textNode
+     *
      * @return Textnode
      */
     public function save($textNode);
@@ -53,6 +54,7 @@ interface TextNodeRepositoryInterface extends ObjectRepository
     /**
      * finds all textnodes of an importfile
      * @param string $importfileId
+     *
      * @return Textnode[]
      */
     public function findByImportfileId($importfileId);
@@ -61,6 +63,7 @@ interface TextNodeRepositoryInterface extends ObjectRepository
      * finds a textnode by twineId
      * @param Importfile $importfile
      * @param string     $twineId
+     *
      * @return Textnode
      */
     public function findByTwineId(Importfile $importfile, $twineId);
@@ -69,6 +72,7 @@ interface TextNodeRepositoryInterface extends ObjectRepository
      * disables textnodes that were not found in importfile
      * @param Importfile $importfile
      * @param array      $existingTextnodeIds
+     *
      * @return void
      */
     public function disableOrphanedNodes(Importfile $importfile, array $existingTextnodeIds);
@@ -76,6 +80,7 @@ interface TextNodeRepositoryInterface extends ObjectRepository
     /**
      * finds a textnode by arbitraryId
      * @param string $arbitraryId
+     *
      * @return Textnode
      */
     public function findOneActiveByArbitraryId($arbitraryId);
@@ -83,6 +88,7 @@ interface TextNodeRepositoryInterface extends ObjectRepository
     /**
      * sets the hyphenated version of the text content to $textnode
      * @param Textnode $textnode
+     *
      * @return void
      */
     public function setHyphenatedText(Textnode $textnode);
@@ -90,12 +96,14 @@ interface TextNodeRepositoryInterface extends ObjectRepository
     /**
      * gets the textnode object for the read controller action
      * @param string $topicId
+     *
      * @return Textnode
      */
     public function getTextnodeToRead($topicId);
 
     /**
      * @param string $id
+     *
      * @return Textnode|null
      */
     public function findOneActiveById(string $id): ?Textnode;

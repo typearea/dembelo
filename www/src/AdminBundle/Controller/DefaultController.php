@@ -105,17 +105,8 @@ class DefaultController extends Controller
      * @param string                        $topicImageDirectory
      * @param Filesystem                    $filesystem
      */
-    public function __construct(
-        Templating $templating,
-        UserRepositoryInterface $userRepository,
-        LicenseeRepositoryInterface $licenseeRepository,
-        TopicRepositoryInterface $topicRepository,
-        ImportfileRepositoryInterface $importfileRepository,
-        UserPasswordEncoder $userPasswordEncoder,
-        string $configTwineDirectory,
-        string $topicImageDirectory,
-        Filesystem $filesystem
-    ) {
+    public function __construct(Templating $templating, UserRepositoryInterface $userRepository, LicenseeRepositoryInterface $licenseeRepository, TopicRepositoryInterface $topicRepository, ImportfileRepositoryInterface $importfileRepository, UserPasswordEncoder $userPasswordEncoder, string $configTwineDirectory, string $topicImageDirectory, Filesystem $filesystem)
+    {
         $this->configTwineDirectory = $configTwineDirectory;
         $this->userRepository = $userRepository;
         $this->templating = $templating;
@@ -131,6 +122,7 @@ class DefaultController extends Controller
      * @Route("/", name="admin_mainpage")
      *
      * @return Response
+     *
      * @throws \RuntimeException
      */
     public function indexAction(): Response
@@ -157,7 +149,9 @@ class DefaultController extends Controller
      * @Route("/save", name="admin_formsave")
      *
      * @param Request $request
+     *
      * @return Response
+     *
      * @throws \Symfony\Component\Filesystem\Exception\IOException
      * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @throws \Exception
@@ -205,13 +199,13 @@ class DefaultController extends Controller
             if (in_array($param, array('id', 'formtype', 'filename', 'orgname'), true)) {
                 continue;
             }
-            if ($param === 'password' && empty($value)) {
+            if ('password' === $param && empty($value)) {
                 continue;
             }
 
-            if ($item instanceof User && $param === 'password') {
+            if ($item instanceof User && 'password' === $param) {
                 $value = $this->userPasswordEncoder->encodePassword($item, $value);
-            } elseif ($value === '' && in_array($param, ['licenseeId', 'imported'], true)) {
+            } elseif ('' === $value && in_array($param, ['licenseeId', 'imported'], true)) {
                 $value = null;
             }
             $method = 'set'.ucfirst($param);
@@ -256,9 +250,10 @@ class DefaultController extends Controller
     /**
      * saves temporary file to final place
      *
-     * @param Importfile $item importfile instance
-     * @param string $filename filename hash
-     * @param string $orgname original name
+     * @param Importfile $item     importfile instance
+     * @param string     $filename filename hash
+     * @param string     $orgname  original name
+     *
      * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Symfony\Component\Filesystem\Exception\IOException
@@ -283,9 +278,10 @@ class DefaultController extends Controller
     /**
      * saves temporary file to final place
      *
-     * @param Topic $item topic instance
+     * @param Topic  $item     topic instance
      * @param string $filename filename hash
-     * @param string $orgname original name
+     * @param string $orgname  original name
+     *
      * @throws \RuntimeException
      */
     private function saveTopicImage(Topic $item, string $filename, string $orgname)

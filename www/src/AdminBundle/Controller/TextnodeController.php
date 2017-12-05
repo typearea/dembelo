@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace AdminBundle\Controller;
 
 use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
@@ -53,11 +52,8 @@ class TextnodeController extends Controller
      * @param ImportfileRepositoryInterface $importfileRepository
      * @param LicenseeRepositoryInterface   $licenseeRepository
      */
-    public function __construct(
-        TextnodeRepositoryInterface $textnodeRepository,
-        ImportfileRepositoryInterface $importfileRepository,
-        LicenseeRepositoryInterface $licenseeRepository
-    ) {
+    public function __construct(TextnodeRepositoryInterface $textnodeRepository, ImportfileRepositoryInterface $importfileRepository, LicenseeRepositoryInterface $licenseeRepository)
+    {
         $this->textnodeRepository = $textnodeRepository;
         $this->importfileRepository = $importfileRepository;
         $this->licenseeRepository = $licenseeRepository;
@@ -67,6 +63,7 @@ class TextnodeController extends Controller
      * @Route("/textnodes", name="admin_textnodes")
      *
      * @return Response
+     *
      * @throws \InvalidArgumentException
      */
     public function textnodesAction(): Response
@@ -98,6 +95,9 @@ class TextnodeController extends Controller
         return new Response(\json_encode($output));
     }
 
+    /**
+     * @return array
+     */
     private function buildLicenseeIndex(): array
     {
         $licensees = $this->licenseeRepository->findAll();
@@ -109,6 +109,11 @@ class TextnodeController extends Controller
         return $index;
     }
 
+    /**
+     * @param array $metadata
+     *
+     * @return string
+     */
     private function formatMetadata(array $metadata): string
     {
         $string = '';
@@ -119,6 +124,9 @@ class TextnodeController extends Controller
         return $string;
     }
 
+    /**
+     * @return array
+     */
     private function buildImportfileIndex(): array
     {
         /* @var $importfiles \DembeloMain\Document\Importfile[] */

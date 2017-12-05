@@ -16,19 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
-
-/**
- * @package AdminBundle
- */
-
 namespace AdminBundle\Command;
 
 use DembeloMain\Document\Importfile;
 use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
 use DembeloMain\Model\Repository\TopicRepositoryInterface;
-use Doctrine\ODM\MongoDB\DocumentRepository;
-use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -38,16 +30,22 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 /**
  * Class ImportCommand
- * @package AdminBundle
  */
 class ImportCommand extends ContainerAwareCommand
 {
+    /**
+     * @var string
+     */
     private $twineArchivePath;
 
     /**
      * @var OutputInterface
      */
     private $output = null;
+
+    /**
+     * @var misc
+     */
     private $mongo = null;
 
     /**
@@ -55,13 +53,30 @@ class ImportCommand extends ContainerAwareCommand
      */
     private $dm = null;
 
+    /**
+     * @var string|null
+     */
     private $licenseeId = null;
+
+    /**
+     * @var string|null
+     */
     private $topicId = null;
+
+    /**
+     * @var string
+     */
     private $author = '';
+
+    /**
+     * @var string
+     */
     private $publisher = '';
 
     /**
      * configures the symfony cli command
+     *
+     * @return void
      */
     protected function configure()
     {
@@ -99,6 +114,14 @@ class ImportCommand extends ContainerAwareCommand
             );
     }
 
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return int
+     *
+     * @throws \Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $importTwine = $this->getContainer()->get('admin.import.twine');
@@ -142,6 +165,11 @@ class ImportCommand extends ContainerAwareCommand
         return 0;
     }
 
+    /**
+     * @param InputInterface $input
+     *
+     * @throws \Exception
+     */
     private function prepare(InputInterface $input)
     {
         $styleWarning = new OutputFormatterStyle('black', 'yellow');
@@ -160,7 +188,7 @@ class ImportCommand extends ContainerAwareCommand
          */
         $licensee = $repositoryLicensee->findOneByName($input->getOption('licensee-name'));
         if (null === $licensee) {
-            throw new \Exception("<error>A Licensee named '".$input->getOption('licensee-name')."' doesn't exist.</error>");
+            throw new \Exception(sprintf("<error>A Licensee named '%s' doesn't exist.</error>", $input->getOption('licensee-name')));
         }
 
         /**
@@ -169,7 +197,7 @@ class ImportCommand extends ContainerAwareCommand
         $repositoryTopic = $this->mongo->getRepository('DembeloMain:Topic');
         $topic = $repositoryTopic->findOneByName($input->getOption('topic-name'));
         if (null === $topic) {
-            throw new \Exception("<error>A Topic named '".$input->getOption('topic-name')."' doesn't exist.</error>");
+            throw new \Exception(sprintf("<error>A Topic named '%s' doesn't exist.</error>", $input->getOption('topic-name')));
         }
         $this->topicId = $topic->getId();
 

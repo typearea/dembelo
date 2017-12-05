@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Textnode;
@@ -24,7 +23,6 @@ use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 
 /**
  * Class StoryDataParser
- * @package AdminBundle\Service\TwineImport
  */
 class StoryDataParser
 {
@@ -56,6 +54,7 @@ class StoryDataParser
 
     /**
      * @param ParserContext $parserContext
+     *
      * @return void
      */
     public function setParserContext(ParserContext $parserContext): void
@@ -66,6 +65,9 @@ class StoryDataParser
     /**
      * @param string $name
      * @param array  $attributes
+     *
+     * @return void
+     *
      * @throws \Exception
      */
     public function startElement(string $name, array $attributes): void
@@ -81,7 +83,9 @@ class StoryDataParser
 
     /**
      * @param string $name
+     *
      * @return void
+     *
      * @throws \Exception
      */
     public function endElement(string $name): void
@@ -99,8 +103,11 @@ class StoryDataParser
     }
 
     /**
-     * @param $name
-     * @param $dembeloId
+     * @param string $name
+     * @param string $dembeloId
+     *
+     * @return void
+     *
      * @throws \Exception
      */
     private function endElementForOneTextnode(string $name, string $dembeloId): void
@@ -108,7 +115,7 @@ class StoryDataParser
         $textnode = $this->textnodeRepository->find($dembeloId);
 
         if (null === $textnode) {
-            throw new \Exception('The Dembelo Textnode with Id \''.$dembeloId.'\' doesn\'t exist, but should by now.');
+            throw new \Exception(sprintf('The Dembelo Textnode with Id \'%s\' doesn\'t exist, but should by now.', $dembeloId));
         }
 
         $textnodeText = $textnode->getText();
@@ -122,10 +129,18 @@ class StoryDataParser
         $this->textnodeRepository->setHyphenatedText($textnode);
     }
 
+    /**
+     * @param string $name
+     * @param array  $attributes
+     *
+     * @return bool
+     *
+     * @throws \Exception
+     */
     private function checkElementStoryData(string $name, array $attributes): bool
     {
         if ($this->parserContext->isTwineRelevant()) {
-            throw new \Exception("Nested '".$name."' found in Twine archive file '".$this->parserContext->getFilename()."'.");
+            throw new \Exception(sprintf("Nested '%s' found in Twine archive file '%s'.", $name, $this->parserContext->getFilename()));
         }
 
         if (!isset($attributes['startnode']) || !is_numeric($attributes['startnode'])) {
@@ -133,20 +148,25 @@ class StoryDataParser
         }
 
         if (isset($attributes['name']) !== true) {
-            throw new \Exception("There is a '".$name."' in the Twine archive file '".$this->parserContext->getFilename()."' which is missing its 'name' attribute.");
+            throw new \Exception(sprintf("There is a '%s' in the Twine archive file '%s' which is missing its 'name' attribute.", $name, $this->parserContext->getFilename()));
         }
 
         return true;
     }
 
+    /**
+     * @param string $textnodeText
+     *
+     * @return string
+     */
     private function convertToPTags(string $textnodeText): string
     {
         $textnodeTextLength = strlen($textnodeText);
         $textnodeTextNew = '<p>';
         $consumed = 0;
-        for ($i = 0; $i < $textnodeTextLength; $i++) {
+        for ($i = 0; $i < $textnodeTextLength; ++$i) {
             if ($textnodeText[$i] === "\n" || $textnodeText[$i] === "\r") {
-                $consumed++;
+                ++$consumed;
 
                 continue;
             }
@@ -163,6 +183,13 @@ class StoryDataParser
         return $textnodeTextNew;
     }
 
+    /**
+     * @param Textnode $textnode
+     * @param string   $text
+     * @param string   $name
+     *
+     * @return null|string
+     */
     private function parseText(Textnode $textnode, string $text, string $name): ?string
     {
         $textnodeTextNew = preg_replace_callback(
@@ -196,17 +223,20 @@ class StoryDataParser
     }
 
     /**
-     * @param Textnode $textnode
+     * @param Textnode   $textnode
      * @param array|null $hitch
+     *
+     * @return void
+     *
      * @throws \Exception
      */
     private function appendHitchToTextnode(Textnode $textnode, ?array $hitch): void
     {
-        if ($hitch === null) {
+        if (null === $hitch) {
             return;
         }
         if ($textnode->getHitchCount() >= Textnode::HITCHES_MAXIMUM_COUNT) {
-            throw new \Exception('There is a textnode in the Twine archive file which has more than '.Textnode::HITCHES_MAXIMUM_COUNT.' links.');
+            throw new \Exception(sprintf('There is a textnode in the Twine archive file which has more than %d links.', Textnode::HITCHES_MAXIMUM_COUNT));
         }
 
         if ($textnode->appendHitch($hitch) !== true) {
@@ -216,9 +246,11 @@ class StoryDataParser
 
     /**
      * @param Textnode $textnode
-     * @param string $content
-     * @param string $name
+     * @param string   $content
+     * @param string   $name
+     *
      * @return array
+     *
      * @throws \Exception
      */
     private function parseColonArrows(Textnode $textnode, string $content, string $name): array
@@ -226,13 +258,13 @@ class StoryDataParser
         $contentArray = explode('>:<', $content, 2);
 
         if (strlen($contentArray[0]) <= 0 || strlen($contentArray[1]) <= 0) {
-            throw new \Exception('The Twine archive file contains a \''.$name.'\' with the invalid element \'[['.$contentArray[0].'>:<'.$contentArray[1].']]\'.');
+            throw new \Exception(sprintf('The Twine archive file contains a \'%s\' with the invalid element \'[[%s>:<%s]]\'.', $name, $contentArray[0], $contentArray[1]));
         }
 
         $metadata = $textnode->getMetadata() ?? [];
 
         if (array_key_exists($contentArray[0], $metadata) === true) {
-            throw new \Exception('There is a textnode in the Twine archive file which contains the metadata field \''.$contentArray[0].'\' twice or would overwrite the already existing value of that field.');
+            throw new \Exception(sprintf('There is a textnode in the Twine archive file which contains the metadata field \'%s\' twice or would overwrite the already existing value of that field.', $contentArray[0]));
         }
 
         $metadata[$contentArray[0]] = $contentArray[1];

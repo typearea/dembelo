@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -24,13 +23,13 @@ use Doctrine\ODM\MongoDB\DocumentRepository;
 
 /**
  * Class AbstractRepository
- * @package DembeloMain\Model\Repository\Doctrine\ODM
  */
 abstract class AbstractRepository extends DocumentRepository
 {
     /**
      * Save object
      * @param object $object
+     *
      * @return object
      */
     public function save($object)
@@ -42,6 +41,11 @@ abstract class AbstractRepository extends DocumentRepository
         return $object;
     }
 
+    /**
+     * @param misc $object
+     *
+     * @return void
+     */
     protected function beforeSave($object)
     {
     }

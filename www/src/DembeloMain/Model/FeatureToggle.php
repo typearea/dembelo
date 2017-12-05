@@ -24,12 +24,14 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * Class FeatureToggle
- * @package DembeloMain\Model
  */
 class FeatureToggle implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
+    /**
+     * @var bool[]
+     */
     private $features = [
         'test_feature'  => false, // for unittesting, don't remove
         'login_enabled' => false, // registration and login enabled in navigation?
@@ -40,6 +42,7 @@ class FeatureToggle implements ContainerAwareInterface
     /**
      * checks availability of a feature
      * @param string $featureKey
+     *
      * @return bool
      */
     public function hasFeature(string $featureKey)
@@ -68,6 +71,11 @@ class FeatureToggle implements ContainerAwareInterface
         return array_keys($this->features);
     }
 
+    /**
+     * @param string $featureKey
+     *
+     * @return string
+     */
     private function buildParameterName(string $featureKey): string
     {
         return 'features.'.$featureKey;

@@ -27,7 +27,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Class Readpath
- * @package DembeloMain\Model
  */
 class Readpath
 {
@@ -64,6 +63,7 @@ class Readpath
 
     /**
      * @param User|null $user
+     *
      * @return null|string
      */
     public function getCurrentTextnodeId(User $user = null): ?string
@@ -80,7 +80,13 @@ class Readpath
         }
     }
 
-    private function saveTextnodeToDatabase(Textnode $textnode, User $user)
+    /**
+     * @param Textnode $textnode
+     * @param User     $user
+     *
+     * @return void
+     */
+    private function saveTextnodeToDatabase(Textnode $textnode, User $user): void
     {
         $readpath = new ReadpathDocument();
         $readpath->setTextnodeId($textnode->getId());
@@ -90,7 +96,12 @@ class Readpath
         $this->readpathRepository->save($readpath);
     }
 
-    private function saveTextnodeToSession($textnode)
+    /**
+     * @param Textnode $textnode
+     *
+     * @return void
+     */
+    private function saveTextnodeToSession(Textnode $textnode): void
     {
         $readpath = $this->session->get('readpath');
         if (is_array($readpath)) {

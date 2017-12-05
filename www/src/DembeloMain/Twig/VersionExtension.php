@@ -25,8 +25,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Class VersionExtension
  * This twig extensions adds a function "version()" to twig that reads the dembelo version number
- *
- * @package DembeloMain\Twig
  */
 class VersionExtension extends Twig_Extension
 {

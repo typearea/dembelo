@@ -22,7 +22,6 @@
 /**
  * @package DembeloMain
  */
-
 namespace DembeloMain\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -54,7 +53,7 @@ class UserControllerTest extends WebTestCase
         $loginUrl = '/login';
 
         $mock = $this->getMockBuilder('foobar')
-            ->setMethods(array('get', 'getLastAuthenticationError', 'getLastUsername', 'createBuilder', 'setAction', 'generate', 'add', 'getForm', 'createView', 'renderResponse'))
+            ->setMethods(array('get', 'getLastAuthenticationError', 'getLastUsername', 'createBuilder', 'setAction', 'generate', 'add', 'getForm', 'createView', 'renderResponse', 'render'))
             ->getMock();
         $container = $this->getMockBuilder("Symfony\Component\DependencyInjection\ContainerInterface")->getMock();
         $container->expects($this->any())
@@ -81,7 +80,7 @@ class UserControllerTest extends WebTestCase
             ->method('getLastAuthenticationError')
             ->will($this->returnValue($authErr));
         $mock->expects($this->once())
-            ->method('renderResponse')
+            ->method('render')
             ->with('DembeloMain::user/login.html.twig', array('error' => $authErr, 'form' => $formView));
         $mock->expects($this->once())
             ->method('generate')
@@ -124,14 +123,14 @@ class UserControllerTest extends WebTestCase
     {
         $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
         $mock = $this->getMockBuilder('foobar')
-            ->setMethods(array('get', 'renderResponse', 'createBuilder', 'add', 'getForm', 'handleRequest', 'isSubmitted', 'isValid', 'getManager', 'createView'))
+            ->setMethods(array('get', 'renderResponse', 'createBuilder', 'add', 'getForm', 'handleRequest', 'isSubmitted', 'isValid', 'getManager', 'createView', 'render'))
             ->getMock();
         $container = $this->getMockBuilder("Symfony\Component\DependencyInjection\ContainerInterface")->getMock();
         $container->expects($this->any())
             ->method("get")
             ->will($this->returnValue($mock));
         $mock->expects($this->once())
-            ->method('renderResponse')
+            ->method('render')
             ->with('DembeloMain::user/register.html.twig', array('form' => 'createViewReturnValue'));
         $mock->expects($this->any())
             ->method('createBuilder')

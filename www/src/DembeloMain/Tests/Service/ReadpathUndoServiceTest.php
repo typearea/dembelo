@@ -27,7 +27,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Class ReadpathUndoServiceTest
- * @package DembeloMain\Tests\Service
  */
 class ReadpathUndoServiceTest extends WebTestCase
 {

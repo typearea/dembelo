@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Importfile;
@@ -24,7 +23,6 @@ use DembeloMain\Document\Textnode;
 
 /**
  * Class ParserContext
- * @package AdminBundle\Service\TwineImport
  */
 class ParserContext
 {
@@ -70,6 +68,9 @@ class ParserContext
 
     /**
      * @param Importfile $importfile
+     *
+     * @return void
+     *
      * @throws \Exception
      */
     public function init(Importfile $importfile): void
@@ -111,6 +112,7 @@ class ParserContext
 
     /**
      * @param bool $twineRelevant
+     *
      * @return void
      */
     public function setTwineRelevant(bool $twineRelevant): void
@@ -128,6 +130,7 @@ class ParserContext
 
     /**
      * @param Textnode $currentTextnode
+     *
      * @return void
      */
     public function setCurrentTextnode(Textnode $currentTextnode): void
@@ -147,6 +150,7 @@ class ParserContext
 
     /**
      * @param bool $twineText
+     *
      * @return void
      */
     public function setTwineText(bool $twineText): void
@@ -180,6 +184,7 @@ class ParserContext
 
     /**
      * @param mixed $twineStartnodeId
+     *
      * @return void
      */
     public function setTwineStartnodeId(int $twineStartnodeId): void
@@ -197,6 +202,7 @@ class ParserContext
 
     /**
      * @param bool $accessSet
+     *
      * @return void
      */
     public function setAccessSet(bool $accessSet): void
@@ -214,6 +220,7 @@ class ParserContext
 
     /**
      * @param array $nodenameMapping
+     *
      * @return void
      */
     public function setNodenameMapping(array $nodenameMapping): void

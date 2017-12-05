@@ -276,20 +276,22 @@ class TextnodeTest extends WebTestCase
 
     /**
      * Tests if appending more hitches than the maximum amount of
-     *     hitches is rejected.
+     * hitches is rejected.
+     *
+     * @return void
      */
-    public function testAppendHitchMoreThanMaximum()
+    public function testAppendHitchMoreThanMaximum(): void
     {
-        for ($i = 0; $i < Textnode::HITCHES_MAXIMUM_COUNT + 1; $i++) {
+        for ($i = 0; $i < Textnode::HITCHES_MAXIMUM_COUNT + 1; ++$i) {
             $hitch = array();
             $hitch['textnodeId'] = $i;
-            $hitch['description'] = "Continue.";
+            $hitch['description'] = 'Continue.';
             $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
 
             if ($i < Textnode::HITCHES_MAXIMUM_COUNT) {
-                $this->assertTrue($this->textnode->appendHitch($hitch));
+                $this->assertTrue($this->textnode->appendHitch($hitch), 'adding hitch no. '.$i);
             } else {
-                $this->assertFalse($this->textnode->appendHitch($hitch));
+                $this->assertFalse($this->textnode->appendHitch($hitch), 'adding hitch no. '.$i);
             }
         }
     }

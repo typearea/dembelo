@@ -25,14 +25,13 @@ use Doctrine\Common\Persistence\ObjectRepository;
 
 /**
  * Interface TopicRepositoryInterface
- * @package DembeloMain\Model\Repository
  */
 interface TopicRepositoryInterface extends ObjectRepository
 {
-
     /**
      * Find a topic by id
      * @param string $id
+     *
      * @return Topic
      */
     public function find($id);
@@ -48,6 +47,7 @@ interface TopicRepositoryInterface extends ObjectRepository
      * @param array|null $sort
      * @param integer    $limit
      * @param integer    $skip
+     *
      * @return Topic[]
      */
     public function findBy(array $criteria, array $sort = null, $limit = null, $skip = null);
@@ -62,6 +62,7 @@ interface TopicRepositoryInterface extends ObjectRepository
      * finds filtered topics
      * @param array $filters
      * @param array $orderBy
+     *
      * @return mixed
      */
     public function findFiltered(array $filters = array(), array $orderBy = array());
@@ -69,12 +70,14 @@ interface TopicRepositoryInterface extends ObjectRepository
     /**
      * Save topic
      * @param Topic $topic
+     *
      * @return Topic
      */
     public function save($topic);
 
     /**
      * @param string $name
+     *
      * @return Topic
      */
     public function findOneByName(string $name): Topic;

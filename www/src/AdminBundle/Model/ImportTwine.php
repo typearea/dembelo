@@ -16,12 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
-
-/**
- * @package AdminBundle
- */
-
 namespace AdminBundle\Model;
 
 use AdminBundle\Service\TwineImport\FileCheck;
@@ -33,10 +27,12 @@ use DembeloMain\Document\Importfile;
 
 /**
  * Class ImportTwine
- * @package AdminBundle\Model
  */
 class ImportTwine
 {
+    /**
+     * @var resource
+     */
     private $xmlParser;
 
     /**
@@ -72,13 +68,8 @@ class ImportTwine
      * @param PassageDataParser $passageDataParser
      * @param ParserContext     $parserContext
      */
-    public function __construct(
-        FileExtractor $fileExtractor,
-        FileCheck $fileCheck,
-        StoryDataParser $storyDataParser,
-        PassageDataParser $passageDataParser,
-        ParserContext $parserContext
-    ) {
+    public function __construct(FileExtractor $fileExtractor, FileCheck $fileCheck, StoryDataParser $storyDataParser, PassageDataParser $passageDataParser, ParserContext $parserContext)
+    {
         $this->fileExtractor = $fileExtractor;
         $this->fileCheck = $fileCheck;
         $this->storyDataParser = $storyDataParser;
@@ -90,7 +81,9 @@ class ImportTwine
      * main method, starts the import process
      *
      * @param Importfile $importfile
+     *
      * @return bool
+     *
      * @throws \Exception
      */
     public function run(Importfile $importfile): bool
@@ -103,8 +96,8 @@ class ImportTwine
 
         $fileHandler = fopen($filenameExtracted, 'rb');
 
-        if ($fileHandler === false) {
-            throw new \Exception('Couldn\'t open file \''.$this->parserContext->getFilename().'\'');
+        if (false === $fileHandler) {
+            throw new \Exception(sprintf('Couldn\'t open file \'%s\'', $this->parserContext->getFilename()));
         }
 
         $this->xmlParser = xml_parser_create('UTF-8');
@@ -126,6 +119,9 @@ class ImportTwine
         xml_parser_free($this->xmlParser);
     }
 
+    /**
+     * @throws \Exception
+     */
     private function setXmlHandler(): void
     {
         xml_parser_set_option($this->xmlParser, XML_OPTION_CASE_FOLDING, 0);
@@ -139,26 +135,39 @@ class ImportTwine
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     private function parseEnvelopeHeader(): void
     {
         if (xml_parse($this->xmlParser, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<tw-archive>\n") !== 1) {
             $errorCode = xml_get_error_code($this->xmlParser);
             $errorDescription = xml_error_string($errorCode);
 
-            throw new \Exception("Error #".$errorCode.": '".$errorDescription."' occurred while the envelope head for the Twine archive was parsed.");
+            throw new \Exception(sprintf("Error #%d: '%s' occurred while the envelope head for the Twine archive was parsed.", $errorCode, $errorDescription));
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     private function parseEnvelopeFooter(): void
     {
         if (xml_parse($this->xmlParser, "\n</tw-archive>\n", true) !== 1) {
             $errorCode = xml_get_error_code($this->xmlParser);
             $errorDescription = xml_error_string($errorCode);
 
-            throw new \Exception("Error #".$errorCode.": '".$errorDescription."' occurred while the envelope foot for the Twine archive was parsed.");
+            throw new \Exception(sprintd("Error #%d: '%s' occurred while the envelope foot for the Twine archive was parsed.", $errorCode, $errorDescription));
         }
     }
 
+    /**
+     * @param resource $fileHandler
+     *
+     * @return bool
+     *
+     * @throws \Exception
+     */
     private function initParser($fileHandler): bool
     {
         $this->setXmlHandler();
@@ -179,11 +188,18 @@ class ImportTwine
         return !(fclose($fileHandler) === false);
     }
 
+    /**
+     * @param resource $fileHandler
+     *
+     * @return bool
+     *
+     * @throws \Exception
+     */
     private function parseLine($fileHandler): bool
     {
         $buffer = fread($fileHandler, 4096);
 
-        if ($buffer === false) {
+        if (false === $buffer) {
             return false;
         }
         if (xml_parse($this->xmlParser, $buffer) !== 1) {
@@ -193,6 +209,9 @@ class ImportTwine
         return true;
     }
 
+    /**
+     * @throws \Exception
+     */
     private function throwParserException(): void
     {
         $errorCode = xml_get_error_code($this->xmlParser);
@@ -201,18 +220,31 @@ class ImportTwine
         $errorColumnNumber = xml_get_current_column_number($this->xmlParser);
         $errorByteIndex = xml_get_current_byte_index($this->xmlParser);
 
-        throw new \Exception('Error #'.$errorCode.': \''.$errorDescription."' occurred while parsing the Twine archive file '".$this->parserContext->getFilename()."' in line ".$errorRowNumber.", character ".$errorColumnNumber." (at byte index ".$errorByteIndex.").");
+        throw new \Exception(sprintf("Error #%s: '%s' occurred while parsing the Twine archive file '%s' in line %d, character %d (at byte index %d).", $errorCode, $errorDescription, $this->parserContext->getFilename(), $errorRowNumber, $errorColumnNumber, $errorByteIndex));
     }
 
+    /**
+     * @param resource $parser
+     * @param string   $name
+     * @param array    $attrs
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
     private function startElement($parser, string $name, array $attrs): void
     {
-        if ($name === 'tw-storydata') {
+        if ('tw-storydata' === $name) {
             $this->storyDataParser->startElement($name, $attrs);
-        } elseif ($this->parserContext->isTwineRelevant() && $name === 'tw-passagedata') {
+        } elseif ($this->parserContext->isTwineRelevant() && 'tw-passagedata' === $name) {
             $this->passageDataParser->startElement($name, $attrs);
         }
     }
 
+    /**
+     * @param resource $parser
+     * @param string   $data
+     */
     private function characterData($parser, string $data): void
     {
         if ($this->parserContext->isTwineRelevant() && $this->parserContext->isTwineText()) {
@@ -223,15 +255,16 @@ class ImportTwine
     /**
      * xml_parse method
      *
-     * @param $parser
-     * @param string $name
+     * @param resource $parser
+     * @param string   $name
+     *
      * @throws \Exception
      */
     private function endElement($parser, string $name): void
     {
-        if ($name === 'tw-storydata') {
+        if ('tw-storydata' === $name) {
             $this->storyDataParser->endElement($name);
-        } elseif ($this->parserContext->isTwineRelevant() && $name === 'tw-passagedata') {
+        } elseif ($this->parserContext->isTwineRelevant() && 'tw-passagedata' === $name) {
             $this->passageDataParser->endElement();
         }
     }

@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace AdminBundle\Tests\Controller;
 
 use AdminBundle\Controller\UserController;
@@ -29,7 +28,6 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * Class UserControllerTest
- * @package AdminBundle\Tests\Controller
  */
 class UserControllerTest extends WebTestCase
 {
