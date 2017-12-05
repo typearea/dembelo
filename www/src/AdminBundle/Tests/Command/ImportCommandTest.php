@@ -81,8 +81,8 @@ class ImportCommandTest extends KernelTestCase
      */
     protected function setUp(): void
     {
-        self::bootKernel();
-        $application = new Application(self::$kernel);
+        $kernel = self::bootKernel();
+        $application = new Application($kernel);
         $application->add(new ImportCommand());
         $this->command = $application->find('dembelo:import');
         $this->commandTester = new CommandTester($this->command);

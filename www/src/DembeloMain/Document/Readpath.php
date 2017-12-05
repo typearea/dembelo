@@ -39,12 +39,12 @@ class Readpath
     protected $id;
 
     /**
-     * @MongoDB\ObjectId
+     * @MongoDB\Field(type="object_id")
      */
     protected $userId;
 
     /**
-     * @MongoDB\ObjectId
+     * @MongoDB\Field(type="object_id")
      */
     protected $textnodeId;
 

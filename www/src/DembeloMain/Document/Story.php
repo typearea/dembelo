@@ -49,7 +49,7 @@ class Story
     /**
      * @var string
      *
-     * @MongoDB\ObjectId
+     * @MongoDB\Field(type="object_id")
      */
     protected $topicId;
 

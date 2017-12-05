@@ -53,7 +53,7 @@ class Textnode
     protected $created;
 
     /**
-     * @MongoDb\ObjectId
+     * @MongoDb\Field(type="object_id")
      */
     protected $topicId;
 
@@ -78,22 +78,22 @@ class Textnode
     protected $access;
 
     /**
-     * @MongoDB\Hash
+     * @MongoDB\Field(type="hash")
      */
     protected $metadata;
 
     /**
-     * @MongoDB\ObjectId
+     * @MongoDB\Field(type="object_id")
      */
     protected $licenseeId;
 
     /**
-     * @MongoDB\Hash
+     * @MongoDB\Field(type="hash")
      */
     protected $hitches = [];
 
     /**
-     * @MongoDB\ObjectId
+     * @MongoDB\Field(type="object_id")
      */
     protected $importfileId;
 

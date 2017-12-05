@@ -64,12 +64,12 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
     protected $roles;
 
     /**
-     * @MongoDB\ObjectId
+     * @MongoDB\Field(type="object_id")
      */
     protected $licenseeId;
 
     /**
-     * @MongoDB\ObjectId
+     * @MongoDB\Field(type="object_id")
      */
     protected $currentTextnode;
 
@@ -101,17 +101,17 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
     protected $activationHash;
 
     /**
-     * @MongoDB\Hash
+     * @MongoDB\Field(type="hash")
      */
     protected $metadata;
 
     /**
-     * @MongoDB\ObjectId
+     * @MongoDB\Field(type="object_id")
      */
     protected $lastTopicId;
 
     /**
-     * @MongoDB\Hash
+     * @MongoDB\Field(type="hash")
      */
     protected $favorites = [];
 
