@@ -49,7 +49,7 @@ class Readpath
     protected $textnodeId;
 
     /**
-     * @MongoDB\Date
+     * @MongoDB\Field(type="date")
      */
     protected $timestamp;
 

@@ -57,7 +57,7 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
     protected $password;
 
     /**
-     * @MongoDB\Collection
+     * @MongoDB\Field(type="collection")
      *
      * @Assert\NotBlank()
      */
