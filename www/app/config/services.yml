@@ -131,11 +131,9 @@ services:
             tags:
                 - { name: twig.extension }
 
-    # @todo remove dependency from service container
     app.twig_extension.hasFeature:
                 class: DembeloMain\Twig\FeatureToggleExtension
-                arguments: ["@service_container"]
-                public: false
+                arguments: ["@app.feature_toggle"]
                 tags:
                     - { name: twig.extension }
 
