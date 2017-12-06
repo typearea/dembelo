@@ -9,6 +9,7 @@ parameters:
     locale: de
     topic_image_directory: '%kernel.root_dir%/../uploads/topicimage/'
     twine_directory: '%kernel.root_dir%/../uploads/twine/'
+    version_file: '%kernel.root_dir%./../../files/version'
 
 framework:
     #esi:             ~

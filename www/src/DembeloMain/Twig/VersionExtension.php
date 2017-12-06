@@ -19,8 +19,7 @@
 namespace DembeloMain\Twig;
 
 use Twig_Extension;
-use Twig_SimpleFunction;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig_Function;
 
 /**
  * Class VersionExtension
@@ -29,27 +28,25 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class VersionExtension extends Twig_Extension
 {
     /**
-     * @var ContainerInterface
+     * @var string
      */
-    protected $container;
+    private $versionFile;
 
     /**
-     * Constructor
-     *
-     * @param ContainerInterface $container
+     * @param string $versionFile
      */
-    public function __construct($container)
+    public function __construct(string $versionFile)
     {
-        $this->container = $container;
+        $this->versionFile = $versionFile;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return array(
-            new Twig_SimpleFunction('dembeloversion', array($this, 'version')),
+            new Twig_Function('dembeloversion', array($this, 'version')),
         );
     }
 
@@ -57,17 +54,15 @@ class VersionExtension extends Twig_Extension
      * reads the version from filesystem and returns it
      * @return string
      */
-    public function version()
+    public function version(): string
     {
-        $file = $this->container->get('kernel')->getRootDir().'/../../files/version';
-
-        return file_get_contents($file);
+        return file_get_contents($this->versionFile);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'dembelo_version';
     }
