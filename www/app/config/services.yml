@@ -123,11 +123,9 @@ services:
             arguments:
                 - DembeloMain\Document\Importfile
 
-    # @todo remove dependency from service container
     app.twig_extension.version:
             class: DembeloMain\Twig\VersionExtension
-            arguments: ["@service_container"]
-            public: false
+            arguments: [%version_file%]
             tags:
                 - { name: twig.extension }
 
