@@ -18,39 +18,37 @@
  */
 namespace DembeloMain\Twig;
 
+use DembeloMain\Model\FeatureToggle;
 use Twig_Extension;
-use Twig_SimpleFunction;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig_Function;
 
 /**
  * Class VersionExtension
- * This twig extensions adds a function "version()" to twig that reads the dembelo version number
+ * This twig extensions adds a function "hasFeature()" to check the feature toggle
  */
 class FeatureToggleExtension extends Twig_Extension
 {
     /**
-     * @var ContainerInterface
+     * @var FeatureToggle
      */
-    protected $container;
+    private $featureToggle;
 
     /**
-     * Constructor
-     *
-     * @param ContainerInterface $container
+     * @param FeatureToggle $featureToggle
      */
-    public function __construct($container)
+    public function __construct(FeatureToggle $featureToggle)
     {
-        $this->container = $container;
+        $this->featureToggle = $featureToggle;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
-        return array(
-            new Twig_SimpleFunction('has_feature', array($this, 'hasFeature')),
-        );
+        return [
+            new Twig_Function('has_feature', array($this, 'hasFeature')),
+        ];
     }
 
     /**
@@ -59,15 +57,15 @@ class FeatureToggleExtension extends Twig_Extension
      *
      * @return bool
      */
-    public function hasFeature($featureKey)
+    public function hasFeature($featureKey): bool
     {
-        return $this->container->get('app.feature_toggle')->hasFeature($featureKey);
+        return $this->featureToggle->hasFeature($featureKey);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'has_feature';
     }
