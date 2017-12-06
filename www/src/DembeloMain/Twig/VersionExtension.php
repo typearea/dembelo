@@ -19,8 +19,7 @@
 namespace DembeloMain\Twig;
 
 use Twig_Extension;
-use Twig_SimpleFunction;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig_Function;
 
 /**
  * Class VersionExtension
@@ -28,6 +27,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class VersionExtension extends Twig_Extension
 {
+    /**
+     * @var string
+     */
+    private $versionFile;
+
     /**
      * @param string $versionFile
      */
@@ -42,7 +46,7 @@ class VersionExtension extends Twig_Extension
     public function getFunctions(): array
     {
         return array(
-            new Twig_SimpleFunction('dembeloversion', array($this, 'version')),
+            new Twig_Function('dembeloversion', array($this, 'version')),
         );
     }
 
