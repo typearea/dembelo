@@ -74,8 +74,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
     public function disableOrphanedNodes(Importfile $importfile, array $existingTextnodeIds)
     {
         $this->getDocumentManager()->createQueryBuilder(Textnode::class)
-            ->update()
-            ->multiple(true)
+            ->updateMany()
             ->field('status')->set(Textnode::STATUS_INACTIVE)
             ->field('importfileId')->equals(new \MongoId($importfile->getId()))
             ->field('id')->notIn($existingTextnodeIds)
