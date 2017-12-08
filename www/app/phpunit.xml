@@ -15,11 +15,9 @@
         </testsuite>
     </testsuites>
 
-    <!--
     <php>
-        <server name="KERNEL_DIR" value="/path/to/your/app/" />
+        <server name="KERNEL_CLASS" value="AppKernel" />
     </php>
-    -->
 
     <filter>
         <whitelist>
