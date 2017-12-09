@@ -53,8 +53,8 @@ services:
             - "@app.model_repository_topic"
             - "@app.model_repository_importfile"
             - "@security.password_encoder"
-            - %twine_directory%
-            - %topic_image_directory%
+            - "%twine_directory%"
+            - "%topic_image_directory%"
             - "@filesystem"
 
     app.admin_controller_user:
@@ -81,7 +81,7 @@ services:
             - "@app.model_repository_importfile"
             - "@admin.import.twine"
             - "@doctrine_mongodb"
-            - %twine_directory%
+            - "%twine_directory%"
 
     app.controller_admin_topic:
         class: AdminBundle\Controller\TopicController
@@ -171,3 +171,17 @@ services:
 
     app.twineImport.parserContext:
         class: AdminBundle\Service\TwineImport\ParserContext
+
+    DembeloMain\Command\InstallCommand:
+        arguments:
+          - "@doctrine_mongodb"
+          - "@app.model_repository_topic"
+          - "@app.model_repository_textnode"
+          - "@app.model_repository_licensee"
+          - "@app.model_repository_user"
+          - "@apoutchika.lorem_ipsum"
+          - "@security.user_password_encoder.generic"
+          - "%topic_dummy_image_directory%"
+          - "%topic_image_directory%"
+        tags:
+          - { name: 'console.command', command: 'dembelo:install' }

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
+/* Copyright (C) 2015-2017 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
  *
@@ -18,27 +18,109 @@
  */
 namespace DembeloMain\Command;
 
+use Apoutchika\LoremIpsumBundle\Services\LoremIpsum;
 use DembeloMain\Document\Licensee;
 use DembeloMain\Document\Textnode;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
+use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use DembeloMain\Model\Repository\TopicRepositoryInterface;
+use DembeloMain\Model\Repository\UserRepositoryInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use DembeloMain\Document\User;
 use DembeloMain\Document\Topic;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
-use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Console\Input\InputOption;
+use DembeloMain\Document\Readpath;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
 /**
  * Class InstallCommand
  */
-class InstallCommand extends ContainerAwareCommand
+class InstallCommand extends Command
 {
+    /**
+     * @var string
+     */
+    protected static $defaultName = 'dembelo:install';
+
+    /**
+     * @var ManagerRegistry
+     */
+    private $mongo;
 
     /**
      * @var array
      */
-    private $dummyData = array();
+    private $dummyData = [];
+
+    /**
+     * @var string
+     */
+    private $topicImageDirectory;
+
+    /**
+     * @var TopicRepositoryInterface
+     */
+    private $topicRepository;
+
+    /**
+     * @var TextNodeRepositoryInterface
+     */
+    private $textNodeRepository;
+
+    /**
+     * @var LicenseeRepositoryInterface
+     */
+    private $licenseeRepository;
+
+    /**
+     * @var string
+     */
+    private $topicDummyImageDirectory;
+
+    /**
+     * @var LoremIpsum
+     */
+    private $loremIpsum;
+
+    /**
+     * @var UserRepositoryInterface
+     */
+    private $userRepository;
+
+    /**
+     * @var UserPasswordEncoder
+     */
+    private $passwordEncoder;
+
+    /**
+     * InstallCommand constructor.
+     * @param ManagerRegistry $mongo
+     * @param TopicRepositoryInterface $topicRepository
+     * @param TextNodeRepositoryInterface $textNodeRepository
+     * @param LicenseeRepositoryInterface $licenseeRepository
+     * @param UserRepositoryInterface $userRepository
+     * @param LoremIpsum $loremIpsum
+     * @param UserPasswordEncoder $passwordEncoder
+     * @param string $topicDummyImageDirectory
+     * @param string $topicImageDirectory
+     */
+    public function __construct(ManagerRegistry $mongo, TopicRepositoryInterface $topicRepository, TextNodeRepositoryInterface $textNodeRepository, LicenseeRepositoryInterface $licenseeRepository, UserRepositoryInterface $userRepository, LoremIpsum $loremIpsum, UserPasswordEncoder $passwordEncoder, string $topicDummyImageDirectory, string $topicImageDirectory)
+    {
+        $this->mongo = $mongo;
+        $this->topicImageDirectory = $topicImageDirectory;
+        $this->topicRepository = $topicRepository;
+        $this->textNodeRepository = $textNodeRepository;
+        $this->licenseeRepository = $licenseeRepository;
+        $this->topicDummyImageDirectory = $topicDummyImageDirectory;
+        $this->loremIpsum = $loremIpsum;
+        $this->userRepository = $userRepository;
+        $this->passwordEncoder = $passwordEncoder;
+        parent::__construct();
+    }
 
     /**
      * @return void
@@ -63,48 +145,49 @@ class InstallCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param InputInterface  $input
+     * @param InputInterface $input
      * @param OutputInterface $output
      *
      * @return int|null|void
+     *
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if ($input->getOption('purge-db')) {
             $this->purgeDB();
-            $output->writeln("<info>Database cleared</info>");
+            $output->writeln('<info>Database cleared</info>');
             $this->cleanImageDirectories();
-            $output->writeln("<info>Directories cleared</info>");
+            $output->writeln('<info>Directories cleared</info>');
         }
 
         $this->installDefaultUsers($output);
-        $output->writeln("<info>Default users installed</info>");
+        $output->writeln('<info>Default users installed</info>');
 
         if ($input->getOption('with-dummy-data')) {
             $this->installDummyData($output);
-            $output->writeln("<info>Dummy data installed</info>");
+            $output->writeln('<info>Dummy data installed</info>');
         }
     }
 
     /**
      * @return void
      */
-    protected function purgeDB()
+    protected function purgeDB(): void
     {
-        $collectionClasses = array(
-            'DembeloMain\Document\Licensee',
-            'DembeloMain\Document\Readpath',
-            'DembeloMain\Document\Textnode',
-            'DembeloMain\Document\Topic',
-            'DembeloMain\Document\User',
-        );
+        $collectionClasses = [
+            Licensee::class,
+            Readpath::class,
+            Textnode::class,
+            Topic::class,
+            User::class,
+        ];
 
-        $mongo = $this->getContainer()->get('doctrine_mongodb');
-        $dm = $mongo->getManager();
+        $dm = $this->mongo->getManager();
 
         foreach ($collectionClasses as $collectionClass) {
             $collection = $dm->getDocumentCollection($collectionClass);
-            $collection->remove(array());
+            $collection->remove([]);
         }
     }
 
@@ -112,8 +195,10 @@ class InstallCommand extends ContainerAwareCommand
      * @param OutputInterface $output
      *
      * @return void
+     *
+     * @throws \Exception
      */
-    protected function installDefaultUsers(OutputInterface $output)
+    protected function installDefaultUsers(OutputInterface $output): void
     {
         $this->installAdminUser();
         $output->writeln('admin user installed');
@@ -121,21 +206,22 @@ class InstallCommand extends ContainerAwareCommand
 
     /**
      * @return void
+     * @throws \Exception
      */
-    protected function installAdminUser()
+    protected function installAdminUser(): void
     {
-        $users = array(
-            array(
+        $users = [
+            [
                 'email' => 'admin@dembelo.tld',
                 'password' => 'dembelo',
-                'roles' => array('ROLE_ADMIN'),
+                'roles' => ['ROLE_ADMIN'],
                 'gender' => 'm',
                 'status' => 1,
                 'source' => '',
                 'reason' => '',
-                'metadata' => array('created' => time(), 'updated' => time()),
-            ),
-        );
+                'metadata' => ['created' => time(), 'updated' => time()],
+            ],
+        ];
 
         $this->installUsers($users);
     }
@@ -144,54 +230,46 @@ class InstallCommand extends ContainerAwareCommand
      * @param OutputInterface $output
      *
      * @return void
+     *
+     * @throws \Exception
      */
     protected function installDummyData(OutputInterface $output): void
     {
-
-        $mongo = $this->getContainer()->get('doctrine_mongodb');
-
-        $dm = $mongo->getManager();
-
-        $this->createLicensees($mongo, $dm);
-        $output->writeln("Licensees installed...");
+        $this->createLicensees();
+        $output->writeln('Licensees installed...');
 
         $this->createUsers();
-        $output->writeln("Users installed...");
+        $output->writeln('Users installed...');
 
-        $this->createTopics($mongo, $dm);
-        $output->writeln("Topics installed...");
+        $this->createTopics();
+        $output->writeln('Topics installed...');
 
         $this->createTextnodes();
-        $output->writeln("Textnodes installed...");
+        $output->writeln('Textnodes installed...');
 
-        $this->createHitches($dm);
-        $output->writeln("Hitches installed...");
+        $this->createHitches();
+        $output->writeln('Hitches installed...');
     }
 
     /**
-     * @param ManagerRegistry $mongo
-     * @param DocumentManager $dm
-     *
      * @return void
      */
-    private function createLicensees(ManagerRegistry $mongo, DocumentManager $dm)
+    private function createLicensees(): void
     {
-        $repository = $mongo->getRepository('DembeloMain:Licensee');
+        $licensees = [
+            ['name' => 'Lizenznehmer 1'],
+            ['name' => 'Lizenznehmer 2'],
+        ];
 
-        $licensees = array(
-            array('name' => 'Lizenznehmer 1'),
-            array('name' => 'Lizenznehmer 2'),
-        );
-
-        $this->dummyData['licensees'] = array();
+        $this->dummyData['licensees'] = [];
 
         foreach ($licensees as $licenseeData) {
-            $licensee = $repository->findOneByName($licenseeData['name']);
+            $licensee = $this->licenseeRepository->findOneByName($licenseeData['name']);
 
             if (null === $licensee) {
                 $licensee = new Licensee();
                 $licensee->setName($licenseeData['name']);
-                $dm->persist($licensee);
+                $this->licenseeRepository->save($licensee);
             }
             $this->dummyData['licensees'][] = $licensee;
         }
@@ -199,31 +277,33 @@ class InstallCommand extends ContainerAwareCommand
 
     /**
      * @return void
+     *
+     * @throws \Exception
      */
-    private function createUsers()
+    private function createUsers(): void
     {
-        $users = array(
-            array(
+        $users = [
+            [
                 'email' => 'reader@dembelo.tld',
                 'password' => 'dembelo',
-                'roles' => array('ROLE_USER'),
+                'roles' => ['ROLE_USER'],
                 'gender' => 'm',
                 'status' => 1,
                 'source' => '',
                 'reason' => '',
-                'metadata' => array('created' => time(), 'updated' => time()),
-            ),
-            array(
+                'metadata' => ['created' => time(), 'updated' => time()],
+            ],
+            [
                 'email' => 'licensee@dembelo.tld',
                 'password' => 'dembelo',
-                'roles' => array('ROLE_LICENSEE'),
+                'roles' => ['ROLE_LICENSEE'],
                 'gender' => 'm',
                 'status' => 1,
                 'source' => '',
                 'reason' => '',
-                'metadata' => array('created' => time(), 'updated' => time()),
-            ),
-        );
+                'metadata' => ['created' => time(), 'updated' => time()],
+            ],
+        ];
 
         $this->installUsers($users);
     }
@@ -235,24 +315,19 @@ class InstallCommand extends ContainerAwareCommand
      *
      * @throws \Exception
      */
-    private function installUsers(array $users)
+    private function installUsers(array $users): void
     {
-        /* @var \DembeloMain\Model\Repository\UserRepositoryInterface */
-        $userRepository = $this->getContainer()->get('app.model_repository_user');
-
-        $encoder = $this->getContainer()->get('security.password_encoder');
-
         if (!isset($this->dummyData['users'])) {
             $this->dummyData['users'] = array();
         }
 
         foreach ($users as $userData) {
-            $user = $userRepository->findOneByEmail($userData['email']);
+            $user = $this->userRepository->findOneBy(['email' => $userData['email']]);
 
-            if (is_null($user)) {
+            if (null === $user) {
                 $user = new User();
                 $user->setEmail($userData['email']);
-                $password = $encoder->encodePassword($user, $userData['password']);
+                $password = $this->passwordEncoder->encodePassword($user, $userData['password']);
                 $user->setPassword($password);
                 $user->setRoles($userData['roles']);
                 $user->setGender($userData['gender']);
@@ -261,11 +336,11 @@ class InstallCommand extends ContainerAwareCommand
                 $user->setStatus($userData['status']);
                 $user->setMetadata($userData['metadata']);
 
-                if (in_array('ROLE_LICENSEE', $userData['roles'])) {
+                if (\in_array('ROLE_LICENSEE', $userData['roles'], true)) {
                     $user->setLicenseeId($this->dummyData['licensees'][0]->getId());
                 }
 
-                $userRepository->save($user);
+                $this->userRepository->save($user);
             }
 
             $this->dummyData['users'][] = $user;
@@ -273,35 +348,31 @@ class InstallCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param ManagerRegistry $mongo
-     * @param DocumentManager $dm
-     *
      * @return void
+     * @throws \RuntimeException
      */
-    private function createTopics(ManagerRegistry $mongo, DocumentManager $dm)
+    private function createTopics(): void
     {
-        $repository = $mongo->getRepository('DembeloMain:Topic');
+        $this->dummyData['topics'] = [];
 
-        $this->dummyData['topics'] = array();
+        $topicData = [
+            ['name' => 'Themenfeld 2', 'status' => Topic::STATUS_ACTIVE],
+            ['name' => 'Themenfeld 3', 'status' => Topic::STATUS_ACTIVE],
+            ['name' => 'Themenfeld 4', 'status' => Topic::STATUS_ACTIVE],
+            ['name' => 'Themenfeld 5', 'status' => Topic::STATUS_ACTIVE],
+            ['name' => 'Themenfeld 6', 'status' => Topic::STATUS_ACTIVE],
+            ['name' => 'Themenfeld 7', 'status' => Topic::STATUS_ACTIVE],
+            ['name' => 'Themenfeld 8', 'status' => Topic::STATUS_ACTIVE],
+            ['name' => 'Themenfeld 9', 'status' => Topic::STATUS_ACTIVE],
+        ];
 
-        $topicData = array(
-            array('name' => 'Themenfeld 2', 'status' => Topic::STATUS_ACTIVE),
-            array('name' => 'Themenfeld 3', 'status' => Topic::STATUS_ACTIVE),
-            array('name' => 'Themenfeld 4', 'status' => Topic::STATUS_ACTIVE),
-            array('name' => 'Themenfeld 5', 'status' => Topic::STATUS_ACTIVE),
-            array('name' => 'Themenfeld 6', 'status' => Topic::STATUS_ACTIVE),
-            array('name' => 'Themenfeld 7', 'status' => Topic::STATUS_ACTIVE),
-            array('name' => 'Themenfeld 8', 'status' => Topic::STATUS_ACTIVE),
-            array('name' => 'Themenfeld 9', 'status' => Topic::STATUS_ACTIVE),
-        );
-
-        $imagesSrcFolder = $this->getContainer()->getParameter('kernel.root_dir').'/../src/DembeloMain/Resources/public/images/';
-        $imagesTargetFolder = $this->getContainer()->getParameter('topic_image_directory');
+        $imagesSrcFolder = $this->topicDummyImageDirectory;
+        $imagesTargetFolder = $this->topicImageDirectory;
 
         $sortKey = 1;
         foreach ($topicData as $topicDatum) {
-            $topic = $repository->findOneByName($topicDatum['name']);
-            if (is_null($topic)) {
+            $topic = $this->topicRepository->findOneByName($topicDatum['name']);
+            if (null === $topic) {
                 $imagename = 'bg0'.$sortKey.'.jpg';
                 $topic = new Topic();
                 $topic->setName($topicDatum['name']);
@@ -309,9 +380,11 @@ class InstallCommand extends ContainerAwareCommand
                 $topic->setSortKey($sortKey);
                 $topic->setOriginalImageName($imagename);
                 $topic->setImageFilename($imagename);
-                $dm->persist($topic);
+                $this->topicRepository->save($topic);
                 $topicFolder = $imagesTargetFolder.'/'.$topic->getId().'/';
-                mkdir($topicFolder);
+                if (!mkdir($topicFolder) && !is_dir($topicFolder)) {
+                    throw new \RuntimeException(sprintf('Directory "%s" was not created', $topicFolder));
+                }
                 copy($imagesSrcFolder.$imagename, $topicFolder.'/'.$imagename);
                 ++$sortKey;
             }
@@ -322,83 +395,79 @@ class InstallCommand extends ContainerAwareCommand
     /**
      * @return void
      */
-    private function createTextnodes()
+    private function createTextnodes(): void
     {
         $loremIpsumLength = 3500;
 
-        $repository = $this->getContainer()->get('app.model_repository_textnode');
-
-        $allAccessNodes = $repository->findByAccess(true);
+        $allAccessNodes = $this->textNodeRepository->findBy(['access' => true]);
         if (count($allAccessNodes) >= 7) {
             return;
         }
 
-        $loremIpsum = $this->getContainer()->get('apoutchika.lorem_ipsum');
-
-        $textnodeData = array(
-            array(
+        $textnodeData = [
+            [
                 'topic' => $this->dummyData['topics'][0],
-                'text' => $loremIpsum->getWords($loremIpsumLength),
+                'text' => $this->loremIpsum->getWords($loremIpsumLength),
                 'access' => true,
                 'licensee' => $this->dummyData['licensees'][0],
-                'metadata' => array(
+                'metadata' => [
                     'Titel' => 'Titel 1',
                     'Autor' => 'Autor 1',
                     'Verlag' => 'Verlag 1',
-                ),
-            ),
-            array(
-                'text' => $loremIpsum->getWords($loremIpsumLength),
+                ],
+            ],
+            [
+                'text' => $this->loremIpsum->getWords($loremIpsumLength),
                 'access' => false,
                 'licensee' => $this->dummyData['licensees'][0],
-                'metadata' => array(
+                'metadata' => [
                     'Titel' => 'Titel 2',
                     'Autor' => 'Autor 2',
                     'Verlag' => 'Verlag 2',
-                ),
-            ),
-            array(
-                'text' => $loremIpsum->getWords($loremIpsumLength),
+                ],
+            ],
+            [
+                'text' => $this->loremIpsum->getWords($loremIpsumLength),
                 'access' => false,
                 'licensee' => $this->dummyData['licensees'][0],
-                'metadata' => array(
+                'metadata' => [
                     'Titel' => 'Titel 3',
                     'Autor' => 'Autor 3',
                     'Verlag' => 'Verlag 3',
-                ),
-            ),
-            array(
+                ],
+            ],
+            [
                 'topic' => $this->dummyData['topics'][1],
-                'text' => $loremIpsum->getWords($loremIpsumLength),
+                'text' => $this->loremIpsum->getWords($loremIpsumLength),
                 'access' => true,
                 'licensee' => $this->dummyData['licensees'][0],
-                'metadata' => array(
+                'metadata' => [
                     'Titel' => 'Titel 4',
                     'Autor' => 'Autor 4',
                     'Verlag' => 'Verlag 4',
-                ),
-            ),
-            array(
-                'text' => $loremIpsum->getWords($loremIpsumLength),
+                ],
+            ],
+            [
+                'text' => $this->loremIpsum->getWords($loremIpsumLength),
                 'access' => false,
                 'licensee' => $this->dummyData['licensees'][0],
-                'metadata' => array(
+                'metadata' => [
                     'Titel' => 'Titel 5',
                     'Autor' => 'Autor 5',
                     'Verlag' => 'Verlag 5',
-                ),
-            ),
-            array(
-                'text' => $loremIpsum->getWords($loremIpsumLength),
+                ],
+            ],
+            [
+                'text' => $this->loremIpsum->getWords($loremIpsumLength),
                 'access' => false,
                 'licensee' => $this->dummyData['licensees'][0],
-                'metadata' => array(
+                'metadata' => [
                     'Titel' => 'Titel 6',
                     'Autor' => 'Autor 6',
                     'Verlag' => 'Verlag 6',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         foreach ($textnodeData as $textnodeDatum) {
             $textnode = new Textnode();
@@ -413,52 +482,54 @@ class InstallCommand extends ContainerAwareCommand
             $textnode->setText($textnodeDatum['text']);
             $textnode->setAccess($textnodeDatum['access']);
             $textnode->setMetadata($textnodeDatum['metadata']);
-            $repository->save($textnode);
+            $this->textNodeRepository->save($textnode);
 
             $this->dummyData['textnodes'][] = $textnode;
         }
     }
 
     /**
-     * @param DocumentManager $dm
-     *
      * @return void
      */
-    private function createHitches(DocumentManager $dm)
+    private function createHitches(): void
     {
         if (isset($this->dummyData['textnodes']) !== true) {
             return;
         }
 
-        if (count($this->dummyData['textnodes']) < 3) {
+        /* @var $dummyTextnodes Textnode[] */
+        $dummyTextnodes = $this->dummyData['textnodes'];
+
+        if (count($dummyTextnodes) < 3) {
             return;
         }
 
-        if ($this->dummyData['textnodes'][0]->getHitchCount() >= 2) {
+        if ($dummyTextnodes[0]->getHitchCount() >= 2) {
             return;
         }
 
-        $hitch = array();
-        $hitch['textnodeId'] = $this->dummyData['textnodes'][1]->getId();
-        $hitch['description'] = "Mehr Lorem.";
+        $hitch = [];
+        $hitch['textnodeId'] = $dummyTextnodes[1]->getId();
+        $hitch['description'] = 'Mehr Lorem.';
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->dummyData['textnodes'][0]->appendHitch($hitch);
-        $dm->persist($this->dummyData['textnodes'][0]);
+        $dummyTextnodes[0]->appendHitch($hitch);
+        $this->textNodeRepository->save($this->dummyData['textnodes'][0]);
 
-        $hitch = array();
-        $hitch['textnodeId'] = $this->dummyData['textnodes'][2]->getId();
-        $hitch['description'] = "Mehr Ipsum.";
+        $hitch = [];
+        $hitch['textnodeId'] = $dummyTextnodes[2]->getId();
+        $hitch['description'] = 'Mehr Ipsum.';
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->dummyData['textnodes'][0]->appendHitch($hitch);
-        $dm->persist($this->dummyData['textnodes'][0]);
+        $dummyTextnodes[0]->appendHitch($hitch);
+
+        $this->textNodeRepository->save($dummyTextnodes[0]);
     }
 
     /**
      * @return void
      */
-    private function cleanImageDirectories()
+    private function cleanImageDirectories(): void
     {
-        $topicImageDirectory = $this->getContainer()->getParameter('topic_image_directory').'/';
+        $topicImageDirectory = $this->topicImageDirectory.'/';
         if (is_dir($topicImageDirectory)) {
             shell_exec('rm -r '.$topicImageDirectory.'*');
         }
