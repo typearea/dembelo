@@ -98,15 +98,16 @@ class InstallCommand extends Command
 
     /**
      * InstallCommand constructor.
-     * @param ManagerRegistry $mongo
-     * @param TopicRepositoryInterface $topicRepository
+     *
+     * @param ManagerRegistry             $mongo
+     * @param TopicRepositoryInterface    $topicRepository
      * @param TextNodeRepositoryInterface $textNodeRepository
      * @param LicenseeRepositoryInterface $licenseeRepository
-     * @param UserRepositoryInterface $userRepository
-     * @param LoremIpsum $loremIpsum
-     * @param UserPasswordEncoder $passwordEncoder
-     * @param string $topicDummyImageDirectory
-     * @param string $topicImageDirectory
+     * @param UserRepositoryInterface     $userRepository
+     * @param LoremIpsum                  $loremIpsum
+     * @param UserPasswordEncoder         $passwordEncoder
+     * @param string                      $topicDummyImageDirectory
+     * @param string                      $topicImageDirectory
      */
     public function __construct(ManagerRegistry $mongo, TopicRepositoryInterface $topicRepository, TextNodeRepositoryInterface $textNodeRepository, LicenseeRepositoryInterface $licenseeRepository, UserRepositoryInterface $userRepository, LoremIpsum $loremIpsum, UserPasswordEncoder $passwordEncoder, string $topicDummyImageDirectory, string $topicImageDirectory)
     {
@@ -145,7 +146,7 @@ class InstallCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      *
      * @return int|null|void
@@ -206,6 +207,7 @@ class InstallCommand extends Command
 
     /**
      * @return void
+     *
      * @throws \Exception
      */
     protected function installAdminUser(): void
@@ -349,6 +351,7 @@ class InstallCommand extends Command
 
     /**
      * @return void
+     *
      * @throws \RuntimeException
      */
     private function createTopics(): void
