@@ -18,20 +18,22 @@
  */
 namespace AdminBundle\Command;
 
+use AdminBundle\Model\ImportTwine;
 use DembeloMain\Document\Importfile;
+use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
 use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
 use DembeloMain\Model\Repository\TopicRepositoryInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * Class ImportCommand
  */
-class ImportCommand extends ContainerAwareCommand
+class ImportCommand extends Command
 {
     /**
      * @var string
@@ -41,27 +43,17 @@ class ImportCommand extends ContainerAwareCommand
     /**
      * @var OutputInterface
      */
-    private $output = null;
-
-    /**
-     * @var misc
-     */
-    private $mongo = null;
-
-    /**
-     * @var \Doctrine\ODM\MongoDB\DocumentManager
-     */
-    private $dm = null;
+    private $output;
 
     /**
      * @var string|null
      */
-    private $licenseeId = null;
+    private $licenseeId;
 
     /**
      * @var string|null
      */
-    private $topicId = null;
+    private $topicId;
 
     /**
      * @var string
@@ -74,11 +66,46 @@ class ImportCommand extends ContainerAwareCommand
     private $publisher = '';
 
     /**
+     * @var ImportTwine
+     */
+    private $importTwine;
+
+    /**
+     * @var LicenseeRepositoryInterface
+     */
+    private $licenseeRepository;
+
+    /**
+     * @var TopicRepositoryInterface
+     */
+    private $topicRepository;
+
+    /**
+     * @var ImportfileRepositoryInterface
+     */
+    private $importfileRepository;
+
+    /**
+     * @param ImportTwine                   $importTwine
+     * @param LicenseeRepositoryInterface   $licenseeRepository
+     * @param TopicRepositoryInterface      $topicRepository
+     * @param ImportfileRepositoryInterface $importfileRepository
+     */
+    public function __construct(ImportTwine $importTwine, LicenseeRepositoryInterface $licenseeRepository, TopicRepositoryInterface $topicRepository, ImportfileRepositoryInterface $importfileRepository)
+    {
+        parent::__construct();
+        $this->importTwine = $importTwine;
+        $this->licenseeRepository = $licenseeRepository;
+        $this->topicRepository = $topicRepository;
+        $this->importfileRepository = $importfileRepository;
+    }
+
+    /**
      * configures the symfony cli command
      *
      * @return void
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('dembelo:import')
@@ -124,7 +151,6 @@ class ImportCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $importTwine = $this->getContainer()->get('admin.import.twine');
         $this->output = $output;
         $this->prepare($input);
 
@@ -148,16 +174,15 @@ class ImportCommand extends ContainerAwareCommand
             $importfile->setPublisher($this->publisher);
             $importfile->setTopicId($this->topicId);
 
-            $this->dm->persist($importfile);
-            $this->dm->flush();
+            $this->importfileRepository->save($importfile);
 
-            $importTwine->run($importfile);
+            $this->importTwine->run($importfile);
 
-            $this->dm->flush();
+            $this->importfileRepository->save($importfile);
         } catch (\Exception $ex) {
             $output->writeln('<error>'.$ex->getMessage().'</error>');
 
-            $importTwine->parserFree();
+            $this->importTwine->parserFree();
 
             return -1;
         }
@@ -175,27 +200,12 @@ class ImportCommand extends ContainerAwareCommand
         $styleWarning = new OutputFormatterStyle('black', 'yellow');
         $this->output->getFormatter()->setStyle('warning', $styleWarning);
 
-        $this->mongo = $this->getContainer()->get('doctrine_mongodb');
-        $this->dm = $this->mongo->getManager();
-
-        /**
-         * @var $repositoryLicensee LicenseeRepositoryInterface
-         */
-        $repositoryLicensee = $this->mongo->getRepository('DembeloMain:Licensee');
-
-        /**
-         * @var $licensee \DembeloMain\Document\Licensee
-         */
-        $licensee = $repositoryLicensee->findOneByName($input->getOption('licensee-name'));
+        $licensee = $this->licenseeRepository->findOneBy(['name' => $input->getOption('licensee-name')]);
         if (null === $licensee) {
             throw new \Exception(sprintf("<error>A Licensee named '%s' doesn't exist.</error>", $input->getOption('licensee-name')));
         }
 
-        /**
-         * @var $repositoryTopic TopicRepositoryInterface
-         */
-        $repositoryTopic = $this->mongo->getRepository('DembeloMain:Topic');
-        $topic = $repositoryTopic->findOneByName($input->getOption('topic-name'));
+        $topic = $this->topicRepository->findOneBy(['name' => $input->getOption('topic-name')]);
         if (null === $topic) {
             throw new \Exception(sprintf("<error>A Topic named '%s' doesn't exist.</error>", $input->getOption('topic-name')));
         }

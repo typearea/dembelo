@@ -33,7 +33,6 @@ use DembeloMain\Document\Topic;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Symfony\Component\Console\Input\InputOption;
 use DembeloMain\Document\Readpath;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
 /**

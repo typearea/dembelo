@@ -185,3 +185,12 @@ services:
           - "%topic_image_directory%"
         tags:
           - { name: 'console.command', command: 'dembelo:install' }
+
+    AdminBundle\Command\ImportCommand:
+        arguments:
+            - "@admin.import.twine"
+            - "@app.model_repository_licensee"
+            - "@app.model_repository_topic"
+            - "@app.model_repository_importfile"
+        tags:
+            - { name: 'console.command', command: 'dembelo:import' }
