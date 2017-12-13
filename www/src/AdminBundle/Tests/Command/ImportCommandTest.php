@@ -45,12 +45,15 @@ function file_exists($filename)
 
 namespace AdminBundle\Tests\Command;
 
+use AdminBundle\Model\ImportTwine;
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Licensee;
 use DembeloMain\Document\Topic;
+use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
+use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
+use DembeloMain\Model\Repository\TopicRepositoryInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use AdminBundle\Command\ImportCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -59,13 +62,8 @@ use Symfony\Component\Console\Tester\CommandTester;
 /**
  * Class ImportCommandTest
  */
-class ImportCommandTest extends KernelTestCase
+class ImportCommandTest extends TestCase
 {
-    /**
-     * @var array
-     */
-    private $mockObjects;
-
     /**
      * @var ContainerAwareCommand
      */
@@ -77,17 +75,43 @@ class ImportCommandTest extends KernelTestCase
     private $commandTester;
 
     /**
+     * @var ImportTwine|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $importTwineMock;
+
+    /**
+     * @var LicenseeRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $licenseeRepositoryMock;
+
+    /**
+     * @var TopicRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $topicRepositoryMock;
+
+    /**
+     * @var ImportfileRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $importfileRepositoryMock;
+
+    /**
      * @inheritdoc
      */
     protected function setUp(): void
     {
-        $kernel = self::bootKernel();
-        $application = new Application($kernel);
-        $application->add(new ImportCommand());
-        $this->command = $application->find('dembelo:import');
+        $this->importTwineMock = $this->createImportTwineMock();
+        $this->licenseeRepositoryMock = $this->createLicenseeRepositoryMock();
+        $this->topicRepositoryMock = $this->createTopicRepositoryMock();
+        $this->importfileRepositoryMock = $this->createImportfileRepositoryMock();
+
+        $this->command = new ImportCommand(
+            $this->importTwineMock,
+            $this->licenseeRepositoryMock,
+            $this->topicRepositoryMock,
+            $this->importfileRepositoryMock
+        );
+
         $this->commandTester = new CommandTester($this->command);
-        $this->mockObjects = $this->getMockObjects();
-        $this->command->setContainer($this->mockObjects['container']);
     }
 
     /**
@@ -95,10 +119,11 @@ class ImportCommandTest extends KernelTestCase
      *
      * @return void
      */
-    public function testExecute()
+    public function testExecute(): void
     {
-        $this->mockObjects['importTwine']->expects($this->once())
+        $this->importTwineMock->expects($this->once())
             ->method('run')
+            // @codingStandardsIgnoreStart
             ->will($this->returnCallback(function (Importfile $importfile): bool {
                 return $importfile->getFilename() === 'somefile_readable_exists.html'
                     && $importfile->getLicenseeId() === 'licenseeId'
@@ -106,15 +131,15 @@ class ImportCommandTest extends KernelTestCase
                     && $importfile->getPublisher() === 'somepublisher'
                     && $importfile->getTopicId() === 'someTopic';
             }));
+            // @codingStandardsIgnoreEnd
 
-        $returnValue = $this->commandTester->execute(array(
-            'command' => $this->command->getName(),
+        $returnValue = $this->commandTester->execute([
             'twine-archive-file' => 'somefile_readable_exists.html',
             '--licensee-name' => 'somelicensee',
             '--metadata-author' => 'someauthor',
             '--metadata-publisher' => 'somepublisher',
             '--topic-name' => 'someTopic',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $this->commandTester->getDisplay();
@@ -124,20 +149,21 @@ class ImportCommandTest extends KernelTestCase
 
     /**
      * tests execute method with unreadable file
+     *
+     * @return void
      */
     public function testExecuteWithUnreadableFile(): void
     {
-        $this->mockObjects['importTwine']->expects($this->never())
+        $this->importTwineMock->expects($this->never())
             ->method('run');
 
-        $returnValue = $this->commandTester->execute(array(
-            'command' => $this->command->getName(),
+        $returnValue = $this->commandTester->execute([
             'twine-archive-file' => 'somefile_exists.html',
             '--licensee-name' => 'somelicensee',
             '--metadata-author' => 'someauthor',
             '--metadata-publisher' => 'somepublisher',
             '--topic-name' => 'someTopic',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $this->commandTester->getDisplay();
@@ -147,20 +173,21 @@ class ImportCommandTest extends KernelTestCase
 
     /**
      * tests execute() method with non existing file
+     *
+     * @return void
      */
     public function testExecuteWithFileNotExisting(): void
     {
-        $this->mockObjects['importTwine']->expects($this->never())
+        $this->importTwineMock->expects($this->never())
             ->method('run');
 
-        $returnValue = $this->commandTester->execute(array(
-            'command' => $this->command->getName(),
+        $returnValue = $this->commandTester->execute([
             'twine-archive-file' => 'somefile_readable.html',
             '--licensee-name' => 'somelicensee',
             '--metadata-author' => 'someauthor',
             '--metadata-publisher' => 'somepublisher',
             '--topic-name' => 'someTopic',
-        ));
+        ]);
 
         // the output of the command in the console
         $output = $this->commandTester->getDisplay();
@@ -170,25 +197,28 @@ class ImportCommandTest extends KernelTestCase
 
     /**
      * tests execute() method with exception thrown by importTwine
+     *
+     * @return void
      */
-    public function testExecuteWithExeptionInImportTwine()
+    public function testExecuteWithExeptionInImportTwine(): void
     {
-        $this->mockObjects['importTwine']->expects($this->once())
+        $this->importTwineMock->expects($this->once())
             ->method('run')
+            // @codingStandardsIgnoreStart
             ->will($this->returnCallback(function (Importfile $importfile): bool {
                 return $importfile->getFilename() === 'somefile_readable_exists.html'
-                && $importfile->getLicenseeId() === 'licenseeId'
-                && $importfile->getAuthor() === 'someauthor'
-                && $importfile->getPublisher() === 'somepublisher'
-                && $importfile->getTopicId() === 'someTopic';
+                    && $importfile->getLicenseeId() === 'licenseeId'
+                    && $importfile->getAuthor() === 'someauthor'
+                    && $importfile->getPublisher() === 'somepublisher'
+                    && $importfile->getTopicId() === 'someTopic';
             }))
+            // @codingStandardsIgnoreEnd
             ->will($this->throwException(new \Exception('dummy Exception')));
 
-        $this->mockObjects['importTwine']->expects($this->once())
+        $this->importTwineMock->expects($this->once())
             ->method('parserFree');
 
         $returnValue = $this->commandTester->execute(array(
-            'command' => $this->command->getName(),
             'twine-archive-file' => 'somefile_readable_exists.html',
             '--licensee-name' => 'somelicensee',
             '--metadata-author' => 'someauthor',
@@ -207,7 +237,7 @@ class ImportCommandTest extends KernelTestCase
      */
     public function testExecuteWithLicenseeNotFound(): void
     {
-        $this->mockObjects['importTwine']->expects($this->never())
+        $this->importTwineMock->expects($this->never())
             ->method('run');
 
         $returnValue = $this->commandTester->execute(array(
@@ -238,12 +268,11 @@ class ImportCommandTest extends KernelTestCase
             return null;
         }
 
-        $licenseeMock = $this->getMockBuilder(Licensee::class)->disableOriginalConstructor()->getMock();
-        $licenseeMock->expects($this->once())
+        $this->licenseeRepositoryMock->expects($this->once())
             ->method('getId')
             ->will($this->returnValue('licenseeId'));
 
-        return $licenseeMock;
+        return $this->licenseeRepositoryMock;
     }
 
     /**
@@ -268,52 +297,52 @@ class ImportCommandTest extends KernelTestCase
     }
 
     /**
-     * @return array
+     * @return ImportTwine|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function getMockObjects(): array
+    private function createImportTwineMock(): ImportTwine
     {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
+        return $this->createMock(ImportTwine::class);
+    }
 
-        $service = $this->getMockBuilder('Doctrine\Bundle\MongoDBBundle\ManagerRegistry')->disableOriginalConstructor()->getMock();
-        $repositoryLicensee = $this->getMockBuilder('repositoryLicenseeMock')->setMethods(['findOneByName'])->getMock();
-        $repositoryTopic = $this->getMockBuilder('repositoryTopicMock')->setMethods(['findOneByName'])->getMock();
-        $importTwine = $this->getMockBuilder('AdminBundle\Model\ImportTwine')->disableOriginalConstructor()->setMethods(['run', 'parserFree'])->getMock();
-        $dm = $this->getMockBuilder('dmMock')->setMethods(['flush', 'persist'])->getMock();
+    /**
+     * @return LicenseeRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createLicenseeRepositoryMock(): LicenseeRepositoryInterface
+    {
+        $mock = $this->createMock(LicenseeRepositoryInterface::class);
 
-        $container->expects($this->at(0))
-            ->method("get")
-            ->with($this->equalTo('admin.import.twine'))
-            ->will($this->returnValue($importTwine));
-        $container->expects($this->at(1))
-            ->method("get")
-            ->with($this->equalTo('doctrine_mongodb'))
-            ->will($this->returnValue($service));
-        $service->expects($this->any())
-            ->method("getRepository")
-            ->willReturnCallback(function ($repositoryName) use ($repositoryLicensee, $repositoryTopic) {
-                if ('DembeloMain:Licensee' === $repositoryName) {
-                    return $repositoryLicensee;
-                }
-                if ('DembeloMain:Topic' === $repositoryName) {
-                    return $repositoryTopic;
-                }
-            });
-        $service->expects($this->any())
-            ->method("getManager")
-            ->will($this->returnValue($dm));
-        $repositoryLicensee->expects($this->any())
-            ->method('findOneByName')
-            ->will($this->returnCallback([$this, 'findOneByNameCallback']));
-        $repositoryTopic->expects($this->any())
-            ->method('findOneByName')
-            ->will($this->returnCallback([$this, 'findOneTopicByNameCallback']));
+        $licenseeMock = $this->createMock(Licensee::class);
+        $licenseeMock->method('getId')->willReturn('someLicenseeId');
 
-        return [
-            'container' => $container,
-            'service' => $service,
-            'repositoryLicensee' => $repositoryLicensee,
-            'importTwine' => $importTwine,
-            'dm' => $dm,
-        ];
+        $mock->method('findOneBy')
+            ->with(['name' => 'somelicensee'])
+            ->willReturn($licenseeMock);
+
+        return $mock;
+    }
+
+    /**
+     * @return TopicRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createTopicRepositoryMock(): TopicRepositoryInterface
+    {
+        $mock = $this->createMock(TopicRepositoryInterface::class);
+
+        $topicMock = $this->createMock(Topic::class);
+        $topicMock->method('getId')->willReturn('someTopicId');
+
+        $mock->method('findOneBy')
+            ->willReturn(['name' => 'someTopic'])
+            ->willReturn($topicMock);
+
+        return $mock;
+    }
+
+    /**
+     * @return ImportfileRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createImportfileRepositoryMock(): ImportfileRepositoryInterface
+    {
+        return $this->createMock(ImportfileRepositoryInterface::class);
     }
 }

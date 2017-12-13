@@ -8,6 +8,7 @@ imports:
 parameters:
     locale: de
     topic_image_directory: '%kernel.root_dir%/../uploads/topicimage/'
+    topic_dummy_image_directory: '%kernel.root_dir%/../src/DembeloMain/Resources/public/images/'
     twine_directory: '%kernel.root_dir%/../uploads/twine/'
     version_file: '%kernel.root_dir%./../../files/version'
 

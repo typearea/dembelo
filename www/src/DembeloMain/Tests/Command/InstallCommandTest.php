@@ -17,47 +17,109 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * @package DembeloMain
  */
 
 namespace DembeloMain\Tests\Command;
 
+use Apoutchika\LoremIpsumBundle\Services\LoremIpsum;
+use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
+use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use DembeloMain\Model\Repository\UserRepositoryInterface;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
+use PHPUnit\Framework\TestCase;
 use DembeloMain\Command\InstallCommand;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Encoder\BasePasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 /**
  * Class DefaultControllerTest
  */
-class InstallCommandTest extends KernelTestCase
+class InstallCommandTest extends TestCase
 {
-    private $containerMock;
-    /* @var InstallCommand */
+    /**
+     * @var InstallCommand
+     */
     private $command;
-    /* @var CommandTester */
+
+    /**
+     * @var CommandTester
+     */
     private $commandTester;
 
+    /**
+     * @var UserRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $userRepositoryMock;
+
+    /**
+     * @var PasswordEncoderInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
     private $passwordEncoderMock;
+
+    /**
+     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $mongoMock;
+
+    /**
+     * @var TopicRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $topicRepositoryMock;
+
+    /**
+     * @var TextNodeRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $textnodeRepositoryMock;
+
+    /**
+     * @var LicenseeRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $licenseeRepositoryMock;
+
+    /**
+     * @var string
+     */
+    private $topicDummyImageDirectory = '/tmp/topicDummyImages/';
+
+    /**
+     * @var string
+     */
+    private $topicImageDirectory = '/tmp/topicImages/';
+
+    /**
+     * @var LoremIpsum|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $loremIpsumMock;
 
     /**
      * @return void
      */
     protected function setUp(): void
     {
-        self::bootKernel();
-        $application = new Application(self::$kernel);
-        $application->add(new InstallCommand());
-        $this->command = $application->find('dembelo:install');
+        $this->mongoMock = $this->createMongoMock();
+        $this->topicRepositoryMock = $this->createTopicRepositoryMock();
+        $this->textnodeRepositoryMock = $this->createTextnodeRepositoryMock();
+        $this->licenseeRepositoryMock = $this->createLicenseeRepositoryMock();
+        $this->userRepositoryMock = $this->createUserRepositoryMock();
+        $this->loremIpsumMock = $this->createLoremIpsumMock();
+        $this->passwordEncoderMock = $this->createPasswordEncoderMock();
+
+        $this->command = new InstallCommand(
+            $this->mongoMock,
+            $this->topicRepositoryMock,
+            $this->textnodeRepositoryMock,
+            $this->licenseeRepositoryMock,
+            $this->userRepositoryMock,
+            $this->loremIpsumMock,
+            $this->passwordEncoderMock,
+            $this->topicDummyImageDirectory,
+            $this->topicImageDirectory
+        );
         $this->commandTester = new CommandTester($this->command);
-        $this->containerMock = $this->getContainerMock();
-        $this->command->setContainer($this->containerMock);
     }
 
     /**
@@ -66,13 +128,7 @@ class InstallCommandTest extends KernelTestCase
      */
     public function testRunConfigure(): void
     {
-        $returnValue = $this->commandTester->execute(array(
-            'command' => $this->command->getName(),
-            //'twine-archive-file' => 'somefile_readable_exists.html',
-            //'--licensee-name' => 'somelicensee',
-            //'--metadata-author' => 'someauthor',
-            //'--metadata-publisher' => 'somepublisher',
-        ));
+        $returnValue = $this->commandTester->execute([]);
 
         // the output of the command in the console
         $output = $this->commandTester->getDisplay();
@@ -81,9 +137,9 @@ class InstallCommandTest extends KernelTestCase
     }
 
     /**
-     * @return void
+     * @return UserRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function getUserRepositoryMock()
+    private function createUserRepositoryMock(): UserRepositoryInterface
     {
         $methods = [
             'findOneByEmail',
@@ -95,44 +151,65 @@ class InstallCommandTest extends KernelTestCase
             'findOneBy',
             'getClassName',
         ];
-        $this->userRepositoryMock = $this->getMockBuilder(UserRepositoryInterface::class)->setMethods($methods)->getMock();
+
+        return $this->getMockBuilder(UserRepositoryInterface::class)->setMethods($methods)->getMock();
     }
 
     /**
-     * @return void
+     * @return BasePasswordEncoder|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function getPasswordEncoderMock()
+    private function createPasswordEncoderMock(): BasePasswordEncoder
     {
         $methods = [
             'encodePassword',
             'isPasswordValid',
         ];
-        $this->passwordEncoderMock = $this->getMockBuilder(BasePasswordEncoder::class)->setMethods($methods)->getMock();
+        $mock = $this->getMockBuilder(BasePasswordEncoder::class)->setMethods($methods)->getMock();
 
-        $this->passwordEncoderMock->expects($this->any())
+        $mock->expects($this->any())
             ->method('encodePassword')
             ->willReturn('encodedPassword');
+
+        return $mock;
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function getContainerMock()
+    private function createMongoMock(): ManagerRegistry
     {
-        $this->getUserRepositoryMock();
-        $this->getPasswordEncoderMock();
-        $containerMock = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $containerMock->expects($this->any())
-            ->method('get')
-            ->willReturnCallback(function ($param) {
-                switch ($param) {
-                    case 'app.model_repository_user':
-                        return $this->userRepositoryMock;
-                    case 'security.password_encoder':
-                        return $this->passwordEncoderMock;
-                }
-            });
+        return $this->createMock(ManagerRegistry::class);
+    }
 
-        return $containerMock;
+    /**
+     * @return TopicRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createTopicRepositoryMock(): TopicRepositoryInterface
+    {
+        return $this->createMock(TopicRepositoryInterface::class);
+    }
+
+    /**
+     * @return TextNodeRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createTextnodeRepositoryMock(): TextNodeRepositoryInterface
+    {
+        return $this->createMock(TextNodeRepositoryInterface::class);
+    }
+
+    /**
+     * @return LicenseeRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createLicenseeRepositoryMock(): LicenseeRepositoryInterface
+    {
+        return $this->createMock(LicenseeRepositoryInterface::class);
+    }
+
+    /**
+     * @return LoremIpsum|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createLoremIpsumMock(): LoremIpsum
+    {
+        return $this->createMock(LoremIpsum::class);
     }
 }
