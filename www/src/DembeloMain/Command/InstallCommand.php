@@ -124,7 +124,7 @@ class InstallCommand extends Command
 
     /**
      * @return void
-     * 
+     *
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      */
     protected function configure(): void
