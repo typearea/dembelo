@@ -33,7 +33,7 @@ use DembeloMain\Document\Topic;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Symfony\Component\Console\Input\InputOption;
 use DembeloMain\Document\Readpath;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 /**
  * Class InstallCommand
@@ -91,7 +91,7 @@ class InstallCommand extends Command
     private $userRepository;
 
     /**
-     * @var UserPasswordEncoder
+     * @var PasswordEncoderInterface
      */
     private $passwordEncoder;
 
@@ -104,11 +104,11 @@ class InstallCommand extends Command
      * @param LicenseeRepositoryInterface $licenseeRepository
      * @param UserRepositoryInterface     $userRepository
      * @param LoremIpsum                  $loremIpsum
-     * @param UserPasswordEncoder         $passwordEncoder
+     * @param PasswordEncoderInterface    $passwordEncoder
      * @param string                      $topicDummyImageDirectory
      * @param string                      $topicImageDirectory
      */
-    public function __construct(ManagerRegistry $mongo, TopicRepositoryInterface $topicRepository, TextNodeRepositoryInterface $textNodeRepository, LicenseeRepositoryInterface $licenseeRepository, UserRepositoryInterface $userRepository, LoremIpsum $loremIpsum, UserPasswordEncoder $passwordEncoder, string $topicDummyImageDirectory, string $topicImageDirectory)
+    public function __construct(ManagerRegistry $mongo, TopicRepositoryInterface $topicRepository, TextNodeRepositoryInterface $textNodeRepository, LicenseeRepositoryInterface $licenseeRepository, UserRepositoryInterface $userRepository, LoremIpsum $loremIpsum, PasswordEncoderInterface $passwordEncoder, string $topicDummyImageDirectory, string $topicImageDirectory)
     {
         $this->mongo = $mongo;
         $this->topicImageDirectory = $topicImageDirectory;
@@ -124,6 +124,7 @@ class InstallCommand extends Command
 
     /**
      * @return void
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      */
     protected function configure(): void
     {
