@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
-namespace AdminBundle\Model;
+namespace AdminBundle\Service\TwineImport;
 
 use AdminBundle\Service\TwineImport\FileCheck;
 use AdminBundle\Service\TwineImport\FileExtractor;

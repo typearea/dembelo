@@ -18,7 +18,7 @@
  */
 namespace AdminBundle\Command;
 
-use AdminBundle\Model\ImportTwine;
+use AdminBundle\Service\TwineImport\ImportTwine;
 use DembeloMain\Document\Importfile;
 use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
 use DembeloMain\Model\Repository\LicenseeRepositoryInterface;

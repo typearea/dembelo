@@ -18,7 +18,7 @@
  */
 namespace AdminBundle\Controller;
 
-use AdminBundle\Model\ImportTwine;
+use AdminBundle\Service\TwineImport\ImportTwine;
 use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use InvalidArgumentException;

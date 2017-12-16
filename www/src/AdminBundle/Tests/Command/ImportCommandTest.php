@@ -45,7 +45,7 @@ function file_exists($filename)
 
 namespace AdminBundle\Tests\Command;
 
-use AdminBundle\Model\ImportTwine;
+use AdminBundle\Service\TwineImport\ImportTwine;
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Licensee;
 use DembeloMain\Document\Topic;

@@ -18,9 +18,9 @@
  */
 
 // @codingStandardsIgnoreStart
-namespace AdminBundle\Model;
+namespace AdminBundle\Service\TwineImport;
 
-use AdminBundle\Tests\Model\ImportTwineTest;
+use AdminBundle\Tests\Service\TwineImport\ImportTwineTest;
 
 /**
  * mock function
@@ -75,9 +75,9 @@ function xml_parser_free($parser)
     \xml_parser_free($parser);
 }
 
-namespace AdminBundle\Tests\Model;
+namespace AdminBundle\Tests\Service\TwineImport;
 
-use AdminBundle\Model\ImportTwine;
+use AdminBundle\Service\TwineImport\ImportTwine;
 use AdminBundle\Service\TwineImport\FileCheck;
 use AdminBundle\Service\TwineImport\FileExtractor;
 use AdminBundle\Service\TwineImport\ParserContext;
