@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "93a43f6e3651e618d650408c53998b32",
+    "content-hash": "b9059247e20dd2528fc013b8cb962f18",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -68,6 +68,55 @@
                 "mongodb"
             ],
             "time": "2016-10-07T05:18:57+00:00"
+        },
+        {
+            "name": "apoutchika/loremipsum-bundle",
+            "version": "dev-master",
+            "target-dir": "Apoutchika/LoremIpsumBundle",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/apoutchika/LoremIpsumBundle.git",
+                "reference": "d02771d1710dd78eccf0d7b12b9e8488bea3d891"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/apoutchika/LoremIpsumBundle/zipball/d02771d1710dd78eccf0d7b12b9e8488bea3d891",
+                "reference": "d02771d1710dd78eccf0d7b12b9e8488bea3d891",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2",
+                "symfony/framework-bundle": ">=2.0"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Apoutchika\\LoremIpsumBundle": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Julien Philippon",
+                    "email": "contact@julienphilippon.fr"
+                }
+            ],
+            "description": "Generate paragraphs, sentences and words for your development.",
+            "keywords": [
+                "data",
+                "fixtures",
+                "ipsum",
+                "lorem"
+            ],
+            "time": "2014-10-05 19:11:51"
         },
         {
             "name": "composer/ca-bundle",
@@ -1195,6 +1244,51 @@
                 "validator"
             ],
             "time": "2017-11-15T23:40:40+00:00"
+        },
+        {
+            "name": "erusev/parsedown",
+            "version": "1.6.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/erusev/parsedown.git",
+                "reference": "fbe3fe878f4fe69048bb8a52783a09802004f548"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/erusev/parsedown/zipball/fbe3fe878f4fe69048bb8a52783a09802004f548",
+                "reference": "fbe3fe878f4fe69048bb8a52783a09802004f548",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Parsedown": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Emanuil Rusev",
+                    "email": "hello@erusev.com",
+                    "homepage": "http://erusev.com"
+                }
+            ],
+            "description": "Parser for Markdown.",
+            "homepage": "http://parsedown.org",
+            "keywords": [
+                "markdown",
+                "parser"
+            ],
+            "time": "2017-11-14T20:44:03+00:00"
         },
         {
             "name": "etdsolutions/domready",
@@ -3061,55 +3155,6 @@
         }
     ],
     "packages-dev": [
-        {
-            "name": "apoutchika/loremipsum-bundle",
-            "version": "dev-master",
-            "target-dir": "Apoutchika/LoremIpsumBundle",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/apoutchika/LoremIpsumBundle.git",
-                "reference": "d02771d1710dd78eccf0d7b12b9e8488bea3d891"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/apoutchika/LoremIpsumBundle/zipball/d02771d1710dd78eccf0d7b12b9e8488bea3d891",
-                "reference": "d02771d1710dd78eccf0d7b12b9e8488bea3d891",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.2",
-                "symfony/framework-bundle": ">=2.0"
-            },
-            "type": "symfony-bundle",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Apoutchika\\LoremIpsumBundle": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Julien Philippon",
-                    "email": "contact@julienphilippon.fr"
-                }
-            ],
-            "description": "Generate paragraphs, sentences and words for your development.",
-            "keywords": [
-                "data",
-                "fixtures",
-                "ipsum",
-                "lorem"
-            ],
-            "time": "2014-10-05 19:11:51"
-        },
         {
             "name": "escapestudios/symfony2-coding-standard",
             "version": "3.0.1",
