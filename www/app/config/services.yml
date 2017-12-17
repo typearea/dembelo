@@ -5,13 +5,14 @@ parameters:
 
 services:
     admin.import.twine:
-        class: AdminBundle\Model\ImportTwine
+        class: AdminBundle\Service\TwineImport\ImportTwine
         arguments:
             - "@app.twineImport.fileextractor"
             - "@app.twineImport.filecheck"
             - "@app.twineImport.storyDataParser"
             - "@app.twineImport.passageDataParser"
             - "@app.twineImport.parserContext"
+            - DembeloMain\Service\FileHandler
 
     # @todo remove dependency from service container
     app.feature_toggle:

@@ -18,12 +18,8 @@
  */
 namespace AdminBundle\Service\TwineImport;
 
-use AdminBundle\Service\TwineImport\FileCheck;
-use AdminBundle\Service\TwineImport\FileExtractor;
-use AdminBundle\Service\TwineImport\ParserContext;
-use AdminBundle\Service\TwineImport\PassageDataParser;
-use AdminBundle\Service\TwineImport\StoryDataParser;
 use DembeloMain\Document\Importfile;
+use DembeloMain\Service\FileHandler;
 
 /**
  * Class ImportTwine
@@ -61,20 +57,27 @@ class ImportTwine
     private $parserContext;
 
     /**
-     * ImportTwine constructor.
-     * @param FileExtractor     $fileExtractor
-     * @param FileCheck         $fileCheck
-     * @param StoryDataParser   $storyDataParser
-     * @param PassageDataParser $passageDataParser
-     * @param ParserContext     $parserContext
+     * @var FileHandler
      */
-    public function __construct(FileExtractor $fileExtractor, FileCheck $fileCheck, StoryDataParser $storyDataParser, PassageDataParser $passageDataParser, ParserContext $parserContext)
+    private $fileHandler;
+
+    /**
+     * ImportTwine constructor.
+     * @param FileExtractor $fileExtractor
+     * @param FileCheck $fileCheck
+     * @param StoryDataParser $storyDataParser
+     * @param PassageDataParser $passageDataParser
+     * @param ParserContext $parserContext
+     * @param FileHandler $fileHandler
+     */
+    public function __construct(FileExtractor $fileExtractor, FileCheck $fileCheck, StoryDataParser $storyDataParser, PassageDataParser $passageDataParser, ParserContext $parserContext, FileHandler $fileHandler)
     {
         $this->fileExtractor = $fileExtractor;
         $this->fileCheck = $fileCheck;
         $this->storyDataParser = $storyDataParser;
         $this->passageDataParser = $passageDataParser;
         $this->parserContext = $parserContext;
+        $this->fileHandler = $fileHandler;
     }
 
     /**
@@ -94,11 +97,7 @@ class ImportTwine
 
         $filenameExtracted = $this->fileExtractor->extract($this->parserContext->getFilename());
 
-        $fileHandler = fopen($filenameExtracted, 'rb');
-
-        if (false === $fileHandler) {
-            throw new \Exception(sprintf('Couldn\'t open file \'%s\'', $this->parserContext->getFilename()));
-        }
+        $fileHandler = $this->fileHandler->open($filenameExtracted, 'rb');
 
         $this->xmlParser = xml_parser_create('UTF-8');
 
@@ -126,12 +125,12 @@ class ImportTwine
     {
         xml_parser_set_option($this->xmlParser, XML_OPTION_CASE_FOLDING, 0);
 
-        if (xml_set_element_handler($this->xmlParser, array($this, "startElement"), array($this, "endElement")) !== true) {
-            throw new \Exception("Couldn't register start/end event handlers for the XML parser.");
+        if (xml_set_element_handler($this->xmlParser, [$this, 'startElement'], [$this, 'endElement']) !== true) {
+            throw new \Exception('Couldn\'t register start/end event handlers for the XML parser.');
         }
 
-        if (xml_set_character_data_handler($this->xmlParser, array($this, "characterData")) !== true) {
-            throw new \Exception("Couldn't register character data event handler for the XML parser.");
+        if (xml_set_character_data_handler($this->xmlParser, [$this, 'characterData']) !== true) {
+            throw new \Exception('Couldn\'t register character data event handler for the XML parser.');
         }
     }
 
@@ -144,7 +143,7 @@ class ImportTwine
             $errorCode = xml_get_error_code($this->xmlParser);
             $errorDescription = xml_error_string($errorCode);
 
-            throw new \Exception(sprintf("Error #%d: '%s' occurred while the envelope head for the Twine archive was parsed.", $errorCode, $errorDescription));
+            throw new \Exception(sprintf('Error #%d: \'%s\' occurred while the envelope head for the Twine archive was parsed.', $errorCode, $errorDescription));
         }
     }
 
@@ -157,18 +156,18 @@ class ImportTwine
             $errorCode = xml_get_error_code($this->xmlParser);
             $errorDescription = xml_error_string($errorCode);
 
-            throw new \Exception(sprintd("Error #%d: '%s' occurred while the envelope foot for the Twine archive was parsed.", $errorCode, $errorDescription));
+            throw new \Exception(sprintf("Error #%d: '%s' occurred while the envelope foot for the Twine archive was parsed.", $errorCode, $errorDescription));
         }
     }
 
     /**
-     * @param resource $fileHandler
+     * @param FileHandler $fileHandler
      *
      * @return bool
      *
      * @throws \Exception
      */
-    private function initParser($fileHandler): bool
+    private function initParser(FileHandler $fileHandler): bool
     {
         $this->setXmlHandler();
 
@@ -178,26 +177,26 @@ class ImportTwine
             if (!$this->parseLine($fileHandler)) {
                 break;
             }
-        } while (feof($fileHandler) === false);
+        } while ($fileHandler->eof() === false);
 
         $this->parseEnvelopeFooter();
 
         $this->parserFree();
 
         // PHP 5.4 compatibility: there's no 'finally' yet.
-        return !(fclose($fileHandler) === false);
+        return $fileHandler->close() !== false;
     }
 
     /**
-     * @param resource $fileHandler
+     * @param FileHandler $fileHandler
      *
      * @return bool
      *
      * @throws \Exception
      */
-    private function parseLine($fileHandler): bool
+    private function parseLine(FileHandler $fileHandler): bool
     {
-        $buffer = fread($fileHandler, 4096);
+        $buffer = $fileHandler->read(4096);
 
         if (false === $buffer) {
             return false;
@@ -220,7 +219,7 @@ class ImportTwine
         $errorColumnNumber = xml_get_current_column_number($this->xmlParser);
         $errorByteIndex = xml_get_current_byte_index($this->xmlParser);
 
-        throw new \Exception(sprintf("Error #%s: '%s' occurred while parsing the Twine archive file '%s' in line %d, character %d (at byte index %d).", $errorCode, $errorDescription, $this->parserContext->getFilename(), $errorRowNumber, $errorColumnNumber, $errorByteIndex));
+        throw new \Exception(sprintf('Error #%s: \'%s\' occurred while parsing the Twine archive file \'%s\' in line %d, character %d (at byte index %d).', $errorCode, $errorDescription, $this->parserContext->getFilename(), $errorRowNumber, $errorColumnNumber, $errorByteIndex));
     }
 
     /**

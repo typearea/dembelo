@@ -45,7 +45,7 @@ class FileHandlerTest extends TestCase
     public function setUp(): void
     {
         $this->fileHandler = new FileHandler();
-        $this->tmpFileName = tempnam('/tmp/phpunit', 'fileHandlerTest');
+        $this->tmpFileName = @tempnam('/tmp/phpunit', 'fileHandlerTest');
     }
 
     /**
@@ -100,23 +100,24 @@ class FileHandlerTest extends TestCase
     /**
      * @return void
      */
-    public function xtestEofOnEmptyFile(): void
+    public function testEofOnEmptyFile(): void
     {
         touch($this->tmpFileName);
         $fileHandler = $this->fileHandler->open($this->tmpFileName, 'r');
+        $fileHandler->read(1);
         self::assertTrue($fileHandler->eof());
     }
 
     /**
      * @return void
      */
-    public function xtestEofForNotEmptyFile(): void
+    public function testEofForNotEmptyFile(): void
     {
         file_put_contents($this->tmpFileName, 'one');
         $fileHandler = $this->fileHandler->open($this->tmpFileName, 'r');
-        $fileHandler->seek(2);
+        $fileHandler->read(2);
         self::assertFalse($fileHandler->eof());
-        $fileHandler->seek(3);
+        $fileHandler->read(2);
         self::assertTrue($fileHandler->eof());
     }
 
