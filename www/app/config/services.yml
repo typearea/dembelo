@@ -12,7 +12,7 @@ services:
             - "@app.twineImport.storyDataParser"
             - "@app.twineImport.passageDataParser"
             - "@app.twineImport.parserContext"
-            - DembeloMain\Service\FileHandler
+            - "@app.filehandler"
 
     # @todo remove dependency from service container
     app.feature_toggle:
@@ -164,6 +164,7 @@ services:
         arguments:
             - "@app.twineImport.hitchparser"
             - "@app.model_repository_textnode"
+            - "@parsedown"
 
     app.twineImport.passageDataParser:
         class: AdminBundle\Service\TwineImport\PassageDataParser
@@ -195,3 +196,9 @@ services:
             - "@app.model_repository_importfile"
         tags:
             - { name: 'console.command', command: 'dembelo:import' }
+
+    app.filehandler:
+        class: DembeloMain\Service\FileHandler
+
+    parsedown:
+        class: Parsedown

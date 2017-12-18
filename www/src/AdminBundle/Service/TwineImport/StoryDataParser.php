@@ -20,6 +20,7 @@ namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use Parsedown;
 
 /**
  * Class StoryDataParser
@@ -42,14 +43,20 @@ class StoryDataParser
     private $textnodeRepository;
 
     /**
+     * @var Parsedown
+     */
+    private $markupParser;
+
+    /**
      * StoryDataParser constructor.
      * @param HitchParser                 $hitchParser
      * @param TextNodeRepositoryInterface $textnodeRepository
      */
-    public function __construct(HitchParser $hitchParser, TextNodeRepositoryInterface $textnodeRepository)
+    public function __construct(HitchParser $hitchParser, TextNodeRepositoryInterface $textnodeRepository, Parsedown $markupParser)
     {
         $this->hitchParser = $hitchParser;
         $this->textnodeRepository = $textnodeRepository;
+        $this->markupParser = $markupParser;
     }
 
     /**
@@ -91,7 +98,7 @@ class StoryDataParser
     public function endElement(string $name): void
     {
         foreach ($this->parserContext->getTextnodeMapping() as $dembeloId) {
-            $this->endElementForOneTextnode($name, $dembeloId);
+            $this->finalizeTextnode($name, $dembeloId);
         }
 
         $this->textnodeRepository->disableOrphanedNodes($this->parserContext->getImportfile(), array_values($this->parserContext->getTextnodeMapping()));
@@ -110,7 +117,7 @@ class StoryDataParser
      *
      * @throws \Exception
      */
-    private function endElementForOneTextnode(string $name, string $dembeloId): void
+    private function finalizeTextnode(string $name, string $dembeloId): void
     {
         $textnode = $this->textnodeRepository->find($dembeloId);
 
@@ -118,8 +125,7 @@ class StoryDataParser
             throw new \Exception(sprintf('The Dembelo Textnode with Id \'%s\' doesn\'t exist, but should by now.', $dembeloId));
         }
 
-        $textnodeText = $textnode->getText();
-        $textnodeTextNew = $this->parseText($textnode, $textnodeText, $name);
+        $textnodeTextNew = $this->parseText($textnode, $name);
 
         if (null !== $textnodeTextNew) {
             $textnodeTextNew = $this->convertToPTags($textnodeTextNew);
@@ -185,13 +191,13 @@ class StoryDataParser
 
     /**
      * @param Textnode $textnode
-     * @param string   $text
      * @param string   $name
      *
      * @return null|string
      */
-    private function parseText(Textnode $textnode, string $text, string $name): ?string
+    private function parseText(Textnode $textnode, string $name): ?string
     {
+        $text = $this->markupParser->parse($textnode->getText());
         $textnodeTextNew = preg_replace_callback(
             '/\[\[(.*?)\]\]/',
             function ($matches) use ($textnode, $name) {

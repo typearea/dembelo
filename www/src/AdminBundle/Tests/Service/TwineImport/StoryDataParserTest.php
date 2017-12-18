@@ -43,13 +43,20 @@ class StoryDataParserTest extends TestCase
     private $parser;
 
     /**
+     * @var \Parsedown
+     */
+    private $parsedownMock;
+
+    /**
      * @return void
      */
     public function setUp(): void
     {
         $this->hitchParserMock = $this->createMock(HitchParser::class);
         $this->textnodeRepositoryMock = $this->createMock(TextNodeRepositoryInterface::class);
-        $this->parser = new StoryDataParser($this->hitchParserMock, $this->textnodeRepositoryMock);
+        $this->parsedownMock = $this->createMock(\Parsedown::class);
+        $this->parsedownMock->method('parse')->willReturnArgument(0);
+        $this->parser = new StoryDataParser($this->hitchParserMock, $this->textnodeRepositoryMock, $this->parsedownMock);
     }
 
     /**
