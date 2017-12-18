@@ -18,6 +18,7 @@
  */
 namespace AdminBundle\Service\TwineImport;
 
+use DembeloMain\Service\FileHandler;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -26,102 +27,109 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class FileCheckTest extends WebTestCase
 {
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|FileHandler
+     */
+    private $fileHandlerMock;
+
+    /**
      * @return void
+     */
+    public function setUp(): void
+    {
+        $this->fileHandlerMock = $this->createMock(FileHandler::class);
+    }
+
+    /**
+     * @return void php
+     *
+     * @throws \Exception
      */
     public function testCheck(): void
     {
-        $tmpName = @tempnam('/tmp/phpunit', 'filecheck');
-        $fileHandler = fopen($tmpName, 'r+');
-        fwrite($fileHandler, '<tw-storydata hurz');
-        fseek($fileHandler, 0);
+        $this->fileHandlerMock->method('read')
+            ->willReturn('<tw-storydata hurz');
 
         $fileCheck = new FileCheck();
-        $returnValue = $fileCheck->check($fileHandler, 'someFileName');
+        $returnValue = $fileCheck->check($this->fileHandlerMock, 'someFileName');
         self::assertTrue($returnValue);
-        unlink($tmpName);
     }
 
     /**
      * @return void
+     *
+     * @throws \Exception
      */
     public function testCheckWithLeadingEmptySpaces(): void
     {
-        $tmpName = @tempnam('/tmp/phpunit', 'filecheck');
-        $fileHandler = fopen($tmpName, 'r+');
-        fwrite($fileHandler, '  '."\n".'<tw-storydata hurz');
-        fseek($fileHandler, 0);
+        $this->fileHandlerMock->method('read')
+            ->willReturn('  '."\n".'<tw-storydata hurz');
 
         $fileCheck = new FileCheck();
-        $returnValue = $fileCheck->check($fileHandler, 'someFileName');
+        $returnValue = $fileCheck->check($this->fileHandlerMock, 'someFileName');
         self::assertTrue($returnValue);
-        unlink($tmpName);
     }
 
     /**
      * @return void
      *
      * @expectedException \Exception
+     *
+     * @throws \Exception
      */
     public function testCheckWithTooShortPeekData(): void
     {
-        $tmpName = @tempnam('/tmp/phpunit', 'filecheck');
-        $fileHandler = fopen($tmpName, 'r+');
-        fwrite($fileHandler, '<tw-storyda');
-        fseek($fileHandler, 0);
+        $this->fileHandlerMock->method('read')
+            ->willReturn('<tw-storyda');
 
         $fileCheck = new FileCheck();
-        $fileCheck->check($fileHandler, 'someFileName');
-        unlink($tmpName);
+        $fileCheck->check($this->fileHandlerMock, 'someFileName');
     }
 
     /**
      * @return void
      *
      * @expectedException \Exception
+     *
+     * @throws \Exception
      */
     public function testCheckWithWrongPeekData(): void
     {
-        $tmpName = @tempnam('/tmp/phpunit', 'filecheck');
-        $fileHandler = fopen($tmpName, 'r+');
-        fwrite($fileHandler, '<tw-storrydata ');
-        fseek($fileHandler, 0);
+        $this->fileHandlerMock->method('read')
+            ->willReturn('<tw-storrydata ');
 
         $fileCheck = new FileCheck();
-        $fileCheck->check($fileHandler, 'someFileName');
-        unlink($tmpName);
+        $fileCheck->check($this->fileHandlerMock, 'someFileName');
     }
 
     /**
      * @return void
      *
      * @expectedException \Exception
+     *
+     * @throws \Exception
      */
     public function testCheckWithEmptyPeekData(): void
     {
-        $tmpName = @tempnam('/tmp/phpunit', 'filecheck');
-        $fileHandler = fopen($tmpName, 'r+');
-        fseek($fileHandler, 0);
+        $this->fileHandlerMock->method('read')
+            ->willReturn('');
 
         $fileCheck = new FileCheck();
-        $fileCheck->check($fileHandler, 'someFileName');
-        unlink($tmpName);
+        $fileCheck->check($this->fileHandlerMock, 'someFileName');
     }
 
     /**
      * @return void
      *
      * @expectedException \Exception
+     *
+     * @throws \Exception
      */
     public function testCheckWithOnlyWhitespacePeekData(): void
     {
-        $tmpName = @tempnam('/tmp/phpunit', 'filecheck');
-        $fileHandler = fopen($tmpName, 'r+');
-        fwrite($fileHandler, ' ');
-
-        fseek($fileHandler, 0);
+        $this->fileHandlerMock->method('read')
+            ->willReturn(' ');
 
         $fileCheck = new FileCheck();
-        $fileCheck->check($fileHandler, 'someFileName');
-        unlink($tmpName);
+        $fileCheck->check($this->fileHandlerMock, 'someFileName');
     }
 }

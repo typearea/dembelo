@@ -16,68 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License 3
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
+namespace AdminBundle\Tests\Service\TwineImport;
 
-// @codingStandardsIgnoreStart
-namespace AdminBundle\Model;
-
-use AdminBundle\Tests\Model\ImportTwineTest;
-
-/**
- * mock function
- *
- * @param string $filename
- * @return bool
- */
-function fopen($filename)
-{
-    return strpos($filename, 'readable') !== false;
-}
-
-/**
- * mock function
- */
-function fclose(): bool
-{
-    return ImportTwineTest::$fcloseReturnValue;
-}
-
-/**
- * mock function
- *
- * @return bool|mixed
- */
-function fread()
-{
-    if (empty(ImportTwineTest::$freadStack)) {
-        return false;
-    }
-
-    return array_shift(ImportTwineTest::$freadStack);
-}
-
-/**
- * mock function
- *
- * @return bool
- */
-function feof()
-{
-    return empty(ImportTwineTest::$freadStack);
-}
-
-/**
- * @param Resource $parser
- * @return void
- */
-function xml_parser_free($parser)
-{
-    ImportTwineTest::$parserFreeCalled = true;
-    \xml_parser_free($parser);
-}
-
-namespace AdminBundle\Tests\Model;
-
-use AdminBundle\Model\ImportTwine;
+use AdminBundle\Service\TwineImport\ImportTwine;
 use AdminBundle\Service\TwineImport\FileCheck;
 use AdminBundle\Service\TwineImport\FileExtractor;
 use AdminBundle\Service\TwineImport\ParserContext;
@@ -85,20 +26,15 @@ use AdminBundle\Service\TwineImport\PassageDataParser;
 use AdminBundle\Service\TwineImport\StoryDataParser;
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
+use DembeloMain\Service\FileHandler;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
-// @codingStandardsIgnoreEnd
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
  * Class ImportTwineTest
  */
 class ImportTwineTest extends WebTestCase
 {
-
-    public static $freadStack = [];
-    public static $parserFreeCalled = false;
-    public static $fcloseReturnValue = true;
-
     /**
      * @var ImportTwine
      */
@@ -130,45 +66,30 @@ class ImportTwineTest extends WebTestCase
     private $parserContextMock;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|FileHandler
+     */
+    private $fileHandlerMock;
+
+    /**
      * resets some variables
      */
     public function setUp()
     {
-        self::$freadStack = [];
-        self::$parserFreeCalled = false;
-        self::$fcloseReturnValue = true;
-
         $this->fileExtractorMock = $this->createFileExtractorMock();
         $this->fileCheckMock = $this->createFileCheckMock();
         $this->storyDataParserMock = $this->createStoryDataParserMock();
         $this->passageDataParserMock = $this->createPassageDataParserMock();
         $this->parserContextMock = $this->createParserContextMock();
+        $this->fileHandlerMock = $this->createFileHandlerMock();
 
         $this->importTwine = new ImportTwine(
             $this->fileExtractorMock,
             $this->fileCheckMock,
             $this->storyDataParserMock,
             $this->passageDataParserMock,
-            $this->parserContextMock
+            $this->parserContextMock,
+            $this->fileHandlerMock
         );
-    }
-
-    /**
-     * @return void
-     *
-     * @expectedException \Exception
-     *
-     * @expectedExceptionMessage Couldn't open file 'someFilename'
-     */
-    public function testRunThrowsExceptionWhenFopenFails(): void
-    {
-        $importFileMock = $this->createImportFileMock();
-
-        $this->fileExtractorMock->expects(self::once())
-            ->method('extract')
-            ->willReturn('someInvalidfilename');
-
-        $this->importTwine->run($importFileMock);
     }
 
     /**
@@ -184,12 +105,25 @@ class ImportTwineTest extends WebTestCase
             'attr3' => 'val3',
             'attr4' => 'val4',
         ];
-        self::$freadStack = [
-            '<tw-storydata attr1="val1" attr2="val2">',
-            '<tw-passagedata attr3="val3" attr4="val4">',
-            '</tw-passagedata>',
-            '</tw-storydata>',
-        ];
+        $this->fileHandlerMock->expects(self::once())
+            ->method('open')
+            ->willReturnSelf();
+        $this->fileHandlerMock->expects(self::any())
+            ->method('read')
+            ->willReturnOnConsecutiveCalls(
+                '<tw-storydata attr1="val1" attr2="val2">',
+                '<tw-passagedata attr3="val3" attr4="val4">',
+                '</tw-passagedata>',
+                '</tw-storydata>'
+            );
+        $this->fileHandlerMock->expects(self::any())
+            ->method('eof')
+            ->willReturnOnConsecutiveCalls(
+                false,
+                false,
+                false,
+                true
+            );
         $importFileMock = $this->createImportFileMock();
 
         $textnodeMock = $this->createTextnodeMock();
@@ -281,5 +215,13 @@ class ImportTwineTest extends WebTestCase
     private function createTextnodeMock(): Textnode
     {
         return $this->createMock(Textnode::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|FileHandler
+     */
+    private function createFileHandlerMock(): FileHandler
+    {
+        return $this->createMock(FileHandler::class);
     }
 }

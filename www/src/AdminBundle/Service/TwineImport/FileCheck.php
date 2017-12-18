@@ -19,6 +19,8 @@
 
 namespace AdminBundle\Service\TwineImport;
 
+use DembeloMain\Service\FileHandler;
+
 /**
  * Class FileCheck
  */
@@ -30,18 +32,18 @@ class FileCheck
     private const OPENING_STRING = '<tw-storydata ';
 
     /**
-     * @param resource $fileHandler
-     * @param string   $filename
+     * @param FileHandler $fileHandler
+     * @param string      $filename
      *
      * @return bool
      *
      * @throws \Exception
      */
-    public function check($fileHandler, string $filename): bool
+    public function check(FileHandler $fileHandler, string $filename): bool
     {
         $magicStringLength = strlen(self::OPENING_STRING);
 
-        $peekData = fread($fileHandler, 1024);
+        $peekData = $fileHandler->read(1024);
 
         if (false === $peekData) {
             throw new \Exception(sprintf("Failed to read data from file '%s'.", $filename));
@@ -70,7 +72,7 @@ class FileCheck
                 throw new \Exception(sprintf("File '%s' isn't a Twine archive file.", $filename));
             }
 
-            if (fseek($fileHandler, 0) !== 0) {
+            if ($fileHandler->seek(0) !== 0) {
                 throw new \Exception(sprintf("Couldn't reset reading position after the magic string in the Twine archive file '%s' was checked.", $filename));
             }
 
