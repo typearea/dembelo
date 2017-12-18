@@ -18,6 +18,7 @@
  */
 
 namespace AdminBundle\Service\TwineImport;
+
 use DembeloMain\Service\FileHandler;
 
 /**
@@ -32,7 +33,7 @@ class FileCheck
 
     /**
      * @param FileHandler $fileHandler
-     * @param string   $filename
+     * @param string      $filename
      *
      * @return bool
      *

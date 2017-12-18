@@ -18,11 +18,11 @@
  */
 
 namespace DembeloMain\Service;
+
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
  * Class FileHandler
- * @package DembeloMain\Service
  */
 class FileHandler
 {
@@ -105,6 +105,7 @@ class FileHandler
         if (null === $length) {
             $length = mb_strlen($string);
         }
+
         return fwrite($this->resource, $string, $length);
     }
 

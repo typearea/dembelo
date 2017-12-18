@@ -51,6 +51,7 @@ class StoryDataParser
      * StoryDataParser constructor.
      * @param HitchParser                 $hitchParser
      * @param TextNodeRepositoryInterface $textnodeRepository
+     * @param Parsedown                   $markupParser
      */
     public function __construct(HitchParser $hitchParser, TextNodeRepositoryInterface $textnodeRepository, Parsedown $markupParser)
     {

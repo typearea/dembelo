@@ -119,7 +119,10 @@ class ImportTwineTest extends WebTestCase
         $this->fileHandlerMock->expects(self::any())
             ->method('eof')
             ->willReturnOnConsecutiveCalls(
-                false, false, false, true
+                false,
+                false,
+                false,
+                true
             );
         $importFileMock = $this->createImportFileMock();
 

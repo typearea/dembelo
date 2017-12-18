@@ -25,7 +25,6 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
  * Class FileHandlerTest
- * @package DembeloMain\Tests\Service
  */
 class FileHandlerTest extends TestCase
 {
@@ -132,7 +131,6 @@ class FileHandlerTest extends TestCase
         self::assertEquals('two', $fileHandler->read(3));
         self::assertEquals('three', $fileHandler->read(6));
         self::assertEquals('', $fileHandler->read(1));
-
     }
 
     /**

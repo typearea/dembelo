@@ -63,12 +63,12 @@ class ImportTwine
 
     /**
      * ImportTwine constructor.
-     * @param FileExtractor $fileExtractor
-     * @param FileCheck $fileCheck
-     * @param StoryDataParser $storyDataParser
+     * @param FileExtractor     $fileExtractor
+     * @param FileCheck         $fileCheck
+     * @param StoryDataParser   $storyDataParser
      * @param PassageDataParser $passageDataParser
-     * @param ParserContext $parserContext
-     * @param FileHandler $fileHandler
+     * @param ParserContext     $parserContext
+     * @param FileHandler       $fileHandler
      */
     public function __construct(FileExtractor $fileExtractor, FileCheck $fileCheck, StoryDataParser $storyDataParser, PassageDataParser $passageDataParser, ParserContext $parserContext, FileHandler $fileHandler)
     {
