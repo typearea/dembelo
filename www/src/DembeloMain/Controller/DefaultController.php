@@ -131,7 +131,7 @@ class DefaultController extends Controller
      *
      * @throws NotFoundHttpException
      */
-    public function readTopicAction($topicId)
+    public function readTopicAction($topicId): RedirectResponse
     {
         if ($this->featureToggle->hasFeature('login_needed') && !$this->authorizationChecker->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('login_route');
@@ -161,9 +161,11 @@ class DefaultController extends Controller
      *
      * @param string $textnodeArbitraryId Textnode arbitrary ID from URL
      *
-     * @return string
+     * @return Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function readTextnodeAction($textnodeArbitraryId)
+    public function readTextnodeAction($textnodeArbitraryId): Response
     {
         if ($this->featureToggle->hasFeature('login_needed') && !$this->authorizationChecker->isGranted('ROLE_USER')) {
             return $this->redirectToRoute('login_route');
@@ -220,9 +222,9 @@ class DefaultController extends Controller
      * @param string $textnodeId Textnode ID from URL
      * @param string $hitchIndex hitch index
      *
-     * @return string
+     * @return Response
      */
-    public function paywallAction($textnodeId, $hitchIndex)
+    public function paywallAction($textnodeId, $hitchIndex): Response
     {
         $hitchedTextnode = $this->getTextnodeForHitchIndex($textnodeId, $hitchIndex);
 
@@ -240,7 +242,7 @@ class DefaultController extends Controller
      *
      * @return RedirectResponse
      */
-    public function backAction()
+    public function backAction(): RedirectResponse
     {
         if (!$this->readpathUndoService->undo()) {
             $user = $this->getUser();
@@ -263,9 +265,9 @@ class DefaultController extends Controller
     /**
      * @Route("/imprint", name="imprint")
      *
-     * @return string
+     * @return Response
      */
-    public function imprintAction()
+    public function imprintAction(): Response
     {
         return $this->templating->renderResponse('DembeloMain::default/imprint.html.twig');
     }
@@ -293,7 +295,7 @@ class DefaultController extends Controller
             return null;
         }
 
-        if (!is_object($user = $token->getUser())) {
+        if (!\is_object($user = $token->getUser())) {
             // e.g. anonymous authentication
             return null;
         }
@@ -306,6 +308,8 @@ class DefaultController extends Controller
      * @param int    $hitchIndex
      *
      * @return Textnode|null
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     private function getTextnodeForHitchIndex($textnodeId, $hitchIndex): ?Textnode
     {
@@ -327,6 +331,6 @@ class DefaultController extends Controller
      */
     private function getTextnodeForTextnodeId($textnodeId): ?Textnode
     {
-        return  $this->textnodeRepository->findOneActiveById($textnodeId);
+        return $this->textnodeRepository->findOneActiveById($textnodeId);
     }
 }

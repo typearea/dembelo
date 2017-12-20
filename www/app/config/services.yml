@@ -42,8 +42,6 @@ services:
             - "@app.readpath"
             - "@app.favoriteManager"
             - "@app.readpathUndoService"
-        class:
-            - [setContainer, ["@service_container"]]
 
     app.admin_controller_default:
         class: AdminBundle\Controller\DefaultController

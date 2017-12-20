@@ -39,6 +39,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use DembeloMain\Controller\DefaultController;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -286,12 +287,13 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testImprintAction(): void
     {
+        $responseMock = $this->createMock(Response::class);
         $this->templatingMock->expects(self::once())
             ->method('renderResponse')
             ->with('DembeloMain::default/imprint.html.twig')
-            ->willReturn('responseString');
+            ->willReturn($responseMock);
         $result = $this->controller->imprintAction();
-        self::assertSame('responseString', $result);
+        self::assertSame($responseMock, $result);
     }
 
     /**
@@ -435,6 +437,8 @@ class DefaultControllerTest extends WebTestCase
             'status' => Textnode::HITCH_STATUS_ACTIVE,
         ]);
 
+        $responseMock = $this->createMock(Response::class);
+
         $this->featureToggleMock->expects(self::once())
             ->method('hasFeature')
             ->willReturn(false);
@@ -453,12 +457,14 @@ class DefaultControllerTest extends WebTestCase
                     'textnode' => $textnode,
                     'hitches' => [],
                 ]
-            );
+            )
+            ->willReturn($responseMock);
         $this->readpathUndoServiceMock->expects(self::once())
             ->method('add')
             ->with($textnodeId);
 
-        $this->controller->readTextnodeAction($textnodeArbitraryId);
+        $returnValue = $this->controller->readTextnodeAction($textnodeArbitraryId);
+        self::assertSame($responseMock, $returnValue);
     }
 
     /**
