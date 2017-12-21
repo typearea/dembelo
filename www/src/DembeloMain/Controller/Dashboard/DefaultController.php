@@ -30,6 +30,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 /**
  * Class DefaultController
+ * @Route(service="app.controller_dashboard")
  */
 class DefaultController extends Controller
 {
