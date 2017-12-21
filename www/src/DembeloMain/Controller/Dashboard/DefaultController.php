@@ -19,13 +19,14 @@
 
 namespace DembeloMain\Controller\Dashboard;
 
-use DembeloMain\Document\Textnode;
+use DembeloMain\Document\User;
 use DembeloMain\Model\FavoriteManager;
-use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 /**
  * Class DefaultController
@@ -33,33 +34,82 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 class DefaultController extends Controller
 {
     /**
+     * @var TopicRepositoryInterface
+     */
+    private $topicRepository;
+
+    /**
+     * @var FavoriteManager
+     */
+    private $favoriteManager;
+
+    /**
+     * @var Templating
+     */
+    private $templating;
+
+    /**
+     * @var TokenStorage
+     */
+    private $tokenStorage;
+
+    /**
+     * DefaultController constructor.
+     * @param TopicRepositoryInterface $topicRepository
+     * @param FavoriteManager $favoriteManager
+     * @param Templating $templating
+     * @param TokenStorage $tokenStorage
+     */
+    public function __construct(TopicRepositoryInterface $topicRepository, FavoriteManager $favoriteManager, Templating $templating, TokenStorage $tokenStorage)
+    {
+        $this->topicRepository = $topicRepository;
+        $this->favoriteManager = $favoriteManager;
+        $this->templating = $templating;
+        $this->tokenStorage = $tokenStorage;
+    }
+
+    /**
      * @Route("/", name="mainpage")
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
-    public function indexAction()
+    public function indexAction(): Response
     {
-        $topicRepository = $this->get('app.model_repository_topic');
-        $favoriteManager = $this->get('app.favoriteManager');
-
-        $topics = $topicRepository->findBy([], array('sortKey' => 'ASC'), 8);
+        $topics = $this->topicRepository->findBy([], ['sortKey' => 'ASC'], 8);
         $favorites = [];
 
         foreach ($topics as $topic) {
-            $favoriteId = $favoriteManager->getFavorite($topic, $this->getUser());
-            if (is_null($favoriteId)) {
+            $favoriteId = $this->favoriteManager->getFavorite($topic, $this->getUser());
+            if (null === $favoriteId) {
                 $favorites[$topic->getId()] = false;
             } else {
                 $favorites[$topic->getId()] = $favoriteId;
             }
         }
 
-        return $this->render(
+        return $this->templating->renderResponse(
             'DembeloMain::dashboard/index.html.twig',
-            array(
+            [
                 'topics' => $topics,
                 'favorites' => $favorites,
-            )
+            ]
         );
+    }
+
+    /**
+     * @return User|null
+     */
+    protected function getUser(): ?User
+    {
+        if (null === $token = $this->tokenStorage->getToken()) {
+            return null;
+        }
+
+        if (!\is_object($user = $token->getUser())) {
+            // e.g. anonymous authentication
+            return null;
+        }
+
+        return $user;
     }
 }
