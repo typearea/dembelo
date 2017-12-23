@@ -57,9 +57,9 @@ class DefaultController extends Controller
     /**
      * DefaultController constructor.
      * @param TopicRepositoryInterface $topicRepository
-     * @param FavoriteManager $favoriteManager
-     * @param Templating $templating
-     * @param TokenStorage $tokenStorage
+     * @param FavoriteManager          $favoriteManager
+     * @param Templating               $templating
+     * @param TokenStorage             $tokenStorage
      */
     public function __construct(TopicRepositoryInterface $topicRepository, FavoriteManager $favoriteManager, Templating $templating, TokenStorage $tokenStorage)
     {
