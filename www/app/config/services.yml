@@ -26,8 +26,12 @@ services:
 
     app.controller_dashboard:
         class: DembeloMain\Controller\Dashboard\DefaultController
-        calls:
-            - [setContainer, ["@service_container"]]
+        arguments:
+            - "@app.model_repository_topic"
+            - "@app.favoriteManager"
+            - "@templating"
+            - "@security.token_storage"
+
 
     app.controller_default:
         class: DembeloMain\Controller\DefaultController
