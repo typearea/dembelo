@@ -21,7 +21,7 @@ composer self-update
 
 gem install sass
 
-cp /vagrant/files/nginx/default /etc/nginx/sites-available/default
+cp /var/www/dembelo/files/nginx/default /etc/nginx/sites-available/default
 ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 service nginx restart

@@ -1,0 +1,14 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - "80:80"
+    links:
+      - database
+    volumes:
+      - .:/var/www/dembelo
+  database:
+    image: "mongo"
+    ports:
+      - 27017:27017
