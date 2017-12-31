@@ -35,6 +35,7 @@ nginx \
 libsasl2-dev \
 #pkg-config \
 unzip \
+sudo \
 && apt-get autoremove -y
 
 RUN curl -s http://getcomposer.org/installer | php -- --install-dir=/usr/bin \
@@ -45,13 +46,6 @@ RUN gem install sass
 
 COPY ./files/nginx/default /etc/nginx/sites-available/default
 RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-RUN /etc/init.d/nginx start \
-&& /etc/init.d/nginx status
-RUN service php7.1-fpm start
-
-RUN useradd -ms /bin/bash dembelo
-
-USER dembelo
 
 WORKDIR /var/www
 EXPOSE 80
