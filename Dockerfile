@@ -44,10 +44,12 @@ RUN curl -s http://getcomposer.org/installer | php -- --install-dir=/usr/bin \
 
 RUN gem install sass
 
+COPY ./files/php/mods-available/xdebug.ini /etc/php/7.1/mods-available/xdebug.ini
+
 COPY ./files/nginx/default /etc/nginx/sites-available/default
 RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 WORKDIR /var/www
 EXPOSE 80
 
-CMD sh /var/www/dembelo/docker/init.sh
+CMD sh /var/www/dembelo/docker/scripts/init.sh

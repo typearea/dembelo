@@ -7,8 +7,11 @@ services:
     links:
       - database
     volumes:
-      - .:/var/www/dembelo
+      - ./www:/var/www/dembelo/www
+      - ./docker/scripts:/var/www/dembelo/docker/scripts
   database:
     image: "mongo"
     ports:
-      - 27017:27017
+      - "27017:27017"
+    volumes:
+      - ./docker/mongodb_data:/data/db
