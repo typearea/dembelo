@@ -34,16 +34,3 @@ Version der Lizenz, so wie diese von der Free Software Foundation herausgegeben 
 * Im [Wiki](https://github.com/typearea/dembelo/wiki) findet sich eine Spezifikation und Konzeptionsthemen.
 * Tretet mit uns per Mail in Kontakt: tina.giesler@typearea.de
 * Wer uns finanziell unterstützen will, kann dies gerne über [paypal.me/waszulesen](https://www.paypal.me/waszulesen) tun.
-
-## Entwicklung
-
-### PHPUnit
-* Aufruf: /vagrant/www/vendor/phpunit/phpunit/phpunit -c /vagrant/www/app/
-
-### CodeSniffer
-
-    cd /vagrant/www
-    ./bin/phpcs --config-set installed_paths vendor/escapestudios/symfony2-coding-standard
-    ./bin/phpcs
-
-
