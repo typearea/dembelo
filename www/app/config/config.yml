@@ -80,7 +80,7 @@ assetic:
 doctrine_mongodb:
     connections:
         default:
-            server: "mongodb://%database_host%:%database_port%"
+            server: "mongodb://%env(DB_HOST)%:%database_port%"
             options: {}
     default_database: "%database_name%"
     document_managers:

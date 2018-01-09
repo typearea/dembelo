@@ -1,0 +1,17 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - "80:80"
+    links:
+      - database
+    volumes:
+      - ./www:/var/www/dembelo/www
+      - ./docker/scripts:/var/www/dembelo/docker/scripts
+  database:
+    image: "mongo"
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./docker/mongodb_data:/data/db
