@@ -33,7 +33,7 @@ use PHPUnit\Framework\TestCase;
 use DembeloMain\Command\InstallCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Security\Core\Encoder\BasePasswordEncoder;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * Class DefaultControllerTest
@@ -56,7 +56,7 @@ class InstallCommandTest extends TestCase
     private $userRepositoryMock;
 
     /**
-     * @var PasswordEncoderInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var UserPasswordEncoderInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $passwordEncoderMock;
 
@@ -156,15 +156,15 @@ class InstallCommandTest extends TestCase
     }
 
     /**
-     * @return BasePasswordEncoder|\PHPUnit_Framework_MockObject_MockObject
+     * @return UserPasswordEncoderInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private function createPasswordEncoderMock(): BasePasswordEncoder
+    private function createPasswordEncoderMock(): UserPasswordEncoderInterface
     {
         $methods = [
             'encodePassword',
             'isPasswordValid',
         ];
-        $mock = $this->getMockBuilder(BasePasswordEncoder::class)->setMethods($methods)->getMock();
+        $mock = $this->getMockBuilder(UserPasswordEncoderInterface::class)->setMethods($methods)->getMock();
 
         $mock->expects($this->any())
             ->method('encodePassword')
