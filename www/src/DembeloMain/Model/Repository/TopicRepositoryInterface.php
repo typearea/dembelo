@@ -80,5 +80,5 @@ interface TopicRepositoryInterface extends ObjectRepository
      *
      * @return Topic
      */
-    public function findOneByName(string $name): Topic;
+    public function findOneByName(string $name): ?Topic;
 }
