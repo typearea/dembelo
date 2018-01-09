@@ -33,7 +33,7 @@ use DembeloMain\Document\Topic;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Symfony\Component\Console\Input\InputOption;
 use DembeloMain\Document\Readpath;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * Class InstallCommand
@@ -91,24 +91,24 @@ class InstallCommand extends Command
     private $userRepository;
 
     /**
-     * @var PasswordEncoderInterface
+     * @var UserPasswordEncoderInterface
      */
     private $passwordEncoder;
 
     /**
      * InstallCommand constructor.
      *
-     * @param ManagerRegistry             $mongo
-     * @param TopicRepositoryInterface    $topicRepository
-     * @param TextNodeRepositoryInterface $textNodeRepository
-     * @param LicenseeRepositoryInterface $licenseeRepository
-     * @param UserRepositoryInterface     $userRepository
-     * @param LoremIpsum                  $loremIpsum
-     * @param PasswordEncoderInterface    $passwordEncoder
-     * @param string                      $topicDummyImageDirectory
-     * @param string                      $topicImageDirectory
+     * @param ManagerRegistry              $mongo
+     * @param TopicRepositoryInterface     $topicRepository
+     * @param TextNodeRepositoryInterface  $textNodeRepository
+     * @param LicenseeRepositoryInterface  $licenseeRepository
+     * @param UserRepositoryInterface      $userRepository
+     * @param LoremIpsum                   $loremIpsum
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param string                       $topicDummyImageDirectory
+     * @param string                       $topicImageDirectory
      */
-    public function __construct(ManagerRegistry $mongo, TopicRepositoryInterface $topicRepository, TextNodeRepositoryInterface $textNodeRepository, LicenseeRepositoryInterface $licenseeRepository, UserRepositoryInterface $userRepository, LoremIpsum $loremIpsum, PasswordEncoderInterface $passwordEncoder, string $topicDummyImageDirectory, string $topicImageDirectory)
+    public function __construct(ManagerRegistry $mongo, TopicRepositoryInterface $topicRepository, TextNodeRepositoryInterface $textNodeRepository, LicenseeRepositoryInterface $licenseeRepository, UserRepositoryInterface $userRepository, LoremIpsum $loremIpsum, UserPasswordEncoderInterface $passwordEncoder, string $topicDummyImageDirectory, string $topicImageDirectory)
     {
         $this->mongo = $mongo;
         $this->topicImageDirectory = $topicImageDirectory;
