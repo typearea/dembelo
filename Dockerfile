@@ -8,7 +8,6 @@ RUN echo "deb https://packages.sury.org/php/ jessie main" > /etc/apt/sources.lis
 
 RUN apt-get update -qq -y \
 && apt-get install -qq -y \
-# git \
 curl \
 vim \
 ruby \
@@ -17,23 +16,15 @@ gem \
 php7.1-fpm \
 php7.1-cli \
 php7.1-dev \
-# php7.1-gd \ # broken packages
 php7.1-curl \
 php7.1-mcrypt \
 php7.1-xdebug \
-#php7.1-memcache \
-#php7.1-intl \
-#php7.1-tidy \
-#php7.1-imap \
-# php7.1-imagick \
 php7.1-fpm \
 php7.1-xml \
 php7.1-mbstring \
 php7.1-mongodb \
 nginx \
-# imagemagick \
 libsasl2-dev \
-#pkg-config \
 unzip \
 sudo \
 && apt-get autoremove -y
