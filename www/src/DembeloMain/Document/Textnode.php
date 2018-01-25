@@ -34,13 +34,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Textnode
 {
-    const STATUS_INACTIVE = 0;
-    const STATUS_ACTIVE = 1;
+    public const STATUS_INACTIVE = 0;
+    public const STATUS_ACTIVE = 1;
 
-    const HITCH_STATUS_INACTIVE = 0;
-    const HITCH_STATUS_ACTIVE = 1;
+    public const HITCH_STATUS_INACTIVE = 0;
+    public const HITCH_STATUS_ACTIVE = 1;
 
-    const HITCHES_MAXIMUM_COUNT = 8;
+    public const HITCHES_MAXIMUM_COUNT = 8;
 
     /**
      * @MongoDB\Id
@@ -106,6 +106,12 @@ class Textnode
      * @MongoDB\Field(type="string")
      */
     protected $arbitraryId;
+
+    /**
+     * @var Textnode
+     * @MongoDB\ReferenceOne(targetDocument="Textnode", storeAs="id")
+     */
+    protected $parentTextnode;
 
     /**
      * gets the timestamp of creation
@@ -512,5 +518,21 @@ class Textnode
     public function clearHitches()
     {
         $this->hitches = [];
+    }
+
+    /**
+     * @return Textnode
+     */
+    public function getParentTextnode(): Textnode
+    {
+        return $this->parentTextnode;
+    }
+
+    /**
+     * @param Textnode $parentTextnode
+     */
+    public function setParentTextnode(Textnode $parentTextnode): void
+    {
+        $this->parentTextnode = $parentTextnode;
     }
 }

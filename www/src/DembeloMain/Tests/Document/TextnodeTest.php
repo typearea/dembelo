@@ -42,8 +42,9 @@ class TextnodeTest extends WebTestCase
 
     /**
      * setUp method
+     * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->textnode = new Textnode();
     }
@@ -155,7 +156,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testGetHitchCount()
     {
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
         $hitch['description'] = "Continue.";
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
@@ -163,7 +164,7 @@ class TextnodeTest extends WebTestCase
 
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
         $hitch['description'] = "Continue 2.";
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
@@ -177,7 +178,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testGetHitch()
     {
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
         $hitch['description'] = "Continue.";
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
@@ -217,7 +218,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testAppendHitch()
     {
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
         $hitch['description'] = "Continue.";
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
@@ -230,7 +231,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testAppendHitchWithoutTextnodeId()
     {
-        $hitch = array();
+        $hitch = [];
         $hitch['description'] = "Continue.";
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
 
@@ -242,7 +243,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testAppendHitchWithoutDescription()
     {
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
 
@@ -254,7 +255,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testAppendHitchWithoutStatus()
     {
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
         $hitch['description'] = "Continue.";
 
@@ -266,7 +267,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testAppendHitchWithEmptyTextnodeId()
     {
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = null;
         $hitch['description'] = "Continue.";
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
@@ -283,7 +284,7 @@ class TextnodeTest extends WebTestCase
     public function testAppendHitchMoreThanMaximum(): void
     {
         for ($i = 0; $i < Textnode::HITCHES_MAXIMUM_COUNT + 1; ++$i) {
-            $hitch = array();
+            $hitch = [];
             $hitch['textnodeId'] = $i;
             $hitch['description'] = 'Continue.';
             $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
@@ -301,7 +302,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testSetHitch()
     {
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
         $hitch['description'] = "Continue.";
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
@@ -309,7 +310,7 @@ class TextnodeTest extends WebTestCase
 
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
         $hitch['description'] = "Abort.";
         $hitch['status'] = Textnode::HITCH_STATUS_INACTIVE;
@@ -332,7 +333,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testSetHitchNegativeIndex()
     {
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
         $hitch['description'] = "Continue.";
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
@@ -345,7 +346,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testSetHitchTooHighIndex()
     {
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
         $hitch['description'] = "Continue.";
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
@@ -358,7 +359,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testSetHitchWithoutTextnodeId()
     {
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
         $hitch['description'] = "Continue.";
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
@@ -366,7 +367,7 @@ class TextnodeTest extends WebTestCase
 
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
-        $hitch = array();
+        $hitch = [];
         $hitch['description'] = "Abort.";
         $hitch['status'] = Textnode::HITCH_STATUS_INACTIVE;
         $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitch);
@@ -379,7 +380,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testSetHitchWithoutDescription()
     {
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
         $hitch['description'] = "Continue.";
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
@@ -387,7 +388,7 @@ class TextnodeTest extends WebTestCase
 
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
         $hitch['status'] = Textnode::HITCH_STATUS_INACTIVE;
         $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitch);
@@ -400,7 +401,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testSetHitchWithoutStatus()
     {
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
         $hitch['description'] = "Continue.";
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
@@ -408,7 +409,7 @@ class TextnodeTest extends WebTestCase
 
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
         $hitch['description'] = "Abort.";
         $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitch);
@@ -421,7 +422,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testSetHitchWithEmptyTextnodeId()
     {
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
         $hitch['description'] = "Continue.";
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
@@ -429,7 +430,7 @@ class TextnodeTest extends WebTestCase
 
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = null;
         $hitch['description'] = "Abort.";
         $hitch['status'] = Textnode::HITCH_STATUS_INACTIVE;
@@ -443,7 +444,7 @@ class TextnodeTest extends WebTestCase
      */
     public function testRemoveHitch()
     {
-        $hitch = array();
+        $hitch = [];
         $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
         $hitch['description'] = "Continue.";
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
@@ -468,9 +469,9 @@ class TextnodeTest extends WebTestCase
      */
     public function testRemoveHitchNegativeIndex()
     {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
+        $hitch = [];
+        $hitch['textnodeId'] = '55f5ab3708985c4b188b4577';
+        $hitch['description'] = 'Continue.';
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
 
         $this->assertTrue($this->textnode->appendHitch($hitch));
@@ -481,12 +482,13 @@ class TextnodeTest extends WebTestCase
 
     /**
      * Tests if removing a hitch fails if a too high index is passed.
+     * @return void
      */
-    public function testRemoveHitchTooHighIndex()
+    public function testRemoveHitchTooHighIndex(): void
     {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
+        $hitch = [];
+        $hitch['textnodeId'] = '55f5ab3708985c4b188b4577';
+        $hitch['description'] = 'Continue.';
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
 
         $this->assertTrue($this->textnode->appendHitch($hitch));
@@ -497,28 +499,29 @@ class TextnodeTest extends WebTestCase
 
     /**
      * Tests if the correct hitch gets removed.
+     * @return void
      */
-    public function testRemoveHitchSpecific()
+    public function testRemoveHitchSpecific(): void
     {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
+        $hitch = [];
+        $hitch['textnodeId'] = '55f5ab3708985c4b188b4577';
+        $hitch['description'] = 'Continue.';
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
 
         $this->assertTrue($this->textnode->appendHitch($hitch));
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
-        $hitch['description'] = "More.";
+        $hitch = [];
+        $hitch['textnodeId'] = '55f5ab3708985c4b188b4578';
+        $hitch['description'] = 'More.';
         $hitch['status'] = Textnode::HITCH_STATUS_INACTIVE;
 
         $this->assertTrue($this->textnode->appendHitch($hitch));
         $this->assertEquals($this->textnode->getHitchCount(), 2);
 
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4579";
-        $hitch['description'] = "Abort.";
+        $hitch = [];
+        $hitch['textnodeId'] = '55f5ab3708985c4b188b4579';
+        $hitch['description'] = 'Abort.';
         $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
 
         $this->assertTrue($this->textnode->appendHitch($hitch));
@@ -527,21 +530,21 @@ class TextnodeTest extends WebTestCase
         $this->assertTrue($this->textnode->removeHitch(1));
 
         $result = $this->textnode->getHitch(0);
-        $this->assertFalse(is_null($result));
+        $this->assertNotNull($result);
 
-        $this->assertEquals($result['textnodeId'], "55f5ab3708985c4b188b4577");
-        $this->assertEquals($result['description'], "Continue.");
+        $this->assertEquals($result['textnodeId'], '55f5ab3708985c4b188b4577');
+        $this->assertEquals($result['description'], 'Continue.');
         $this->assertEquals($result['status'], Textnode::HITCH_STATUS_ACTIVE);
 
         $result = $this->textnode->getHitch(1);
-        $this->assertFalse(is_null($result));
+        $this->assertNotNull($result);
 
         $this->assertEquals($result['textnodeId'], "55f5ab3708985c4b188b4579");
         $this->assertEquals($result['description'], "Abort.");
         $this->assertEquals($result['status'], Textnode::HITCH_STATUS_ACTIVE);
 
         $result = $this->textnode->getHitch(2);
-        $this->assertTrue(is_null($result));
+        $this->assertNull($result);
     }
 
     /**
@@ -555,8 +558,9 @@ class TextnodeTest extends WebTestCase
 
     /**
      * tests the text
+     * @return void
      */
-    public function testTextHyphenated()
+    public function testTextHyphenated(): void
     {
         $text = 'Lorem Ipsum';
         $this->textnode->setTextHyphenated($text);
@@ -565,45 +569,59 @@ class TextnodeTest extends WebTestCase
 
     /**
      * tests isFinanceNode();
+     * @return void
      */
-    public function testIsFinanceNode()
+    public function testIsFinanceNode(): void
     {
         $hitch = [
             'textnodeId' => 12,
             'description' => 'foobar',
             'status' => Textnode::HITCH_STATUS_ACTIVE,
         ];
-        $this->assertTrue($this->textnode->isFinanceNode());
+        self::assertTrue($this->textnode->isFinanceNode());
         $this->textnode->appendHitch($hitch);
-        $this->assertFalse($this->textnode->isFinanceNode());
+        self::assertFalse($this->textnode->isFinanceNode());
     }
 
     /**
      * tests clearHitches() method
+     * @return void
      */
-    public function testClearHitches()
+    public function testClearHitches(): void
     {
-        $hitch1 = array();
-        $hitch1['textnodeId'] = "Id1";
-        $hitch1['description'] = "Abort.";
+        $hitch1 = [];
+        $hitch1['textnodeId'] = 'Id1';
+        $hitch1['description'] = 'Abort.';
         $hitch1['status'] = Textnode::HITCH_STATUS_ACTIVE;
 
-        $hitch2 = array();
-        $hitch2['textnodeId'] = "Id2";
-        $hitch2['description'] = "Abort.";
+        $hitch2 = [];
+        $hitch2['textnodeId'] = 'Id2';
+        $hitch2['description'] = 'Abort.';
         $hitch2['status'] = Textnode::HITCH_STATUS_ACTIVE;
 
-        $hitch3 = array();
-        $hitch3['textnodeId'] = "Id3";
-        $hitch3['description'] = "Abort.";
+        $hitch3 = [];
+        $hitch3['textnodeId'] = 'Id3';
+        $hitch3['description'] = 'Abort.';
         $hitch3['status'] = Textnode::HITCH_STATUS_ACTIVE;
 
         $this->textnode->appendHitch($hitch1);
         $this->textnode->appendHitch($hitch2);
         $this->textnode->appendHitch($hitch3);
-        $this->assertEquals(3, $this->textnode->getHitchCount());
+        self::assertEquals(3, $this->textnode->getHitchCount());
 
         $this->textnode->clearHitches();
-        $this->assertEquals(0, $this->textnode->getHitchCount());
+        self::assertEquals(0, $this->textnode->getHitchCount());
+    }
+
+    /**
+     * @return void
+     */
+    public function testSetParentTextnode(): void
+    {
+        /** @var $parentTextnodeMock \PHPUnit_Framework_MockObject_MockObject|Textnode */
+        $parentTextnodeMock = $this->createMock(Textnode::class);
+        $this->textnode->setParentTextnode($parentTextnodeMock);
+        $returnedParentTextnode = $this->textnode->getParentTextnode();
+        self::assertSame($parentTextnodeMock, $returnedParentTextnode);
     }
 }
