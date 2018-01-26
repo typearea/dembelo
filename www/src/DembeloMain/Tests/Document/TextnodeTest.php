@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -18,11 +17,9 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * @package DembeloMain
  */
-
 namespace DembeloMain\Tests\Document;
 
 use DembeloMain\Document\Licensee;

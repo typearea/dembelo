@@ -108,8 +108,9 @@ class Textnode
     protected $arbitraryId;
 
     /**
-     * @var Textnode
-     * @MongoDB\ReferenceOne(targetDocument="Textnode", storeAs="id")
+     * @var Textnode|null
+     *
+     * @MongoDB\ReferenceOne(targetDocument="Textnode", storeAs="id", nullable=true)
      */
     protected $parentTextnode;
 
@@ -521,9 +522,9 @@ class Textnode
     }
 
     /**
-     * @return Textnode
+     * @return Textnode|null
      */
-    public function getParentTextnode(): Textnode
+    public function getParentTextnode(): ?Textnode
     {
         return $this->parentTextnode;
     }
