@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -22,9 +21,6 @@
 namespace DembeloMain\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use DembeloMain\Document\Licensee;
-use DembeloMain\Document\Topic;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class Textnode
@@ -328,7 +324,7 @@ class Textnode
     /**
      * Appends a hitch at the end of the collection.
      *
-     * @param array $hitch
+     * @param TextnodeHitch $hitch
      *
      * @return true|false False, if $hitch doesn't contain all
      *     associative array elements which form a hitch, or if
@@ -336,36 +332,26 @@ class Textnode
      *     within $hitch doesn't contain a valid value, or if
      *     there are already HITCHES_MAXIMUM_COUNT hitches present.
      */
-    public function appendHitch(array $hitch)
+    public function appendHitch(TextnodeHitch $hitch): bool
     {
         $hitchCount = count($this->hitches);
 
         if ($hitchCount >= self::HITCHES_MAXIMUM_COUNT) {
             return false;
         }
-
-        if (array_key_exists("textnodeId", $hitch) !== true) {
+        if (!in_array($hitch->getStatus(), [self::HITCH_STATUS_INACTIVE, self::HITCH_STATUS_ACTIVE], true)) {
             return false;
         }
 
-        if (array_key_exists("description", $hitch) !== true) {
+        if (null === $hitch->getTextnodeId()) {
             return false;
         }
 
-        if (array_key_exists("status", $hitch) !== true) {
-            return false;
-        }
-
-        if ($hitch['status'] !== self::HITCH_STATUS_INACTIVE &&
-            $hitch['status'] !== self::HITCH_STATUS_ACTIVE) {
-            return false;
-        }
-
-        if (null === $hitch['textnodeId']) {
-            return false;
-        }
-
-        $this->hitches[$hitchCount] = $hitch;
+        $this->hitches[$hitchCount] = [
+            'description' => $hitch->getDescription(),
+            'status' => $hitch->getStatus(),
+            'textnodeId' => $hitch->getTextnodeId(),
+        ];
 
         return true;
     }
@@ -374,8 +360,8 @@ class Textnode
      * Overwrites the hitch which is stored in the collection at the
      *     specified index.
      *
-     * @param int   $hitchIndex
-     * @param array $hitch
+     * @param int           $hitchIndex
+     * @param TextnodeHitch $hitch
      *
      * @return true|false False, if the $hitchIndex doesn't specify
      *     an element within the collection, or if $hitch doesn't
@@ -383,34 +369,25 @@ class Textnode
      *     or if no "textnodeId" is set within $hitch, or if "status"
      *     within $hitch doesn't contain a valid value.
      */
-    public function setHitch($hitchIndex, array $hitch)
+    public function setHitch($hitchIndex, TextnodeHitch $hitch)
     {
         if ($hitchIndex < 0 || $hitchIndex >= count($this->hitches)) {
             return false;
         }
 
-        if (array_key_exists("textnodeId", $hitch) !== true) {
+        if (!\in_array($hitch->getStatus(), [self::HITCH_STATUS_INACTIVE, self::HITCH_STATUS_ACTIVE], true)) {
             return false;
         }
 
-        if (array_key_exists("description", $hitch) !== true) {
+        if (null === $hitch->getTextnodeId()) {
             return false;
         }
 
-        if (array_key_exists("status", $hitch) !== true) {
-            return false;
-        }
-
-        if ($hitch['status'] !== Textnode::HITCH_STATUS_INACTIVE &&
-            $hitch['status'] !== Textnode::HITCH_STATUS_ACTIVE) {
-            return false;
-        }
-
-        if (is_null($hitch['textnodeId']) === true) {
-            return false;
-        }
-
-        $this->hitches[$hitchIndex] = $hitch;
+        $this->hitches[$hitchIndex] = [
+            'description' => $hitch->getDescription(),
+            'status' => $hitch->getStatus(),
+            'textnodeId' => $hitch->getTextnodeId(),
+        ];
 
         return true;
     }

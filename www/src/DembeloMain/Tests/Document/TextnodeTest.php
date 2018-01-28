@@ -22,15 +22,16 @@
  */
 namespace DembeloMain\Tests\Document;
 
-use DembeloMain\Document\Licensee;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use DembeloMain\Document\TextnodeHitch;
+use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
+use PHP_CodeSniffer\Generators\Text;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use DembeloMain\Document\Textnode;
-use DembeloMain\Document\Topic;
 
 /**
  * Class DocumentTextnodeTest
  */
-class TextnodeTest extends WebTestCase
+class TextnodeTest extends KernelTestCase
 {
     /**
      * @var \DembeloMain\Document\Textnode
@@ -153,19 +154,21 @@ class TextnodeTest extends WebTestCase
      */
     public function testGetHitchCount()
     {
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
+        /* @var $hitchMock \PHPUnit_Framework_MockObject_MockObject|TextnodeHitch */
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4577');
+        $hitchMock->method('getDescription')->willReturn('Continue.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
+        $this->textnode->appendHitch($hitchMock);
 
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
-        $hitch['description'] = "Continue 2.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
+        /* @var $hitchMock \PHPUnit_Framework_MockObject_MockObject|TextnodeHitch */
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4578');
+        $hitchMock->method('getDescription')->willReturn('Continue 2.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
+        $this->textnode->appendHitch($hitchMock);
 
         $this->assertEquals($this->textnode->getHitchCount(), 2);
     }
@@ -175,18 +178,19 @@ class TextnodeTest extends WebTestCase
      */
     public function testGetHitch()
     {
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
+        /* @var $hitchMock \PHPUnit_Framework_MockObject_MockObject|TextnodeHitch */
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4577');
+        $hitchMock->method('getDescription')->willReturn('Continue.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
+        $this->textnode->appendHitch($hitchMock);
 
         $result = $this->textnode->getHitch($this->textnode->getHitchCount() - 1);
 
-        $this->assertFalse(is_null($result));
+        $this->assertFalse(null === $result);
 
-        $this->assertEquals($result['textnodeId'], "55f5ab3708985c4b188b4577");
-        $this->assertEquals($result['description'], "Continue.");
+        $this->assertEquals($result['textnodeId'], '55f5ab3708985c4b188b4577');
+        $this->assertEquals($result['description'], 'Continue.');
         $this->assertEquals($result['status'], Textnode::HITCH_STATUS_ACTIVE);
     }
 
@@ -197,7 +201,7 @@ class TextnodeTest extends WebTestCase
     {
         $result = $this->textnode->getHitch(-1);
 
-        $this->assertTrue(is_null($result));
+        $this->assertTrue(null === $result);
     }
 
     /**
@@ -207,7 +211,7 @@ class TextnodeTest extends WebTestCase
     {
         $result = $this->textnode->getHitch(0);
 
-        $this->assertTrue(is_null($result));
+        $this->assertNull($result);
     }
 
     /**
@@ -215,63 +219,14 @@ class TextnodeTest extends WebTestCase
      */
     public function testAppendHitch()
     {
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        /* @var $hitchMock \PHPUnit_Framework_MockObject_MockObject|TextnodeHitch */
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4577');
+        $hitchMock->method('getDescription')->willReturn('Continue.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
 
-        $this->assertTrue($this->textnode->appendHitch($hitch));
+        $this->assertTrue($this->textnode->appendHitch($hitchMock));
     }
-
-    /**
-     * Tests if the attempt of adding a hitch fails if the textnodeId is missing.
-     */
-    public function testAppendHitchWithoutTextnodeId()
-    {
-        $hitch = [];
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $this->assertFalse($this->textnode->appendHitch($hitch));
-    }
-
-    /**
-     * Tests if the attempt of adding a hitch fails if the description is missing.
-     */
-    public function testAppendHitchWithoutDescription()
-    {
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $this->assertFalse($this->textnode->appendHitch($hitch));
-    }
-
-    /**
-     * Tests if the attempt of adding a hitch fails if the status is missing.
-     */
-    public function testAppendHitchWithoutStatus()
-    {
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-
-        $this->assertFalse($this->textnode->appendHitch($hitch));
-    }
-
-    /**
-     * Tests if the attempt of adding a hitch fails if the textnodeId is empty.
-     */
-    public function testAppendHitchWithEmptyTextnodeId()
-    {
-        $hitch = [];
-        $hitch['textnodeId'] = null;
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $this->assertFalse($this->textnode->appendHitch($hitch));
-    }
-
     /**
      * Tests if appending more hitches than the maximum amount of
      * hitches is rejected.
@@ -281,15 +236,15 @@ class TextnodeTest extends WebTestCase
     public function testAppendHitchMoreThanMaximum(): void
     {
         for ($i = 0; $i < Textnode::HITCHES_MAXIMUM_COUNT + 1; ++$i) {
-            $hitch = [];
-            $hitch['textnodeId'] = $i;
-            $hitch['description'] = 'Continue.';
-            $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+            $hitchMock = $this->createMock(TextnodeHitch::class);
+            $hitchMock->method('getTextnodeId')->willReturn($i);
+            $hitchMock->method('getDescription')->willReturn('Continue.');
+            $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
 
             if ($i < Textnode::HITCHES_MAXIMUM_COUNT) {
-                $this->assertTrue($this->textnode->appendHitch($hitch), 'adding hitch no. '.$i);
+                $this->assertTrue($this->textnode->appendHitch($hitchMock), 'adding hitch no. '.$i);
             } else {
-                $this->assertFalse($this->textnode->appendHitch($hitch), 'adding hitch no. '.$i);
+                $this->assertFalse($this->textnode->appendHitch($hitchMock), 'adding hitch no. '.$i);
             }
         }
     }
@@ -299,26 +254,26 @@ class TextnodeTest extends WebTestCase
      */
     public function testSetHitch()
     {
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4577');
+        $hitchMock->method('getDescription')->willReturn('Continue.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
+        $this->textnode->appendHitch($hitchMock);
 
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
-        $hitch['description'] = "Abort.";
-        $hitch['status'] = Textnode::HITCH_STATUS_INACTIVE;
-        $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitch);
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4578');
+        $hitchMock->method('getDescription')->willReturn('Abort.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_INACTIVE);
+        $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitchMock);
 
         $this->assertTrue($result);
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
         $result = $this->textnode->getHitch($this->textnode->getHitchCount() - 1);
 
-        $this->assertFalse(is_null($result));
+        $this->assertFalse(null === $result);
 
         $this->assertEquals($result['textnodeId'], "55f5ab3708985c4b188b4578");
         $this->assertEquals($result['description'], "Abort.");
@@ -330,12 +285,12 @@ class TextnodeTest extends WebTestCase
      */
     public function testSetHitchNegativeIndex()
     {
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4577');
+        $hitchMock->method('getDescription')->willReturn('Continue.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
 
-        $this->assertFalse($this->textnode->setHitch(-1, $hitch));
+        $this->assertFalse($this->textnode->setHitch(-1, $hitchMock));
     }
 
     /**
@@ -343,12 +298,12 @@ class TextnodeTest extends WebTestCase
      */
     public function testSetHitchTooHighIndex()
     {
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4577');
+        $hitchMock->method('getDescription')->willReturn('Continue.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
 
-        $this->assertFalse($this->textnode->setHitch(1, $hitch));
+        $this->assertFalse($this->textnode->setHitch(1, $hitchMock));
     }
 
     /**
@@ -356,20 +311,20 @@ class TextnodeTest extends WebTestCase
      */
     public function testSetHitchWithoutTextnodeId()
     {
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4577');
+        $hitchMock->method('getDescription')->willReturn('Continue.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
+        $this->textnode->appendHitch($hitchMock);
 
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
-        $hitch = [];
-        $hitch['description'] = "Abort.";
-        $hitch['status'] = Textnode::HITCH_STATUS_INACTIVE;
-        $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitch);
-
-        $this->assertFalse($result);
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getDescription')->willReturn('Abort.');
+        $hitchMock->method('getTextnodeId')->willReturn(null);
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_INACTIVE);
+        $this->expectException(\TypeError::class);
+        $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitchMock);
     }
 
     /**
@@ -377,63 +332,43 @@ class TextnodeTest extends WebTestCase
      */
     public function testSetHitchWithoutDescription()
     {
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4577');
+        $hitchMock->method('getDescription')->willReturn('Continue.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
+        $this->textnode->appendHitch($hitchMock);
 
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
-        $hitch['status'] = Textnode::HITCH_STATUS_INACTIVE;
-        $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitch);
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4578');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_INACTIVE);
+        $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitchMock);
 
-        $this->assertFalse($result);
+        $this->assertTrue($result);
     }
 
     /**
      * Tests if the attempt of updating a hitch fails if the status is missing.
+     *
+     * @return void
      */
-    public function testSetHitchWithoutStatus()
+    public function testSetHitchWithoutStatus(): void
     {
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4577');
+        $hitchMock->method('getDescription')->willReturn('Continue.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
+        $this->textnode->appendHitch($hitchMock);
 
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
-        $hitch['description'] = "Abort.";
-        $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitch);
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4578');
+        $hitchMock->method('getDescription')->willReturn('Abort.');
+        $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitchMock);
 
-        $this->assertFalse($result);
-    }
-
-    /**
-     * Tests if the attempt of updating a hitch fails if the textnodeId is empty.
-     */
-    public function testSetHitchWithEmptyTextnodeId()
-    {
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
-
-        $this->assertEquals($this->textnode->getHitchCount(), 1);
-
-        $hitch = [];
-        $hitch['textnodeId'] = null;
-        $hitch['description'] = "Abort.";
-        $hitch['status'] = Textnode::HITCH_STATUS_INACTIVE;
-        $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitch);
-
-        $this->assertFalse($result);
+        $this->assertTrue($result);
     }
 
     /**
@@ -441,12 +376,12 @@ class TextnodeTest extends WebTestCase
      */
     public function testRemoveHitch()
     {
-        $hitch = [];
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4577');
+        $hitchMock->method('getDescription')->willReturn('Continue.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
 
-        $this->assertTrue($this->textnode->appendHitch($hitch));
+        $this->assertTrue($this->textnode->appendHitch($hitchMock));
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
         $this->assertTrue($this->textnode->removeHitch($this->textnode->getHitchCount() - 1));
@@ -464,14 +399,14 @@ class TextnodeTest extends WebTestCase
     /**
      * Tests if removing a hitch fails if a negative index is passed.
      */
-    public function testRemoveHitchNegativeIndex()
+    public function testRemoveHitchNegativeIndex(): void
     {
-        $hitch = [];
-        $hitch['textnodeId'] = '55f5ab3708985c4b188b4577';
-        $hitch['description'] = 'Continue.';
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4577');
+        $hitchMock->method('getDescription')->willReturn('Continue.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
 
-        $this->assertTrue($this->textnode->appendHitch($hitch));
+        $this->assertTrue($this->textnode->appendHitch($hitchMock));
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
         $this->assertFalse($this->textnode->removeHitch(-1));
@@ -483,12 +418,12 @@ class TextnodeTest extends WebTestCase
      */
     public function testRemoveHitchTooHighIndex(): void
     {
-        $hitch = [];
-        $hitch['textnodeId'] = '55f5ab3708985c4b188b4577';
-        $hitch['description'] = 'Continue.';
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4577');
+        $hitchMock->method('getDescription')->willReturn('Continue.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
 
-        $this->assertTrue($this->textnode->appendHitch($hitch));
+        $this->assertTrue($this->textnode->appendHitch($hitchMock));
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
         $this->assertFalse($this->textnode->removeHitch(2));
@@ -500,28 +435,28 @@ class TextnodeTest extends WebTestCase
      */
     public function testRemoveHitchSpecific(): void
     {
-        $hitch = [];
-        $hitch['textnodeId'] = '55f5ab3708985c4b188b4577';
-        $hitch['description'] = 'Continue.';
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4577');
+        $hitchMock->method('getDescription')->willReturn('Continue.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
 
-        $this->assertTrue($this->textnode->appendHitch($hitch));
+        $this->assertTrue($this->textnode->appendHitch($hitchMock));
         $this->assertEquals($this->textnode->getHitchCount(), 1);
 
-        $hitch = [];
-        $hitch['textnodeId'] = '55f5ab3708985c4b188b4578';
-        $hitch['description'] = 'More.';
-        $hitch['status'] = Textnode::HITCH_STATUS_INACTIVE;
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4578');
+        $hitchMock->method('getDescription')->willReturn('More.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_INACTIVE);
 
-        $this->assertTrue($this->textnode->appendHitch($hitch));
+        $this->assertTrue($this->textnode->appendHitch($hitchMock));
         $this->assertEquals($this->textnode->getHitchCount(), 2);
 
-        $hitch = [];
-        $hitch['textnodeId'] = '55f5ab3708985c4b188b4579';
-        $hitch['description'] = 'Abort.';
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4579');
+        $hitchMock->method('getDescription')->willReturn('Abort.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
 
-        $this->assertTrue($this->textnode->appendHitch($hitch));
+        $this->assertTrue($this->textnode->appendHitch($hitchMock));
         $this->assertEquals($this->textnode->getHitchCount(), 3);
 
         $this->assertTrue($this->textnode->removeHitch(1));
@@ -570,13 +505,13 @@ class TextnodeTest extends WebTestCase
      */
     public function testIsFinanceNode(): void
     {
-        $hitch = [
-            'textnodeId' => 12,
-            'description' => 'foobar',
-            'status' => Textnode::HITCH_STATUS_ACTIVE,
-        ];
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('55f5ab3708985c4b188b4577');
+        $hitchMock->method('getDescription')->willReturn('Continue.');
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
+
         self::assertTrue($this->textnode->isFinanceNode());
-        $this->textnode->appendHitch($hitch);
+        $this->textnode->appendHitch($hitchMock);
         self::assertFalse($this->textnode->isFinanceNode());
     }
 
@@ -586,24 +521,24 @@ class TextnodeTest extends WebTestCase
      */
     public function testClearHitches(): void
     {
-        $hitch1 = [];
-        $hitch1['textnodeId'] = 'Id1';
-        $hitch1['description'] = 'Abort.';
-        $hitch1['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitchMock1 = $this->createMock(TextnodeHitch::class);
+        $hitchMock1->method('getTextnodeId')->willReturn('Id1');
+        $hitchMock1->method('getDescription')->willReturn('Abort.');
+        $hitchMock1->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
 
-        $hitch2 = [];
-        $hitch2['textnodeId'] = 'Id2';
-        $hitch2['description'] = 'Abort.';
-        $hitch2['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitchMock2 = $this->createMock(TextnodeHitch::class);
+        $hitchMock2->method('getTextnodeId')->willReturn('Id2');
+        $hitchMock2->method('getDescription')->willReturn('Abort.');
+        $hitchMock2->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
 
-        $hitch3 = [];
-        $hitch3['textnodeId'] = 'Id3';
-        $hitch3['description'] = 'Abort.';
-        $hitch3['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitchMock3 = $this->createMock(TextnodeHitch::class);
+        $hitchMock3->method('getTextnodeId')->willReturn('Id3');
+        $hitchMock3->method('getDescription')->willReturn('Abort.');
+        $hitchMock3->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
 
-        $this->textnode->appendHitch($hitch1);
-        $this->textnode->appendHitch($hitch2);
-        $this->textnode->appendHitch($hitch3);
+        $this->textnode->appendHitch($hitchMock1);
+        $this->textnode->appendHitch($hitchMock2);
+        $this->textnode->appendHitch($hitchMock3);
         self::assertEquals(3, $this->textnode->getHitchCount());
 
         $this->textnode->clearHitches();
@@ -620,5 +555,42 @@ class TextnodeTest extends WebTestCase
         $this->textnode->setParentTextnode($parentTextnodeMock);
         $returnedParentTextnode = $this->textnode->getParentTextnode();
         self::assertSame($parentTextnodeMock, $returnedParentTextnode);
+    }
+
+    /**
+     * not exactly a unit test..
+     * @todo establish a directory for integration tests
+     */
+    public function testReferences(): void
+    {
+        $kernel = self::bootKernel();
+        /* @var $mongo \Doctrine\Bundle\MongoDBBundle\ManagerRegistry */
+        $mongo = $kernel->getContainer()->get('doctrine_mongodb');
+        $manager = $mongo->getManager();
+        /* @var $textnodeRepository TextNodeRepository */
+        $textnodeRepository = $mongo->getRepository(Textnode::class);
+
+        $textnode = new Textnode();
+        $textnode->setText('someText');
+        $textnodeRepository->save($textnode);
+        $textnodeId = $textnode->getId();
+        self::assertNotNull($textnodeId);
+        $manager->clear();
+        self::assertFalse($manager->contains($textnode));
+        $textnodeRefetched = $textnodeRepository->find($textnodeId);
+        self::assertNotNull($textnodeRefetched);
+        self::assertEquals('someText', $textnodeRefetched->getText());
+        self::assertNull($textnodeRefetched->getParentTextnode());
+
+        $parentTextnode = new Textnode();
+        $parentTextnode->setText('parent textnode');
+        $textnodeRepository->save($parentTextnode);
+        $textnodeRefetched->setParentTextnode($parentTextnode);
+        $textnodeRepository->save($textnodeRefetched);
+        $manager->clear();
+        $textnodeRefetched = $textnodeRepository->find($textnodeId);
+        $parentTextnodeRefetched = $textnodeRefetched->getParentTextnode();
+        self::assertNotNull($parentTextnodeRefetched);
+        self::assertEquals('parent textnode', $parentTextnodeRefetched->getText());
     }
 }

@@ -19,6 +19,7 @@
 namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Textnode;
+use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use Exception;
 
@@ -58,11 +59,11 @@ class HitchParser
      * @param string $content
      * @param string $name
      *
-     * @return array
+     * @return TextnodeHitch
      *
      * @throws Exception
      */
-    public function parseDoubleArrowRight(string $content, string $name): array
+    public function parseDoubleArrowRight(string $content, string $name): TextnodeHitch
     {
         $contentArray = explode('-->', $content, 2);
 
@@ -76,10 +77,10 @@ class HitchParser
             throw new Exception(sprintf("There is a textnode which references the external Dembelo Textnode '%s', but a Dembelo Textnode with such an Id doesn't exist.", $contentArray[1]));
         }
 
-        $hitch = array();
-        $hitch['description'] = $contentArray[0];
-        $hitch['textnodeId'] = $contentArray[1];
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitch = new TextnodeHitch();
+        $hitch->setDescription($contentArray[0]);
+        $hitch->setTextnodeId($contentArray[1]);
+        $hitch->setStatus(Textnode::HITCH_STATUS_ACTIVE);
 
         return $hitch;
     }
@@ -88,11 +89,11 @@ class HitchParser
      * @param string $content
      * @param string $name
      *
-     * @return array
+     * @return TextnodeHitch
      *
      * @throws Exception
      */
-    public function parseSingleArrowRight(string $content, string $name): array
+    public function parseSingleArrowRight(string $content, string $name): TextnodeHitch
     {
         $contentArray = explode("->", $content, 2);
 
@@ -104,10 +105,10 @@ class HitchParser
             throw new Exception(sprintf("There is a textnode which references another textnode named '%s', but this textnode doesn't exist within the same story.", $contentArray[1]));
         }
 
-        $hitch = array();
-        $hitch['description'] = $contentArray[0];
-        $hitch['textnodeId'] = $this->nodeNameMapping[$contentArray[1]];
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitch = new TextnodeHitch();
+        $hitch->setDescription($contentArray[0]);
+        $hitch->setTextnodeId($this->nodeNameMapping[$contentArray[1]]);
+        $hitch->setStatus(Textnode::HITCH_STATUS_ACTIVE);
 
         return $hitch;
     }
@@ -116,11 +117,11 @@ class HitchParser
      * @param string $content
      * @param string $name
      *
-     * @return array
+     * @return TextnodeHitch
      *
      * @throws Exception
      */
-    public function parseSingleArrowLeft(string $content, string $name): array
+    public function parseSingleArrowLeft(string $content, string $name): TextnodeHitch
     {
         $contentArray = explode("<-", $content, 2);
 
@@ -132,10 +133,10 @@ class HitchParser
             throw new Exception(sprintf("There is a textnode in the Twine archive file which references another textnode named '%s', but this textnode doesn't exist within the same story.", $contentArray[0]));
         }
 
-        $hitch = array();
-        $hitch['description'] = $contentArray[1];
-        $hitch['textnodeId'] = $this->nodeNameMapping[$contentArray[0]];
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitch = new TextnodeHitch();
+        $hitch->setDescription($contentArray[1]);
+        $hitch->setTextnodeId($this->nodeNameMapping[$contentArray[0]]);
+        $hitch->setStatus(Textnode::HITCH_STATUS_ACTIVE);
 
         return $hitch;
     }
@@ -144,11 +145,11 @@ class HitchParser
      * @param string $content
      * @param string $name
      *
-     * @return array
+     * @return TextnodeHitch
      *
      * @throws Exception
      */
-    public function parseSimpleHitch(string $content, string $name): array
+    public function parseSimpleHitch(string $content, string $name): TextnodeHitch
     {
         if (strlen($content) <= 0) {
             throw new Exception(sprintf("The Twine archive file contains a '%s' with the invalid element '[[%s]]'.", $name, $content));
@@ -158,10 +159,10 @@ class HitchParser
             throw new Exception(sprintf("There is a textnode in the Twine archive file which references another textnode named '%s', but this textnode doesn't exist within the same story.", $content));
         }
 
-        $hitch = array();
-        $hitch['description'] = $content;
-        $hitch['textnodeId'] = $this->nodeNameMapping[$content];
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitch = new TextnodeHitch();
+        $hitch->setDescription($content);
+        $hitch->setTextnodeId($this->nodeNameMapping[$content]);
+        $hitch->setStatus(Textnode::HITCH_STATUS_ACTIVE);
 
         return $hitch;
     }

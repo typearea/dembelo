@@ -27,7 +27,8 @@ use Hyphenator\Core as Hyphenator;
 
 /**
  * Class TextNodeRepository
- * @method findOneBy(array $where): Textnode
+ * @method Textnode findOneBy(array $where)
+ * @method Textnode find($id)
  */
 class TextNodeRepository extends AbstractRepository implements TextNodeRepositoryInterface
 {
@@ -65,13 +66,13 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
     /**
      * sets textnodes to status=inactive that are not in $existingTextnodeIds
      * @param Importfile $importfile
-     * @param array      $existingTextnodeIds array of textnodeIds
+     * @param string[] $existingTextnodeIds array of textnodeIds
      *
      * @return void
      *
      * @throws \Doctrine\ODM\MongoDB\MongoDBException
      */
-    public function disableOrphanedNodes(Importfile $importfile, array $existingTextnodeIds)
+    public function disableOrphanedNodes(Importfile $importfile, array $existingTextnodeIds): void
     {
         $this->getDocumentManager()->createQueryBuilder(Textnode::class)
             ->updateMany()

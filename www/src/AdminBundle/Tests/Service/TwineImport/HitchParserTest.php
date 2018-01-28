@@ -19,6 +19,7 @@
 namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Textnode;
+use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -88,27 +89,23 @@ class HitchParserTest extends WebTestCase
 
     /**
      * tests parseDoubleArrowRight with a valid textnode id
+     * @throws \Exception
      */
     public function testParseDoubleArrowRightWithValidTextnodeIdOnRightPart(): void
     {
         $content = 'description-->textnodeId';
         $twineName = 'bar';
-        $name = 'someName';
 
         $this->textnodeRepositoryMock->expects(self::once())
             ->method('find')
             ->with('textnodeId')
             ->willReturn(new Textnode());
 
-        $result = $this->hitchParser->parseDoubleArrowRight($content, $twineName, $name);
-
-        self::assertInternalType('array', $result);
-        self::assertArrayHasKey('description', $result);
-        self::assertEquals('description', $result['description']);
-        self::assertArrayHasKey('textnodeId', $result);
-        self::assertEquals('textnodeId', $result['textnodeId']);
-        self::assertArrayHasKey('status', $result);
-        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result['status']);
+        $result = $this->hitchParser->parseDoubleArrowRight($content, $twineName);
+        self::assertInstanceOf(TextnodeHitch::class, $result);
+        self::assertEquals('description', $result->getDescription());
+        self::assertEquals('textnodeId', $result->getTextnodeId());
+        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result->getStatus());
     }
 
     /**
@@ -165,14 +162,10 @@ class HitchParserTest extends WebTestCase
         $this->hitchParser->setNodeNameMapping($mapping);
 
         $result = $this->hitchParser->parseSingleArrowRight($content, $name);
-
-        self::assertInternalType('array', $result);
-        self::assertArrayHasKey('description', $result);
-        self::assertEquals('description', $result['description']);
-        self::assertArrayHasKey('textnodeId', $result);
-        self::assertEquals('textnodeId', $result['textnodeId']);
-        self::assertArrayHasKey('status', $result);
-        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result['status']);
+        self::assertInstanceOf(TextnodeHitch::class, $result);
+        self::assertEquals('description', $result->getDescription());
+        self::assertEquals('textnodeId', $result->getTextnodeId());
+        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result->getStatus());
     }
 
     /**
@@ -228,13 +221,10 @@ class HitchParserTest extends WebTestCase
 
         $result = $this->hitchParser->parseSingleArrowLeft($content, $name);
 
-        self::assertInternalType('array', $result);
-        self::assertArrayHasKey('description', $result);
-        self::assertEquals('description', $result['description']);
-        self::assertArrayHasKey('textnodeId', $result);
-        self::assertEquals('textnodeId', $result['textnodeId']);
-        self::assertArrayHasKey('status', $result);
-        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result['status']);
+        self::assertInstanceOf(TextnodeHitch::class, $result);
+        self::assertEquals('description', $result->getDescription());
+        self::assertEquals('textnodeId', $result->getTextnodeId());
+        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result->getStatus());
     }
 
     /**
@@ -277,13 +267,10 @@ class HitchParserTest extends WebTestCase
         $this->hitchParser->setNodeNameMapping($keyMap);
         $result = $this->hitchParser->parseSimpleHitch($content, $name);
 
-        self::assertInternalType('array', $result);
-        self::assertArrayHasKey('description', $result);
-        self::assertEquals('mapKey', $result['description']);
-        self::assertArrayHasKey('textnodeId', $result);
-        self::assertEquals('textnodeId', $result['textnodeId']);
-        self::assertArrayHasKey('status', $result);
-        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result['status']);
+        self::assertInstanceOf(TextnodeHitch::class, $result);
+        self::assertEquals('mapKey', $result->getDescription());
+        self::assertEquals('textnodeId', $result->getTextnodeId());
+        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result->getStatus());
     }
 
     /**

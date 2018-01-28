@@ -19,6 +19,7 @@
 namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Textnode;
+use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -235,7 +236,7 @@ class StoryDataParserTest extends TestCase
             'someTwineId' => 'someTextnodeId',
         ];
 
-        $someHitch = [];
+        $someHitch = new TextnodeHitch();
 
         /* @var $textnode \PHPUnit_Framework_MockObject_MockObject|Textnode */
         $textnodeMock = $this->createMock(Textnode::class);
@@ -294,7 +295,7 @@ class StoryDataParserTest extends TestCase
             'someTwineId' => 'someTextnodeId',
         ];
 
-        $someHitch = [];
+        $someHitch = new TextnodeHitch();
 
         /* @var $textnode \PHPUnit_Framework_MockObject_MockObject|Textnode */
         $textnodeMock = $this->createMock(Textnode::class);
@@ -338,7 +339,7 @@ class StoryDataParserTest extends TestCase
             'someTwineId' => 'someTextnodeId',
         ];
 
-        $someHitch = [];
+        $someHitch = new TextnodeHitch();
 
         /* @var $textnode \PHPUnit_Framework_MockObject_MockObject|Textnode */
         $textnodeMock = $this->createMock(Textnode::class);
@@ -373,14 +374,13 @@ class StoryDataParserTest extends TestCase
      * @expectedException \Exception
      *
      * @expectedExceptionMessage The Twine archive file contains a 'someName' with the invalid element '[[>:<value]]'.
+     * @throws \Exception
      */
     public function testEndElementForInvalidMetadataField(): void
     {
         $textnodeMapping = [
             'someTwineId' => 'someTextnodeId',
         ];
-
-        $someHitch = [];
 
         /* @var $textnode \PHPUnit_Framework_MockObject_MockObject|Textnode */
         $textnodeMock = $this->createMock(Textnode::class);

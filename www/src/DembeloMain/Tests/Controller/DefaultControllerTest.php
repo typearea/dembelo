@@ -28,6 +28,7 @@ declare(strict_types = 1);
 namespace DembeloMain\Tests\Controller;
 
 use DembeloMain\Document\Textnode;
+use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Document\User;
 use DembeloMain\Model\FavoriteManager;
 use DembeloMain\Model\FeatureToggle;
@@ -183,13 +184,14 @@ class DefaultControllerTest extends WebTestCase
     {
         $topicId = 'someTopicId';
 
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('1');
+        $hitchMock->method('getDescription')->willReturn(2);
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
+
         $textnode = new Textnode();
         $textnode->setArbitraryId('someArbitraryId');
-        $textnode->appendHitch([
-            'textnodeId' => '1',
-            'description' => 2,
-            'status' => Textnode::HITCH_STATUS_ACTIVE,
-        ]);
+        $textnode->appendHitch($hitchMock);
 
         $this->featureToggleMock->expects(self::once())
             ->method('hasFeature')
@@ -244,13 +246,14 @@ class DefaultControllerTest extends WebTestCase
     {
         $topicId = 'someTopicId';
 
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('1');
+        $hitchMock->method('getDescription')->willReturn(2);
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
+
         $textnode = new Textnode();
         $textnode->setArbitraryId('someArbitraryId');
-        $textnode->appendHitch([
-            'textnodeId' => '1',
-            'description' => 2,
-            'status' => Textnode::HITCH_STATUS_ACTIVE,
-        ]);
+        $textnode->appendHitch($hitchMock);
 
         $user = new User();
 
@@ -428,14 +431,15 @@ class DefaultControllerTest extends WebTestCase
         $textnodeArbitraryId = 'someArbitraryId';
         $textnodeId = 'someId';
 
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTextnodeId')->willReturn('1');
+        $hitchMock->method('getDescription')->willReturn(2);
+        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
+
         $textnode = new Textnode();
         $textnode->setId($textnodeId);
         $textnode->setArbitraryId($textnodeArbitraryId);
-        $textnode->appendHitch([
-            'textnodeId' => '1',
-            'description' => 2,
-            'status' => Textnode::HITCH_STATUS_ACTIVE,
-        ]);
+        $textnode->appendHitch($hitchMock);
 
         $responseMock = $this->createMock(Response::class);
 

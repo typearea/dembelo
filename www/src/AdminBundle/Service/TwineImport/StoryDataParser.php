@@ -19,6 +19,7 @@
 namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Textnode;
+use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use Parsedown;
 
@@ -231,13 +232,13 @@ class StoryDataParser
 
     /**
      * @param Textnode   $textnode
-     * @param array|null $hitch
+     * @param TextnodeHitch|null $hitch
      *
      * @return void
      *
      * @throws \Exception
      */
-    private function appendHitchToTextnode(Textnode $textnode, ?array $hitch): void
+    private function appendHitchToTextnode(Textnode $textnode, ?TextnodeHitch $hitch): void
     {
         if (null === $hitch) {
             return;
