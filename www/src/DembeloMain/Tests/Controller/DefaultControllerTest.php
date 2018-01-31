@@ -36,6 +36,7 @@ use DembeloMain\Model\Readpath;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use DembeloMain\Model\Repository\UserRepositoryInterface;
 use DembeloMain\Service\ReadpathUndoService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use DembeloMain\Controller\DefaultController;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -433,7 +434,7 @@ class DefaultControllerTest extends WebTestCase
 
         $sourceTextnode = $this->createMock(Textnode::class);
         $sourceTextnode->method('getArbitraryId')->willReturn($textnodeArbitraryId);
-        $sourceTextnode->method('getChildHitches')->willReturn([]);
+        $sourceTextnode->method('getChildHitches')->willReturn(new ArrayCollection());
         $sourceTextnode->method('getId')->willReturn($textnodeId);
 
         $responseMock = $this->createMock(Response::class);

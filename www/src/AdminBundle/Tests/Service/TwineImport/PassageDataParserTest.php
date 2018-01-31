@@ -20,6 +20,7 @@ namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -38,12 +39,18 @@ class PassageDataParserTest extends TestCase
     private $parser;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|DocumentManager
+     */
+    private $documentManagerMock;
+
+    /**
      * @return void
      */
     public function setUp(): void
     {
         $this->textnodeRepositoryMock = $this->createMock(TextNodeRepositoryInterface::class);
-        $this->parser = new PassageDataParser($this->textnodeRepositoryMock);
+        $this->documentManagerMock = $this->createMock(DocumentManager::class);
+        $this->parser = new PassageDataParser($this->textnodeRepositoryMock, $this->documentManagerMock);
     }
 
     /**

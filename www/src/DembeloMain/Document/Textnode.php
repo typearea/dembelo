@@ -20,6 +20,7 @@
  */
 namespace DembeloMain\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\ReferenceMany;
 
@@ -80,16 +81,16 @@ class Textnode
     protected $licenseeId;
 
     /**
-     * @var TextnodeHitch[]
+     * @var TextnodeHitch[]|ArrayCollection
      * @ReferenceMany(targetDocument="TextnodeHitch", mappedBy="targetHitches")
      */
-    protected $parentHitches = [];
+    protected $parentHitches;
 
     /**
-     * @var TextnodeHitch[]
+     * @var TextnodeHitch[]|ArrayCollection
      * @ReferenceMany(targetDocument="TextnodeHitch", mappedBy="sourceHitches")
      */
-    protected $childHitches = [];
+    protected $childHitches;
 
     /**
      * @MongoDB\Field(type="object_id")
@@ -105,6 +106,12 @@ class Textnode
      * @MongoDB\Field(type="string")
      */
     protected $arbitraryId;
+
+    public function __construct()
+    {
+        $this->childHitches = new ArrayCollection();
+        $this->parentHitches = new ArrayCollection();
+    }
 
     /**
      * gets the timestamp of creation
@@ -289,17 +296,17 @@ class Textnode
     }
 
     /**
-     * @return TextnodeHitch[]
+     * @return TextnodeHitch[]|ArrayCollection
      */
-    public function getChildHitches(): array
+    public function getChildHitches(): ArrayCollection
     {
         return $this->childHitches;
     }
 
     /**
-     * @return TextnodeHitch[]
+     * @return TextnodeHitch[]|ArrayCollection
      */
-    public function getParentHitches(): array
+    public function getParentHitches(): ArrayCollection
     {
         return $this->parentHitches;
     }
@@ -369,8 +376,8 @@ class Textnode
      *
      * @return bool
      */
-    public function isFinanceNode()
+    public function isFinanceNode(): bool
     {
-        return count($this->getChildHitches()) === 0;
+        return $this->getChildHitches()->isEmpty();
     }
 }

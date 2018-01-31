@@ -21,6 +21,8 @@ namespace AdminBundle\Service\TwineImport;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -49,6 +51,11 @@ class StoryDataParserTest extends TestCase
     private $parsedownMock;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|DocumentManager
+     */
+    private $documentManagerMock;
+
+    /**
      * @return void
      */
     public function setUp(): void
@@ -57,7 +64,13 @@ class StoryDataParserTest extends TestCase
         $this->textnodeRepositoryMock = $this->createMock(TextNodeRepositoryInterface::class);
         $this->parsedownMock = $this->createMock(\Parsedown::class);
         $this->parsedownMock->method('parse')->willReturnArgument(0);
-        $this->parser = new StoryDataParser($this->hitchParserMock, $this->textnodeRepositoryMock, $this->parsedownMock);
+        $this->documentManagerMock = $this->createMock(DocumentManager::class);
+        $this->parser = new StoryDataParser(
+            $this->hitchParserMock,
+            $this->textnodeRepositoryMock,
+            $this->parsedownMock,
+            $this->documentManagerMock
+        );
     }
 
     /**
@@ -155,6 +168,7 @@ class StoryDataParserTest extends TestCase
 
     /**
      * @return void
+     * @throws \Exception
      */
     public function testEndElementWithoutAnyHitches(): void
     {
@@ -168,6 +182,7 @@ class StoryDataParserTest extends TestCase
             ->willReturnCallback(function (string $textNew) {
                 self::assertEquals('<p>someText</p><p>someOtherText</p>', $textNew);
             });
+        $textnodeMock->method('getChildHitches')->willReturn(new ArrayCollection());
 
         $textnodeMapping = [
             'someTwineId' => $textnodeMock,
@@ -211,6 +226,7 @@ class StoryDataParserTest extends TestCase
             ->willReturnCallback(function (string $textNew) {
                 self::assertEquals('<p>someText</p>', $textNew);
             });
+        $textnodeMock->method('getChildHitches')->willReturn(new ArrayCollection());
 
         $textnodeMapping = [
             'someTwineId' => $textnodeMock,
@@ -293,6 +309,7 @@ class StoryDataParserTest extends TestCase
         $textnodeMock->expects(self::any())
             ->method('getText')
             ->willReturn('someText [[>:<value]] ');
+        $textnodeMock->method('getChildHitches')->willReturn(new ArrayCollection());
 
         $textnodeMapping = [
             'someTwineId' => $textnodeMock,
@@ -325,6 +342,7 @@ class StoryDataParserTest extends TestCase
         $textnodeMock->expects(self::once())
             ->method('getMetadata')
             ->willReturn(['key' => 'foobar']);
+        $textnodeMock->method('getChildHitches')->willReturn(new ArrayCollection());
 
         $textnodeMapping = [
             'someTwineId' => $textnodeMock,
