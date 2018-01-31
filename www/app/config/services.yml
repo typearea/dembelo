@@ -135,7 +135,7 @@ services:
 
     app.twig_extension.version:
             class: DembeloMain\Twig\VersionExtension
-            arguments: [%version_file%]
+            arguments: ["%version_file%"]
             tags:
                 - { name: twig.extension }
 
