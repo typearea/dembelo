@@ -34,6 +34,12 @@ class TextnodeHitch
 
     /**
      * @var string
+     * @MongoDB\Id
+     */
+    private $id;
+
+    /**
+     * @var string
      * @MongoDB\Field(type="string")
      */
     private $description;
@@ -55,6 +61,24 @@ class TextnodeHitch
      * @MongoDB\Field(type="integer")
      */
     private $status;
+
+    /**
+     * @return string
+     */
+    public function getId(): ?string
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
+    public function setId(string $id): void
+    {
+        $this->id = $id;
+    }
 
     /**
      * @return string
