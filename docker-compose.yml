@@ -9,6 +9,8 @@ services:
     volumes:
       - ./www:/var/www/dembelo/www
       - ./docker/scripts:/var/www/dembelo/docker/scripts
+    environment:
+      PHP_IDE_CONFIG: "serverName=Docker"
   database:
     image: "mongo"
     ports:
