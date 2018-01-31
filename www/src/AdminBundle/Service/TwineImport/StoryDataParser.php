@@ -21,6 +21,7 @@ namespace AdminBundle\Service\TwineImport;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Parsedown;
 
 /**
@@ -49,16 +50,22 @@ class StoryDataParser
     private $markupParser;
 
     /**
+     * @var DocumentManager
+     */
+    private $documentManager;
+
+    /**
      * StoryDataParser constructor.
      * @param HitchParser                 $hitchParser
      * @param TextNodeRepositoryInterface $textnodeRepository
      * @param Parsedown                   $markupParser
      */
-    public function __construct(HitchParser $hitchParser, TextNodeRepositoryInterface $textnodeRepository, Parsedown $markupParser)
+    public function __construct(HitchParser $hitchParser, TextNodeRepositoryInterface $textnodeRepository, Parsedown $markupParser, DocumentManager $documentManager)
     {
         $this->hitchParser = $hitchParser;
         $this->textnodeRepository = $textnodeRepository;
         $this->markupParser = $markupParser;
+        $this->documentManager = $documentManager;
     }
 
     /**
@@ -191,6 +198,9 @@ class StoryDataParser
      */
     private function parseText(Textnode $textnode, string $name): ?string
     {
+        foreach ($textnode->getChildHitches() as $childHitch) {
+            $this->documentManager->remove($childHitch);
+        }
         $text = $this->markupParser->parse($textnode->getText());
         $textnodeTextNew = preg_replace_callback(
             '/\[\[(.*?)\]\]/',
@@ -216,7 +226,7 @@ class StoryDataParser
 
                 if ($hitch) {
                     $hitch->setSourceTextnode($textnode);
-                    //@todo persist hitch
+                    $this->documentManager->persist($hitch);
                 }
             },
             $text

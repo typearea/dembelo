@@ -283,48 +283,6 @@ class StoryDataParserTest extends TestCase
      *
      * @expectedException \Exception
      *
-     * @expectedExceptionMessage Failed to append hitch for a textnode
-     */
-    public function xtestEndElementForFailingAppendHitch(): void
-    {
-        $textnodeMapping = [
-            'someTwineId' => 'someTextnodeId',
-        ];
-
-        $someHitch = new TextnodeHitch();
-
-        /* @var $textnode \PHPUnit_Framework_MockObject_MockObject|Textnode */
-        $textnodeMock = $this->createMock(Textnode::class);
-        $textnodeMock->expects(self::any())
-            ->method('getText')
-            ->willReturn('someText [[foo1-->foo2]] ');
-        $textnodeMock->expects(self::once())
-            ->method('appendHitch')
-            ->willReturn(false);
-
-        $parserContext = $this->createParserContextMock();
-        $parserContext->expects(self::any())
-            ->method('getTextnodeMapping')
-            ->willReturn($textnodeMapping);
-        $this->parser->setParserContext($parserContext);
-
-        $this->textnodeRepositoryMock->expects(self::once())
-            ->method('find')
-            ->willReturn($textnodeMock);
-
-        $this->hitchParserMock->expects(self::once())
-            ->method('parseDoubleArrowRight')
-            ->with('foo1-->foo2')
-            ->willReturn($someHitch);
-
-        $this->parser->endElement('someName');
-    }
-
-    /**
-     * @return void
-     *
-     * @expectedException \Exception
-     *
      * @expectedExceptionMessage The Twine archive file contains a 'someName' with the invalid element '[[>:<value]]'.
      * @throws \Exception
      */

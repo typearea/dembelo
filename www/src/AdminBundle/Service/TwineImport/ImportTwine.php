@@ -20,6 +20,7 @@ namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Importfile;
 use DembeloMain\Service\FileHandler;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * Class ImportTwine
@@ -62,6 +63,11 @@ class ImportTwine
     private $fileHandler;
 
     /**
+     * @var DocumentManager
+     */
+    private $documentManager;
+
+    /**
      * ImportTwine constructor.
      * @param FileExtractor     $fileExtractor
      * @param FileCheck         $fileCheck
@@ -70,7 +76,7 @@ class ImportTwine
      * @param ParserContext     $parserContext
      * @param FileHandler       $fileHandler
      */
-    public function __construct(FileExtractor $fileExtractor, FileCheck $fileCheck, StoryDataParser $storyDataParser, PassageDataParser $passageDataParser, ParserContext $parserContext, FileHandler $fileHandler)
+    public function __construct(FileExtractor $fileExtractor, FileCheck $fileCheck, StoryDataParser $storyDataParser, PassageDataParser $passageDataParser, ParserContext $parserContext, FileHandler $fileHandler, DocumentManager $documentManager)
     {
         $this->fileExtractor = $fileExtractor;
         $this->fileCheck = $fileCheck;
@@ -78,6 +84,7 @@ class ImportTwine
         $this->passageDataParser = $passageDataParser;
         $this->parserContext = $parserContext;
         $this->fileHandler = $fileHandler;
+        $this->documentManager = $documentManager;
     }
 
     /**
@@ -108,9 +115,10 @@ class ImportTwine
                 return false;
             }
 
-            //@todo flush database
+            $this->documentManager->flush();
         } catch (\Throwable $exception) {
-            //@todo clear uow
+            $this->documentManager->clear();
+
             return false;
         }
 

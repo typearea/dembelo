@@ -21,6 +21,7 @@ namespace DembeloMain\Command;
 use Apoutchika\LoremIpsumBundle\Services\LoremIpsum;
 use DembeloMain\Document\Licensee;
 use DembeloMain\Document\Textnode;
+use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use DembeloMain\Model\Repository\TopicRepositoryInterface;
@@ -515,14 +516,14 @@ class InstallCommand extends Command
         $hitch = [];
         $hitch['textnodeId'] = $dummyTextnodes[1]->getId();
         $hitch['description'] = 'Mehr Lorem.';
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitch['status'] = TextnodeHitch::STATUS_ACTIVE;
         $dummyTextnodes[0]->appendHitch($hitch);
         $this->textNodeRepository->save($this->dummyData['textnodes'][0]);
 
         $hitch = [];
         $hitch['textnodeId'] = $dummyTextnodes[2]->getId();
         $hitch['description'] = 'Mehr Ipsum.';
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
+        $hitch['status'] = TextnodeHitch::STATUS_ACTIVE;
         $dummyTextnodes[0]->appendHitch($hitch);
 
         $this->textNodeRepository->save($dummyTextnodes[0]);

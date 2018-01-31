@@ -13,6 +13,7 @@ services:
             - "@app.twineImport.passageDataParser"
             - "@app.twineImport.parserContext"
             - "@app.filehandler"
+            - "@doctrine.odm.mongodb.document_manager"
 
     # @todo remove dependency from service container
     app.feature_toggle:
@@ -173,11 +174,13 @@ services:
             - "@app.twineImport.hitchparser"
             - "@app.model_repository_textnode"
             - "@parsedown"
+            - "@doctrine.odm.mongodb.document_manager"
 
     app.twineImport.passageDataParser:
         class: AdminBundle\Service\TwineImport\PassageDataParser
         arguments:
             - "@app.model_repository_textnode"
+            - "@doctrine.odm.mongodb.document_manager"
 
     app.twineImport.parserContext:
         class: AdminBundle\Service\TwineImport\ParserContext

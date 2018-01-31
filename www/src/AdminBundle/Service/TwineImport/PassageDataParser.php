@@ -21,6 +21,7 @@ namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * Class PassageDataParser
@@ -43,12 +44,18 @@ class PassageDataParser
     private $twineTextnodeName;
 
     /**
+     * @var DocumentManager
+     */
+    private $documentManager;
+
+    /**
      * PassageDataParser constructor.
      * @param TextNodeRepositoryInterface $textNodeRepository
      */
-    public function __construct(TextNodeRepositoryInterface $textNodeRepository)
+    public function __construct(TextNodeRepositoryInterface $textNodeRepository, DocumentManager $documentManager)
     {
         $this->textnodeRepository = $textNodeRepository;
+        $this->documentManager = $documentManager;
     }
 
     /**
@@ -127,9 +134,6 @@ class PassageDataParser
      */
     public function endElement(): void
     {
-        //@todo persist textnode
-        //$this->textnodeRepository->save($this->parserContext->getCurrentTextnode());
-
         $nodenameMapping = $this->parserContext->getNodenameMapping();
         $nodenameMapping[$this->twineTextnodeName] = $this->parserContext->getCurrentTextnode();
         $this->parserContext->setNodenameMapping($nodenameMapping);
@@ -151,6 +155,8 @@ class PassageDataParser
         $textnode->setImportfileId($this->parserContext->getImportfile()->getId());
         $textnode->setStatus(Textnode::STATUS_ACTIVE);
         $textnode->setTwineId($twineId);
+
+        $this->documentManager->persist($textnode);
 
         return $textnode;
     }
