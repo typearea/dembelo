@@ -47,7 +47,8 @@ class ParserContext
     private $twineText = false;
 
     /**
-     * @var array
+     * twineId => $textnode
+     * @var Textnode[]
      */
     private $textnodeMapping = [];
 
@@ -62,7 +63,8 @@ class ParserContext
     private $accessSet = false;
 
     /**
-     * @var array
+     * textnodename => textnode
+     * @var Textnode[]
      */
     private $nodenameMapping = [];
 
@@ -137,7 +139,7 @@ class ParserContext
     {
         $this->currentTextnode = $currentTextnode;
         $twineId = $currentTextnode->getTwineId();
-        $this->textnodeMapping[$twineId] = $currentTextnode->getId();
+        $this->textnodeMapping[$twineId] = $currentTextnode;
     }
 
     /**
@@ -167,7 +169,7 @@ class ParserContext
     }
 
     /**
-     * @return string[]
+     * @return Textnode[]
      */
     public function getTextnodeMapping(): array
     {
@@ -211,7 +213,7 @@ class ParserContext
     }
 
     /**
-     * @return array
+     * @return Textnode[]
      */
     public function getNodenameMapping(): array
     {
@@ -219,7 +221,7 @@ class ParserContext
     }
 
     /**
-     * @param array $nodenameMapping
+     * @param Textnode[] $nodenameMapping
      *
      * @return void
      */

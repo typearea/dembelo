@@ -508,7 +508,7 @@ class InstallCommand extends Command
             return;
         }
 
-        if ($dummyTextnodes[0]->getHitchCount() >= 2) {
+        if ($dummyTextnodes[0]->getChildHitchCount() >= 2) {
             return;
         }
 

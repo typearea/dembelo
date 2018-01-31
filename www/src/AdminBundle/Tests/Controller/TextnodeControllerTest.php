@@ -25,13 +25,13 @@ use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
 use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class TextnodeControllerTest
  */
-class TextnodeControllerTest extends WebTestCase
+class TextnodeControllerTest extends TestCase
 {
     /**
      * @var TextnodeController

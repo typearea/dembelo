@@ -184,14 +184,15 @@ class DefaultControllerTest extends WebTestCase
     {
         $topicId = 'someTopicId';
 
-        $hitchMock = $this->createMock(TextnodeHitch::class);
-        $hitchMock->method('getTextnodeId')->willReturn('1');
-        $hitchMock->method('getDescription')->willReturn(2);
-        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
+        $childTextnodeMock = $this->createMock(Textnode::class);
 
-        $textnode = new Textnode();
-        $textnode->setArbitraryId('someArbitraryId');
-        $textnode->appendHitch($hitchMock);
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTargetTextnode')->willReturn($childTextnodeMock);
+        $hitchMock->method('getDescription')->willReturn(2);
+        $hitchMock->method('getStatus')->willReturn(TextnodeHitch::STATUS_ACTIVE);
+
+        $textnodeMock = $this->createMock(Textnode::class);
+        $textnodeMock->method('getArbitraryId')->willReturn('someArbitraryId');
 
         $this->featureToggleMock->expects(self::once())
             ->method('hasFeature')
@@ -199,7 +200,7 @@ class DefaultControllerTest extends WebTestCase
         $this->textnodeRepositoryMock->expects(self::once())
             ->method('getTextnodeToRead')
             ->with($topicId)
-            ->willReturn($textnode);
+            ->willReturn($textnodeMock);
         $this->tokenStorageMock->expects(self::once())
             ->method('getToken')
             ->willReturn(null);
@@ -246,14 +247,13 @@ class DefaultControllerTest extends WebTestCase
     {
         $topicId = 'someTopicId';
 
-        $hitchMock = $this->createMock(TextnodeHitch::class);
-        $hitchMock->method('getTextnodeId')->willReturn('1');
-        $hitchMock->method('getDescription')->willReturn(2);
-        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
+        $textnodeMock = $this->createMock(Textnode::class);
+        $textnodeMock->method('getArbitraryId')->willReturn('someArbitraryId');
 
-        $textnode = new Textnode();
-        $textnode->setArbitraryId('someArbitraryId');
-        $textnode->appendHitch($hitchMock);
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getTargetTextnode')->willReturn($textnodeMock);
+        $hitchMock->method('getDescription')->willReturn(2);
+        $hitchMock->method('getStatus')->willReturn(TextnodeHitch::STATUS_ACTIVE);
 
         $user = new User();
 
@@ -272,7 +272,7 @@ class DefaultControllerTest extends WebTestCase
         $this->textnodeRepositoryMock->expects(self::once())
             ->method('getTextnodeToRead')
             ->with($topicId)
-            ->willReturn($textnode);
+            ->willReturn($textnodeMock);
         $this->tokenStorageMock->expects(self::once())
             ->method('getToken')
             ->willReturn($tokenMock);
@@ -431,15 +431,10 @@ class DefaultControllerTest extends WebTestCase
         $textnodeArbitraryId = 'someArbitraryId';
         $textnodeId = 'someId';
 
-        $hitchMock = $this->createMock(TextnodeHitch::class);
-        $hitchMock->method('getTextnodeId')->willReturn('1');
-        $hitchMock->method('getDescription')->willReturn(2);
-        $hitchMock->method('getStatus')->willReturn(Textnode::HITCH_STATUS_ACTIVE);
-
-        $textnode = new Textnode();
-        $textnode->setId($textnodeId);
-        $textnode->setArbitraryId($textnodeArbitraryId);
-        $textnode->appendHitch($hitchMock);
+        $sourceTextnode = $this->createMock(Textnode::class);
+        $sourceTextnode->method('getArbitraryId')->willReturn($textnodeArbitraryId);
+        $sourceTextnode->method('getChildHitches')->willReturn([]);
+        $sourceTextnode->method('getId')->willReturn($textnodeId);
 
         $responseMock = $this->createMock(Response::class);
 
@@ -449,7 +444,7 @@ class DefaultControllerTest extends WebTestCase
         $this->textnodeRepositoryMock->expects(self::once())
             ->method('findOneActiveByArbitraryId')
             ->with($textnodeArbitraryId)
-            ->willReturn($textnode);
+            ->willReturn($sourceTextnode);
         $this->tokenStorageMock->expects(self::once())
             ->method('getToken')
             ->willReturn(null);
@@ -458,7 +453,7 @@ class DefaultControllerTest extends WebTestCase
             ->with(
                 'DembeloMain::default/read.html.twig',
                 [
-                    'textnode' => $textnode,
+                    'textnode' => $sourceTextnode,
                     'hitches' => [],
                 ]
             )
@@ -468,7 +463,7 @@ class DefaultControllerTest extends WebTestCase
             ->with($textnodeId);
 
         $returnValue = $this->controller->readTextnodeAction($textnodeArbitraryId);
-        self::assertSame($responseMock, $returnValue);
+        self::assertEquals($responseMock, $returnValue);
     }
 
     /**

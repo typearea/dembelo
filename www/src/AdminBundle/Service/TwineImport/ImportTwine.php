@@ -91,19 +91,26 @@ class ImportTwine
      */
     public function run(Importfile $importfile): bool
     {
-        $this->parserContext->init($importfile);
-        $this->storyDataParser->setParserContext($this->parserContext);
-        $this->passageDataParser->setParserContext($this->parserContext);
+        try {
+            $this->parserContext->init($importfile);
+            $this->storyDataParser->setParserContext($this->parserContext);
+            $this->passageDataParser->setParserContext($this->parserContext);
 
-        $filenameExtracted = $this->fileExtractor->extract($this->parserContext->getFilename());
+            $filenameExtracted = $this->fileExtractor->extract($this->parserContext->getFilename());
 
-        $fileHandler = $this->fileHandler->open($filenameExtracted, 'rb');
+            $fileHandler = $this->fileHandler->open($filenameExtracted, 'rb');
 
-        $this->xmlParser = xml_parser_create('UTF-8');
+            $this->xmlParser = xml_parser_create('UTF-8');
 
-        $this->fileCheck->check($fileHandler, $this->parserContext->getFilename());
+            $this->fileCheck->check($fileHandler, $this->parserContext->getFilename());
 
-        if (!$this->initParser($fileHandler)) {
+            if (!$this->initParser($fileHandler)) {
+                return false;
+            }
+
+            //@todo flush database
+        } catch (\Throwable $exception) {
+            //@todo clear uow
             return false;
         }
 

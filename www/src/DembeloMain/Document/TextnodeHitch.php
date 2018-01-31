@@ -19,21 +19,40 @@
 
 namespace DembeloMain\Document;
 
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
+/**
+ * Class TextnodeHitch
+ * @MongoDB\Document(repositoryClass="\DembeloMain\Model\Repository\Doctrine\ODM\TextnodeHitchRepository")
+ */
 class TextnodeHitch
 {
+    public const STATUS_INACTIVE = 0;
+    public const STATUS_ACTIVE = 1;
+
+    public const MAXIMUM_COUNT = 8;
+
     /**
      * @var string
+     * @MongoDB\Field(type="string")
      */
     private $description;
 
     /**
-     * @var string
+     * @var Textnode
+     * @MongoDB\ReferenceOne(targetDocument="Textnode", inversedBy="childHitches")
      */
-    private $textnodeId;
+    private $sourceTextnode;
+
+    /**
+     * @var Textnode
+     * @MongoDB\ReferenceOne(targetDocument="Textnode", inversedBy="parentHitches")
+     */
+    private $targetTextnode;
 
     /**
      * @var int
+     * @MongoDB\Field(type="integer")
      */
     private $status;
 
@@ -54,19 +73,35 @@ class TextnodeHitch
     }
 
     /**
-     * @return string
+     * @return Textnode
      */
-    public function getTextnodeId(): string
+    public function getTargetTextnode(): Textnode
     {
-        return $this->textnodeId;
+        return $this->targetTextnode;
     }
 
     /**
-     * @param string $textnodeId
+     * @param Textnode $targetTextnode
      */
-    public function setTextnodeId(string $textnodeId): void
+    public function setTargetTextnode(Textnode $targetTextnode): void
     {
-        $this->textnodeId = $textnodeId;
+        $this->targetTextnode = $targetTextnode;
+    }
+
+    /**
+     * @return Textnode
+     */
+    public function getSourceTextnode(): Textnode
+    {
+        return $this->sourceTextnode;
+    }
+
+    /**
+     * @param Textnode $sourceTextnode
+     */
+    public function setSourceTextnode(Textnode $sourceTextnode): void
+    {
+        $this->sourceTextnode = $sourceTextnode;
     }
 
     /**

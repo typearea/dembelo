@@ -193,15 +193,13 @@ class DefaultController extends Controller
 
         $hitches = [];
 
-        for ($i = 0; $i < $textnode->getHitchCount(); ++$i) {
-            $hitch = $textnode->getHitch($i);
-            $hitchedTextnode = $this->getTextnodeForTextnodeId($hitch['textnodeId']);
-            if (null === $hitchedTextnode) {
-                continue;
-            }
+        $childHitches = $textnode->getChildHitches();
+        $index = 0;
+        foreach ($childHitches as $childHitch) {
+            $hitchedTextnode = $childHitch->getTargetTextnode();
             $hitches[] = [
-                'index' => $i,
-                'description' => $hitch['description'],
+                'index' => $index++,
+                'description' => $childHitch->getDescription(),
                 'arbitraryId' => $hitchedTextnode->getArbitraryId(),
                 'isFinanceNode' => $hitchedTextnode->isFinanceNode(),
             ];

@@ -96,16 +96,18 @@ class HitchParserTest extends WebTestCase
         $content = 'description-->textnodeId';
         $twineName = 'bar';
 
+        $targetTextnode = new Textnode();
+
         $this->textnodeRepositoryMock->expects(self::once())
             ->method('find')
             ->with('textnodeId')
-            ->willReturn(new Textnode());
+            ->willReturn($targetTextnode);
 
         $result = $this->hitchParser->parseDoubleArrowRight($content, $twineName);
         self::assertInstanceOf(TextnodeHitch::class, $result);
         self::assertEquals('description', $result->getDescription());
-        self::assertEquals('textnodeId', $result->getTextnodeId());
-        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result->getStatus());
+        self::assertSame($targetTextnode, $result->getTargetTextnode());
+        self::assertEquals(TextnodeHitch::STATUS_ACTIVE, $result->getStatus());
     }
 
     /**
@@ -149,14 +151,17 @@ class HitchParserTest extends WebTestCase
 
     /**
      * tests singleArrowRight with a valid map name
+     * @throws \Exception
      */
     public function testSingleArrowRightWithValidMapName(): void
     {
         $content = 'description->key';
         $name = 'someName';
 
+        $targetTextnode = new Textnode();
+
         $mapping = [
-            'key' => 'textnodeId',
+            'key' => $targetTextnode,
         ];
 
         $this->hitchParser->setNodeNameMapping($mapping);
@@ -164,8 +169,8 @@ class HitchParserTest extends WebTestCase
         $result = $this->hitchParser->parseSingleArrowRight($content, $name);
         self::assertInstanceOf(TextnodeHitch::class, $result);
         self::assertEquals('description', $result->getDescription());
-        self::assertEquals('textnodeId', $result->getTextnodeId());
-        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result->getStatus());
+        self::assertEquals($targetTextnode, $result->getTargetTextnode());
+        self::assertEquals(TextnodeHitch::STATUS_ACTIVE, $result->getStatus());
     }
 
     /**
@@ -208,13 +213,17 @@ class HitchParserTest extends WebTestCase
 
     /**
      * tests parseSingleArrowLeft with a valid key
+     * @throws \Exception
      */
     public function testParseSingleArrowLeftWithValidKey(): void
     {
         $content = 'mapKey<-description';
         $name = 'someName';
+
+        $targetTextnode = new Textnode();
+
         $keyMap = [
-            'mapKey' => 'textnodeId',
+            'mapKey' => $targetTextnode,
         ];
 
         $this->hitchParser->setNodeNameMapping($keyMap);
@@ -223,8 +232,8 @@ class HitchParserTest extends WebTestCase
 
         self::assertInstanceOf(TextnodeHitch::class, $result);
         self::assertEquals('description', $result->getDescription());
-        self::assertEquals('textnodeId', $result->getTextnodeId());
-        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result->getStatus());
+        self::assertEquals($targetTextnode, $result->getTargetTextnode());
+        self::assertEquals(TextnodeHitch::STATUS_ACTIVE, $result->getStatus());
     }
 
     /**
@@ -255,13 +264,17 @@ class HitchParserTest extends WebTestCase
 
     /**
      * tests parseSimpleHitch with a valid key
+     * @throws \Exception
      */
     public function testParseSimpleHitchWithValidKey(): void
     {
         $content = 'mapKey';
         $name = 'someName';
+
+        $targetTextnode = new Textnode();
+
         $keyMap = [
-            'mapKey' => 'textnodeId',
+            'mapKey' => $targetTextnode,
         ];
 
         $this->hitchParser->setNodeNameMapping($keyMap);
@@ -269,8 +282,8 @@ class HitchParserTest extends WebTestCase
 
         self::assertInstanceOf(TextnodeHitch::class, $result);
         self::assertEquals('mapKey', $result->getDescription());
-        self::assertEquals('textnodeId', $result->getTextnodeId());
-        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result->getStatus());
+        self::assertSame($targetTextnode, $result->getTargetTextnode());
+        self::assertEquals(TextnodeHitch::STATUS_ACTIVE, $result->getStatus());
     }
 
     /**

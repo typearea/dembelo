@@ -21,6 +21,7 @@
 namespace DembeloMain\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\ReferenceMany;
 
 /**
  * Class Textnode
@@ -32,11 +33,6 @@ class Textnode
 {
     public const STATUS_INACTIVE = 0;
     public const STATUS_ACTIVE = 1;
-
-    public const HITCH_STATUS_INACTIVE = 0;
-    public const HITCH_STATUS_ACTIVE = 1;
-
-    public const HITCHES_MAXIMUM_COUNT = 8;
 
     /**
      * @MongoDB\Id
@@ -84,9 +80,16 @@ class Textnode
     protected $licenseeId;
 
     /**
-     * @MongoDB\Field(type="hash")
+     * @var TextnodeHitch[]
+     * @ReferenceMany(targetDocument="TextnodeHitch", mappedBy="targetHitches")
      */
-    protected $hitches = [];
+    protected $parentHitches = [];
+
+    /**
+     * @var TextnodeHitch[]
+     * @ReferenceMany(targetDocument="TextnodeHitch", mappedBy="sourceHitches")
+     */
+    protected $childHitches = [];
 
     /**
      * @MongoDB\Field(type="object_id")
@@ -102,13 +105,6 @@ class Textnode
      * @MongoDB\Field(type="string")
      */
     protected $arbitraryId;
-
-    /**
-     * @var Textnode|null
-     *
-     * @MongoDB\ReferenceOne(targetDocument="Textnode", storeAs="id", nullable=true)
-     */
-    protected $parentTextnode;
 
     /**
      * gets the timestamp of creation
@@ -292,132 +288,20 @@ class Textnode
         return $this->access;
     }
 
-
     /**
-     * Counts the number of hitches within the collection.
-     *
-     * @return Number of hitches within the collection.
+     * @return TextnodeHitch[]
      */
-    public function getHitchCount()
+    public function getChildHitches(): array
     {
-        return count($this->hitches);
+        return $this->childHitches;
     }
 
     /**
-     * Gets the hitch which is stored in the collection at the
-     *     specified index.
-     *
-     * @param int $hitchIndex
-     *
-     * @return array|null Null, if the $hitchIndex doesn't specify
-     *     an element within the collection.
+     * @return TextnodeHitch[]
      */
-    public function getHitch($hitchIndex)
+    public function getParentHitches(): array
     {
-        if ($hitchIndex < 0 || $hitchIndex >= count($this->hitches)) {
-            return null;
-        }
-
-        return $this->hitches[$hitchIndex];
-    }
-
-    /**
-     * Appends a hitch at the end of the collection.
-     *
-     * @param TextnodeHitch $hitch
-     *
-     * @return true|false False, if $hitch doesn't contain all
-     *     associative array elements which form a hitch, or if
-     *     no "textnodeId" is set within $hitch, or if "status"
-     *     within $hitch doesn't contain a valid value, or if
-     *     there are already HITCHES_MAXIMUM_COUNT hitches present.
-     */
-    public function appendHitch(TextnodeHitch $hitch): bool
-    {
-        $hitchCount = count($this->hitches);
-
-        if ($hitchCount >= self::HITCHES_MAXIMUM_COUNT) {
-            return false;
-        }
-        if (!in_array($hitch->getStatus(), [self::HITCH_STATUS_INACTIVE, self::HITCH_STATUS_ACTIVE], true)) {
-            return false;
-        }
-
-        if (null === $hitch->getTextnodeId()) {
-            return false;
-        }
-
-        $this->hitches[$hitchCount] = [
-            'description' => $hitch->getDescription(),
-            'status' => $hitch->getStatus(),
-            'textnodeId' => $hitch->getTextnodeId(),
-        ];
-
-        return true;
-    }
-
-    /**
-     * Overwrites the hitch which is stored in the collection at the
-     *     specified index.
-     *
-     * @param int           $hitchIndex
-     * @param TextnodeHitch $hitch
-     *
-     * @return true|false False, if the $hitchIndex doesn't specify
-     *     an element within the collection, or if $hitch doesn't
-     *     contain all associative array elements which form a hitch,
-     *     or if no "textnodeId" is set within $hitch, or if "status"
-     *     within $hitch doesn't contain a valid value.
-     */
-    public function setHitch($hitchIndex, TextnodeHitch $hitch)
-    {
-        if ($hitchIndex < 0 || $hitchIndex >= count($this->hitches)) {
-            return false;
-        }
-
-        if (!\in_array($hitch->getStatus(), [self::HITCH_STATUS_INACTIVE, self::HITCH_STATUS_ACTIVE], true)) {
-            return false;
-        }
-
-        if (null === $hitch->getTextnodeId()) {
-            return false;
-        }
-
-        $this->hitches[$hitchIndex] = [
-            'description' => $hitch->getDescription(),
-            'status' => $hitch->getStatus(),
-            'textnodeId' => $hitch->getTextnodeId(),
-        ];
-
-        return true;
-    }
-
-    /**
-     * Removes the hitch which is stored in the collection at the
-     *     specified index. Reordering of the hitch collection will
-     *     take place, former collection indexes might become invalid
-     *     by calling removeHitch().
-     *
-     * @param int $hitchIndex
-     *
-     * @return true|false False, if the collection is already empty or
-     *     the $hitchIndex doesn't specify an element within the collection.
-     */
-    public function removeHitch($hitchIndex)
-    {
-        $hitchCount = count($this->hitches);
-
-        if ($hitchCount <= 0) {
-            return false;
-        }
-
-        if ($hitchIndex < 0 || $hitchIndex >= $hitchCount) {
-            return false;
-        }
-
-        array_splice($this->hitches, $hitchIndex, 1);
-
-        return true;
+        return $this->parentHitches;
     }
 
     /**
@@ -487,30 +371,6 @@ class Textnode
      */
     public function isFinanceNode()
     {
-        return $this->getHitchCount() === 0;
-    }
-
-    /**
-     * removes all hitches
-     */
-    public function clearHitches()
-    {
-        $this->hitches = [];
-    }
-
-    /**
-     * @return Textnode|null
-     */
-    public function getParentTextnode(): ?Textnode
-    {
-        return $this->parentTextnode;
-    }
-
-    /**
-     * @param Textnode $parentTextnode
-     */
-    public function setParentTextnode(Textnode $parentTextnode): void
-    {
-        $this->parentTextnode = $parentTextnode;
+        return count($this->getChildHitches()) === 0;
     }
 }

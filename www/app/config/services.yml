@@ -102,6 +102,12 @@ services:
         arguments:
             - DembeloMain\Document\Textnode
 
+    app.model_repository_textnodehitch:
+        class: DembeloMain\Model\Repository\Doctrine\ODM\TextnodeHitchRepository
+        factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
+        arguments:
+            - DembeloMain\Document\TextnodeHitch
+
     app.model_repository_read_path:
         class: DembeloMain\Model\Repository\Doctrine\ODM\ReadPathRepository
         factory: ["@doctrine_mongodb.odm.document_manager", getRepository]

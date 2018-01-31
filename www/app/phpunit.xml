@@ -17,6 +17,7 @@
 
     <php>
         <server name="KERNEL_CLASS" value="AppKernel" />
+        <server name="PHP_IDE_CONFIG" value="serverName=Docker" />
     </php>
 
     <filter>

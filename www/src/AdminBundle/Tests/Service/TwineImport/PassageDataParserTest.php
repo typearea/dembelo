@@ -351,10 +351,6 @@ class PassageDataParserTest extends TestCase
             ->with(false);
         $this->parser->setParserContext($parserContext);
 
-        $this->textnodeRepositoryMock->expects(self::once())
-            ->method('save')
-            ->with($textnodeMock);
-
         $this->parser->endElement();
     }
 

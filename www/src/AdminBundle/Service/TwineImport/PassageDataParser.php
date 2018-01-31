@@ -93,11 +93,7 @@ class PassageDataParser
             $textnode = $this->createTextnode($twineId);
         } else {
             $textnode->setText('');
-            $textnode->clearHitches();
-        }
-
-        if (null === $textnode->getId()) {
-            $this->textnodeRepository->save($textnode);
+            // @todo clear hitches
         }
 
         $this->twineTextnodeName = $attrs['name'];
@@ -131,10 +127,11 @@ class PassageDataParser
      */
     public function endElement(): void
     {
-        $this->textnodeRepository->save($this->parserContext->getCurrentTextnode());
+        //@todo persist textnode
+        //$this->textnodeRepository->save($this->parserContext->getCurrentTextnode());
 
         $nodenameMapping = $this->parserContext->getNodenameMapping();
-        $nodenameMapping[$this->twineTextnodeName] = $this->parserContext->getCurrentTextnode()->getId();
+        $nodenameMapping[$this->twineTextnodeName] = $this->parserContext->getCurrentTextnode();
         $this->parserContext->setNodenameMapping($nodenameMapping);
 
         $this->parserContext->setTwineText(false);

@@ -99,8 +99,8 @@ class StoryDataParser
      */
     public function endElement(string $name): void
     {
-        foreach ($this->parserContext->getTextnodeMapping() as $dembeloId) {
-            $this->finalizeTextnode($name, $dembeloId);
+        foreach ($this->parserContext->getTextnodeMapping() as $textnode) {
+            $this->finalizeTextnode($name, $textnode);
         }
 
         $this->textnodeRepository->disableOrphanedNodes($this->parserContext->getImportfile(), array_values($this->parserContext->getTextnodeMapping()));
@@ -113,20 +113,12 @@ class StoryDataParser
 
     /**
      * @param string $name
-     * @param string $dembeloId
-     *
+     * @param Textnode $textnode
      * @return void
      *
-     * @throws \Exception
      */
-    private function finalizeTextnode(string $name, string $dembeloId): void
+    private function finalizeTextnode(string $name, Textnode $textnode): void
     {
-        $textnode = $this->textnodeRepository->find($dembeloId);
-
-        if (null === $textnode) {
-            throw new \Exception(sprintf('The Dembelo Textnode with Id \'%s\' doesn\'t exist, but should by now.', $dembeloId));
-        }
-
         $textnodeTextNew = $this->parseText($textnode, $name);
 
         if (null !== $textnodeTextNew) {
@@ -222,34 +214,15 @@ class StoryDataParser
                     $hitch = $this->hitchParser->parseSimpleHitch($content, $name);
                 }
 
-                $this->appendHitchToTextnode($textnode, $hitch);
+                if ($hitch) {
+                    $hitch->setSourceTextnode($textnode);
+                    //@todo persist hitch
+                }
             },
             $text
         );
 
         return trim($textnodeTextNew);
-    }
-
-    /**
-     * @param Textnode   $textnode
-     * @param TextnodeHitch|null $hitch
-     *
-     * @return void
-     *
-     * @throws \Exception
-     */
-    private function appendHitchToTextnode(Textnode $textnode, ?TextnodeHitch $hitch): void
-    {
-        if (null === $hitch) {
-            return;
-        }
-        if ($textnode->getHitchCount() >= Textnode::HITCHES_MAXIMUM_COUNT) {
-            throw new \Exception(sprintf('There is a textnode in the Twine archive file which has more than %d links.', Textnode::HITCHES_MAXIMUM_COUNT));
-        }
-
-        if ($textnode->appendHitch($hitch) !== true) {
-            throw new \Exception('Failed to append hitch for a textnode');
-        }
     }
 
     /**
