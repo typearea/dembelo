@@ -21,6 +21,7 @@
 namespace DembeloMain\Document;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\ReferenceMany;
 
@@ -81,13 +82,13 @@ class Textnode
     protected $licenseeId;
 
     /**
-     * @var TextnodeHitch[]|ArrayCollection
+     * @var TextnodeHitch[]|Collection
      * @ReferenceMany(targetDocument="TextnodeHitch", mappedBy="targetHitches")
      */
     protected $parentHitches;
 
     /**
-     * @var TextnodeHitch[]|ArrayCollection
+     * @var TextnodeHitch[]|Collection
      * @ReferenceMany(targetDocument="TextnodeHitch", mappedBy="sourceHitches")
      */
     protected $childHitches;
@@ -296,17 +297,17 @@ class Textnode
     }
 
     /**
-     * @return TextnodeHitch[]|ArrayCollection
+     * @return TextnodeHitch[]|Collection
      */
-    public function getChildHitches(): ArrayCollection
+    public function getChildHitches(): Collection
     {
         return $this->childHitches;
     }
 
     /**
-     * @return TextnodeHitch[]|ArrayCollection
+     * @return TextnodeHitch[]|Collection
      */
-    public function getParentHitches(): ArrayCollection
+    public function getParentHitches(): Collection
     {
         return $this->parentHitches;
     }
