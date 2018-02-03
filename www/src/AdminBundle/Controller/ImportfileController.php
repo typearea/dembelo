@@ -104,8 +104,6 @@ class ImportfileController extends Controller
      *
      * @return Response
      *
-     * @throws \Doctrine\ODM\MongoDB\Mapping\MappingException
-     * @throws \Doctrine\ODM\MongoDB\LockException
      * @throws InvalidArgumentException
      */
     public function importAction(Request $request): Response

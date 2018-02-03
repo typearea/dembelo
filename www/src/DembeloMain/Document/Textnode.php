@@ -83,13 +83,13 @@ class Textnode
 
     /**
      * @var TextnodeHitch[]|Collection
-     * @ReferenceMany(targetDocument="TextnodeHitch", mappedBy="targetHitches")
+     * @ReferenceMany(targetDocument="TextnodeHitch", mappedBy="targetTextnode")
      */
     protected $parentHitches;
 
     /**
      * @var TextnodeHitch[]|Collection
-     * @ReferenceMany(targetDocument="TextnodeHitch", mappedBy="sourceHitches")
+     * @ReferenceMany(targetDocument="TextnodeHitch", mappedBy="sourceTextnode")
      */
     protected $childHitches;
 

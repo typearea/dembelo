@@ -183,7 +183,7 @@ class DefaultController extends Controller
 
         $user = $this->getUser();
 
-        $this->readpath->storeReadPath($textnode, $user);
+        $this->readpath->storeReadpath($textnode, $user);
         $this->favoriteManager->setFavorite($textnode, $user);
         $this->readpathUndoService->add($textnode->getId());
 

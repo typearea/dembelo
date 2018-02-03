@@ -8,12 +8,8 @@
 >
     <testsuites>
         <testsuite name="Project Test Suite">
-            <directory>../src/*/*Bundle/Tests</directory>
-            <directory>../src/*/*Bundle/IntegrationTests</directory>
-            <directory>../src/*/Bundle/*Bundle/Tests</directory>
-            <directory>../src/*/Bundle/*Bundle/IntegrationTests</directory>
-            <directory>../src/*Bundle/Tests</directory>
-            <directory>../src/*Bundle/IntegrationTests</directory>
+            <directory>../src/AdminBundle/Tests</directory>
+            <directory>../src/AdminBundle/IntegrationTests</directory>
             <directory>../src/DembeloMain/Tests</directory>
             <directory>../src/DembeloMain/IntegrationTests</directory>
         </testsuite>

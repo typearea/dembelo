@@ -17,3 +17,9 @@ web_profiler:
 
 swiftmailer:
     disable_delivery: true
+
+security:
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js|install|admin)/
+            security: false
