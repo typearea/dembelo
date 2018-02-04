@@ -29,6 +29,9 @@ use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Document\Topic;
 use DembeloMain\Document\User;
 
+/**
+ * Class WebTestCase
+ */
 class WebTestCase extends SymfonyWebTestCase
 {
     /**
@@ -52,6 +55,7 @@ class WebTestCase extends SymfonyWebTestCase
 
     /**
      * @return void
+     *
      * @throws \Doctrine\ODM\MongoDB\MongoDBException
      */
     public function tearDown(): void

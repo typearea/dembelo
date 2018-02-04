@@ -51,6 +51,7 @@ class PassageDataParser
     /**
      * PassageDataParser constructor.
      * @param TextNodeRepositoryInterface $textNodeRepository
+     * @param DocumentManager             $documentManager
      */
     public function __construct(TextNodeRepositoryInterface $textNodeRepository, DocumentManager $documentManager)
     {

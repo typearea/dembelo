@@ -59,6 +59,7 @@ class StoryDataParser
      * @param HitchParser                 $hitchParser
      * @param TextNodeRepositoryInterface $textnodeRepository
      * @param Parsedown                   $markupParser
+     * @param DocumentManager             $documentManager
      */
     public function __construct(HitchParser $hitchParser, TextNodeRepositoryInterface $textnodeRepository, Parsedown $markupParser, DocumentManager $documentManager)
     {
@@ -119,10 +120,10 @@ class StoryDataParser
     }
 
     /**
-     * @param string $name
+     * @param string   $name
      * @param Textnode $textnode
-     * @return void
      *
+     * @return void
      */
     private function finalizeTextnode(string $name, Textnode $textnode): void
     {

@@ -48,7 +48,7 @@ class DefaultControllerTest extends WebTestCase
 
         $client = static::createClient();
 
-        $client->request('GET', '/themenfeld/' . $topic->getId());
+        $client->request('GET', '/themenfeld/'.$topic->getId());
 
         $response = $client->getResponse();
 

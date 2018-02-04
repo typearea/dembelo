@@ -83,12 +83,14 @@ class Textnode
 
     /**
      * @var TextnodeHitch[]|Collection
+     *
      * @ReferenceMany(targetDocument="TextnodeHitch", mappedBy="targetTextnode")
      */
     protected $parentHitches;
 
     /**
      * @var TextnodeHitch[]|Collection
+     *
      * @ReferenceMany(targetDocument="TextnodeHitch", mappedBy="sourceTextnode")
      */
     protected $childHitches;
@@ -108,6 +110,9 @@ class Textnode
      */
     protected $arbitraryId;
 
+    /**
+     * Textnode constructor.
+     */
     public function __construct()
     {
         $this->childHitches = new ArrayCollection();

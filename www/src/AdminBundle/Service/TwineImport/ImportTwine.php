@@ -75,6 +75,7 @@ class ImportTwine
      * @param PassageDataParser $passageDataParser
      * @param ParserContext     $parserContext
      * @param FileHandler       $fileHandler
+     * @param DocumentManager   $documentManager
      */
     public function __construct(FileExtractor $fileExtractor, FileCheck $fileCheck, StoryDataParser $storyDataParser, PassageDataParser $passageDataParser, ParserContext $parserContext, FileHandler $fileHandler, DocumentManager $documentManager)
     {

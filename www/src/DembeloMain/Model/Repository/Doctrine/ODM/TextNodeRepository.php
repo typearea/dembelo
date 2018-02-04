@@ -66,7 +66,7 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
     /**
      * sets textnodes to status=inactive that are not in $existingTextnodeIds
      * @param Importfile $importfile
-     * @param string[] $existingTextnodeIds array of textnodeIds
+     * @param string[]   $existingTextnodeIds array of textnodeIds
      *
      * @return void
      *

@@ -19,7 +19,9 @@
 
 namespace DembeloMain\Model\Repository;
 
+/**
+ * Interface TextnodeHitchRepositoryInterface
+ */
 interface TextnodeHitchRepositoryInterface
 {
-
 }

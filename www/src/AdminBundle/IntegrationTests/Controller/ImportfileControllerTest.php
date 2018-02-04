@@ -48,9 +48,9 @@ class ImportfileControllerTest extends WebTestCase
      */
     public function testImportAction(): void
     {
-        $teststorySourcePath = __DIR__ . '/../Fixtures/teststory.html';
+        $teststorySourcePath = __DIR__.'/../Fixtures/teststory.html';
         @mkdir(self::TMP_PATH);
-        $teststoryPath = self::TMP_PATH . 'teststory.html';
+        $teststoryPath = self::TMP_PATH.'teststory.html';
         copy($teststorySourcePath, $teststoryPath);
 
         $licensee = new Licensee();

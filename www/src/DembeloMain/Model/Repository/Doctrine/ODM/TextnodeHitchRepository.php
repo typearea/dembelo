@@ -29,5 +29,4 @@ use DembeloMain\Model\Repository\TextnodeHitchRepositoryInterface;
  */
 class TextnodeHitchRepository extends AbstractRepository implements TextnodeHitchRepositoryInterface
 {
-
 }

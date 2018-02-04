@@ -168,6 +168,7 @@ class StoryDataParserTest extends TestCase
 
     /**
      * @return void
+     *
      * @throws \Exception
      */
     public function testEndElementWithoutAnyHitches(): void
@@ -264,6 +265,7 @@ class StoryDataParserTest extends TestCase
      * @expectedException \Exception
      *
      * @expectedExceptionMessage There is a textnode in the Twine archive file which has more than 8 links.
+     *
      * @throws \Exception
      */
     public function xtestEndElementExceedingMaximumHitchCount(): void
@@ -300,6 +302,7 @@ class StoryDataParserTest extends TestCase
      * @expectedException \Exception
      *
      * @expectedExceptionMessage The Twine archive file contains a 'someName' with the invalid element '[[>:<value]]'.
+     *
      * @throws \Exception
      */
     public function testEndElementForInvalidMetadataField(): void
@@ -330,6 +333,7 @@ class StoryDataParserTest extends TestCase
      * @expectedException \Exception
      *
      * @expectedExceptionMessage There is a textnode in the Twine archive file which contains the metadata field 'key' twice or would overwrite the already existing value of that field.
+     *
      * @throws \Exception
      */
     public function testEndElementForAlreadyExistingMetadata(): void

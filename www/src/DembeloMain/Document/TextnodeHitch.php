@@ -34,30 +34,35 @@ class TextnodeHitch
 
     /**
      * @var string
+     *
      * @MongoDB\Id
      */
     private $id;
 
     /**
      * @var string
+     *
      * @MongoDB\Field(type="string")
      */
     private $description;
 
     /**
      * @var Textnode
+     *
      * @MongoDB\ReferenceOne(targetDocument="Textnode", inversedBy="childHitches")
      */
     private $sourceTextnode;
 
     /**
      * @var Textnode
+     *
      * @MongoDB\ReferenceOne(targetDocument="Textnode", inversedBy="parentHitches")
      */
     private $targetTextnode;
 
     /**
      * @var int
+     *
      * @MongoDB\Field(type="integer")
      */
     private $status;

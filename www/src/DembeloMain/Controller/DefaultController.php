@@ -198,11 +198,12 @@ class DefaultController extends Controller
         foreach ($childHitches as $childHitch) {
             $hitchedTextnode = $childHitch->getTargetTextnode();
             $hitches[] = [
-                'index' => $index++,
+                'index' => $index,
                 'description' => $childHitch->getDescription(),
                 'arbitraryId' => $hitchedTextnode->getArbitraryId(),
                 'isFinanceNode' => $hitchedTextnode->isFinanceNode(),
             ];
+            $index += 1;
         }
 
         return $this->templating->renderResponse(
