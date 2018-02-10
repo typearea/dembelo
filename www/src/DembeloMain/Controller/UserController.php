@@ -187,8 +187,7 @@ class UserController extends Controller
     public function registrationsuccessAction()
     {
         return $this->render(
-            'DembeloMain::user/registrationSuccess.html.twig',
-            array()
+            'DembeloMain::user/registrationSuccess.html.twig'
         );
     }
 
@@ -211,8 +210,7 @@ class UserController extends Controller
         $dm->flush();
 
         return $this->render(
-            'DembeloMain::user/activationSuccess.html.twig',
-            array()
+            'DembeloMain::user/activationSuccess.html.twig'
         );
     }
 }

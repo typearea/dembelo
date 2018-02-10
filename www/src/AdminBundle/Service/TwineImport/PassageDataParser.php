@@ -157,6 +157,8 @@ class PassageDataParser
         $textnode->setStatus(Textnode::STATUS_ACTIVE);
         $textnode->setTwineId($twineId);
 
+        $this->textnodeRepository->decorateArbitraryId($textnode);
+
         $this->documentManager->persist($textnode);
 
         return $textnode;

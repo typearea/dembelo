@@ -107,4 +107,11 @@ interface TextNodeRepositoryInterface extends ObjectRepository
      * @return Textnode|null
      */
     public function findOneActiveById(string $id): ?Textnode;
+
+    /**
+     * @param Textnode $object
+     *
+     * @return void
+     */
+    public function decorateArbitraryId(Textnode $object): void;
 }

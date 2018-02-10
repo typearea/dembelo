@@ -150,28 +150,17 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
      *
      * @return void
      */
-    protected function beforeSave($object)
+    public function decorateArbitraryId(Textnode $object): void
     {
-        parent::beforeSave($object);
-        if (null === $object->getArbitraryId()) {
-            $object->setArbitraryId($this->createArbitraryId($object));
-        }
-    }
-
-    /**
-     * @param Textnode $object
-     *
-     * @return string
-     */
-    private function createArbitraryId(Textnode $object): string
-    {
-        $id = substr(md5(time().$object->getTwineId().substr($object->getText(), 0, 100)), 0, 15);
-        $exists = count($this->findBy(array('arbitraryId' => $id))) > 0;
+        $arbitraryId = substr(md5(time().$object->getTwineId().substr($object->getText(), 0, 100)), 0, 15);
+        $exists = count($this->findBy(array('arbitraryId' => $arbitraryId))) > 0;
 
         if ($exists) {
-            return $this->createArbitraryId($object);
+            $this->decorateArbitraryId($object);
+
+            return;
         }
 
-        return $id;
+        $object->setArbitraryId($arbitraryId);
     }
 }

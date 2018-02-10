@@ -272,14 +272,14 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
      */
     public function unserialize($serialized)
     {
-        list (
+        [
             $this->id,
             $this->email,
             $this->password,
             // see section on salt below
             // $this->salt,
             $this->currentTextnode,
-            ) = unserialize($serialized);
+        ] = unserialize($serialized);
     }
 
     /**
@@ -443,7 +443,7 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
 
     /**
      * gets the metadata
-     * @return Array
+     * @return array
      */
     public function getMetadata()
     {
@@ -452,16 +452,16 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
 
     /**
      * sets the metadata
-     * @param Array|string $metadata
+     * @param array|string $metadata
      * @param string       $value
      *
      * @throws Exception
      */
     public function setMetadata($metadata, $value = null)
     {
-        if (is_array($metadata) && is_null($value)) {
+        if (is_array($metadata) && null === $value) {
             $this->metadata = $metadata;
-        } elseif (is_string($metadata) && !is_null($value)) {
+        } elseif (is_string($metadata) && null !== $value) {
             $this->metadata[$metadata] = $value;
         } else {
             throw new Exception('invalid data');

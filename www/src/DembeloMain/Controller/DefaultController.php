@@ -22,6 +22,7 @@ declare(strict_types = 1);
 namespace DembeloMain\Controller;
 
 use DembeloMain\Document\Textnode;
+use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Document\User;
 use DembeloMain\Model\FavoriteManager;
 use DembeloMain\Model\FeatureToggle;
@@ -318,18 +319,9 @@ class DefaultController extends Controller
             throw $this->createNotFoundException(sprintf('No Textnode with ID \'%s\' found.', $textnodeId));
         }
 
-        $hitch = $textnode->getHitch($hitchIndex);
+        /* @var $hitch TextnodeHitch */
+        $hitch = $textnode->getChildHitches()->get($hitchIndex);
 
-        return $this->getTextnodeForTextnodeId($hitch['textnodeId']);
-    }
-
-    /**
-     * @param string $textnodeId
-     *
-     * @return Textnode|null
-     */
-    private function getTextnodeForTextnodeId($textnodeId): ?Textnode
-    {
-        return $this->textnodeRepository->findOneActiveById($textnodeId);
+        return $hitch->getTargetTextnode();
     }
 }
