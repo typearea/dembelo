@@ -16,8 +16,7 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** global: webix,paths,XMLHttpRequest*/
-
+/*global:webix,paths,XMLHttpRequest*/
 define(function () {
     function showError(msg) {
         webix.modalbox({
@@ -577,7 +576,9 @@ define(function () {
                                                             {view: "text", name: "licensee", label: "Lizenznehmer", disabled: true},
                                                             {view: "text", name: "importfile", label: "Importdatei", disabled: true},
                                                             {view: "textarea", name: "beginning", label: "Textanfang", height: 200, disabled: true},
-                                                            {view: "textarea", name: "metadata", label: "Metadaten", attributes: {disabled: "true"}}
+                                                            {view: "textarea", name: "metadata", label: "Metadaten", height: 200, attributes: {disabled: "true"}},
+                                                            {view: "textarea", name: "parentnodes", label: "Elternknoten", height: 200, attributes: {disabled: "true"}},
+                                                            {view: "textarea", name: "childnodes", label: "Kindknoten", height: 200, attributes: {disabled: "true"}}
                                                         ]
                                                     }
                                                 ]

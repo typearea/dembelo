@@ -18,9 +18,11 @@
  */
 namespace AdminBundle\Controller;
 
+use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
 use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use Doctrine\ODM\MongoDB\PersistentCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -68,14 +70,12 @@ class TextnodeController extends Controller
      */
     public function textnodesAction(): Response
     {
-        /* @var $textnodes \DembeloMain\Document\Textnode[] */
         $textnodes = $this->textnodeRepository->findAll();
 
         $licenseeIndex = $this->buildLicenseeIndex();
         $importfileIndex = $this->buildImportfileIndex();
 
         $output = [];
-        /* @var $textnode \DembeloMain\Document\Textnode */
         foreach ($textnodes as $textnode) {
             $obj = new \stdClass();
             $obj->id = $textnode->getId();
@@ -84,15 +84,42 @@ class TextnodeController extends Controller
             $obj->status = $textnode->getStatus() ? 'aktiv' : 'inaktiv';
             $obj->access = $textnode->getAccess() ? 'ja' : 'nein';
             $obj->licensee = $licenseeIndex[$textnode->getLicenseeId()];
-            $obj->importfile = isset($importfileIndex[$textnode->getImportfileId()]) ? $importfileIndex[$textnode->getImportfileId()] : 'unbekannt';
-            $obj->beginning = substr(htmlentities(strip_tags($textnode->getText())), 0, 200)."...";
+            $obj->importfile = $importfileIndex[$textnode->getImportfileId()] ?? 'unbekannt';
+            $obj->beginning = substr(htmlentities(strip_tags($textnode->getText())), 0, 200).'...';
             $obj->financenode = $textnode->isFinanceNode() ? 'ja' : 'nein';
             $obj->twineId = $textnode->getTwineId();
             $obj->metadata = $this->formatMetadata($textnode->getMetadata());
+            $obj->parentnodes = $this->buildHitchString($textnode->getParentHitches(), 'parent');
+            $obj->childnodes = $this->buildHitchString($textnode->getChildHitches(), 'child');
             $output[] = $obj;
         }
 
         return new Response(\json_encode($output));
+    }
+
+    /**
+     * @param TextnodeHitch[]|PersistentCollection $hitches
+     * @param string $direction
+     * @return string
+     */
+    private function buildHitchString(PersistentCollection $hitches, string $direction): string
+    {
+        $string = '';
+        $counter = 0;
+        foreach ($hitches as $hitch) {
+            ++$counter;
+
+            if ($direction === 'parent') {
+                $arbitraryId = $hitch->getSourceTextnode()->getArbitraryId();
+            } else {
+                $arbitraryId = $hitch->getTargetTextnode()->getArbitraryId();
+            }
+
+            $string .= $counter . ') ' . $hitch->getDescription()
+                . ' [' . $arbitraryId . ']'
+                . "\n";
+        }
+        return $string;
     }
 
     /**
@@ -133,7 +160,7 @@ class TextnodeController extends Controller
         $importfiles = $this->importfileRepository->findAll();
         $index = [];
         foreach ($importfiles as $importfile) {
-            $index[$importfile->getID()] = $importfile->getName();
+            $index[$importfile->getId()] = $importfile->getName();
         }
 
         return $index;
