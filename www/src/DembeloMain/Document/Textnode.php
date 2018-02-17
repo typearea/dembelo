@@ -74,7 +74,7 @@ class Textnode
     /**
      * @MongoDB\Field(type="hash")
      */
-    protected $metadata;
+    protected $metadata = [];
 
     /**
      * @MongoDB\Field(type="object_id")
