@@ -54,6 +54,7 @@ services:
             - "@app.readpath"
             - "@app.feature_toggle"
             - "@app.model_repository_textnode"
+            - "@security.authorization_checker"
 
     app.admin_controller_default:
         class: AdminBundle\Controller\DefaultController

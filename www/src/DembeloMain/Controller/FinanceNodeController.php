@@ -28,6 +28,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 
 /**
@@ -62,20 +63,28 @@ class FinanceNodeController extends Controller
     private $textnodeRepository;
 
     /**
+     * @var AuthorizationCheckerInterface
+     */
+    private $authorizationChecker;
+
+    /**
      * FinanceNodeController constructor.
      *
      * @param Templating $templating
      * @param TokenStorage $tokenStorage
      * @param Readpath $readpath
      * @param FeatureToggle $featureToggle
+     * @param TextNodeRepositoryInterface $textNodeRepository
+     * @param AuthorizationCheckerInterface $authorizationChecker
      */
-    public function __construct(Templating $templating, TokenStorage $tokenStorage, Readpath $readpath, FeatureToggle $featureToggle, TextNodeRepositoryInterface $textNodeRepository)
+    public function __construct(Templating $templating, TokenStorage $tokenStorage, Readpath $readpath, FeatureToggle $featureToggle, TextNodeRepositoryInterface $textNodeRepository, AuthorizationCheckerInterface $authorizationChecker)
     {
         $this->templating = $templating;
         $this->tokenStorage = $tokenStorage;
         $this->readpath = $readpath;
         $this->featureToggle = $featureToggle;
         $this->textnodeRepository = $textNodeRepository;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
