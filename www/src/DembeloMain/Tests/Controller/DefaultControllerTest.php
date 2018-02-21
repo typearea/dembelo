@@ -35,8 +35,8 @@ use DembeloMain\Model\FeatureToggle;
 use DembeloMain\Model\Readpath;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use DembeloMain\Model\Repository\UserRepositoryInterface;
-use DembeloMain\Service\ReadpathUndoService;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use DembeloMain\Controller\DefaultController;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -103,11 +103,6 @@ class DefaultControllerTest extends WebTestCase
     private $favoriteManagerMock;
 
     /**
-     * @var ReadpathUndoService|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $readpathUndoServiceMock;
-
-    /**
      * @inheritdoc
      */
     public function setUp(): void
@@ -121,7 +116,6 @@ class DefaultControllerTest extends WebTestCase
         $this->tokenStorageMock = $this->createTokenStorageMock();
         $this->readpathMock = $this->createReadpathMock();
         $this->favoriteManagerMock = $this->createFavoriteManagerMock();
-        $this->readpathUndoServiceMock = $this->createReadpathUndoServiceMock();
 
         $this->controller = new DefaultController(
             $this->featureToggleMock,
@@ -132,8 +126,7 @@ class DefaultControllerTest extends WebTestCase
             $this->routerMock,
             $this->tokenStorageMock,
             $this->readpathMock,
-            $this->favoriteManagerMock,
-            $this->readpathUndoServiceMock
+            $this->favoriteManagerMock
         );
     }
 
@@ -301,89 +294,116 @@ class DefaultControllerTest extends WebTestCase
     }
 
     /**
-     * tests back action
+     * @return void
      */
-    public function testBackActionSuccess(): void
+    public function testBackActionNoReadpath(): void
     {
-        $textnode = new Textnode();
-        $textnode->setArbitraryId('someArbitraryId');
-
-        $this->readpathUndoServiceMock->expects(self::once())
-            ->method('undo')
-            ->willReturn(true);
-        $this->readpathUndoServiceMock->expects(self::once())
-            ->method('getCurrentItem')
-            ->willReturn(5);
-        $this->textnodeRepositoryMock->expects(self::once())
-            ->method('find')
-            ->with(5)
-            ->willReturn($textnode);
-        $this->routerMock->expects(self::once())
-            ->method('generate')
-            ->with('text', ['textnodeArbitraryId' => 'someArbitraryId'])
-            ->willReturn('someUrl');
+        $this->readpathMock->method('getCurrentTextnodeId')->willReturn(null);
 
         $result = $this->controller->backAction();
         self::assertInstanceOf(RedirectResponse::class, $result);
-        self::assertSame('someUrl', $result->getTargetUrl());
+        self::assertSame('mainpage', $result->getTargetUrl());
     }
 
     /**
-     * tests back action when undo() ist not successful
+     * @return void
      */
-    public function testBackActionUnsuccessfulForGuestUser(): void
+    public function testBackActionCurrentTextnodeNotFound(): void
     {
-        $textnode = new Textnode();
-        $textnode->setArbitraryId('someArbitraryId');
-
-        $this->readpathUndoServiceMock->expects(self::once())
-            ->method('undo')
-            ->willReturn(false);
-        $this->readpathUndoServiceMock->expects(self::never())
-            ->method('getCurrentItem');
-        $this->routerMock->expects(self::once())
-            ->method('generate')
-            ->with('mainpage')
-            ->willReturn('someUrl');
+        $lastTextnodeId = 'someTextnodeId';
+        $this->readpathMock->method('getCurrentTextnodeId')->willReturn($lastTextnodeId);
+        $this->textnodeRepositoryMock->method('find')->with($lastTextnodeId)->willReturn(null);
 
         $result = $this->controller->backAction();
         self::assertInstanceOf(RedirectResponse::class, $result);
-        self::assertSame('someUrl', $result->getTargetUrl());
+        self::assertSame('mainpage', $result->getTargetUrl());
     }
 
     /**
-     * tests back action when undo() ist not successful
+     * @return void
      */
-    public function testBackActionUnsuccessfulForLoggedInUser(): void
+    public function testBackActionNoParentHitches(): void
     {
-        $textnode = new Textnode();
-        $textnode->setArbitraryId('someArbitraryId');
-
-        $user = new User();
-        $user->setLastTopicId('someLastTopicId');
-
-        $tokenMock = $this->createTokenMock();
-        $tokenMock->expects(self::once())
-            ->method('getUser')
-            ->willReturn($user);
-
-        $this->tokenStorageMock->expects(self::once())
-            ->method('getToken')
-            ->willReturn($tokenMock);
-        $this->readpathUndoServiceMock->expects(self::once())
-            ->method('undo')
-            ->willReturn(false);
-        $this->readpathUndoServiceMock->expects(self::never())
-            ->method('getCurrentItem');
-        $this->routerMock->expects(self::once())
-            ->method('generate')
-            ->with('themenfeld', ['topicId' => 'someLastTopicId'])
-            ->willReturn('someUrl');
+        $textnodeMock = $this->createMock(Textnode::class);
+        $lastTextnodeId = 'someTextnodeId';
+        $this->readpathMock->method('getCurrentTextnodeId')->willReturn($lastTextnodeId);
+        $this->textnodeRepositoryMock->method('find')->with($lastTextnodeId)->willReturn($textnodeMock);
 
         $result = $this->controller->backAction();
         self::assertInstanceOf(RedirectResponse::class, $result);
-        self::assertSame('someUrl', $result->getTargetUrl());
+        self::assertSame('mainpage', $result->getTargetUrl());
     }
+
+    /**
+     * @return void
+     */
+    public function testBackActionForEmptyHitchCollection(): void
+    {
+        $hitchCollectionMock = $this->createMock(Collection::class);
+        $hitchCollectionMock->method('isEmpty')->willReturn(true);
+        $textnodeMock = $this->createMock(Textnode::class);
+        $lastTextnodeId = 'someTextnodeId';
+        $this->readpathMock->method('getCurrentTextnodeId')->willReturn($lastTextnodeId);
+        $this->textnodeRepositoryMock->method('find')->with($lastTextnodeId)->willReturn($textnodeMock);
+        $textnodeMock->method('getParentHitches')->willReturn($hitchCollectionMock);
+
+        $result = $this->controller->backAction();
+        self::assertInstanceOf(RedirectResponse::class, $result);
+        self::assertSame('mainpage', $result->getTargetUrl());
+    }
+
+    /**
+     * @return void
+     */
+    public function testBackActionForParentIsAccessNode(): void
+    {
+        $parentTextnodeMock = $this->createMock(Textnode::class);
+        $parentTextnodeMock->method('getAccess')->willReturn(true);
+
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getSourceTextnode')->willReturn($parentTextnodeMock);
+
+        $hitchCollectionMock = $this->createMock(Collection::class);
+        $hitchCollectionMock->method('isEmpty')->willReturn(false);
+        $hitchCollectionMock->method('first')->willReturn($hitchMock);
+
+        $textnodeMock = $this->createMock(Textnode::class);
+        $lastTextnodeId = 'someTextnodeId';
+        $this->readpathMock->method('getCurrentTextnodeId')->willReturn($lastTextnodeId);
+        $this->textnodeRepositoryMock->method('find')->with($lastTextnodeId)->willReturn($textnodeMock);
+        $textnodeMock->method('getParentHitches')->willReturn($hitchCollectionMock);
+
+        $result = $this->controller->backAction();
+        self::assertInstanceOf(RedirectResponse::class, $result);
+        self::assertSame('themenfeld', $result->getTargetUrl());
+    }
+
+    /**
+     * @return void
+     */
+    public function testBackActionForParentIsNotAccessNode(): void
+    {
+        $parentTextnodeMock = $this->createMock(Textnode::class);
+        $parentTextnodeMock->method('getAccess')->willReturn(false);
+
+        $hitchMock = $this->createMock(TextnodeHitch::class);
+        $hitchMock->method('getSourceTextnode')->willReturn($parentTextnodeMock);
+
+        $hitchCollectionMock = $this->createMock(Collection::class);
+        $hitchCollectionMock->method('isEmpty')->willReturn(false);
+        $hitchCollectionMock->method('first')->willReturn($hitchMock);
+
+        $textnodeMock = $this->createMock(Textnode::class);
+        $lastTextnodeId = 'someTextnodeId';
+        $this->readpathMock->method('getCurrentTextnodeId')->willReturn($lastTextnodeId);
+        $this->textnodeRepositoryMock->method('find')->with($lastTextnodeId)->willReturn($textnodeMock);
+        $textnodeMock->method('getParentHitches')->willReturn($hitchCollectionMock);
+
+        $result = $this->controller->backAction();
+        self::assertInstanceOf(RedirectResponse::class, $result);
+        self::assertSame('text', $result->getTargetUrl());
+    }
+
     /**
      * tests readTextnodeAction with guest user and enabled login feature
      */
@@ -459,9 +479,6 @@ class DefaultControllerTest extends WebTestCase
                 ]
             )
             ->willReturn($responseMock);
-        $this->readpathUndoServiceMock->expects(self::once())
-            ->method('add')
-            ->with($textnodeId);
 
         $returnValue = $this->controller->readTextnodeAction($textnodeArbitraryId);
         self::assertEquals($responseMock, $returnValue);
@@ -545,7 +562,7 @@ class DefaultControllerTest extends WebTestCase
         $mock = $this->createMock(Router::class);
         $mock->expects(self::any())
             ->method('generate')
-            ->willReturn('someUrl');
+            ->willReturnArgument(0);
 
         return $mock;
     }
@@ -572,13 +589,5 @@ class DefaultControllerTest extends WebTestCase
     private function createFavoriteManagerMock(): FavoriteManager
     {
         return $this->createMock(FavoriteManager::class);
-    }
-
-    /**
-     * @return ReadpathUndoService|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private function createReadpathUndoServiceMock(): ReadpathUndoService
-    {
-        return $this->createMock(ReadpathUndoService::class);
     }
 }

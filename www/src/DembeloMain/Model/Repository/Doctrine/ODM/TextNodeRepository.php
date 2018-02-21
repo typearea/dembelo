@@ -28,7 +28,7 @@ use Hyphenator\Core as Hyphenator;
 /**
  * Class TextNodeRepository
  * @method Textnode findOneBy(array $where)
- * @method Textnode find($id)
+ * @method Textnode|null find($id)
  */
 class TextNodeRepository extends AbstractRepository implements TextNodeRepositoryInterface
 {

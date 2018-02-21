@@ -111,7 +111,8 @@ class TextnodeControllerTest extends TestCase
         $expectedJson = '[{"id":"someId","status":"aktiv","created":"01.01.2017, 12:00:00",';
         $expectedJson .= '"access":"ja","licensee":"someLicenseeName","importfile":"unbekannt","beginning":"...",';
         $expectedJson .= '"financenode":"ja","arbitraryId":"someArbitraryId","twineId":"someTwineId",';
-        $expectedJson .= '"metadata":"key1: val1\nkey2: val2\n"}]';
+        $expectedJson .= '"metadata":"key1: val1\nkey2: val2\n",';
+        $expectedJson .= '"parentnodes":"","childnodes":""}]';
         $this->assertJsonStringEqualsJsonString($expectedJson, $response->getContent());
     }
 

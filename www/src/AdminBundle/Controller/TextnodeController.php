@@ -22,6 +22,7 @@ use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
 use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\PersistentCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -79,14 +80,14 @@ class TextnodeController extends Controller
         foreach ($textnodes as $textnode) {
             $obj = new \stdClass();
             $obj->id = $textnode->getId();
-            $obj->arbitraryId = $textnode->getArbitraryId();
-            $obj->created = $textnode->getCreated()->format('d.m.Y, H:i:s');
             $obj->status = $textnode->getStatus() ? 'aktiv' : 'inaktiv';
+            $obj->created = $textnode->getCreated()->format('d.m.Y, H:i:s');
             $obj->access = $textnode->getAccess() ? 'ja' : 'nein';
             $obj->licensee = $licenseeIndex[$textnode->getLicenseeId()];
             $obj->importfile = $importfileIndex[$textnode->getImportfileId()] ?? 'unbekannt';
             $obj->beginning = substr(htmlentities(strip_tags($textnode->getText())), 0, 200).'...';
             $obj->financenode = $textnode->isFinanceNode() ? 'ja' : 'nein';
+            $obj->arbitraryId = $textnode->getArbitraryId();
             $obj->twineId = $textnode->getTwineId();
             $obj->metadata = $this->formatMetadata($textnode->getMetadata());
             $obj->parentnodes = $this->buildHitchString($textnode->getParentHitches(), 'parent');
@@ -98,11 +99,11 @@ class TextnodeController extends Controller
     }
 
     /**
-     * @param TextnodeHitch[]|PersistentCollection $hitches
+     * @param TextnodeHitch[]|Collection $hitches
      * @param string $direction
      * @return string
      */
-    private function buildHitchString(PersistentCollection $hitches, string $direction): string
+    private function buildHitchString(Collection $hitches, string $direction): string
     {
         $string = '';
         $counter = 0;

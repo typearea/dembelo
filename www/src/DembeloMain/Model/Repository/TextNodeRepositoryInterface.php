@@ -33,7 +33,7 @@ interface TextNodeRepositoryInterface extends ObjectRepository
      * Find a text node by id
      * @param string $id
      *
-     * @return Textnode
+     * @return Textnode|null
      */
     public function find($id);
 

@@ -46,7 +46,6 @@ services:
             - "@security.token_storage"
             - "@app.readpath"
             - "@app.favoriteManager"
-            - "@app.readpathUndoService"
 
     app.admin_controller_default:
         class: AdminBundle\Controller\DefaultController
@@ -153,10 +152,6 @@ services:
     app.favoriteManager:
             class: DembeloMain\Model\FavoriteManager
             arguments: ["@session"]
-
-    app.readpathUndoService:
-                class: DembeloMain\Service\ReadpathUndoService
-                arguments: ["@session"]
 
     app.twineImport.hitchparser:
             class: AdminBundle\Service\TwineImport\HitchParser
