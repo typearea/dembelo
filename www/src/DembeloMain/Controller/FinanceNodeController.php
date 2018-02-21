@@ -19,23 +19,103 @@
 
 namespace DembeloMain\Controller;
 
+use DembeloMain\Document\User;
+use DembeloMain\Model\FeatureToggle;
+use DembeloMain\Model\Readpath;
+use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+
 
 /**
  * Class FinanceNodeController
+ * @Route(service="app.controller_financenode")
  */
 class FinanceNodeController extends Controller
 {
+    /**
+     * @var Templating
+     */
+    private $templating;
+
+    /**
+     * @var TokenStorage
+     */
+    private $tokenStorage;
+
+    /**
+     * @var Readpath
+     */
+    private $readpath;
+
+    /**
+     * @var FeatureToggle
+     */
+    private $featureToggle;
+
+    /**
+     * @var TextNodeRepositoryInterface
+     */
+    private $textnodeRepository;
+
+    /**
+     * FinanceNodeController constructor.
+     *
+     * @param Templating $templating
+     * @param TokenStorage $tokenStorage
+     * @param Readpath $readpath
+     * @param FeatureToggle $featureToggle
+     */
+    public function __construct(Templating $templating, TokenStorage $tokenStorage, Readpath $readpath, FeatureToggle $featureToggle, TextNodeRepositoryInterface $textNodeRepository)
+    {
+        $this->templating = $templating;
+        $this->tokenStorage = $tokenStorage;
+        $this->readpath = $readpath;
+        $this->featureToggle = $featureToggle;
+        $this->textnodeRepository = $textNodeRepository;
+    }
+
     /**
      * @Route("/collect/{textnodeArbitraryId}", name="financenode")
      *
      * @param string $textnodeArbitraryId arbitrary ID of textnode
      *
-     * @return string
+     * @return Response
      */
-    public function showAction($textnodeArbitraryId)
+    public function showAction(string $textnodeArbitraryId): Response
     {
-        return $this->render('DembeloMain::financenode/show.html.twig');
+        if ($this->featureToggle->hasFeature('login_needed') && !$this->authorizationChecker->isGranted('ROLE_USER')) {
+            return $this->redirectToRoute('login_route');
+        }
+
+        $textnode = $this->textnodeRepository->findOneActiveByArbitraryId($textnodeArbitraryId);
+
+        $user = $this->getUser();
+
+        $this->readpath->storeReadpath($textnode, $user);
+
+        return $this->templating->renderResponse(
+            'DembeloMain::financenode/show.html.twig'
+        );
+    }
+
+    /**
+     * @return User|null
+     */
+    protected function getUser(): ?User
+    {
+        if (null === $token = $this->tokenStorage->getToken()) {
+            return null;
+        }
+
+        if (!\is_object($user = $token->getUser())) {
+            // e.g. anonymous authentication
+            return null;
+        }
+
+        return $user;
     }
 }

@@ -33,7 +33,6 @@ services:
             - "@templating"
             - "@security.token_storage"
 
-
     app.controller_default:
         class: DembeloMain\Controller\DefaultController
         arguments:
@@ -46,6 +45,15 @@ services:
             - "@security.token_storage"
             - "@app.readpath"
             - "@app.favoriteManager"
+
+    app.controller_financenode:
+        class: DembeloMain\Controller\FinanceNodeController
+        arguments:
+            - "@templating"
+            - "@security.token_storage"
+            - "@app.readpath"
+            - "@app.feature_toggle"
+            - "@app.model_repository_textnode"
 
     app.admin_controller_default:
         class: AdminBundle\Controller\DefaultController
