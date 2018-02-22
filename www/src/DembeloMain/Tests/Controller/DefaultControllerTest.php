@@ -476,6 +476,7 @@ class DefaultControllerTest extends WebTestCase
                 [
                     'textnode' => $sourceTextnode,
                     'hitches' => [],
+                    'showBackButton' => false,
                 ]
             )
             ->willReturn($responseMock);
