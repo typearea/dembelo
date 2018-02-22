@@ -198,11 +198,14 @@ class DefaultController extends Controller
             ++$index;
         }
 
+        $showBackButton = $this->showBackButton($textnode);
+
         return $this->templating->renderResponse(
             'DembeloMain::default/read.html.twig',
             [
                 'textnode' => $textnode,
                 'hitches' => $hitches,
+                'showBackButton' => $showBackButton,
             ]
         );
     }
@@ -333,5 +336,18 @@ class DefaultController extends Controller
         $hitch = $textnode->getChildHitches()->get($hitchIndex);
 
         return $hitch->getTargetTextnode();
+    }
+
+    private function showBackButton(Textnode $textnode): bool
+    {
+        if (false === $textnode->getAccess()) {
+            return true;
+        }
+        $criteria = [
+            'topic_id' => $textnode->getTopicId(),
+        ];
+        $accessNodes = $this->textnodeRepository->findBy($criteria);
+
+        return (count($accessNodes) >= 2);
     }
 }

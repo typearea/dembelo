@@ -8,11 +8,14 @@
         </div>
         {% if showBackButton is defined and showBackButton %}
             <a href="{{ path('back') }}">
-            <div id="back-icon" class="back-icon">
+                <div id="back-icon" class="back-icon">
+                    <i class="ion-android-arrow-dropup-circle"></i>
+                </div>
+            </a>
+        {% else %}
+            <div id="back-icon" class="back-icon disabled">
                 <i class="ion-android-arrow-dropup-circle"></i>
             </div>
-        </a>
         {% endif %}
-
     </div>
 </header>
