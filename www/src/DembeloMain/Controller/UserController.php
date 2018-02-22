@@ -101,6 +101,8 @@ class UserController extends Controller
      * @param Request $request request object
      *
      * @return string
+     *
+     * @throws \Exception
      */
     public function registrationAction(Request $request)
     {
