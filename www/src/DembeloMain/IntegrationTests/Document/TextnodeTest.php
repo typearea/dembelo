@@ -68,7 +68,5 @@ class TextnodeTest extends WebTestCase
         self::assertSame($textnodes[0], $hitches[0]->getSourceTextnode());
         self::assertEquals(1, $textnodes[0]->getChildHitches()->count());
         self::assertSame($hitches[0], $textnodes[0]->getChildHitches()->first());
-
-
     }
 }

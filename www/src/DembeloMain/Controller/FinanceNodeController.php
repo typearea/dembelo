@@ -30,7 +30,6 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-
 /**
  * Class FinanceNodeController
  * @Route(service="app.controller_financenode")
@@ -70,11 +69,11 @@ class FinanceNodeController extends Controller
     /**
      * FinanceNodeController constructor.
      *
-     * @param Templating $templating
-     * @param TokenStorage $tokenStorage
-     * @param Readpath $readpath
-     * @param FeatureToggle $featureToggle
-     * @param TextNodeRepositoryInterface $textNodeRepository
+     * @param Templating                    $templating
+     * @param TokenStorage                  $tokenStorage
+     * @param Readpath                      $readpath
+     * @param FeatureToggle                 $featureToggle
+     * @param TextNodeRepositoryInterface   $textNodeRepository
      * @param AuthorizationCheckerInterface $authorizationChecker
      */
     public function __construct(Templating $templating, TokenStorage $tokenStorage, Readpath $readpath, FeatureToggle $featureToggle, TextNodeRepositoryInterface $textNodeRepository, AuthorizationCheckerInterface $authorizationChecker)

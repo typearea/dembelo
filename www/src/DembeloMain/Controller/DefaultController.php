@@ -246,33 +246,11 @@ class DefaultController extends Controller
         if ($parentTextnode->getAccess()) {
             return $this->redirectToRoute('themenfeld', ['topicId' => $parentTextnode->getTopicId()]);
         }
+
         return $this->redirectToRoute(
             'text',
             array('textnodeArbitraryId' => $parentTextnode->getArbitraryId())
         );
-    }
-
-    /**
-     * @return TextnodeHitch|null
-     */
-    private function getParentHitch(): ?TextnodeHitch
-    {
-        $user = $this->getUser();
-        $lastTextnodeId = $this->readpath->getCurrentTextnodeId($user);
-
-        if (null === $lastTextnodeId) {
-            return null;
-        }
-        $lastTextnode = $this->textnodeRepository->find($lastTextnodeId);
-        if (null === $lastTextnode) {
-            return null;
-        }
-        $parentHitches = $lastTextnode->getParentHitches();
-        if ($parentHitches->isEmpty()) {
-            return null;
-        }
-
-        return $parentHitches->first();
     }
 
     /**
@@ -338,6 +316,11 @@ class DefaultController extends Controller
         return $hitch->getTargetTextnode();
     }
 
+    /**
+     * @param Textnode $textnode
+     *
+     * @return bool
+     */
     private function showBackButton(Textnode $textnode): bool
     {
         if (false === $textnode->getAccess()) {
@@ -349,5 +332,28 @@ class DefaultController extends Controller
         $accessNodes = $this->textnodeRepository->findBy($criteria);
 
         return (count($accessNodes) >= 2);
+    }
+
+    /**
+     * @return TextnodeHitch|null
+     */
+    private function getParentHitch(): ?TextnodeHitch
+    {
+        $user = $this->getUser();
+        $lastTextnodeId = $this->readpath->getCurrentTextnodeId($user);
+
+        if (null === $lastTextnodeId) {
+            return null;
+        }
+        $lastTextnode = $this->textnodeRepository->find($lastTextnodeId);
+        if (null === $lastTextnode) {
+            return null;
+        }
+        $parentHitches = $lastTextnode->getParentHitches();
+        if ($parentHitches->isEmpty()) {
+            return null;
+        }
+
+        return $parentHitches->first();
     }
 }

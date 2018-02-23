@@ -100,7 +100,8 @@ class TextnodeController extends Controller
 
     /**
      * @param TextnodeHitch[]|Collection $hitches
-     * @param string $direction
+     * @param string                     $direction
+     *
      * @return string
      */
     private function buildHitchString(Collection $hitches, string $direction): string
@@ -110,16 +111,15 @@ class TextnodeController extends Controller
         foreach ($hitches as $hitch) {
             ++$counter;
 
-            if ($direction === 'parent') {
+            if ('parent' === $direction) {
                 $arbitraryId = $hitch->getSourceTextnode()->getArbitraryId();
             } else {
                 $arbitraryId = $hitch->getTargetTextnode()->getArbitraryId();
             }
 
-            $string .= $counter . ') ' . $hitch->getDescription()
-                . ' [' . $arbitraryId . ']'
-                . "\n";
+            $string .= $counter.') '.$hitch->getDescription().' ['.$arbitraryId.']'."\n";
         }
+
         return $string;
     }
 
