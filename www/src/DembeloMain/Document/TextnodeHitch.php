@@ -86,9 +86,9 @@ class TextnodeHitch
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -102,9 +102,9 @@ class TextnodeHitch
     }
 
     /**
-     * @return Textnode
+     * @return Textnode|null
      */
-    public function getTargetTextnode(): Textnode
+    public function getTargetTextnode(): ?Textnode
     {
         return $this->targetTextnode;
     }
@@ -118,9 +118,9 @@ class TextnodeHitch
     }
 
     /**
-     * @return Textnode
+     * @return Textnode|null
      */
-    public function getSourceTextnode(): Textnode
+    public function getSourceTextnode(): ?Textnode
     {
         return $this->sourceTextnode;
     }
