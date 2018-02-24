@@ -19,7 +19,7 @@ services:
 script:
 - ./www/bin/phpcs --standard=www/app/phpcs.xml
 - ./www/bin/phpunit -c www/app/ --exclude-group integration
-- ./www/bin/phpunit -c www/app/ --group integration --no-coverage
+#- ./www/bin/phpunit -c www/app/ --group integration --no-coverage
 - php ./scripts/coverage-checker.php www/var/logs/clover.xml 75
 install:
 - composer --working-dir="www" install
