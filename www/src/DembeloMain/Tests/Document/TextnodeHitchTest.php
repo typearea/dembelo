@@ -25,7 +25,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Class TextnodeHitchTest
- * @package DembeloMain\Tests\Document
  */
 class TextnodeHitchTest extends TestCase
 {

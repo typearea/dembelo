@@ -84,6 +84,7 @@ class FinanceNodeController extends Controller
      * @param FeatureToggle                 $featureToggle
      * @param TextNodeRepositoryInterface   $textNodeRepository
      * @param AuthorizationCheckerInterface $authorizationChecker
+     * @param Router                        $router
      */
     public function __construct(Templating $templating, TokenStorage $tokenStorage, Readpath $readpath, FeatureToggle $featureToggle, TextNodeRepositoryInterface $textNodeRepository, AuthorizationCheckerInterface $authorizationChecker, Router $router)
     {

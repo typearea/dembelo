@@ -28,8 +28,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * Class RequestListenerTest
- *
- * @package DembeloMain\Tests\EventListener
  */
 class RequestListenerTest extends TestCase
 {

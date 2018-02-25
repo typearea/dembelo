@@ -32,6 +32,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Class FinanceNodeControllerTest
+ */
 class FinanceNodeControllerTest extends TestCase
 {
     /**
@@ -166,6 +169,5 @@ class FinanceNodeControllerTest extends TestCase
         $returnValue = $this->controller->showAction($arbitraryId);
 
         self::assertInstanceOf(RedirectResponse::class, $returnValue);
-
     }
 }
