@@ -81,9 +81,9 @@ interface TextNodeRepositoryInterface extends ObjectRepository
      * finds a textnode by arbitraryId
      * @param string $arbitraryId
      *
-     * @return Textnode
+     * @return Textnode|null
      */
-    public function findOneActiveByArbitraryId($arbitraryId);
+    public function findOneActiveByArbitraryId($arbitraryId): ?Textnode;
 
     /**
      * sets the hyphenated version of the text content to $textnode
