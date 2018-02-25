@@ -22,13 +22,13 @@ declare(strict_types = 1);
 namespace DembeloMain\Controller;
 
 use DembeloMain\Document\Textnode;
+use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Document\User;
 use DembeloMain\Model\FavoriteManager;
 use DembeloMain\Model\FeatureToggle;
 use DembeloMain\Model\Readpath;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use DembeloMain\Model\Repository\UserRepositoryInterface;
-use DembeloMain\Service\ReadpathUndoService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -86,11 +86,6 @@ class DefaultController extends Controller
     private $readpath;
 
     /**
-     * @var ReadpathUndoService
-     */
-    private $readpathUndoService;
-
-    /**
      * @var FavoriteManager
      */
     private $favoriteManager;
@@ -106,9 +101,8 @@ class DefaultController extends Controller
      * @param TokenStorage                  $tokenStorage
      * @param Readpath                      $readpath
      * @param FavoriteManager               $favoriteManager
-     * @param ReadpathUndoService           $readpathUndoService
      */
-    public function __construct(FeatureToggle $featureToggle, AuthorizationCheckerInterface $authorizationChecker, UserRepositoryInterface $userRepository, TextNodeRepositoryInterface $textNodeRepository, Templating $templating, Router $router, TokenStorage $tokenStorage, Readpath $readpath, FavoriteManager $favoriteManager, ReadpathUndoService $readpathUndoService)
+    public function __construct(FeatureToggle $featureToggle, AuthorizationCheckerInterface $authorizationChecker, UserRepositoryInterface $userRepository, TextNodeRepositoryInterface $textNodeRepository, Templating $templating, Router $router, TokenStorage $tokenStorage, Readpath $readpath, FavoriteManager $favoriteManager)
     {
         $this->featureToggle = $featureToggle;
         $this->authorizationChecker = $authorizationChecker;
@@ -119,7 +113,6 @@ class DefaultController extends Controller
         $this->tokenStorage = $tokenStorage;
         $this->readpath = $readpath;
         $this->favoriteManager = $favoriteManager;
-        $this->readpathUndoService = $readpathUndoService;
     }
 
     /**
@@ -183,9 +176,8 @@ class DefaultController extends Controller
 
         $user = $this->getUser();
 
-        $this->readpath->storeReadPath($textnode, $user);
+        $this->readpath->storeReadpath($textnode, $user);
         $this->favoriteManager->setFavorite($textnode, $user);
-        $this->readpathUndoService->add($textnode->getId());
 
         if ($user instanceof User) {
             $this->userRepository->save($user);
@@ -193,25 +185,27 @@ class DefaultController extends Controller
 
         $hitches = [];
 
-        for ($i = 0; $i < $textnode->getHitchCount(); ++$i) {
-            $hitch = $textnode->getHitch($i);
-            $hitchedTextnode = $this->getTextnodeForTextnodeId($hitch['textnodeId']);
-            if (null === $hitchedTextnode) {
-                continue;
-            }
+        $childHitches = $textnode->getChildHitches();
+        $index = 0;
+        foreach ($childHitches as $childHitch) {
+            $hitchedTextnode = $childHitch->getTargetTextnode();
             $hitches[] = [
-                'index' => $i,
-                'description' => $hitch['description'],
+                'index' => $index,
+                'description' => $childHitch->getDescription(),
                 'arbitraryId' => $hitchedTextnode->getArbitraryId(),
                 'isFinanceNode' => $hitchedTextnode->isFinanceNode(),
             ];
+            ++$index;
         }
+
+        $showBackButton = $this->showBackButton($textnode);
 
         return $this->templating->renderResponse(
             'DembeloMain::default/read.html.twig',
             [
                 'textnode' => $textnode,
                 'hitches' => $hitches,
+                'showBackButton' => $showBackButton,
             ]
         );
     }
@@ -244,21 +238,18 @@ class DefaultController extends Controller
      */
     public function backAction(): RedirectResponse
     {
-        if (!$this->readpathUndoService->undo()) {
-            $user = $this->getUser();
-            if (null === $user) {
-                return $this->redirectToRoute('mainpage');
-            }
-            $topicId = $user->getLastTopicId();
-
-            return $this->redirectToRoute('themenfeld', ['topicId' => $topicId]);
+        $parentHitch = $this->getParentHitch();
+        if (null === $parentHitch) {
+            return $this->redirectToRoute('mainpage');
         }
-        $currentTextnodeId = $this->readpathUndoService->getCurrentItem();
-        $textnode = $this->textnodeRepository->find($currentTextnodeId);
+        $parentTextnode = $parentHitch->getSourceTextnode();
+        if ($parentTextnode->getAccess()) {
+            return $this->redirectToRoute('themenfeld', ['topicId' => $parentTextnode->getTopicId()]);
+        }
 
         return $this->redirectToRoute(
             'text',
-            array('textnodeArbitraryId' => $textnode->getArbitraryId())
+            array('textnodeArbitraryId' => $parentTextnode->getArbitraryId())
         );
     }
 
@@ -319,18 +310,50 @@ class DefaultController extends Controller
             throw $this->createNotFoundException(sprintf('No Textnode with ID \'%s\' found.', $textnodeId));
         }
 
-        $hitch = $textnode->getHitch($hitchIndex);
+        /* @var $hitch TextnodeHitch */
+        $hitch = $textnode->getChildHitches()->get($hitchIndex);
 
-        return $this->getTextnodeForTextnodeId($hitch['textnodeId']);
+        return $hitch->getTargetTextnode();
     }
 
     /**
-     * @param string $textnodeId
+     * @param Textnode $textnode
      *
-     * @return Textnode|null
+     * @return bool
      */
-    private function getTextnodeForTextnodeId($textnodeId): ?Textnode
+    private function showBackButton(Textnode $textnode): bool
     {
-        return $this->textnodeRepository->findOneActiveById($textnodeId);
+        if (false === $textnode->getAccess()) {
+            return true;
+        }
+        $criteria = [
+            'topic_id' => $textnode->getTopicId(),
+        ];
+        $accessNodes = $this->textnodeRepository->findBy($criteria);
+
+        return (count($accessNodes) >= 2);
+    }
+
+    /**
+     * @return TextnodeHitch|null
+     */
+    private function getParentHitch(): ?TextnodeHitch
+    {
+        $user = $this->getUser();
+        $lastTextnodeId = $this->readpath->getCurrentTextnodeId($user);
+
+        if (null === $lastTextnodeId) {
+            return null;
+        }
+        $lastTextnode = $this->textnodeRepository->find($lastTextnodeId);
+        if (null === $lastTextnode) {
+            return null;
+        }
+        $parentHitches = $lastTextnode->getParentHitches();
+        if ($parentHitches->isEmpty()) {
+            return null;
+        }
+
+        return $parentHitches->first();
     }
 }

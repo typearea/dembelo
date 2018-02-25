@@ -21,6 +21,7 @@ namespace AdminBundle\Tests\Service\TwineImport;
 use AdminBundle\Service\TwineImport\ParserContext;
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
+use PHP_CodeSniffer\Generators\Text;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -122,17 +123,16 @@ class ParserContextTest extends TestCase
      */
     public function testGetCurrentTextnode(): void
     {
-        $expectedTextnodeMapping = [
-            'someTwineId' => 'someId',
-        ];
         /* @var $textnodeMock \PHPUnit_Framework_MockObject_MockObject|Textnode*/
         $textnodeMock = $this->createMock(Textnode::class);
         $textnodeMock->expects(self::once())
             ->method('getTwineId')
             ->willReturn('someTwineId');
-        $textnodeMock->expects(self::once())
-            ->method('getId')
-            ->willReturn('someId');
+
+        $expectedTextnodeMapping = [
+            'someTwineId' => $textnodeMock,
+        ];
+
         $parserContext = new ParserContext();
         self::assertNull($parserContext->getCurrentTextnode());
         $parserContext->setCurrentTextnode($textnodeMock);

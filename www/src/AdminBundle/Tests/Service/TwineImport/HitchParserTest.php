@@ -19,6 +19,7 @@
 namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Textnode;
+use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -88,27 +89,25 @@ class HitchParserTest extends WebTestCase
 
     /**
      * tests parseDoubleArrowRight with a valid textnode id
+     * @throws \Exception
      */
     public function testParseDoubleArrowRightWithValidTextnodeIdOnRightPart(): void
     {
         $content = 'description-->textnodeId';
         $twineName = 'bar';
-        $name = 'someName';
+
+        $targetTextnode = new Textnode();
 
         $this->textnodeRepositoryMock->expects(self::once())
             ->method('find')
             ->with('textnodeId')
-            ->willReturn(new Textnode());
+            ->willReturn($targetTextnode);
 
-        $result = $this->hitchParser->parseDoubleArrowRight($content, $twineName, $name);
-
-        self::assertInternalType('array', $result);
-        self::assertArrayHasKey('description', $result);
-        self::assertEquals('description', $result['description']);
-        self::assertArrayHasKey('textnodeId', $result);
-        self::assertEquals('textnodeId', $result['textnodeId']);
-        self::assertArrayHasKey('status', $result);
-        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result['status']);
+        $result = $this->hitchParser->parseDoubleArrowRight($content, $twineName);
+        self::assertInstanceOf(TextnodeHitch::class, $result);
+        self::assertEquals('description', $result->getDescription());
+        self::assertSame($targetTextnode, $result->getTargetTextnode());
+        self::assertEquals(TextnodeHitch::STATUS_ACTIVE, $result->getStatus());
     }
 
     /**
@@ -152,27 +151,26 @@ class HitchParserTest extends WebTestCase
 
     /**
      * tests singleArrowRight with a valid map name
+     * @throws \Exception
      */
     public function testSingleArrowRightWithValidMapName(): void
     {
         $content = 'description->key';
         $name = 'someName';
 
+        $targetTextnode = new Textnode();
+
         $mapping = [
-            'key' => 'textnodeId',
+            'key' => $targetTextnode,
         ];
 
         $this->hitchParser->setNodeNameMapping($mapping);
 
         $result = $this->hitchParser->parseSingleArrowRight($content, $name);
-
-        self::assertInternalType('array', $result);
-        self::assertArrayHasKey('description', $result);
-        self::assertEquals('description', $result['description']);
-        self::assertArrayHasKey('textnodeId', $result);
-        self::assertEquals('textnodeId', $result['textnodeId']);
-        self::assertArrayHasKey('status', $result);
-        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result['status']);
+        self::assertInstanceOf(TextnodeHitch::class, $result);
+        self::assertEquals('description', $result->getDescription());
+        self::assertEquals($targetTextnode, $result->getTargetTextnode());
+        self::assertEquals(TextnodeHitch::STATUS_ACTIVE, $result->getStatus());
     }
 
     /**
@@ -215,26 +213,27 @@ class HitchParserTest extends WebTestCase
 
     /**
      * tests parseSingleArrowLeft with a valid key
+     * @throws \Exception
      */
     public function testParseSingleArrowLeftWithValidKey(): void
     {
         $content = 'mapKey<-description';
         $name = 'someName';
+
+        $targetTextnode = new Textnode();
+
         $keyMap = [
-            'mapKey' => 'textnodeId',
+            'mapKey' => $targetTextnode,
         ];
 
         $this->hitchParser->setNodeNameMapping($keyMap);
 
         $result = $this->hitchParser->parseSingleArrowLeft($content, $name);
 
-        self::assertInternalType('array', $result);
-        self::assertArrayHasKey('description', $result);
-        self::assertEquals('description', $result['description']);
-        self::assertArrayHasKey('textnodeId', $result);
-        self::assertEquals('textnodeId', $result['textnodeId']);
-        self::assertArrayHasKey('status', $result);
-        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result['status']);
+        self::assertInstanceOf(TextnodeHitch::class, $result);
+        self::assertEquals('description', $result->getDescription());
+        self::assertEquals($targetTextnode, $result->getTargetTextnode());
+        self::assertEquals(TextnodeHitch::STATUS_ACTIVE, $result->getStatus());
     }
 
     /**
@@ -265,25 +264,26 @@ class HitchParserTest extends WebTestCase
 
     /**
      * tests parseSimpleHitch with a valid key
+     * @throws \Exception
      */
     public function testParseSimpleHitchWithValidKey(): void
     {
         $content = 'mapKey';
         $name = 'someName';
+
+        $targetTextnode = new Textnode();
+
         $keyMap = [
-            'mapKey' => 'textnodeId',
+            'mapKey' => $targetTextnode,
         ];
 
         $this->hitchParser->setNodeNameMapping($keyMap);
         $result = $this->hitchParser->parseSimpleHitch($content, $name);
 
-        self::assertInternalType('array', $result);
-        self::assertArrayHasKey('description', $result);
-        self::assertEquals('mapKey', $result['description']);
-        self::assertArrayHasKey('textnodeId', $result);
-        self::assertEquals('textnodeId', $result['textnodeId']);
-        self::assertArrayHasKey('status', $result);
-        self::assertEquals(Textnode::HITCH_STATUS_ACTIVE, $result['status']);
+        self::assertInstanceOf(TextnodeHitch::class, $result);
+        self::assertEquals('mapKey', $result->getDescription());
+        self::assertSame($targetTextnode, $result->getTargetTextnode());
+        self::assertEquals(TextnodeHitch::STATUS_ACTIVE, $result->getStatus());
     }
 
     /**

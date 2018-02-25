@@ -27,6 +27,7 @@ use AdminBundle\Service\TwineImport\StoryDataParser;
 use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Service\FileHandler;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
@@ -71,6 +72,11 @@ class ImportTwineTest extends WebTestCase
     private $fileHandlerMock;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|DocumentManager
+     */
+    private $documentManagerMock;
+
+    /**
      * resets some variables
      */
     public function setUp()
@@ -81,6 +87,7 @@ class ImportTwineTest extends WebTestCase
         $this->passageDataParserMock = $this->createPassageDataParserMock();
         $this->parserContextMock = $this->createParserContextMock();
         $this->fileHandlerMock = $this->createFileHandlerMock();
+        $this->documentManagerMock = $this->createMock(DocumentManager::class);
 
         $this->importTwine = new ImportTwine(
             $this->fileExtractorMock,
@@ -88,7 +95,8 @@ class ImportTwineTest extends WebTestCase
             $this->storyDataParserMock,
             $this->passageDataParserMock,
             $this->parserContextMock,
-            $this->fileHandlerMock
+            $this->fileHandlerMock,
+            $this->documentManagerMock
         );
     }
 

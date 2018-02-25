@@ -25,13 +25,13 @@ use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
 use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class TextnodeControllerTest
  */
-class TextnodeControllerTest extends WebTestCase
+class TextnodeControllerTest extends TestCase
 {
     /**
      * @var TextnodeController
@@ -111,7 +111,8 @@ class TextnodeControllerTest extends WebTestCase
         $expectedJson = '[{"id":"someId","status":"aktiv","created":"01.01.2017, 12:00:00",';
         $expectedJson .= '"access":"ja","licensee":"someLicenseeName","importfile":"unbekannt","beginning":"...",';
         $expectedJson .= '"financenode":"ja","arbitraryId":"someArbitraryId","twineId":"someTwineId",';
-        $expectedJson .= '"metadata":"key1: val1\nkey2: val2\n"}]';
+        $expectedJson .= '"metadata":"key1: val1\nkey2: val2\n",';
+        $expectedJson .= '"parentnodes":"","childnodes":""}]';
         $this->assertJsonStringEqualsJsonString($expectedJson, $response->getContent());
     }
 

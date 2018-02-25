@@ -8,15 +8,16 @@
 >
     <testsuites>
         <testsuite name="Project Test Suite">
-            <directory>../src/*/*Bundle/Tests</directory>
-            <directory>../src/*/Bundle/*Bundle/Tests</directory>
-            <directory>../src/*Bundle/Tests</directory>
+            <directory>../src/AdminBundle/Tests</directory>
+            <directory>../src/AdminBundle/IntegrationTests</directory>
             <directory>../src/DembeloMain/Tests</directory>
+            <directory>../src/DembeloMain/IntegrationTests</directory>
         </testsuite>
     </testsuites>
 
     <php>
         <server name="KERNEL_CLASS" value="AppKernel" />
+        <server name="PHP_IDE_CONFIG" value="serverName=Docker" />
     </php>
 
     <filter>
@@ -25,12 +26,16 @@
             <exclude>
                 <directory>../src/*Bundle/Resources</directory>
                 <directory>../src/*Bundle/Tests</directory>
+                <directory>../src/*Bundle/IntegrationTests</directory>
                 <directory>../src/*/*Bundle/Resources</directory>
                 <directory>../src/*/*Bundle/Tests</directory>
+                <directory>../src/*/*Bundle/IntegrationTests</directory>
                 <directory>../src/*/Bundle/*Bundle/Resources</directory>
                 <directory>../src/*/Bundle/*Bundle/Tests</directory>
+                <directory>../src/*/Bundle/*Bundle/IntegrationTests</directory>
                 <directory>../src/DembeloMain/Resources</directory>
                 <directory>../src/DembeloMain/Tests</directory>
+                <directory>../src/DembeloMain/IntegrationTests</directory>
             </exclude>
         </whitelist>
     </filter>

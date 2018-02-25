@@ -13,6 +13,7 @@ services:
             - "@app.twineImport.passageDataParser"
             - "@app.twineImport.parserContext"
             - "@app.filehandler"
+            - "@doctrine.odm.mongodb.document_manager"
 
     # @todo remove dependency from service container
     app.feature_toggle:
@@ -32,7 +33,6 @@ services:
             - "@templating"
             - "@security.token_storage"
 
-
     app.controller_default:
         class: DembeloMain\Controller\DefaultController
         arguments:
@@ -45,7 +45,16 @@ services:
             - "@security.token_storage"
             - "@app.readpath"
             - "@app.favoriteManager"
-            - "@app.readpathUndoService"
+
+    app.controller_financenode:
+        class: DembeloMain\Controller\FinanceNodeController
+        arguments:
+            - "@templating"
+            - "@security.token_storage"
+            - "@app.readpath"
+            - "@app.feature_toggle"
+            - "@app.model_repository_textnode"
+            - "@security.authorization_checker"
 
     app.admin_controller_default:
         class: AdminBundle\Controller\DefaultController
@@ -102,6 +111,12 @@ services:
         arguments:
             - DembeloMain\Document\Textnode
 
+    app.model_repository_textnodehitch:
+        class: DembeloMain\Model\Repository\Doctrine\ODM\TextnodeHitchRepository
+        factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
+        arguments:
+            - DembeloMain\Document\TextnodeHitch
+
     app.model_repository_read_path:
         class: DembeloMain\Model\Repository\Doctrine\ODM\ReadPathRepository
         factory: ["@doctrine_mongodb.odm.document_manager", getRepository]
@@ -128,7 +143,7 @@ services:
 
     app.twig_extension.version:
             class: DembeloMain\Twig\VersionExtension
-            arguments: [%version_file%]
+            arguments: ["%version_file%"]
             tags:
                 - { name: twig.extension }
 
@@ -147,10 +162,6 @@ services:
             class: DembeloMain\Model\FavoriteManager
             arguments: ["@session"]
 
-    app.readpathUndoService:
-                class: DembeloMain\Service\ReadpathUndoService
-                arguments: ["@session"]
-
     app.twineImport.hitchparser:
             class: AdminBundle\Service\TwineImport\HitchParser
             arguments: ["@app.model_repository_textnode"]
@@ -167,11 +178,13 @@ services:
             - "@app.twineImport.hitchparser"
             - "@app.model_repository_textnode"
             - "@parsedown"
+            - "@doctrine.odm.mongodb.document_manager"
 
     app.twineImport.passageDataParser:
         class: AdminBundle\Service\TwineImport\PassageDataParser
         arguments:
             - "@app.model_repository_textnode"
+            - "@doctrine.odm.mongodb.document_manager"
 
     app.twineImport.parserContext:
         class: AdminBundle\Service\TwineImport\ParserContext

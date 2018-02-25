@@ -27,7 +27,8 @@ use Hyphenator\Core as Hyphenator;
 
 /**
  * Class TextNodeRepository
- * @method findOneBy(array $where): Textnode
+ * @method Textnode findOneBy(array $where)
+ * @method Textnode|null find($id)
  */
 class TextNodeRepository extends AbstractRepository implements TextNodeRepositoryInterface
 {
@@ -65,13 +66,13 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
     /**
      * sets textnodes to status=inactive that are not in $existingTextnodeIds
      * @param Importfile $importfile
-     * @param array      $existingTextnodeIds array of textnodeIds
+     * @param string[]   $existingTextnodeIds array of textnodeIds
      *
      * @return void
      *
      * @throws \Doctrine\ODM\MongoDB\MongoDBException
      */
-    public function disableOrphanedNodes(Importfile $importfile, array $existingTextnodeIds)
+    public function disableOrphanedNodes(Importfile $importfile, array $existingTextnodeIds): void
     {
         $this->getDocumentManager()->createQueryBuilder(Textnode::class)
             ->updateMany()
@@ -149,28 +150,17 @@ class TextNodeRepository extends AbstractRepository implements TextNodeRepositor
      *
      * @return void
      */
-    protected function beforeSave($object)
+    public function decorateArbitraryId(Textnode $object): void
     {
-        parent::beforeSave($object);
-        if (null === $object->getArbitraryId()) {
-            $object->setArbitraryId($this->createArbitraryId($object));
-        }
-    }
-
-    /**
-     * @param Textnode $object
-     *
-     * @return string
-     */
-    private function createArbitraryId(Textnode $object): string
-    {
-        $id = substr(md5(time().$object->getTwineId().substr($object->getText(), 0, 100)), 0, 15);
-        $exists = count($this->findBy(array('arbitraryId' => $id))) > 0;
+        $arbitraryId = substr(md5(time().$object->getTwineId().substr($object->getText(), 0, 100)), 0, 15);
+        $exists = count($this->findBy(array('arbitraryId' => $arbitraryId))) > 0;
 
         if ($exists) {
-            return $this->createArbitraryId($object);
+            $this->decorateArbitraryId($object);
+
+            return;
         }
 
-        return $id;
+        $object->setArbitraryId($arbitraryId);
     }
 }

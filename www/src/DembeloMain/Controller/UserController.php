@@ -101,6 +101,8 @@ class UserController extends Controller
      * @param Request $request request object
      *
      * @return string
+     *
+     * @throws \Exception
      */
     public function registrationAction(Request $request)
     {
@@ -187,8 +189,7 @@ class UserController extends Controller
     public function registrationsuccessAction()
     {
         return $this->render(
-            'DembeloMain::user/registrationSuccess.html.twig',
-            array()
+            'DembeloMain::user/registrationSuccess.html.twig'
         );
     }
 
@@ -211,8 +212,7 @@ class UserController extends Controller
         $dm->flush();
 
         return $this->render(
-            'DembeloMain::user/activationSuccess.html.twig',
-            array()
+            'DembeloMain::user/activationSuccess.html.twig'
         );
     }
 }

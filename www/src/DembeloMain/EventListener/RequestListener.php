@@ -28,11 +28,12 @@ class RequestListener
 {
     /**
      * modifies response when session does not exist in ajax call
+     *
      * @param GetResponseEvent $event
      *
      * @return void
      */
-    public function onRequest(GetResponseEvent $event)
+    public function onRequest(GetResponseEvent $event): void
     {
         $request = $event->getRequest();
 
@@ -41,8 +42,8 @@ class RequestListener
         }
 
         if (strpos($request->getUri(), 'login')) {
-            $response = new JsonResponse(['session_expired' => true]); //you should give some content here
-            $event->setResponse($response); //now you override response which will be sent to user
+            $response = new JsonResponse(['session_expired' => true]);
+            $event->setResponse($response);
         }
     }
 }

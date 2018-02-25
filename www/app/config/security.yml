@@ -54,6 +54,8 @@ security:
                 path:   /logout
                 target: /
 
+            # logout_on_user_change: true
+
     encoders:
         DembeloMain\Document\User:
             algorithm: bcrypt

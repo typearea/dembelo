@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -21,10 +20,10 @@
  */
 namespace DembeloMain\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use DembeloMain\Document\Licensee;
-use DembeloMain\Document\Topic;
-use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\ReferenceMany;
 
 /**
  * Class Textnode
@@ -34,13 +33,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Textnode
 {
-    const STATUS_INACTIVE = 0;
-    const STATUS_ACTIVE = 1;
-
-    const HITCH_STATUS_INACTIVE = 0;
-    const HITCH_STATUS_ACTIVE = 1;
-
-    const HITCHES_MAXIMUM_COUNT = 8;
+    public const STATUS_INACTIVE = 0;
+    public const STATUS_ACTIVE = 1;
 
     /**
      * @MongoDB\Id
@@ -80,7 +74,7 @@ class Textnode
     /**
      * @MongoDB\Field(type="hash")
      */
-    protected $metadata;
+    protected $metadata = [];
 
     /**
      * @MongoDB\Field(type="object_id")
@@ -88,9 +82,18 @@ class Textnode
     protected $licenseeId;
 
     /**
-     * @MongoDB\Field(type="hash")
+     * @var TextnodeHitch[]|Collection
+     *
+     * @ReferenceMany(targetDocument="TextnodeHitch", mappedBy="targetTextnode")
      */
-    protected $hitches = [];
+    protected $parentHitches;
+
+    /**
+     * @var TextnodeHitch[]|Collection
+     *
+     * @ReferenceMany(targetDocument="TextnodeHitch", mappedBy="sourceTextnode")
+     */
+    protected $childHitches;
 
     /**
      * @MongoDB\Field(type="object_id")
@@ -106,6 +109,15 @@ class Textnode
      * @MongoDB\Field(type="string")
      */
     protected $arbitraryId;
+
+    /**
+     * Textnode constructor.
+     */
+    public function __construct()
+    {
+        $this->childHitches = new ArrayCollection();
+        $this->parentHitches = new ArrayCollection();
+    }
 
     /**
      * gets the timestamp of creation
@@ -289,151 +301,20 @@ class Textnode
         return $this->access;
     }
 
-
     /**
-     * Counts the number of hitches within the collection.
-     *
-     * @return Number of hitches within the collection.
+     * @return TextnodeHitch[]|Collection
      */
-    public function getHitchCount()
+    public function getChildHitches(): Collection
     {
-        return count($this->hitches);
+        return $this->childHitches;
     }
 
     /**
-     * Gets the hitch which is stored in the collection at the
-     *     specified index.
-     *
-     * @param int $hitchIndex
-     *
-     * @return array|null Null, if the $hitchIndex doesn't specify
-     *     an element within the collection.
+     * @return TextnodeHitch[]|Collection
      */
-    public function getHitch($hitchIndex)
+    public function getParentHitches(): Collection
     {
-        if ($hitchIndex < 0 || $hitchIndex >= count($this->hitches)) {
-            return null;
-        }
-
-        return $this->hitches[$hitchIndex];
-    }
-
-    /**
-     * Appends a hitch at the end of the collection.
-     *
-     * @param array $hitch
-     *
-     * @return true|false False, if $hitch doesn't contain all
-     *     associative array elements which form a hitch, or if
-     *     no "textnodeId" is set within $hitch, or if "status"
-     *     within $hitch doesn't contain a valid value, or if
-     *     there are already HITCHES_MAXIMUM_COUNT hitches present.
-     */
-    public function appendHitch(array $hitch)
-    {
-        $hitchCount = count($this->hitches);
-
-        if ($hitchCount >= self::HITCHES_MAXIMUM_COUNT) {
-            return false;
-        }
-
-        if (array_key_exists("textnodeId", $hitch) !== true) {
-            return false;
-        }
-
-        if (array_key_exists("description", $hitch) !== true) {
-            return false;
-        }
-
-        if (array_key_exists("status", $hitch) !== true) {
-            return false;
-        }
-
-        if ($hitch['status'] !== self::HITCH_STATUS_INACTIVE &&
-            $hitch['status'] !== self::HITCH_STATUS_ACTIVE) {
-            return false;
-        }
-
-        if (null === $hitch['textnodeId']) {
-            return false;
-        }
-
-        $this->hitches[$hitchCount] = $hitch;
-
-        return true;
-    }
-
-    /**
-     * Overwrites the hitch which is stored in the collection at the
-     *     specified index.
-     *
-     * @param int   $hitchIndex
-     * @param array $hitch
-     *
-     * @return true|false False, if the $hitchIndex doesn't specify
-     *     an element within the collection, or if $hitch doesn't
-     *     contain all associative array elements which form a hitch,
-     *     or if no "textnodeId" is set within $hitch, or if "status"
-     *     within $hitch doesn't contain a valid value.
-     */
-    public function setHitch($hitchIndex, array $hitch)
-    {
-        if ($hitchIndex < 0 || $hitchIndex >= count($this->hitches)) {
-            return false;
-        }
-
-        if (array_key_exists("textnodeId", $hitch) !== true) {
-            return false;
-        }
-
-        if (array_key_exists("description", $hitch) !== true) {
-            return false;
-        }
-
-        if (array_key_exists("status", $hitch) !== true) {
-            return false;
-        }
-
-        if ($hitch['status'] !== Textnode::HITCH_STATUS_INACTIVE &&
-            $hitch['status'] !== Textnode::HITCH_STATUS_ACTIVE) {
-            return false;
-        }
-
-        if (is_null($hitch['textnodeId']) === true) {
-            return false;
-        }
-
-        $this->hitches[$hitchIndex] = $hitch;
-
-        return true;
-    }
-
-    /**
-     * Removes the hitch which is stored in the collection at the
-     *     specified index. Reordering of the hitch collection will
-     *     take place, former collection indexes might become invalid
-     *     by calling removeHitch().
-     *
-     * @param int $hitchIndex
-     *
-     * @return true|false False, if the collection is already empty or
-     *     the $hitchIndex doesn't specify an element within the collection.
-     */
-    public function removeHitch($hitchIndex)
-    {
-        $hitchCount = count($this->hitches);
-
-        if ($hitchCount <= 0) {
-            return false;
-        }
-
-        if ($hitchIndex < 0 || $hitchIndex >= $hitchCount) {
-            return false;
-        }
-
-        array_splice($this->hitches, $hitchIndex, 1);
-
-        return true;
+        return $this->parentHitches;
     }
 
     /**
@@ -501,16 +382,8 @@ class Textnode
      *
      * @return bool
      */
-    public function isFinanceNode()
+    public function isFinanceNode(): bool
     {
-        return $this->getHitchCount() === 0;
-    }
-
-    /**
-     * removes all hitches
-     */
-    public function clearHitches()
-    {
-        $this->hitches = [];
+        return $this->getChildHitches()->isEmpty();
     }
 }

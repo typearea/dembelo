@@ -130,7 +130,7 @@ class TopicController extends Controller
             return new Response(\json_encode($output));
         }
         $directory = $request->query->get('topic_image_directory');
-        $filename = md5(uniqid().$file['name']);
+        $filename = md5(uniqid('', true).$file['name']);
         move_uploaded_file($file["tmp_name"], $directory.$filename);
         $output['imageFileName'] = $filename;
         $output['originalImageName'] = $file['name'];

@@ -21,6 +21,7 @@ namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Textnode;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * Class PassageDataParser
@@ -43,12 +44,19 @@ class PassageDataParser
     private $twineTextnodeName;
 
     /**
+     * @var DocumentManager
+     */
+    private $documentManager;
+
+    /**
      * PassageDataParser constructor.
      * @param TextNodeRepositoryInterface $textNodeRepository
+     * @param DocumentManager             $documentManager
      */
-    public function __construct(TextNodeRepositoryInterface $textNodeRepository)
+    public function __construct(TextNodeRepositoryInterface $textNodeRepository, DocumentManager $documentManager)
     {
         $this->textnodeRepository = $textNodeRepository;
+        $this->documentManager = $documentManager;
     }
 
     /**
@@ -93,11 +101,7 @@ class PassageDataParser
             $textnode = $this->createTextnode($twineId);
         } else {
             $textnode->setText('');
-            $textnode->clearHitches();
-        }
-
-        if (null === $textnode->getId()) {
-            $this->textnodeRepository->save($textnode);
+            // @todo clear hitches
         }
 
         $this->twineTextnodeName = $attrs['name'];
@@ -131,10 +135,8 @@ class PassageDataParser
      */
     public function endElement(): void
     {
-        $this->textnodeRepository->save($this->parserContext->getCurrentTextnode());
-
         $nodenameMapping = $this->parserContext->getNodenameMapping();
-        $nodenameMapping[$this->twineTextnodeName] = $this->parserContext->getCurrentTextnode()->getId();
+        $nodenameMapping[$this->twineTextnodeName] = $this->parserContext->getCurrentTextnode();
         $this->parserContext->setNodenameMapping($nodenameMapping);
 
         $this->parserContext->setTwineText(false);
@@ -154,6 +156,10 @@ class PassageDataParser
         $textnode->setImportfileId($this->parserContext->getImportfile()->getId());
         $textnode->setStatus(Textnode::STATUS_ACTIVE);
         $textnode->setTwineId($twineId);
+
+        $this->textnodeRepository->decorateArbitraryId($textnode);
+
+        $this->documentManager->persist($textnode);
 
         return $textnode;
     }

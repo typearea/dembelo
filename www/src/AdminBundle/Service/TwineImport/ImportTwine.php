@@ -20,6 +20,7 @@ namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Importfile;
 use DembeloMain\Service\FileHandler;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * Class ImportTwine
@@ -62,6 +63,11 @@ class ImportTwine
     private $fileHandler;
 
     /**
+     * @var DocumentManager
+     */
+    private $documentManager;
+
+    /**
      * ImportTwine constructor.
      * @param FileExtractor     $fileExtractor
      * @param FileCheck         $fileCheck
@@ -69,8 +75,9 @@ class ImportTwine
      * @param PassageDataParser $passageDataParser
      * @param ParserContext     $parserContext
      * @param FileHandler       $fileHandler
+     * @param DocumentManager   $documentManager
      */
-    public function __construct(FileExtractor $fileExtractor, FileCheck $fileCheck, StoryDataParser $storyDataParser, PassageDataParser $passageDataParser, ParserContext $parserContext, FileHandler $fileHandler)
+    public function __construct(FileExtractor $fileExtractor, FileCheck $fileCheck, StoryDataParser $storyDataParser, PassageDataParser $passageDataParser, ParserContext $parserContext, FileHandler $fileHandler, DocumentManager $documentManager)
     {
         $this->fileExtractor = $fileExtractor;
         $this->fileCheck = $fileCheck;
@@ -78,6 +85,7 @@ class ImportTwine
         $this->passageDataParser = $passageDataParser;
         $this->parserContext = $parserContext;
         $this->fileHandler = $fileHandler;
+        $this->documentManager = $documentManager;
     }
 
     /**
@@ -91,19 +99,27 @@ class ImportTwine
      */
     public function run(Importfile $importfile): bool
     {
-        $this->parserContext->init($importfile);
-        $this->storyDataParser->setParserContext($this->parserContext);
-        $this->passageDataParser->setParserContext($this->parserContext);
+        try {
+            $this->parserContext->init($importfile);
+            $this->storyDataParser->setParserContext($this->parserContext);
+            $this->passageDataParser->setParserContext($this->parserContext);
 
-        $filenameExtracted = $this->fileExtractor->extract($this->parserContext->getFilename());
+            $filenameExtracted = $this->fileExtractor->extract($this->parserContext->getFilename());
 
-        $fileHandler = $this->fileHandler->open($filenameExtracted, 'rb');
+            $fileHandler = $this->fileHandler->open($filenameExtracted, 'rb');
 
-        $this->xmlParser = xml_parser_create('UTF-8');
+            $this->xmlParser = xml_parser_create('UTF-8');
 
-        $this->fileCheck->check($fileHandler, $this->parserContext->getFilename());
+            $this->fileCheck->check($fileHandler, $this->parserContext->getFilename());
 
-        if (!$this->initParser($fileHandler)) {
+            if (!$this->initParser($fileHandler)) {
+                return false;
+            }
+
+            $this->documentManager->flush();
+        } catch (\Throwable $exception) {
+            $this->documentManager->clear();
+
             return false;
         }
 

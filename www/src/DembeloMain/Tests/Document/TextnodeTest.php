@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2015 Michael Giesler, Stephan Kreutzer
  *
  * This file is part of Dembelo.
@@ -18,22 +17,21 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * @package DembeloMain
  */
-
 namespace DembeloMain\Tests\Document;
 
-use DembeloMain\Document\Licensee;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use DembeloMain\Document\TextnodeHitch;
+use DembeloMain\Model\Repository\Doctrine\ODM\TextNodeRepository;
+use PHP_CodeSniffer\Generators\Text;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use DembeloMain\Document\Textnode;
-use DembeloMain\Document\Topic;
 
 /**
  * Class DocumentTextnodeTest
  */
-class TextnodeTest extends WebTestCase
+class TextnodeTest extends KernelTestCase
 {
     /**
      * @var \DembeloMain\Document\Textnode
@@ -42,8 +40,9 @@ class TextnodeTest extends WebTestCase
 
     /**
      * setUp method
+     * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->textnode = new Textnode();
     }
@@ -145,403 +144,9 @@ class TextnodeTest extends WebTestCase
     /**
      * Tests that no hitches are present after the Textnode was constructed.
      */
-    public function testGetHitchCountAfterTextnodeConstruction()
+    public function testGetChildHitchesCountAfterTextnodeConstruction()
     {
-        $this->assertEquals($this->textnode->getHitchCount(), 0);
-    }
-
-    /**
-     * Tests if the hitches gets correctly counted after their insertion.
-     */
-    public function testGetHitchCount()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
-
-        $this->assertEquals($this->textnode->getHitchCount(), 1);
-
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
-        $hitch['description'] = "Continue 2.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
-
-        $this->assertEquals($this->textnode->getHitchCount(), 2);
-    }
-
-    /**
-     * Tests if a hitch can be correctly retrieved after its insertion.
-     */
-    public function testGetHitch()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
-
-        $result = $this->textnode->getHitch($this->textnode->getHitchCount() - 1);
-
-        $this->assertFalse(is_null($result));
-
-        $this->assertEquals($result['textnodeId'], "55f5ab3708985c4b188b4577");
-        $this->assertEquals($result['description'], "Continue.");
-        $this->assertEquals($result['status'], Textnode::HITCH_STATUS_ACTIVE);
-    }
-
-    /**
-     * Tests if retrieving a hitch fails if a negative index is passed.
-     */
-    public function testGetHitchNegativeIndex()
-    {
-        $result = $this->textnode->getHitch(-1);
-
-        $this->assertTrue(is_null($result));
-    }
-
-    /**
-     * Tests if retrieving a hitch fails if a too high index is passed.
-     */
-    public function testGetHitchTooHighIndex()
-    {
-        $result = $this->textnode->getHitch(0);
-
-        $this->assertTrue(is_null($result));
-    }
-
-    /**
-     * Tests if the success of adding a hitch gets correctly signalled.
-     */
-    public function testAppendHitch()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $this->assertTrue($this->textnode->appendHitch($hitch));
-    }
-
-    /**
-     * Tests if the attempt of adding a hitch fails if the textnodeId is missing.
-     */
-    public function testAppendHitchWithoutTextnodeId()
-    {
-        $hitch = array();
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $this->assertFalse($this->textnode->appendHitch($hitch));
-    }
-
-    /**
-     * Tests if the attempt of adding a hitch fails if the description is missing.
-     */
-    public function testAppendHitchWithoutDescription()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $this->assertFalse($this->textnode->appendHitch($hitch));
-    }
-
-    /**
-     * Tests if the attempt of adding a hitch fails if the status is missing.
-     */
-    public function testAppendHitchWithoutStatus()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-
-        $this->assertFalse($this->textnode->appendHitch($hitch));
-    }
-
-    /**
-     * Tests if the attempt of adding a hitch fails if the textnodeId is empty.
-     */
-    public function testAppendHitchWithEmptyTextnodeId()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = null;
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $this->assertFalse($this->textnode->appendHitch($hitch));
-    }
-
-    /**
-     * Tests if appending more hitches than the maximum amount of
-     * hitches is rejected.
-     *
-     * @return void
-     */
-    public function testAppendHitchMoreThanMaximum(): void
-    {
-        for ($i = 0; $i < Textnode::HITCHES_MAXIMUM_COUNT + 1; ++$i) {
-            $hitch = array();
-            $hitch['textnodeId'] = $i;
-            $hitch['description'] = 'Continue.';
-            $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-            if ($i < Textnode::HITCHES_MAXIMUM_COUNT) {
-                $this->assertTrue($this->textnode->appendHitch($hitch), 'adding hitch no. '.$i);
-            } else {
-                $this->assertFalse($this->textnode->appendHitch($hitch), 'adding hitch no. '.$i);
-            }
-        }
-    }
-
-    /**
-     * Tests if an old hitch can be replaced by a new hitch.
-     */
-    public function testSetHitch()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
-
-        $this->assertEquals($this->textnode->getHitchCount(), 1);
-
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
-        $hitch['description'] = "Abort.";
-        $hitch['status'] = Textnode::HITCH_STATUS_INACTIVE;
-        $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitch);
-
-        $this->assertTrue($result);
-        $this->assertEquals($this->textnode->getHitchCount(), 1);
-
-        $result = $this->textnode->getHitch($this->textnode->getHitchCount() - 1);
-
-        $this->assertFalse(is_null($result));
-
-        $this->assertEquals($result['textnodeId'], "55f5ab3708985c4b188b4578");
-        $this->assertEquals($result['description'], "Abort.");
-        $this->assertEquals($result['status'], Textnode::HITCH_STATUS_INACTIVE);
-    }
-
-    /**
-     * Tests if updating a hitch fails if a negative index is passed.
-     */
-    public function testSetHitchNegativeIndex()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $this->assertFalse($this->textnode->setHitch(-1, $hitch));
-    }
-
-    /**
-     * Tests if updating a hitch fails if a too high index is passed.
-     */
-    public function testSetHitchTooHighIndex()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $this->assertFalse($this->textnode->setHitch(1, $hitch));
-    }
-
-    /**
-     * Tests if the attempt of updating a hitch fails if the textnodeId is missing.
-     */
-    public function testSetHitchWithoutTextnodeId()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
-
-        $this->assertEquals($this->textnode->getHitchCount(), 1);
-
-        $hitch = array();
-        $hitch['description'] = "Abort.";
-        $hitch['status'] = Textnode::HITCH_STATUS_INACTIVE;
-        $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitch);
-
-        $this->assertFalse($result);
-    }
-
-    /**
-     * Tests if the attempt of updating a hitch fails if the description is missing.
-     */
-    public function testSetHitchWithoutDescription()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
-
-        $this->assertEquals($this->textnode->getHitchCount(), 1);
-
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
-        $hitch['status'] = Textnode::HITCH_STATUS_INACTIVE;
-        $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitch);
-
-        $this->assertFalse($result);
-    }
-
-    /**
-     * Tests if the attempt of updating a hitch fails if the status is missing.
-     */
-    public function testSetHitchWithoutStatus()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
-
-        $this->assertEquals($this->textnode->getHitchCount(), 1);
-
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
-        $hitch['description'] = "Abort.";
-        $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitch);
-
-        $this->assertFalse($result);
-    }
-
-    /**
-     * Tests if the attempt of updating a hitch fails if the textnodeId is empty.
-     */
-    public function testSetHitchWithEmptyTextnodeId()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-        $this->textnode->appendHitch($hitch);
-
-        $this->assertEquals($this->textnode->getHitchCount(), 1);
-
-        $hitch = array();
-        $hitch['textnodeId'] = null;
-        $hitch['description'] = "Abort.";
-        $hitch['status'] = Textnode::HITCH_STATUS_INACTIVE;
-        $result = $this->textnode->setHitch($this->textnode->getHitchCount() - 1, $hitch);
-
-        $this->assertFalse($result);
-    }
-
-    /**
-     * Tests if the success of removing a hitch gets correctly signalled.
-     */
-    public function testRemoveHitch()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $this->assertTrue($this->textnode->appendHitch($hitch));
-        $this->assertEquals($this->textnode->getHitchCount(), 1);
-
-        $this->assertTrue($this->textnode->removeHitch($this->textnode->getHitchCount() - 1));
-        $this->assertEquals($this->textnode->getHitchCount(), 0);
-    }
-
-    /**
-     * Tests if removing a hitch fails if there's no hitch present.
-     */
-    public function testRemoveHitchThatsNotPresent()
-    {
-        $this->assertFalse($this->textnode->removeHitch(1));
-    }
-
-    /**
-     * Tests if removing a hitch fails if a negative index is passed.
-     */
-    public function testRemoveHitchNegativeIndex()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $this->assertTrue($this->textnode->appendHitch($hitch));
-        $this->assertEquals($this->textnode->getHitchCount(), 1);
-
-        $this->assertFalse($this->textnode->removeHitch(-1));
-    }
-
-    /**
-     * Tests if removing a hitch fails if a too high index is passed.
-     */
-    public function testRemoveHitchTooHighIndex()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $this->assertTrue($this->textnode->appendHitch($hitch));
-        $this->assertEquals($this->textnode->getHitchCount(), 1);
-
-        $this->assertFalse($this->textnode->removeHitch(2));
-    }
-
-    /**
-     * Tests if the correct hitch gets removed.
-     */
-    public function testRemoveHitchSpecific()
-    {
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4577";
-        $hitch['description'] = "Continue.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $this->assertTrue($this->textnode->appendHitch($hitch));
-        $this->assertEquals($this->textnode->getHitchCount(), 1);
-
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4578";
-        $hitch['description'] = "More.";
-        $hitch['status'] = Textnode::HITCH_STATUS_INACTIVE;
-
-        $this->assertTrue($this->textnode->appendHitch($hitch));
-        $this->assertEquals($this->textnode->getHitchCount(), 2);
-
-        $hitch = array();
-        $hitch['textnodeId'] = "55f5ab3708985c4b188b4579";
-        $hitch['description'] = "Abort.";
-        $hitch['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $this->assertTrue($this->textnode->appendHitch($hitch));
-        $this->assertEquals($this->textnode->getHitchCount(), 3);
-
-        $this->assertTrue($this->textnode->removeHitch(1));
-
-        $result = $this->textnode->getHitch(0);
-        $this->assertFalse(is_null($result));
-
-        $this->assertEquals($result['textnodeId'], "55f5ab3708985c4b188b4577");
-        $this->assertEquals($result['description'], "Continue.");
-        $this->assertEquals($result['status'], Textnode::HITCH_STATUS_ACTIVE);
-
-        $result = $this->textnode->getHitch(1);
-        $this->assertFalse(is_null($result));
-
-        $this->assertEquals($result['textnodeId'], "55f5ab3708985c4b188b4579");
-        $this->assertEquals($result['description'], "Abort.");
-        $this->assertEquals($result['status'], Textnode::HITCH_STATUS_ACTIVE);
-
-        $result = $this->textnode->getHitch(2);
-        $this->assertTrue(is_null($result));
+        $this->assertCount(0, $this->textnode->getChildHitches());
     }
 
     /**
@@ -555,8 +160,9 @@ class TextnodeTest extends WebTestCase
 
     /**
      * tests the text
+     * @return void
      */
-    public function testTextHyphenated()
+    public function testTextHyphenated(): void
     {
         $text = 'Lorem Ipsum';
         $this->textnode->setTextHyphenated($text);
@@ -564,46 +170,10 @@ class TextnodeTest extends WebTestCase
     }
 
     /**
-     * tests isFinanceNode();
+     * @return void
      */
-    public function testIsFinanceNode()
+    public function testIsFinanceNode(): void
     {
-        $hitch = [
-            'textnodeId' => 12,
-            'description' => 'foobar',
-            'status' => Textnode::HITCH_STATUS_ACTIVE,
-        ];
-        $this->assertTrue($this->textnode->isFinanceNode());
-        $this->textnode->appendHitch($hitch);
-        $this->assertFalse($this->textnode->isFinanceNode());
-    }
-
-    /**
-     * tests clearHitches() method
-     */
-    public function testClearHitches()
-    {
-        $hitch1 = array();
-        $hitch1['textnodeId'] = "Id1";
-        $hitch1['description'] = "Abort.";
-        $hitch1['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $hitch2 = array();
-        $hitch2['textnodeId'] = "Id2";
-        $hitch2['description'] = "Abort.";
-        $hitch2['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $hitch3 = array();
-        $hitch3['textnodeId'] = "Id3";
-        $hitch3['description'] = "Abort.";
-        $hitch3['status'] = Textnode::HITCH_STATUS_ACTIVE;
-
-        $this->textnode->appendHitch($hitch1);
-        $this->textnode->appendHitch($hitch2);
-        $this->textnode->appendHitch($hitch3);
-        $this->assertEquals(3, $this->textnode->getHitchCount());
-
-        $this->textnode->clearHitches();
-        $this->assertEquals(0, $this->textnode->getHitchCount());
+        self::assertTrue($this->textnode->isFinanceNode());
     }
 }

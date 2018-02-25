@@ -19,7 +19,9 @@
 namespace AdminBundle\Service\TwineImport;
 
 use DembeloMain\Document\Textnode;
+use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Parsedown;
 
 /**
@@ -48,16 +50,23 @@ class StoryDataParser
     private $markupParser;
 
     /**
+     * @var DocumentManager
+     */
+    private $documentManager;
+
+    /**
      * StoryDataParser constructor.
      * @param HitchParser                 $hitchParser
      * @param TextNodeRepositoryInterface $textnodeRepository
      * @param Parsedown                   $markupParser
+     * @param DocumentManager             $documentManager
      */
-    public function __construct(HitchParser $hitchParser, TextNodeRepositoryInterface $textnodeRepository, Parsedown $markupParser)
+    public function __construct(HitchParser $hitchParser, TextNodeRepositoryInterface $textnodeRepository, Parsedown $markupParser, DocumentManager $documentManager)
     {
         $this->hitchParser = $hitchParser;
         $this->textnodeRepository = $textnodeRepository;
         $this->markupParser = $markupParser;
+        $this->documentManager = $documentManager;
     }
 
     /**
@@ -98,8 +107,8 @@ class StoryDataParser
      */
     public function endElement(string $name): void
     {
-        foreach ($this->parserContext->getTextnodeMapping() as $dembeloId) {
-            $this->finalizeTextnode($name, $dembeloId);
+        foreach ($this->parserContext->getTextnodeMapping() as $textnode) {
+            $this->finalizeTextnode($name, $textnode);
         }
 
         $this->textnodeRepository->disableOrphanedNodes($this->parserContext->getImportfile(), array_values($this->parserContext->getTextnodeMapping()));
@@ -111,21 +120,13 @@ class StoryDataParser
     }
 
     /**
-     * @param string $name
-     * @param string $dembeloId
+     * @param string   $name
+     * @param Textnode $textnode
      *
      * @return void
-     *
-     * @throws \Exception
      */
-    private function finalizeTextnode(string $name, string $dembeloId): void
+    private function finalizeTextnode(string $name, Textnode $textnode): void
     {
-        $textnode = $this->textnodeRepository->find($dembeloId);
-
-        if (null === $textnode) {
-            throw new \Exception(sprintf('The Dembelo Textnode with Id \'%s\' doesn\'t exist, but should by now.', $dembeloId));
-        }
-
         $textnodeTextNew = $this->parseText($textnode, $name);
 
         if (null !== $textnodeTextNew) {
@@ -198,6 +199,9 @@ class StoryDataParser
      */
     private function parseText(Textnode $textnode, string $name): ?string
     {
+        foreach ($textnode->getChildHitches() as $childHitch) {
+            $this->documentManager->remove($childHitch);
+        }
         $text = $this->markupParser->parse($textnode->getText());
         $textnodeTextNew = preg_replace_callback(
             '/\[\[(.*?)\]\]/',
@@ -221,34 +225,15 @@ class StoryDataParser
                     $hitch = $this->hitchParser->parseSimpleHitch($content, $name);
                 }
 
-                $this->appendHitchToTextnode($textnode, $hitch);
+                if ($hitch) {
+                    $hitch->setSourceTextnode($textnode);
+                    $this->documentManager->persist($hitch);
+                }
             },
             $text
         );
 
         return trim($textnodeTextNew);
-    }
-
-    /**
-     * @param Textnode   $textnode
-     * @param array|null $hitch
-     *
-     * @return void
-     *
-     * @throws \Exception
-     */
-    private function appendHitchToTextnode(Textnode $textnode, ?array $hitch): void
-    {
-        if (null === $hitch) {
-            return;
-        }
-        if ($textnode->getHitchCount() >= Textnode::HITCHES_MAXIMUM_COUNT) {
-            throw new \Exception(sprintf('There is a textnode in the Twine archive file which has more than %d links.', Textnode::HITCHES_MAXIMUM_COUNT));
-        }
-
-        if ($textnode->appendHitch($hitch) !== true) {
-            throw new \Exception('Failed to append hitch for a textnode');
-        }
     }
 
     /**
