@@ -26,72 +26,119 @@
 namespace DembeloMain\Controller;
 
 use DembeloMain\Document\User;
+use DembeloMain\Form\Login;
+use DembeloMain\Form\Registration;
+use DembeloMain\Model\Repository\UserRepositoryInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 /**
  * Class DefaultController
+ * @Route(service="app.controller_user")
  */
 class UserController extends Controller
 {
     /**
+     * @var AuthenticationUtils
+     */
+    private $authenticationUtils;
+
+    /**
+     * @var UserRepositoryInterface
+     */
+    private $userRepository;
+
+    /**
+     * @var DocumentManager
+     */
+    private $documentManager;
+
+    /**
+     * @var Templating
+     */
+    private $templating;
+
+    /**
+     * @var Router
+     */
+    private $router;
+
+    /**
+     * @var FormFactoryInterface
+     */
+    private $formFactory;
+
+    /**
+     * @var UserPasswordEncoder
+     */
+    private $passwordEncoder;
+
+    /**
+     * UserController constructor.
+     * @param AuthenticationUtils     $authenticationUtils
+     * @param UserRepositoryInterface $userRepository
+     * @param DocumentManager         $documentManager
+     * @param Templating              $templating
+     * @param Router                  $router
+     * @param FormFactoryInterface    $formFactory
+     * @param UserPasswordEncoder     $passwordEncoder
+     */
+    public function __construct(AuthenticationUtils $authenticationUtils, UserRepositoryInterface $userRepository, DocumentManager $documentManager, Templating $templating, Router $router, FormFactoryInterface $formFactory, UserPasswordEncoder $passwordEncoder)
+    {
+        $this->authenticationUtils = $authenticationUtils;
+        $this->userRepository = $userRepository;
+        $this->documentManager = $documentManager;
+        $this->templating = $templating;
+        $this->router = $router;
+        $this->formFactory = $formFactory;
+        $this->passwordEncoder = $passwordEncoder;
+    }
+
+    /**
      * @Route("/login", name="login_route")
      *
-     * @return string
+     * @return Response
      */
-    public function loginAction()
+    public function loginAction(): Response
     {
-        $authenticationUtils = $this->get('security.authentication_utils');
-        $error = $authenticationUtils->getLastAuthenticationError();
+        $error = $this->authenticationUtils->getLastAuthenticationError();
 
         // last username entered by the user
-        $lastUsername = $authenticationUtils->getLastUsername();
+        $lastUsername = $this->authenticationUtils->getLastUsername();
 
         $user = new User();
         $user->setEmail($lastUsername);
 
-        $form = $this->createFormBuilder($user)
-            ->setAction($this->generateUrl('login_check'))
-            ->add(
-                '_username',
-                EmailType::class,
-                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'Email'))
-            )
-            ->add(
-                'password',
-                PasswordType::class,
-                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'Password'))
-            )
-            ->add(
-                'save',
-                SubmitType::class,
-                array('label' => 'Login', 'attr' => array('class' => 'button button-primary u-full-width'))
-            )
-            ->getForm();
+        $url = $this->router->generate('login_check');
 
+        $form = $this->formFactory->create(Login::class, $user, [
+            'action' => $url,
+        ]);
 
-        return $this->render(
+        return $this->templating->renderResponse(
             'DembeloMain::user/login.html.twig',
-            array(
+            [
                 'error' => $error,
-                'form' => $form->createView(),
-            )
+                'form' => $form,
+            ]
         );
     }
 
     /**
      * @Route("/login_check", name="login_check")
      *
-     * @return string
+     * @return void
      */
-    public function loginCheckAction()
+    public function loginCheckAction(): void
     {
     }
 
@@ -100,97 +147,47 @@ class UserController extends Controller
      *
      * @param Request $request request object
      *
-     * @return string
+     * @return Response
      *
      * @throws \Exception
      */
-    public function registrationAction(Request $request)
+    public function registrationAction(Request $request): Response
     {
         $user = new User();
         $user->setRoles(['ROLE_USER']);
         $user->setStatus(0);
-        $form = $this->createFormBuilder($user)
-            ->add(
-                'email',
-                EmailType::class,
-                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'E-Mail'))
-            )
-            ->add(
-                'password',
-                PasswordType::class,
-                array('label' => false, 'attr' => array('class' => 'u-full-width', 'placeholder' => 'Password'))
-            )
-            ->add(
-                'gender',
-                ChoiceType::class,
-                array(
-                    'choices' => array('male' => 'm', 'female' => 'f'),
-                    'label' => false,
-                    'placeholder' => 'Gender',
-                    'required' => false,
-                    'attr' => array('class' => 'u-full-width'),
-                )
-            )
-            ->add(
-                'source',
-                TextType::class,
-                array(
-                    'label' => 'Where have you first heard of Dembelo?',
-                    'required' => false,
-                    'attr' => array('class' => 'u-full-width'),
-                )
-            )
-            ->add(
-                'reason',
-                TextareaType::class,
-                array(
-                    'label' => 'Why to you want to participate in our Closed Beta?',
-                    'required' => false,
-                    'attr' => array('class' => 'u-full-width'),
-                )
-            )
-            ->add(
-                'save',
-                SubmitType::class,
-                array(
-                    'label' => 'Request registration',
-                    'attr' => array('class' => 'button button-primary u-full-width'),
-                )
-            )
-            ->getForm();
+
+        $form = $this->formFactory->create(Registration::class, $user);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $mongo = $this->get('doctrine_mongodb');
-            $dm = $mongo->getManager();
-            $encoder = $this->get('security.password_encoder');
-            $password = $encoder->encodePassword($user, $user->getPassword());
+            $password = $this->passwordEncoder->encodePassword($user, $user->getPassword());
             $user->setPassword($password);
             $user->setMetadata('created', time());
             $user->setMetadata('updated', time());
-            $dm->persist($user);
-            $dm->flush();
+            $this->documentManager->persist($user);
+            $this->documentManager->flush();
 
             return $this->redirectToRoute('registration_success');
         }
 
-        return $this->render(
+        return $this->templating->renderResponse(
             'DembeloMain::user/register.html.twig',
-            array('form' => $form->createView())
+            [
+                'form' => $form->createView(),
+            ]
         );
     }
 
     /**
      * @Route("/registrationSuccess", name="registration_success")
      *
-     * @return string
+     * @return Response
      */
-    public function registrationsuccessAction()
+    public function registrationsuccessAction(): Response
     {
-        return $this->render(
-            'DembeloMain::user/registrationSuccess.html.twig'
-        );
+        return $this->templating->renderResponse('DembeloMain::user/registrationSuccess.html.twig');
     }
 
     /**
@@ -198,21 +195,33 @@ class UserController extends Controller
      *
      * @param string $hash activation hash
      *
-     * @return string
+     * @return Response
      */
-    public function activateemailAction($hash)
+    public function activateemailAction(string $hash): Response
     {
-        $mongo = $this->get('doctrine_mongodb');
-        $repository = $mongo->getRepository('DembeloMain:User');
-        $dm = $mongo->getManager();
-        $user = $repository->findOneByActivationHash($hash);
+        $user = $this->userRepository->findOneBy(['activationHash' => $hash]);
+        if (null === $user) {
+            throw new \InvalidArgumentException('no user found for hash');
+        }
         $user->setActivationHash('');
         $user->setStatus(1);
-        $dm->persist($user);
-        $dm->flush();
+        $this->documentManager->persist($user);
+        $this->documentManager->flush();
 
-        return $this->render(
-            'DembeloMain::user/activationSuccess.html.twig'
-        );
+        return $this->templating->renderResponse('DembeloMain::user/activationSuccess.html.twig');
+    }
+
+    /**
+     * @param string $route
+     * @param array  $parameters
+     * @param int    $status
+     *
+     * @return RedirectResponse
+     */
+    protected function redirectToRoute($route, array $parameters = array(), $status = 302): RedirectResponse
+    {
+        $url = $this->router->generate($route, $parameters);
+
+        return new RedirectResponse($url, $status);
     }
 }

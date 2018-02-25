@@ -23,7 +23,9 @@ services:
 
     app.readpath:
         class: DembeloMain\Model\Readpath
-        arguments: ["@app.model_repository_read_path", "@session"]
+        arguments:
+            - "@app.model_repository_read_path"
+            - "@session"
 
     app.controller_dashboard:
         class: DembeloMain\Controller\Dashboard\DefaultController
@@ -55,6 +57,18 @@ services:
             - "@app.feature_toggle"
             - "@app.model_repository_textnode"
             - "@security.authorization_checker"
+            - "@router"
+
+    app.controller_user:
+        class: DembeloMain\Controller\UserController
+        arguments:
+            - "@security.authentication_utils"
+            - "@app.model_repository_user"
+            - "@doctrine_mongodb.odm.document_manager"
+            - "@templating"
+            - "@router"
+            - "@form.factory"
+            - "@security.password_encoder"
 
     app.admin_controller_default:
         class: AdminBundle\Controller\DefaultController

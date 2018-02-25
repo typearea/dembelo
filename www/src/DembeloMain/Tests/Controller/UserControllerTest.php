@@ -24,146 +24,213 @@
  */
 namespace DembeloMain\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use DembeloMain\Document\User;
+use DembeloMain\Model\Repository\UserRepositoryInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
+use PHPUnit\Framework\TestCase;
 use DembeloMain\Controller\UserController;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
 
 /**
  * Class DefaultControllerTest
  */
-class UserControllerTest extends WebTestCase
+class UserControllerTest extends TestCase
 {
     /**
-     * tests for http status code and html content
+     * @var UserController
      */
-    public function testLoginRoute()
+    private $controller;
+
+    /**
+     * @var AuthenticationUtils|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $authenticationUtilsMock;
+
+    /**
+     * @var UserRepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $userRepositoryMock;
+
+    /**
+     * @var DocumentManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $documentManagerMock;
+
+    /**
+     * @var Templating|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $templatingMock;
+
+    /**
+     * @var Router|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $routerMock;
+
+    /**
+     * @var FormFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $formFactoryMock;
+
+    /**
+     * @var UserPasswordEncoder
+     */
+    private $passwordEncoderMock;
+
+    /**
+     * @return void
+     */
+    protected function setUp(): void
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/login');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertTrue($crawler->filter('html:contains("Einloggen")')->count() > 0);
+        parent::setUp();
+
+        $this->authenticationUtilsMock = $this->createMock(AuthenticationUtils::class);
+        $this->userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
+        $this->documentManagerMock = $this->createMock(DocumentManager::class);
+        $this->templatingMock = $this->createMock(Templating::class);
+        $this->routerMock = $this->createMock(Router::class);
+        $this->formFactoryMock = $this->createMock(FormFactoryInterface::class);
+        $this->passwordEncoderMock = $this->createMock(UserPasswordEncoder::class);
+
+        $this->controller = new UserController(
+            $this->authenticationUtilsMock,
+            $this->userRepositoryMock,
+            $this->documentManagerMock,
+            $this->templatingMock,
+            $this->routerMock,
+            $this->formFactoryMock,
+            $this->passwordEncoderMock
+        );
     }
 
     /**
-     * tests the loginAction
+     * @return void
      */
-    public function testLoginAction()
+    public function testLoginAction(): void
     {
-        $formView = 'formView';
-        $authErr = 'authErr';
-        $loginUrl = '/login';
+        $loginFormMock = $this->createMock(FormInterface::class);
+        $this->formFactoryMock->method('create')->willReturn($loginFormMock);
 
-        $mock = $this->getMockBuilder('foobar')
-            ->setMethods(array('get', 'getLastAuthenticationError', 'getLastUsername', 'createBuilder', 'setAction', 'generate', 'add', 'getForm', 'createView', 'renderResponse', 'render'))
-            ->getMock();
-        $container = $this->getMockBuilder("Symfony\Component\DependencyInjection\ContainerInterface")->getMock();
-        $container->expects($this->any())
-            ->method("get")
-            ->will($this->returnValue($mock));
-        $mock->expects($this->any())
-            ->method('createBuilder')
-            ->with('Symfony\Component\Form\Extension\Core\Type\FormType', $this->isInstanceOf('DembeloMain\Document\User'))
-            ->will($this->returnSelf());
-        $mock->expects($this->any())
-            ->method('setAction')
-            ->with($loginUrl)
-            ->will($this->returnSelf());
-        $mock->expects($this->any())
-            ->method('add')
-            ->will($this->returnSelf());
-        $mock->expects($this->any())
-            ->method('getForm')
-            ->will($this->returnSelf());
-        $mock->expects($this->once())
-            ->method('createView')
-            ->will($this->returnValue($formView));
-        $mock->expects($this->once())
-            ->method('getLastAuthenticationError')
-            ->will($this->returnValue($authErr));
-        $mock->expects($this->once())
-            ->method('render')
-            ->with('DembeloMain::user/login.html.twig', array('error' => $authErr, 'form' => $formView));
-        $mock->expects($this->once())
-            ->method('generate')
-            ->will($this->returnValue($loginUrl));
-        $container->expects($this->any())
-            ->method('has')
-            ->with('templating')
-            ->will($this->returnValue(true));
+        $responseMock = $this->createMock(Response::class);
 
-        $controller = new UserController();
-        $controller->setContainer($container);
-        $controller->loginAction();
+        $this->templatingMock->expects(self::once())
+            ->method('renderResponse')
+            ->willReturn($responseMock);
+
+        $this->controller->loginAction();
     }
 
     /**
-     * tests the loginCheck action
+     * @return void
+     *
+     * @throws \Exception
      */
-    public function testLoginCheckAction()
+    public function testRegistrationActionNotSubmitted(): void
     {
-        $client = static::createClient();
-        $client->request('GET', '/login_check');
-        $this->assertEquals(500, $client->getResponse()->getStatusCode());
+        $registrationFormMock = $this->createMock(FormInterface::class);
+        $this->formFactoryMock->method('create')->willReturn($registrationFormMock);
+        $registrationFormMock->method('isSubmitted')->willReturn(false);
+
+        /** @var Request|\PHPUnit_Framework_MockObject_MockObject $request */
+        $request = $this->createMock(Request::class);
+
+        $responseMock = $this->createMock(Response::class);
+
+        $this->templatingMock->expects(self::once())
+            ->method('renderResponse')
+            ->willReturn($responseMock);
+
+        $this->documentManagerMock->expects(self::never())->method('persist');
+        $this->documentManagerMock->expects(self::never())->method('flush');
+
+        $this->controller->registrationAction($request);
     }
 
     /**
-     * tests the registerAction http status code
+     * @return void
+     *
+     * @throws \Exception
      */
-    public function testRegisterActionHttpStatusCode()
+    public function testRegistrationActionSubmittedAndValid(): void
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/registration');
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertTrue($crawler->filter('html:contains("Registrierung")')->count() > 0);
+        $registrationFormMock = $this->createMock(FormInterface::class);
+        $this->formFactoryMock->method('create')->willReturn($registrationFormMock);
+        $registrationFormMock->method('isSubmitted')->willReturn(true);
+        $registrationFormMock->method('isValid')->willReturn(true);
+
+        /** @var Request|\PHPUnit_Framework_MockObject_MockObject $request */
+        $request = $this->createMock(Request::class);
+
+        $responseMock = $this->createMock(Response::class);
+
+        $this->templatingMock->expects(self::never())->method('renderResponse');
+
+        $this->routerMock->method('generate')->willReturn('registration_success');
+
+        $this->documentManagerMock->expects(self::once())->method('persist');
+        $this->documentManagerMock->expects(self::once())->method('flush');
+
+        $this->controller->registrationAction($request);
     }
 
     /**
-     * tests the registerAction response
+     * @return void
      */
-    public function testRegisterActionResponse()
+    public function testRegistrationsuccessAction(): void
     {
-        $request = $this->getMockBuilder("Symfony\Component\HttpFoundation\Request")->disableOriginalConstructor()->getMock();
-        $mock = $this->getMockBuilder('foobar')
-            ->setMethods(array('get', 'renderResponse', 'createBuilder', 'add', 'getForm', 'handleRequest', 'isSubmitted', 'isValid', 'getManager', 'createView', 'render'))
-            ->getMock();
-        $container = $this->getMockBuilder("Symfony\Component\DependencyInjection\ContainerInterface")->getMock();
-        $container->expects($this->any())
-            ->method("get")
-            ->will($this->returnValue($mock));
-        $mock->expects($this->once())
-            ->method('render')
-            ->with('DembeloMain::user/register.html.twig', array('form' => 'createViewReturnValue'));
-        $mock->expects($this->any())
-            ->method('createBuilder')
-            ->with('Symfony\Component\Form\Extension\Core\Type\FormType', $this->isInstanceOf('DembeloMain\Document\User'))
-            ->will($this->returnSelf());
-        $mock->expects($this->any())
-            ->method('add')
-            ->will($this->returnSelf());
-        $mock->expects($this->any())
-            ->method('getForm')
-            ->will($this->returnSelf());
-        $mock->expects($this->any())
-            ->method('handleRequest')
-            ->will($this->returnSelf());
-        $mock->expects($this->any())
-            ->method('isValid')
-            ->will($this->returnValue(false));
-        $mock->expects($this->any())
-            ->method('isValid')
-            ->will($this->returnValue(true));
-        $mock->expects($this->any())
-            ->method('getManager')
-            ->will($this->returnSelf());
-        $mock->expects($this->any())
-            ->method('createView')
-            ->will($this->returnValue('createViewReturnValue'));
-        $container->expects($this->any())
-            ->method('has')
-            ->with('templating')
-            ->will($this->returnValue(true));
+        $responseMock = $this->createMock(Response::class);
 
-        $controller = new UserController();
-        $controller->setContainer($container);
-        $controller->registrationAction($request);
+        $this->templatingMock->expects(self::once())
+            ->method('renderResponse')
+            ->willReturn($responseMock);
+        $this->controller->registrationsuccessAction();
+    }
+
+    /**
+     * @return void
+     */
+    public function testActivateemailActionUserNotFound(): void
+    {
+        $hash = 'someHash';
+        $responseMock = $this->createMock(Response::class);
+
+        $this->templatingMock->expects(self::never())->method('renderResponse');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->controller->activateemailAction($hash);
+    }
+
+    /**
+     * @return void
+     */
+    public function testActivateemailActionUserFound(): void
+    {
+        $hash = 'someHash';
+        $responseMock = $this->createMock(Response::class);
+
+        $this->templatingMock->expects(self::once())
+            ->method('renderResponse')
+            ->willReturn($responseMock);
+
+        $userMock = $this->createMock(User::class);
+
+        $this->userRepositoryMock->method('findOneBy')
+            ->willReturn($userMock);
+
+        $this->controller->activateemailAction($hash);
+    }
+
+    /**
+     * @return void
+     */
+    public function testLoginCheckAction(): void
+    {
+        self::assertNull($this->controller->loginCheckAction());
     }
 }
