@@ -67,6 +67,8 @@ services:
             - "@doctrine_mongodb.odm.document_manager"
             - "@templating"
             - "@router"
+            - "@form.factory"
+            - "@security.password_encoder"
 
     app.admin_controller_default:
         class: AdminBundle\Controller\DefaultController
