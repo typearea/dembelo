@@ -84,10 +84,13 @@ class UserController extends Controller
 
     /**
      * UserController constructor.
-     * @param AuthenticationUtils $authenticationUtils
+     * @param AuthenticationUtils     $authenticationUtils
      * @param UserRepositoryInterface $userRepository
-     * @param DocumentManager $documentManager
-     * @param Templating $templating
+     * @param DocumentManager         $documentManager
+     * @param Templating              $templating
+     * @param Router                  $router
+     * @param FormFactoryInterface    $formFactory
+     * @param UserPasswordEncoder     $passwordEncoder
      */
     public function __construct(AuthenticationUtils $authenticationUtils, UserRepositoryInterface $userRepository, DocumentManager $documentManager, Templating $templating, Router $router, FormFactoryInterface $formFactory, UserPasswordEncoder $passwordEncoder)
     {
@@ -172,7 +175,7 @@ class UserController extends Controller
         return $this->templating->renderResponse(
             'DembeloMain::user/register.html.twig',
             [
-                'form' => $form->createView()
+                'form' => $form->createView(),
             ]
         );
     }

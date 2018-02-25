@@ -128,6 +128,7 @@ class UserControllerTest extends TestCase
 
     /**
      * @return void
+     *
      * @throws \Exception
      */
     public function testRegistrationActionNotSubmitted(): void
@@ -153,6 +154,7 @@ class UserControllerTest extends TestCase
 
     /**
      * @return void
+     *
      * @throws \Exception
      */
     public function testRegistrationActionSubmittedAndValid(): void
@@ -222,5 +224,13 @@ class UserControllerTest extends TestCase
             ->willReturn($userMock);
 
         $this->controller->activateemailAction($hash);
+    }
+
+    /**
+     * @return void
+     */
+    public function testLoginCheckAction(): void
+    {
+        self::assertNull($this->controller->loginCheckAction());
     }
 }

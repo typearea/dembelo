@@ -33,6 +33,12 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class Registration extends AbstractType
 {
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array                $options
+     *
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
