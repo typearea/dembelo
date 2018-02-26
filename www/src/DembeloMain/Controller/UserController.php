@@ -128,7 +128,7 @@ class UserController extends Controller
             'DembeloMain::user/login.html.twig',
             [
                 'error' => $error,
-                'form' => $form,
+                'form' => $form->createView(),
             ]
         );
     }
