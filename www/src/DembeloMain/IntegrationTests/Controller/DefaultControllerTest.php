@@ -34,6 +34,8 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testReadTopicActionWithAccessNode(): void
     {
+        $client = static::createClient();
+
         $topic = new Topic();
         $topic->setStatus(Topic::STATUS_ACTIVE);
         $this->getMongo()->persist($topic);
@@ -52,8 +54,9 @@ class DefaultControllerTest extends WebTestCase
 
         $response = $client->getResponse();
 
+        self::assertNotNull($response);
         self::assertEquals(302, $response->getStatusCode());
-        self::assertTrue($response->isRedirect('/collect/someArbitraryId'));
+        self::assertTrue($response->isRedirect('/collect/someArbitraryId'), $response->getContent());
     }
 
     /**
@@ -72,6 +75,7 @@ class DefaultControllerTest extends WebTestCase
         $client->request('GET', '/text/someArbitraryId');
         $response = $client->getResponse();
 
+        self::assertNotNull($response);
         self::assertEquals(302, $response->getStatusCode());
         self::assertTrue($response->isRedirect('/collect/someArbitraryId'));
     }
@@ -81,10 +85,17 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testReadTextnodeActionWithHitchShowsTextnode(): void
     {
+        $topic = new Topic();
+        $topic->setStatus(Topic::STATUS_ACTIVE);
+        $topic->setName('someTopic');
+        $this->getMongo()->persist($topic);
+        $this->getMongo()->flush();
+
         $textnode = new Textnode();
         $textnode->setStatus(Textnode::STATUS_ACTIVE);
         $textnode->setAccess(true);
         $textnode->setArbitraryId('someArbitraryId');
+        $textnode->setTopicId($topic->getId());
         $textnode->setMetadata(
             [
                 'Titel' => 'some title',
@@ -98,6 +109,7 @@ class DefaultControllerTest extends WebTestCase
         $textnodeChild->setStatus(Textnode::STATUS_ACTIVE);
         $textnodeChild->setAccess(true);
         $textnodeChild->setArbitraryId('someArbitraryIdChild');
+        $textnodeChild->setTopicId($topic->getId());
         $this->getMongo()->persist($textnodeChild);
 
         $hitch = new TextnodeHitch();
@@ -113,10 +125,11 @@ class DefaultControllerTest extends WebTestCase
         $client->request('GET', '/text/someArbitraryId');
         $response = $client->getResponse();
 
+        self::assertNotNull($response);
         self::assertEquals(200, $response->getStatusCode());
         self::assertContains(
             'hitch to target textnode',
-            $client->getResponse()->getContent()
+            $response->getContent()
         );
     }
 }
