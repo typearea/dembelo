@@ -42,6 +42,7 @@ class WebTestCase extends SymfonyWebTestCase
 
     /**
      * @return void
+     *
      * @throws \Exception
      */
     public function setUp(): void
@@ -85,6 +86,7 @@ class WebTestCase extends SymfonyWebTestCase
     {
         $server['PHP_AUTH_USER'] = 'admin@dembelo.tld';
         $server['PHP_AUTH_PW'] = 'dembelo';
+
         return parent::createClient($options, $server);
     }
 

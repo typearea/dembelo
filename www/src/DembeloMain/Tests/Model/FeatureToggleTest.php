@@ -76,9 +76,13 @@ class FeatureToggleTest extends WebTestCase
      */
     public function testHasFeatureReturnsWhenNoParameterExistsForTestFeature()
     {
-        $featureToggle = new FeatureToggle([
-            ['test_feature' => false]
-        ]);
+        $featureToggle = new FeatureToggle(
+            [
+                [
+                    'test_feature' => false,
+                ],
+            ]
+        );
         self::assertFalse($featureToggle->hasFeature('test_feature'));
     }
 
