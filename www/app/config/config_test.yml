@@ -4,6 +4,11 @@ imports:
 doctrine_mongodb:
     default_database: dembelo_test
 
+security:
+    firewalls:
+        default:
+            http_basic: ~
+
 framework:
     test: ~
     session:
@@ -18,8 +23,8 @@ web_profiler:
 swiftmailer:
     disable_delivery: true
 
-security:
-    firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js|install|admin)/
-            security: false
+parameters:
+    features:
+      - login_enabled: true
+      - login_needed: true
+      - paywall: true

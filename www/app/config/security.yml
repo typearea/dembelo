@@ -5,18 +5,6 @@ security:
     providers:
         mongo_provider:
             mongodb: {class: DembeloMain\Document\User, property: email}
-#        in_memory:
-#            memory:
-#                users:
-#                    michael@4horsemen.de:
-#                        password: $2a$12$D5qSIjvkpBwXgL3EMYQyMOwTl0LDe0OASrsGPc1KCZvo9i.E0.Xgq
-#                        roles: 'ROLE_USER'
-#                    vistin@4horsemen.de:
-#                        password: $2a$12$HmGHnn74Y/7jNMaZR/U6oO6AJUr74X1U7kkPueDRSuIAc7xk0RVuG
-#                        roles: 'ROLE_USER'
-#                    admin@dembelo.de:
-#                        password: $2a$12$ZQIXVmCQaCCWzM7Ca8nrwudYwaKEtagnkkcz/YRLIvvnQgRa.6YTy
-#                        roles: 'ROLE_ADMIN'
 
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs
@@ -36,20 +24,8 @@ security:
                 login_path: /login
                 check_path: /login_check
                 default_target_path: mainpage
-                username_parameter:  form[_username]
-                password_parameter:  form[password]
-                # intention:           authenticate
-
-            # activate different ways to authenticate
-
-            # http_basic: ~
-            # http://symfony.com/doc/current/book/security.html#a-configuring-how-your-users-will-authenticate
-
-            # form_login: ~
-            # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
-
-        # secured_area:
-            # ...
+                username_parameter:  login[_username]
+                password_parameter:  login[password]
             logout:
                 path:   /logout
                 target: /
