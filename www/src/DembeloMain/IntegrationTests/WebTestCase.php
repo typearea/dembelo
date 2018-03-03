@@ -28,6 +28,7 @@ use DembeloMain\Document\Textnode;
 use DembeloMain\Document\TextnodeHitch;
 use DembeloMain\Document\Topic;
 use DembeloMain\Document\User;
+use Symfony\Component\BrowserKit\Client;
 
 /**
  * Class WebTestCase
@@ -41,6 +42,8 @@ class WebTestCase extends SymfonyWebTestCase
 
     /**
      * @return void
+     *
+     * @throws \Exception
      */
     public function setUp(): void
     {
@@ -51,6 +54,8 @@ class WebTestCase extends SymfonyWebTestCase
         self::$em = self::$kernel->getContainer()
             ->get('doctrine_mongodb')
             ->getManager();
+
+        $this->createAdminUser();
     }
 
     /**
@@ -72,10 +77,43 @@ class WebTestCase extends SymfonyWebTestCase
     }
 
     /**
+     * @param array $options
+     * @param array $server
+     *
+     * @return \Symfony\Bundle\FrameworkBundle\Client
+     */
+    protected static function createClient(array $options = [], array $server = [])
+    {
+        $server['PHP_AUTH_USER'] = 'admin@dembelo.tld';
+        $server['PHP_AUTH_PW'] = 'dembelo';
+
+        return parent::createClient($options, $server);
+    }
+
+    /**
      * @return DocumentManager
      */
     protected function getMongo(): DocumentManager
     {
         return self::$em;
+    }
+
+    /**
+     * @throws \Exception
+     *
+     * @return void
+     */
+    private function createAdminUser(): void
+    {
+        $passwordEncoder = self::$kernel->getContainer()->get('security.password_encoder');
+        $user = new User();
+        $user->setStatus(1);
+        $user->setEmail('admin@dembelo.tld');
+        $user->setPassword($passwordEncoder->encodePassword($user, 'dembelo'));
+        $user->setRoles(['ROLE_ADMIN']);
+        $user->setStatus(1);
+        $user->setMetadata(['created' => time(), 'updated' => time()]);
+        self::$em->persist($user);
+        self::$em->flush();
     }
 }

@@ -19,16 +19,11 @@
 
 namespace DembeloMain\Model;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-
 /**
  * Class FeatureToggle
  */
-class FeatureToggle implements ContainerAwareInterface
+class FeatureToggle
 {
-    use ContainerAwareTrait;
-
     /**
      * @var bool[]
      */
@@ -40,12 +35,28 @@ class FeatureToggle implements ContainerAwareInterface
     ];
 
     /**
+     * @var bool[]
+     */
+    private $featureParameters = [];
+
+    /**
+     * FeatureToggle constructor.
+     * @param array $featureParameters
+     */
+    public function __construct(array $featureParameters)
+    {
+        foreach ($featureParameters as $featureParameter) {
+            $this->featureParameters += $featureParameter;
+        }
+    }
+
+    /**
      * checks availability of a feature
      * @param string $featureKey
      *
      * @return bool
      */
-    public function hasFeature(string $featureKey)
+    public function hasFeature(string $featureKey): bool
     {
         if (!isset($this->features[$featureKey])) {
             return false;
@@ -53,31 +64,19 @@ class FeatureToggle implements ContainerAwareInterface
 
         $defaultValue = $this->features[$featureKey];
 
-        $parameterName = $this->buildParameterName($featureKey);
-        if (!$this->container->hasParameter($parameterName)) {
+        if (!isset($this->featureParameters[$featureKey])) {
             return $defaultValue;
         }
-        $parameterValue = $this->container->getParameter($parameterName);
 
-        return $parameterValue;
+        return $this->featureParameters[$featureKey];
     }
 
     /**
      * returns an array of existing features
-     * @return array
+     * @return string[]
      */
     public function getFeatures(): array
     {
         return array_keys($this->features);
-    }
-
-    /**
-     * @param string $featureKey
-     *
-     * @return string
-     */
-    private function buildParameterName(string $featureKey): string
-    {
-        return 'features.'.$featureKey;
     }
 }

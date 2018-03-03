@@ -15,11 +15,10 @@ services:
             - "@app.filehandler"
             - "@doctrine.odm.mongodb.document_manager"
 
-    # @todo remove dependency from service container
     app.feature_toggle:
         class: DembeloMain\Model\FeatureToggle
-        calls:
-        - [setContainer, ["@service_container"]]
+        arguments:
+        - "%features%"
 
     app.readpath:
         class: DembeloMain\Model\Readpath

@@ -20,6 +20,7 @@ parameters:
     locale: de
 
     # features
-    features.login_enabled: true
-    features.login_needed: true
-    features.paywall: true
+    features:
+        - login_enabled: true
+        - login_needed: true
+        - paywall: true

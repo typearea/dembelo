@@ -34,39 +34,23 @@ class FeatureToggleTest extends WebTestCase
     private $featureToggle;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @return void
      */
-    private $containerMock;
-
-    /**
-     * @inheritdoc
-     */
-    public function setUp()
+    public function testHasFeatureExists(): void
     {
-        $this->containerMock = $this->getMockBuilder(Container::class)->setMethods(['hasParameter', 'getParameter'])->getMock();
-        $this->featureToggle = new FeatureToggle();
-        $this->featureToggle->setContainer($this->containerMock);
+        $featureToggle = new FeatureToggle([]);
+        $this->assertTrue(method_exists($featureToggle, 'hasFeature'));
     }
 
     /**
-     * tests hasFeature() exists
+     * @return void
      */
-    public function testHasFeatureExists()
+    public function testHasFeatureThrowsErrorWithMissingParameter(): void
     {
-        $this->assertTrue(method_exists($this->featureToggle, 'hasFeature'));
-    }
+        $featureToggle = new FeatureToggle([]);
 
-    /**
-     * tests hasFeature() throws an error because of missing parameter
-     */
-    public function testHasFeatureThrowsErrorWithMissingParameter()
-    {
-        if (version_compare(PHP_VERSION, '7.1.0') >= 0) {
-            $this->expectException(\ArgumentCountError::class);
-        } else {
-            $this->expectException(\PHPUnit_Framework_Error::class);
-        }
-        $this->featureToggle->hasFeature();
+        $this->expectException(\ArgumentCountError::class);
+        $featureToggle->hasFeature();
     }
 
     /**
@@ -74,7 +58,8 @@ class FeatureToggleTest extends WebTestCase
      */
     public function testHasFeatureReturnsFalseForUnknownFeature()
     {
-        $this->assertFalse($this->featureToggle->hasFeature('unknownFeature'));
+        $featureToggle = new FeatureToggle([]);
+        self::assertFalse($featureToggle->hasFeature('unknownFeature'));
     }
 
     /**
@@ -82,7 +67,8 @@ class FeatureToggleTest extends WebTestCase
      */
     public function testHasFeatureReturnsFalseForTestFeature()
     {
-        $this->assertFalse($this->featureToggle->hasFeature('test_feature'));
+        $featureToggle = new FeatureToggle([]);
+        self::assertFalse($featureToggle->hasFeature('test_feature'));
     }
 
     /**
@@ -90,11 +76,14 @@ class FeatureToggleTest extends WebTestCase
      */
     public function testHasFeatureReturnsWhenNoParameterExistsForTestFeature()
     {
-        $this->containerMock->expects($this->atLeastOnce())
-            ->method('hasParameter')
-            ->with('features.test_feature')
-            ->willReturn(false);
-        $this->assertFalse($this->featureToggle->hasFeature('test_feature'));
+        $featureToggle = new FeatureToggle(
+            [
+                [
+                    'test_feature' => false,
+                ],
+            ]
+        );
+        self::assertFalse($featureToggle->hasFeature('test_feature'));
     }
 
     /**
@@ -102,17 +91,11 @@ class FeatureToggleTest extends WebTestCase
      */
     public function testHasFeatureReturnsTrueWhenTestFeatureIsEnabledByParameter()
     {
-        $this->containerMock->expects($this->atLeastOnce())
-            ->method('hasParameter')
-            ->with('features.test_feature')
-            ->willReturn(true);
+        $featureToggle = new FeatureToggle([
+            ['test_feature' => true],
+        ]);
 
-        $this->containerMock->expects($this->atLeastOnce())
-            ->method('getParameter')
-            ->with('features.test_feature')
-            ->willReturn(true);
-
-        $this->assertTrue($this->featureToggle->hasFeature('test_feature'));
+        self::assertTrue($featureToggle->hasFeature('test_feature'));
     }
 
     /**
@@ -120,7 +103,8 @@ class FeatureToggleTest extends WebTestCase
      */
     public function testGetFeaturesExists()
     {
-        $this->assertTrue(method_exists($this->featureToggle, 'getFeatures'));
+        $featureToggle = new FeatureToggle([]);
+        self::assertTrue(method_exists($featureToggle, 'getFeatures'));
     }
 
     /**
@@ -128,7 +112,8 @@ class FeatureToggleTest extends WebTestCase
      */
     public function testGetFeaturesReturnsAnArray()
     {
-        $this->assertInternalType('array', $this->featureToggle->getFeatures());
+        $featureToggle = new FeatureToggle([]);
+        self::assertInternalType('array', $featureToggle->getFeatures());
     }
 
     /**
@@ -136,7 +121,8 @@ class FeatureToggleTest extends WebTestCase
      */
     public function testGetFeaturesCountGreaterOne()
     {
-        $this->assertGreaterThan(0, count($this->featureToggle->getFeatures()));
+        $featureToggle = new FeatureToggle([]);
+        self::assertGreaterThan(0, count($featureToggle->getFeatures()));
     }
 
     /**
@@ -144,7 +130,8 @@ class FeatureToggleTest extends WebTestCase
      */
     public function testGetFeaturesContainsTestFeature()
     {
-        $features = $this->featureToggle->getFeatures();
-        $this->assertContains('test_feature', $features);
+        $featureToggle = new FeatureToggle([]);
+        $features = $featureToggle->getFeatures();
+        self::assertContains('test_feature', $features);
     }
 }
