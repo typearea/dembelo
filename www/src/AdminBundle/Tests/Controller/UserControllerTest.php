@@ -27,7 +27,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
 
-
 /**
  * Class UserControllerTest
  */
@@ -55,6 +54,7 @@ class UserControllerTest extends WebTestCase
 
     /**
      * @return void
+     *
      * @throws \ReflectionException
      */
     protected function setUp(): void

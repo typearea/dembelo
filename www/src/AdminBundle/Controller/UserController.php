@@ -49,8 +49,8 @@ class UserController
     /**
      * UserController constructor.
      * @param UserRepositoryInterface $userRepository
-     * @param \Swift_Mailer $mailer
-     * @param Templating $templating
+     * @param \Swift_Mailer           $mailer
+     * @param Templating              $templating
      */
     public function __construct(UserRepositoryInterface $userRepository, \Swift_Mailer $mailer, Templating $templating)
     {
