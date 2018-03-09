@@ -23,7 +23,6 @@ use DembeloMain\Document\User;
 use DembeloMain\Model\FavoriteManager;
 use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
@@ -32,7 +31,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
  * Class DefaultController
  * @Route(service="app.controller_dashboard")
  */
-class DefaultController extends Controller
+class DefaultController
 {
     /**
      * @var TopicRepositoryInterface
