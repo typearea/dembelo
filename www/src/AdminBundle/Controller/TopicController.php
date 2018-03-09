@@ -19,9 +19,7 @@
 namespace AdminBundle\Controller;
 
 use DembeloMain\Model\Repository\TopicRepositoryInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -30,7 +28,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @Route(service="app.controller_admin_topic")
  */
-class TopicController extends Controller
+class TopicController
 {
     /**
      * @var TopicRepositoryInterface

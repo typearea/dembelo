@@ -18,7 +18,6 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * @package AdminBundle
  */
@@ -33,7 +32,6 @@ use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
 use DembeloMain\Model\Repository\TopicRepositoryInterface;
 use DembeloMain\Model\Repository\UserRepositoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,7 +44,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
  * Class DefaultController
  * @Route(service="app.admin_controller_default")
  */
-class DefaultController extends Controller
+class DefaultController
 {
     /**
      * @var string
@@ -254,11 +252,13 @@ class DefaultController extends Controller
      * @param string     $filename filename hash
      * @param string     $orgname  original name
      *
+     * @return void
+     *
      * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Symfony\Component\Filesystem\Exception\IOException
      */
-    private function saveFile(Importfile $item, $filename, $orgname)
+    private function saveFile(Importfile $item, $filename, $orgname): void
     {
         $directory = $this->configTwineDirectory;
         $file = $directory.$filename;
@@ -282,9 +282,11 @@ class DefaultController extends Controller
      * @param string $filename filename hash
      * @param string $orgname  original name
      *
+     * @return void
+     *
      * @throws \RuntimeException
      */
-    private function saveTopicImage(Topic $item, string $filename, string $orgname)
+    private function saveTopicImage(Topic $item, string $filename, string $orgname): void
     {
         $directory = $this->topicImageDirectory;
         $finalDirectory = $directory.$item->getId().'/';

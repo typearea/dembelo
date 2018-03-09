@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2015 Michael Giesler
  *
  * This file is part of Dembelo.
@@ -18,7 +17,6 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * @package DembeloMain
  */
@@ -31,7 +29,6 @@ use DembeloMain\Form\Registration;
 use DembeloMain\Model\Repository\UserRepositoryInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,7 +42,7 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
  * Class DefaultController
  * @Route(service="app.controller_user")
  */
-class UserController extends Controller
+class UserController
 {
     /**
      * @var AuthenticationUtils

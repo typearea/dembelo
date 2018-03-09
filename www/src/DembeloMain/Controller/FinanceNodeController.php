@@ -26,7 +26,6 @@ use DembeloMain\Model\FeatureToggle;
 use DembeloMain\Model\Readpath;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
@@ -38,7 +37,7 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
  * Class FinanceNodeController
  * @Route(service="app.controller_financenode")
  */
-class FinanceNodeController extends Controller
+class FinanceNodeController
 {
     /**
      * @var Templating

@@ -25,6 +25,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
 
 /**
  * Class UserControllerTest
@@ -47,16 +48,25 @@ class UserControllerTest extends WebTestCase
     private $mailerMock;
 
     /**
+     * @var Templating|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $templatingMock;
+
+    /**
      * @return void
+     *
+     * @throws \ReflectionException
      */
     protected function setUp(): void
     {
         $this->userRepositoryMock = $this->createUserRepositoryMock();
         $this->mailerMock = $this->createMailerMock();
+        $this->templatingMock = $this->createMock(Templating::class);
 
         $this->controller = new UserController(
             $this->userRepositoryMock,
-            $this->mailerMock
+            $this->mailerMock,
+            $this->templatingMock
         );
     }
 

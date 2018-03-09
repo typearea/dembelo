@@ -87,6 +87,7 @@ services:
         arguments:
             - "@app.model_repository_user"
             - "@mailer"
+            - "@templating"
 
     app.admin_controller_licensee:
             class: AdminBundle\Controller\LicenseeController
