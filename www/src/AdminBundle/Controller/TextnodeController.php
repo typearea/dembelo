@@ -23,8 +23,6 @@ use DembeloMain\Model\Repository\ImportfileRepositoryInterface;
 use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ODM\MongoDB\PersistentCollection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -32,7 +30,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Class TextnodeController
  * @Route(service="app.admin_controller_textnode")
  */
-class TextnodeController extends Controller
+class TextnodeController
 {
     /**
      * @var TextNodeRepositoryInterface
