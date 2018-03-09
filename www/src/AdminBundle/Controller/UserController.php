@@ -18,18 +18,18 @@
  */
 namespace AdminBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\QueryBuilder;
 use DembeloMain\Model\Repository\UserRepositoryInterface;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as Templating;
 
 /**
  * Class UserController
  * @Route(service="app.admin_controller_user")
  */
-class UserController extends Controller
+class UserController
 {
     /**
      * @var UserRepositoryInterface
@@ -42,14 +42,21 @@ class UserController extends Controller
     private $mailer;
 
     /**
+     * @var Templating
+     */
+    private $templating;
+
+    /**
      * UserController constructor.
      * @param UserRepositoryInterface $userRepository
-     * @param \Swift_Mailer           $mailer
+     * @param \Swift_Mailer $mailer
+     * @param Templating $templating
      */
-    public function __construct(UserRepositoryInterface $userRepository, \Swift_Mailer $mailer)
+    public function __construct(UserRepositoryInterface $userRepository, \Swift_Mailer $mailer, Templating $templating)
     {
         $this->userRepository = $userRepository;
         $this->mailer = $mailer;
+        $this->templating = $templating;
     }
 
     /**
@@ -128,9 +135,9 @@ class UserController extends Controller
             ->setFrom('system@waszulesen.de')
             ->setTo($user->getEmail())
             ->setBody(
-                $this->renderView(
+                $this->templating->render(
                     'AdminBundle::Emails/registration.txt.twig',
-                    array('hash' => $user->getActivationHash())
+                    ['hash' => $user->getActivationHash()]
                 ),
                 'text/html'
             );
