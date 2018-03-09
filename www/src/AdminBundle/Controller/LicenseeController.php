@@ -21,7 +21,6 @@ namespace AdminBundle\Controller;
 
 use DembeloMain\Document\Licensee;
 use DembeloMain\Model\Repository\LicenseeRepositoryInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Class LicenseeController
  * @Route(service="app.admin_controller_licensee")
  */
-class LicenseeController extends Controller
+class LicenseeController
 {
     /**
      * @var LicenseeRepositoryInterface
