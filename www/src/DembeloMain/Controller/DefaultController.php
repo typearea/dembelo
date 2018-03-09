@@ -30,7 +30,6 @@ use DembeloMain\Model\Readpath;
 use DembeloMain\Model\Repository\TextNodeRepositoryInterface;
 use DembeloMain\Model\Repository\UserRepositoryInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -43,7 +42,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  * Class DefaultController
  * @Route(service="app.controller_default")
  */
-class DefaultController extends Controller
+class DefaultController
 {
     /**
      * @var FeatureToggle
@@ -133,7 +132,7 @@ class DefaultController extends Controller
         $textnode = $this->textnodeRepository->getTextnodeToRead($topicId);
 
         if (null === $textnode) {
-            throw $this->createNotFoundException(sprintf('No Textnode for Topic \'%s\' found.', $topicId));
+            throw new NotFoundHttpException(sprintf('No Textnode for Topic \'%s\' found.', $topicId));
         }
 
         $user = $this->getUser();
@@ -167,7 +166,7 @@ class DefaultController extends Controller
         $textnode = $this->textnodeRepository->findOneActiveByArbitraryId($textnodeArbitraryId);
 
         if (null === $textnode) {
-            throw $this->createNotFoundException(sprintf('No Textnode with arbitrary ID \'%s\' found.', $textnodeArbitraryId));
+            throw new NotFoundHttpException(sprintf('No Textnode with arbitrary ID \'%s\' found.', $textnodeArbitraryId));
         }
 
         if ($textnode->isFinanceNode()) {
@@ -307,7 +306,7 @@ class DefaultController extends Controller
         $textnode = $this->textnodeRepository->findOneActiveById($textnodeId);
 
         if (null === $textnode) {
-            throw $this->createNotFoundException(sprintf('No Textnode with ID \'%s\' found.', $textnodeId));
+            throw new NotFoundHttpException(sprintf('No Textnode with ID \'%s\' found.', $textnodeId));
         }
 
         /* @var $hitch TextnodeHitch */
