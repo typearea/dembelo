@@ -33,6 +33,7 @@ services:
             - "@app.favoriteManager"
             - "@templating"
             - "@security.token_storage"
+        tags: ['controller.service_arguments']
 
     app.controller_default:
         class: DembeloMain\Controller\DefaultController
@@ -46,6 +47,7 @@ services:
             - "@security.token_storage"
             - "@app.readpath"
             - "@app.favoriteManager"
+        tags: ['controller.service_arguments']
 
     app.controller_financenode:
         class: DembeloMain\Controller\FinanceNodeController
@@ -57,6 +59,7 @@ services:
             - "@app.model_repository_textnode"
             - "@security.authorization_checker"
             - "@router"
+        tags: ['controller.service_arguments']
 
     app.controller_user:
         class: DembeloMain\Controller\UserController
@@ -68,6 +71,7 @@ services:
             - "@router"
             - "@form.factory"
             - "@security.password_encoder"
+        tags: ['controller.service_arguments']
 
     app.admin_controller_default:
         class: AdminBundle\Controller\DefaultController
@@ -81,6 +85,7 @@ services:
             - "%twine_directory%"
             - "%topic_image_directory%"
             - "@filesystem"
+        tags: ['controller.service_arguments']
 
     app.admin_controller_user:
         class: AdminBundle\Controller\UserController
@@ -88,18 +93,21 @@ services:
             - "@app.model_repository_user"
             - "@mailer"
             - "@templating"
+        tags: ['controller.service_arguments']
 
     app.admin_controller_licensee:
-            class: AdminBundle\Controller\LicenseeController
-            arguments:
-                - "@app.model_repository_licensee"
+        class: AdminBundle\Controller\LicenseeController
+        arguments:
+            - "@app.model_repository_licensee"
+        tags: ['controller.service_arguments']
 
     app.admin_controller_textnode:
-            class: AdminBundle\Controller\TextnodeController
-            arguments:
-                - "@app.model_repository_textnode"
-                - "@app.model_repository_importfile"
-                - "@app.model_repository_licensee"
+        class: AdminBundle\Controller\TextnodeController
+        arguments:
+            - "@app.model_repository_textnode"
+            - "@app.model_repository_importfile"
+            - "@app.model_repository_licensee"
+        tags: ['controller.service_arguments']
 
     app.admin_controller_importfile:
         class: AdminBundle\Controller\ImportfileController
@@ -108,10 +116,12 @@ services:
             - "@admin.import.twine"
             - "@doctrine_mongodb"
             - "%twine_directory%"
+        tags: ['controller.service_arguments']
 
     app.controller_admin_topic:
         class: AdminBundle\Controller\TopicController
         arguments: ["@app.model_repository_topic"]
+        tags: ['controller.service_arguments']
 
     app.model_repository_topic:
         class: DembeloMain\Model\Repository\Doctrine\ODM\TopicRepository
