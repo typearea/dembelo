@@ -4,8 +4,6 @@
     <p>von {{ textnode.getMetadata.Autor }} aus {{ textnode.getMetadata.Verlag }}</p>
 
     <a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-sa/3.0/de/">
-        {% image '@DembeloMain/Resources/public/images/cc-by-sa.png' %}
-        <img src="{{ asset_url }}" alt="Creative Commons Lizenzvertrag"/>
-        {% endimage %}
+        <img src="{{ asset('build/images/cc-by-sa.png') }}" alt="Creative Commons Lizenzvertrag"/>
     </a>
 </div>

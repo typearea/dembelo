@@ -11,7 +11,7 @@ git checkout-index -a -f --prefix release/
 cd release
 export SYMFONY_ENV=prod
 composer --working-dir="www" install --no-dev --optimize-autoloader
-php www/bin/console assetic:dump --env=prod
+php www/bin/console assets:install web --env=prod
 rm www/app/config/parameters.yml
 echo "zip release: $RELEASE_FILENAME"
 zip -rq $RELEASE_FILENAME ./

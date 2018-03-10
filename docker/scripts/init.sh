@@ -4,7 +4,8 @@ umask 0000
 
 cd /var/www/dembelo/www
 composer install
-bin/console assetic:dump
+yarn run encore dev --watch
+bin/console assets:install web --symlink
 bin/console cache:warmup
 
 service nginx start

@@ -1,5 +1,5 @@
 {#
-Copyright (C) 2015-2017 Michael Giesler, Stephan Kreutzer, Daniel Hebestreit
+Copyright (C) 2015-2018 Michael Giesler, Stephan Kreutzer, Daniel Hebestreit
 
 This file is part of Dembelo.
 
@@ -39,9 +39,7 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
 
     {% block stylesheets %}
         <link rel="stylesheet" href="{{ asset('vendor/Ionicons/css/ionicons.min.css') }}">
-        {% stylesheets '@DembeloMain/Resources/public/css/dembelo.scss' filter='sass' output='css/compiled/app.css' %}
-        <link rel="stylesheet" href="{{ asset_url }}">
-        {% endstylesheets %}
+        <link rel="stylesheet" href="{{ asset('build/css.css') }}">
     {% endblock %}
 </head>
 <body id="{% block bodyid %}{% endblock %}">
@@ -59,14 +57,11 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-    {% javascripts
-    '@DembeloMain/Resources/public/js/toolbar.js'
-    '@DembeloMain/Resources/public/js/navigation.js'
-    '@DembeloMain/Resources/public/js/touch.js'
-    '@DembeloMain/Resources/public/js/modal.js'
-    '@DembeloMain/Resources/public/js/dembelo.js' %}
-    <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+    <script type="text/javascript" src="{{ asset('build/dembelo.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/modal.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/navigation.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/toolbar.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('build/touch.js') }}"></script>
 {% endblock %}
 {# Piwik #}
 <script type="text/javascript">

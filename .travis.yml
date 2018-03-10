@@ -24,7 +24,7 @@ script:
 install:
 - composer --working-dir="www" install
 - phpenv rehash
-- php www/bin/console assetic:dump --env=prod
+- php www/bin/console assets:install web --symlink
 before_deploy:
 - ./scripts/buildRelease.sh
 deploy:

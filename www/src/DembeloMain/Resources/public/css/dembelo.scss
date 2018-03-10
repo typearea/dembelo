@@ -1,7 +1,5 @@
 @import "variables";
-/**
-* Skeleton Styles
-*/
+
 // import normalize-scss
 @import "../../../../../web/vendor/normalize-scss/sass/normalize/import-now";
 // Skeleton Sass core loader
@@ -12,9 +10,7 @@
 @import "skeleton/themes/dembelo/base";
 // theme grid styles
 @import "skeleton/themes/dembelo/skeleton";
-/**
-* Dembelo Styles
-*/
+
 // import variables
 @import "fonts";
 @import "variables/dashboard";
