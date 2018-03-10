@@ -22,6 +22,7 @@ use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique as MongoDBUnique;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Exception;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -34,7 +35,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @MongoDB\Document(repositoryClass="\DembeloMain\Model\Repository\Doctrine\ODM\UserRepository")
  */
-class User implements UserInterface, \Serializable, AdvancedUserInterface
+class User implements UserInterface, \Serializable, AdvancedUserInterface, EquatableInterface
 {
     /**
      * @MongoDB\Id
@@ -510,5 +511,30 @@ class User implements UserInterface, \Serializable, AdvancedUserInterface
         }
 
         return $this->favorites[$topicId];
+    }
+
+    /**
+     * The equality comparison should neither be done by referential equality
+     * nor by comparing identities (i.e. getId() === getId()).
+     *
+     * However, you do not need to compare every attribute, but only those that
+     * are relevant for assessing whether re-authentication is required.
+     *
+     * Also implementation should consider that $user instance may implement
+     * the extended user interface `AdvancedUserInterface`.
+     *
+     * @return bool
+     */
+    public function isEqualTo(UserInterface $user): bool
+    {
+        if ($this->getPassword() !== $user->getPassword()) {
+            return false;
+        }
+
+        if ($this->getUsername() !== $user->getUsername()) {
+            return false;
+        }
+
+        return true;
     }
 }
