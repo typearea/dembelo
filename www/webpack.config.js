@@ -8,16 +8,18 @@ Encore
     .setPublicPath('/build')
 
     // will create web/build/app.js and public/build/app.css
-    .addEntry('dembelo', './src/DembeloMain/Resources/public/js/dembelo.js')
-    .addEntry('modal', './src/DembeloMain/Resources/public/js/modal.js')
-    .addEntry('navigation', './src/DembeloMain/Resources/public/js/navigation.js')
-    .addEntry('toolbar', './src/DembeloMain/Resources/public/js/toolbar.js')
-    .addEntry('touch', './src/DembeloMain/Resources/public/js/touch.js')
+    .addEntry('js/dembelo', './src/DembeloMain/Resources/public/js/dembelo.js')
+    .addEntry('js/modal', './src/DembeloMain/Resources/public/js/modal.js')
+    .addEntry('js/navigation', './src/DembeloMain/Resources/public/js/navigation.js')
+    .addEntry('js/toolbar', './src/DembeloMain/Resources/public/js/toolbar.js')
+    .addEntry('js/touch', './src/DembeloMain/Resources/public/js/touch.js')
+
+    .addEntry('js/libs/require', './vendor/etdsolutions/requirejs/require.js')
 
     .addEntry('images/share-facebook', './src/DembeloMain/Resources/public/images/share-facebook.png')
     .addEntry('images/cc-by-sa', './src/DembeloMain/Resources/public/images/cc-by-sa.png')
 
-    .addStyleEntry('css', './src/DembeloMain/Resources/public/css/dembelo.scss')
+    .addStyleEntry('css/dembelo', './src/DembeloMain/Resources/public/css/dembelo.scss')
 
     // allow sass/scss files to be processed
     .enableSassLoader()
