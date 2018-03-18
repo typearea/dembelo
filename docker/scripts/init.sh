@@ -10,4 +10,5 @@ bin/console cache:warmup
 service nginx start
 service php7.1-fpm start
 
+yarn install
 yarn run encore dev --watch
