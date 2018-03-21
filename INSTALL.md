@@ -41,7 +41,7 @@ php bin/console dembelo:install --purge-db --with-dummy-data
 export SYMFONY_ENV=prod
 composer install --no-dev --optimize-autoloader
 php app/console cache:clear --env=prod
-php app/console assetic:dump --env=prod
+php app/console assets:install web --env=prod
 ```
 Quelle: http://symfony.com/doc/current/deployment.html
 

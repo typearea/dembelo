@@ -17,12 +17,12 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace DembeloMain\Tests\Controller\Dashboard;
+namespace DembeloMain\IntegrationTests\Controller\Dashboard;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use DembeloMain\IntegrationTests\WebTestCase;
 
 /**
- * Class Dashboard DefaultControllerTest
+ * @group integration
  */
 class DefaultControllerTest extends WebTestCase
 {

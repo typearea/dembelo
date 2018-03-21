@@ -8,11 +8,6 @@
 
     {% block stylesheets %}
         <link rel="stylesheet" href="/js/libs/webix/webix.css" type="text/css">
-
-        {% stylesheets '@DembeloMain/Resources/public/css/*' filter='cssrewrite' %}
-        <link rel="stylesheet" href="{{ asset_url }}">
-        {% endstylesheets %}
-
     {% endblock %}
 
     {% block javascripts %}

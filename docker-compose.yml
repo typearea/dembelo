@@ -1,7 +1,7 @@
 version: '3'
 services:
   web:
-    build: .
+    build: ./www
     ports:
       - "80:80"
     links:
@@ -10,6 +10,8 @@ services:
       - ./www:/var/www/dembelo/www
       - ./scripts:/var/www/dembelo/scripts
       - ./docker/scripts:/var/www/dembelo/docker/scripts
+      - ./files/php/mods-available/xdebug.ini:/etc/php/7.1/mods-available/xdebug.ini
+      - ./files/nginx/default:/etc/nginx/sites-available/default
     environment:
       PHP_IDE_CONFIG: "serverName=Docker"
   database:

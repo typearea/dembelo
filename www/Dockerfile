@@ -1,13 +1,19 @@
 FROM debian
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get -qq update \
-&& apt-get install -qq -y apt-transport-https apt-utils wget
+&& apt-get install -qq -y apt-transport-https apt-utils wget curl gnupg
 
 RUN echo "deb https://packages.sury.org/php/ jessie main" > /etc/apt/sources.list.d/php.list \
-&& wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+&& curl https://packages.sury.org/php/apt.gpg | apt-key add -
 
-RUN apt-get update -qq -y \
-&& apt-get install -qq -y \
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
+&& curl https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+
+RUN apt-get update -qq -y
+
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
+
+RUN apt-get install -qq -y \
 curl \
 vim \
 ruby \
@@ -27,17 +33,16 @@ nginx \
 libsasl2-dev \
 unzip \
 sudo \
+nodejs \
+yarn \
 && apt-get autoremove -y
 
 RUN curl -s http://getcomposer.org/installer | php -- --install-dir=/usr/bin \
 && mv /usr/bin/composer.phar /usr/bin/composer \
 && composer self-update
 
-RUN gem install sass
+RUN yarn add sass-loader node-sass webpack-notifier @symfony/webpack-encore --dev
 
-COPY ./files/php/mods-available/xdebug.ini /etc/php/7.1/mods-available/xdebug.ini
-
-COPY ./files/nginx/default /etc/nginx/sites-available/default
 RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 WORKDIR /var/www

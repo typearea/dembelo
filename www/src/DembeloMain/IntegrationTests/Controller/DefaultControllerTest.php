@@ -34,7 +34,7 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testReadTopicActionWithAccessNode(): void
     {
-        $client = static::createClient();
+        static::createClient();
 
         $topic = new Topic();
         $topic->setStatus(Topic::STATUS_ACTIVE);
