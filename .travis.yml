@@ -21,10 +21,13 @@ script:
 - ./www/bin/phpunit -c www/app/ --group integration --no-coverage
 - php ./scripts/coverage-checker.php www/var/logs/clover.xml 75
 install:
-- composer --working-dir="www" install
+- cd www
+- composer install
 - phpenv rehash
-- php www/bin/console assets:install web --symlink
-- cd www && yarn install && cd ..
+- php bin/console assets:install web --symlink
+- yarn install
+- yarn run encore dev
+- cd ..
 before_deploy:
 - ./scripts/buildRelease.sh
 deploy:
