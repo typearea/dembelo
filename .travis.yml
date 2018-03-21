@@ -16,6 +16,7 @@ before_install:
 services:
 - mongodb
 script:
+- cd www && yarn install
 - ./www/bin/phpcs --standard=www/app/phpcs.xml
 - ./www/bin/phpunit -c www/app/ --exclude-group integration
 - ./www/bin/phpunit -c www/app/ --group integration --no-coverage
