@@ -16,7 +16,6 @@ before_install:
 services:
 - mongodb
 script:
-- cd www && yarn install
 - ./www/bin/phpcs --standard=www/app/phpcs.xml
 - ./www/bin/phpunit -c www/app/ --exclude-group integration
 - ./www/bin/phpunit -c www/app/ --group integration --no-coverage
@@ -25,6 +24,7 @@ install:
 - composer --working-dir="www" install
 - phpenv rehash
 - php www/bin/console assets:install web --symlink
+- cd www && yarn install && cd ..
 before_deploy:
 - ./scripts/buildRelease.sh
 deploy:
