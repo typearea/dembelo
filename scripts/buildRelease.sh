@@ -10,9 +10,13 @@ git push --quiet git@github.com:typearea/dembelo.git $DEMBELO_VERSION
 git checkout-index -a -f --prefix release/
 cd release
 export SYMFONY_ENV=prod
-composer --working-dir="www" install --no-dev --optimize-autoloader
-php www/bin/console assets:install web --env=prod
-rm www/app/config/parameters.yml
+cd www
+composer install --no-dev --optimize-autoloader
+php bin/console assets:install web --env=prod
+yarn install
+yarn run encore production
+rm app/config/parameters.yml
+cd ..
 echo "zip release: $RELEASE_FILENAME"
 zip -rq $RELEASE_FILENAME ./
 ls -l $RELEASE_FILENAME
