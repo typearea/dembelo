@@ -22,7 +22,6 @@
       "doctrine/mongodb-odm": "1.2.*",
       "doctrine/mongodb-odm-bundle": "3.4.*",
       "etdsolutions/domready": "dev-master",
-      "etdsolutions/requirejs": "^2.3",
       "typearea/webix": "^4.1",
       "alcaeus/mongo-php-adapter": "1.0.6",
       "sllh/composer-versions-check": "^2.0",

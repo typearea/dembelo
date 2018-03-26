@@ -16,8 +16,8 @@
  * along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*global:webix,paths,XMLHttpRequest*/
-define(function () {
+/*global:webix,paths,XMLHttpRequest,module*/
+(function () {
     function showError(msg) {
         webix.modalbox({
             title: "Fehler",
@@ -165,7 +165,7 @@ define(function () {
     function sendActivationMail() {
         var userId = $$('usergrid').getSelectedId().id;
 
-        webix.ajax().post(paths.adminUserActivationMail, {userId: userId}, function (text) {
+        webix.ajax().post(window.paths.adminUserActivationMail, {userId: userId}, function (text) {
             var params = JSON.parse(text);
             if (params['error'] === false) {
                 webix.modalbox({
@@ -216,7 +216,7 @@ define(function () {
         $$(type + 'grid').select(itemId);
     }
 
-    return {
+    module.exports = {
         init: function () {
             $$("mainnav").attachEvent("onAfterSelect", function (id){
                 if (id === '1') {
@@ -374,7 +374,7 @@ define(function () {
                                                                             {view: "label", id: "userformcreated", name: "updated"},
                                                                         ]},
                                                                         {view: "combo", id: "userformrole", name: "roles", label: "Rolle", options: [{id:"ROLE_ADMIN", value: "Admin"}, {id:"ROLE_USER", value: "Leser"}, {id:"ROLE_LICENSEE", value: "Lizenznehmer"}], validate:webix.rules.isNotEmpty},
-                                                                        {view: "combo", id: "userformlicensee", name: "licenseeId", label: "Lizenznehmer", suggest: paths.adminLicenceeSuggest, disabled: true},
+                                                                        {view: "combo", id: "userformlicensee", name: "licenseeId", label: "Lizenznehmer", suggest: window.paths.adminLicenceeSuggest, disabled: true},
                                                                         {view: "combo", id: "userformgender", name: "gender", label: "Geschlecht", options: [{id: 'm', value: 'männlich'},{ id: 'f', value: 'weiblich'}]},
                                                                         {view: "combo", id: "userformstatus", name: "status", label: "Status", options: [{id: '0', value: 'inaktiv'}, {id: '1', value: 'aktiv'}], validate:webix.rules.isNotEmpty},
                                                                         {view: "textarea", id: "userformsource", name: "source", label: "Quelle", height: 100},
@@ -456,7 +456,7 @@ define(function () {
                                                                             id: "topicuploadimage",
                                                                             value:"Dateiauswahl",
                                                                             link:"topicuploadimagelist",
-                                                                            upload: paths.adminTopicImageUploader,
+                                                                            upload: window.paths.adminTopicImageUploader,
                                                                             multiple: false
                                                                         },
                                                                         {
@@ -510,8 +510,8 @@ define(function () {
                                                                         {view: "text", name: "name", label: "Name"},
                                                                         {view: "text", name: "author", label: "Autor"},
                                                                         {view: "text", name: "publisher", label: "Verlag"},
-                                                                        {view: "combo", id: "userformlicensee", name: "licenseeId", label: "Lizenznehmer", suggest: paths.adminLicenceeSuggest},
-                                                                        {view: "combo", id: "importfiletopic", name: "topicId", label: "Themenfeld", suggest: paths.adminTopicSuggest},
+                                                                        {view: "combo", id: "userformlicensee", name: "licenseeId", label: "Lizenznehmer", suggest: window.paths.adminLicenceeSuggest},
+                                                                        {view: "combo", id: "importfiletopic", name: "topicId", label: "Themenfeld", suggest: window.paths.adminTopicSuggest},
                                                                         {view: "text", name: "orgname", label: "Datei", disabled: true},
                                                                         {
                                                                             view:"uploader",
@@ -595,4 +595,4 @@ define(function () {
 
     };
 
-});
+}());

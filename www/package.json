@@ -5,5 +5,9 @@
     "node-sass": "^4.7.2",
     "sass-loader": "^6.0.7",
     "webpack-notifier": "^1.6.0"
+  },
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "requirejs": "^2.3.5"
   }
 }

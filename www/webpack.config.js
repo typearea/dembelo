@@ -1,4 +1,5 @@
-var Encore = require('@symfony/webpack-encore');
+var Encore = require('@symfony/webpack-encore'),
+    path = require('path');
 
 Encore
 // the project directory where all compiled assets will be stored
@@ -14,12 +15,21 @@ Encore
     .addEntry('js/toolbar', './src/DembeloMain/Resources/public/js/toolbar.js')
     .addEntry('js/touch', './src/DembeloMain/Resources/public/js/touch.js')
 
-    .addEntry('js/libs/require', './vendor/etdsolutions/requirejs/require.js')
+    // AdminBundle
+    //.addExternals({
+//    webix: 'Webix'
+    //})
+    .addAliases({
+        Webix: path.resolve(__dirname, './vendor/typearea/webix/lib/codebase/webix_debug.js')
+    })
+    .addEntry('js/admin/admin', './src/AdminBundle/Resources/public/js/admin.js')
+    .addEntry('js/admin/main', './src/AdminBundle/Resources/public/js/main.js')
 
     .addEntry('images/share-facebook', './src/DembeloMain/Resources/public/images/share-facebook.png')
     .addEntry('images/cc-by-sa', './src/DembeloMain/Resources/public/images/cc-by-sa.png')
 
     .addStyleEntry('css/dembelo', './src/DembeloMain/Resources/public/css/dembelo.scss')
+    .addStyleEntry('css/admin/webix', './vendor/typearea/webix/lib/codebase/webix.css')
 
     // allow sass/scss files to be processed
     .enableSassLoader()
