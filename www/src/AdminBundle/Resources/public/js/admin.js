@@ -371,7 +371,7 @@
                                                                         ]},
                                                                         {cols: [
                                                                             {view: "label", label: "Aktualisiert", width: 80},
-                                                                            {view: "label", id: "userformcreated", name: "updated"},
+                                                                            {view: "label", id: "userformupdated", name: "updated"},
                                                                         ]},
                                                                         {view: "combo", id: "userformrole", name: "roles", label: "Rolle", options: [{id:"ROLE_ADMIN", value: "Admin"}, {id:"ROLE_USER", value: "Leser"}, {id:"ROLE_LICENSEE", value: "Lizenznehmer"}], validate:webix.rules.isNotEmpty},
                                                                         {view: "combo", id: "userformlicensee", name: "licenseeId", label: "Lizenznehmer", suggest: window.paths.adminLicenceeSuggest, disabled: true},
@@ -510,7 +510,7 @@
                                                                         {view: "text", name: "name", label: "Name"},
                                                                         {view: "text", name: "author", label: "Autor"},
                                                                         {view: "text", name: "publisher", label: "Verlag"},
-                                                                        {view: "combo", id: "userformlicensee", name: "licenseeId", label: "Lizenznehmer", suggest: window.paths.adminLicenceeSuggest},
+                                                                        {view: "combo", id: "importfilelicensee", name: "licenseeId", label: "Lizenznehmer", suggest: window.paths.adminLicenceeSuggest},
                                                                         {view: "combo", id: "importfiletopic", name: "topicId", label: "Themenfeld", suggest: window.paths.adminTopicSuggest},
                                                                         {view: "text", name: "orgname", label: "Datei", disabled: true},
                                                                         {
