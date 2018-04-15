@@ -128,7 +128,7 @@ class ImportfileController
         } catch (\Exception $e) {
             $output = [
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => $e->getMessage().':<br/>'.$e->getTraceAsString(),
             ];
         }
 

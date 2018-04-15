@@ -130,6 +130,7 @@
                     webix.modalbox({
                         title: "Fehler",
                         buttons: ["OK"],
+                        width: 800,
                         text: "Fehler: " + params['message']
                     });
                 }

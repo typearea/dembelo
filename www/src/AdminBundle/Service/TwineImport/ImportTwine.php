@@ -95,7 +95,7 @@ class ImportTwine
      *
      * @return bool
      *
-     * @throws \Exception
+     * @throws ImportException
      */
     public function run(Importfile $importfile): bool
     {
@@ -120,7 +120,7 @@ class ImportTwine
         } catch (\Throwable $exception) {
             $this->documentManager->clear();
 
-            return false;
+            throw new ImportException(sprintf('import failed: %s', $exception->getMessage()), 0, $exception);
         }
 
         return true;
