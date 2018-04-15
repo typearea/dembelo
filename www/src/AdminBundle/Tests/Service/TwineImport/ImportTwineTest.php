@@ -18,6 +18,7 @@
  */
 namespace AdminBundle\Tests\Service\TwineImport;
 
+use AdminBundle\Service\TwineImport\ImportException;
 use AdminBundle\Service\TwineImport\ImportTwine;
 use AdminBundle\Service\TwineImport\FileCheck;
 use AdminBundle\Service\TwineImport\FileExtractor;
@@ -28,13 +29,12 @@ use DembeloMain\Document\Importfile;
 use DembeloMain\Document\Textnode;
 use DembeloMain\Service\FileHandler;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Filesystem\Exception\FileNotFoundException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class ImportTwineTest
  */
-class ImportTwineTest extends WebTestCase
+class ImportTwineTest extends TestCase
 {
     /**
      * @var ImportTwine
@@ -78,8 +78,12 @@ class ImportTwineTest extends WebTestCase
 
     /**
      * resets some variables
+     *
+     * @return void
+     *
+     * @throws \ReflectionException
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->fileExtractorMock = $this->createFileExtractorMock();
         $this->fileCheckMock = $this->createFileCheckMock();
@@ -102,6 +106,9 @@ class ImportTwineTest extends WebTestCase
 
     /**
      * @return void
+     *
+     * @throws \Exception
+     * @throws \ReflectionException
      */
     public function testRun(): void
     {
@@ -165,7 +172,27 @@ class ImportTwineTest extends WebTestCase
     }
 
     /**
+     * @return void
+     *
+     * @throws \Exception
+     * @throws \ReflectionException
+     */
+    public function testRunThrowsImportException(): void
+    {
+        $this->parserContextMock->method('init')
+            ->willThrowException(new ImportException('init failed'));
+
+        $importFileMock = $this->createImportFileMock();
+
+        $this->expectException(ImportException::class);
+        $this->expectExceptionMessageRegExp('/import failed/');
+        $this->importTwine->run($importFileMock);
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|FileExtractor
+     *
+     * @throws \ReflectionException
      */
     private function createFileExtractorMock(): FileExtractor
     {
@@ -174,6 +201,8 @@ class ImportTwineTest extends WebTestCase
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|FileCheck
+     *
+     * @throws \ReflectionException
      */
     private function createFileCheckMock(): FileCheck
     {
@@ -182,6 +211,8 @@ class ImportTwineTest extends WebTestCase
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|StoryDataParser
+     *
+     * @throws \ReflectionException
      */
     private function createStoryDataParserMock(): StoryDataParser
     {
@@ -190,6 +221,8 @@ class ImportTwineTest extends WebTestCase
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|PassageDataParser
+     *
+     * @throws \ReflectionException
      */
     private function createPassageDataParserMock(): PassageDataParser
     {
@@ -198,6 +231,8 @@ class ImportTwineTest extends WebTestCase
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|ParserContext
+     *
+     * @throws \ReflectionException
      */
     private function createParserContextMock():ParserContext
     {
@@ -211,6 +246,8 @@ class ImportTwineTest extends WebTestCase
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|Importfile
+     *
+     * @throws \ReflectionException
      */
     private function createImportFileMock(): Importfile
     {
@@ -219,6 +256,8 @@ class ImportTwineTest extends WebTestCase
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|Textnode
+     *
+     * @throws \ReflectionException
      */
     private function createTextnodeMock(): Textnode
     {
@@ -227,6 +266,8 @@ class ImportTwineTest extends WebTestCase
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|FileHandler
+     *
+     * @throws \ReflectionException
      */
     private function createFileHandlerMock(): FileHandler
     {
