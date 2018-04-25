@@ -65,7 +65,7 @@ class HitchParser
      */
     public function parseDoubleArrowRight(string $content, string $name): TextnodeHitch
     {
-        list($description, $textnodeId) = explode('-->', $content, 2);
+        list($description, $textnodeId) = explode('--&gt;', $content, 2);
 
         if (strlen($description) <= 0 || strlen($textnodeId) <= 0) {
             throw new Exception(sprintf("The Twine archive file contains a '%s' with the invalid element '[[%s-->%s]]'.", $name, $description, $textnodeId));
@@ -95,7 +95,7 @@ class HitchParser
      */
     public function parseSingleArrowRight(string $content, string $name): TextnodeHitch
     {
-        list($description, $nodeName) = explode('->', $content, 2);
+        list($description, $nodeName) = explode('-&gt;', $content, 2);
 
         if (\strlen($description) <= 0 || \strlen($nodeName) <= 0) {
             throw new Exception(sprintf("The Twine archive file contains a '%s' with the invalid element '[[%s->%s]]'.", $name, $description, $nodeName));
@@ -123,7 +123,7 @@ class HitchParser
      */
     public function parseSingleArrowLeft(string $content, string $name): TextnodeHitch
     {
-        list($nodeName, $description) = explode('<-', $content, 2);
+        list($nodeName, $description) = explode('&lt;-', $content, 2);
 
         if (\strlen($nodeName) <= 0 || \strlen($description) <= 0) {
             throw new Exception(sprintf("The Twine archive file contains a '%s' with the invalid element '[[%s<-%s]]'.", $name, $nodeName, $description));
