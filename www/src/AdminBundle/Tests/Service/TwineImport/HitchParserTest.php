@@ -50,33 +50,36 @@ class HitchParserTest extends WebTestCase
 
     /**
      * @expectedException \Exception
+     *
+     * @throws \Exception
      */
     public function testParseDoubleArrowRightWithEmptyLeftPart(): void
     {
-        $content = '-->textnodeId';
-        $twineName = 'bar';
+        $content = '--&gt;textnodeId';
         $name = 'someName';
-        $this->hitchParser->parseDoubleArrowRight($content, $twineName, $name);
+        $this->hitchParser->parseDoubleArrowRight($content, $name);
     }
 
     /**
      * @expectedException \Exception
+     *
+     * @throws \Exception
      */
     public function testParseDoubleArrowRightWithEmptyRightPart(): void
     {
-        $content = 'description-->';
-        $twineName = 'bar';
+        $content = 'description--&gt;';
         $name = 'someName';
-        $this->hitchParser->parseDoubleArrowRight($content, $twineName, $name);
+        $this->hitchParser->parseDoubleArrowRight($content, $name);
     }
 
     /**
      * @expectedException \Exception
+     *
+     * @throws \Exception
      */
     public function testParseDoubleArrowRightWithNoValidTextnodeIdOnRightPart(): void
     {
-        $content = 'description-->invalidTextnodeId';
-        $twineName = 'bar';
+        $content = 'description--&gt;invalidTextnodeId';
         $name = 'someName';
 
         $this->textnodeRepositoryMock->expects(self::once())
@@ -84,7 +87,7 @@ class HitchParserTest extends WebTestCase
             ->with('invalidTextnodeId')
             ->willReturn(null);
 
-        $this->hitchParser->parseDoubleArrowRight($content, $twineName, $name);
+        $this->hitchParser->parseDoubleArrowRight($content, $name);
     }
 
     /**
@@ -93,7 +96,7 @@ class HitchParserTest extends WebTestCase
      */
     public function testParseDoubleArrowRightWithValidTextnodeIdOnRightPart(): void
     {
-        $content = 'description-->textnodeId';
+        $content = 'description--&gt;textnodeId';
         $twineName = 'bar';
 
         $targetTextnode = new Textnode();
@@ -112,10 +115,12 @@ class HitchParserTest extends WebTestCase
 
     /**
      * @expectedException \Exception
+     *
+     * @throws \Exception
      */
     public function testSingleArrowRightWithEmptyLeftPart(): void
     {
-        $content = '->nodeName';
+        $content = '-&gt;nodeName';
         $name = 'someName';
 
         $this->hitchParser->parseSingleArrowRight($content, $name);
@@ -123,10 +128,12 @@ class HitchParserTest extends WebTestCase
 
     /**
      * @expectedException \Exception
+     *
+     * @throws \Exception
      */
     public function testSingleArrowRightWithEmptyRightPart(): void
     {
-        $content = 'description->';
+        $content = 'description-&gt;';
         $name = 'someName';
 
         $this->hitchParser->parseSingleArrowRight($content, $name);
@@ -134,10 +141,12 @@ class HitchParserTest extends WebTestCase
 
     /**
      * @expectedException \Exception
+     *
+     * @throws \Exception
      */
     public function testSingleArrowRightWithInvalidMapName(): void
     {
-        $content = 'description->name';
+        $content = 'description-&gt;name';
         $name = 'someName';
 
         $mapping = [
@@ -155,7 +164,7 @@ class HitchParserTest extends WebTestCase
      */
     public function testSingleArrowRightWithValidMapName(): void
     {
-        $content = 'description->key';
+        $content = 'description-&gt;key';
         $name = 'someName';
 
         $targetTextnode = new Textnode();
@@ -175,10 +184,12 @@ class HitchParserTest extends WebTestCase
 
     /**
      * @expectedException \Exception
+     *
+     * @throws \Exception
      */
     public function testParseSingleArrowLeftWithEmptyLeftPart(): void
     {
-        $content = '<-description';
+        $content = '&lt;-description';
         $name = 'someName';
 
         $this->hitchParser->parseSingleArrowLeft($content, $name);
@@ -186,10 +197,12 @@ class HitchParserTest extends WebTestCase
 
     /**
      * @expectedException \Exception
+     *
+     * @throws \Exception
      */
     public function testParseSingleArrowLeftWithEmptyRightPart(): void
     {
-        $content = 'mapKey<-';
+        $content = 'mapKey&lt;-';
         $name = 'someName';
 
         $this->hitchParser->parseSingleArrowLeft($content, $name);
@@ -197,10 +210,12 @@ class HitchParserTest extends WebTestCase
 
     /**
      * @expectedException \Exception
+     *
+     * @throws \Exception
      */
     public function testParseSingleArrowLeftWithInvalidKey(): void
     {
-        $content = 'mapKey<-description';
+        $content = 'mapKey&lt;-description';
         $name = 'someName';
         $keyMap = [
             'invalidKey' => 'textnodeId',
@@ -217,7 +232,7 @@ class HitchParserTest extends WebTestCase
      */
     public function testParseSingleArrowLeftWithValidKey(): void
     {
-        $content = 'mapKey<-description';
+        $content = 'mapKey&lt;-description';
         $name = 'someName';
 
         $targetTextnode = new Textnode();
@@ -238,6 +253,8 @@ class HitchParserTest extends WebTestCase
 
     /**
      * @expectedException \Exception
+     *
+     * @throws \Exception
      */
     public function testParseSimpleHitchWithEmpyContent(): void
     {
@@ -248,7 +265,11 @@ class HitchParserTest extends WebTestCase
     }
 
     /**
+     * @return void
+     *
      * @expectedException \Exception
+     *
+     * @throws \Exception
      */
     public function testParseSimpleHitchWithInvalidKey(): void
     {
@@ -288,6 +309,8 @@ class HitchParserTest extends WebTestCase
 
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|TextNodeRepositoryInterface
+     *
+     * @throws \ReflectionException
      */
     private function createTextnodeRepositoryMock(): TextNodeRepositoryInterface
     {

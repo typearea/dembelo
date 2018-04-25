@@ -212,13 +212,13 @@ class StoryDataParser
 
                 $this->hitchParser->setNodeNameMapping($this->parserContext->getNodenameMapping());
 
-                if (strpos($content, '-->') !== false) {
+                if (strpos($content, '--&gt;') !== false) {
                     $hitch = $this->hitchParser->parseDoubleArrowRight($content, $name);
-                } elseif (strpos($content, '->') !== false) {
+                } elseif (strpos($content, '-&gt;') !== false) {
                     $hitch = $this->hitchParser->parseSingleArrowRight($content, $name);
-                } elseif (strpos($content, '<-') !== false) {
+                } elseif (strpos($content, '&lt;-') !== false) {
                     $hitch = $this->hitchParser->parseSingleArrowLeft($content, $name);
-                } elseif (strpos($content, '>:<') !== false) {
+                } elseif (strpos($content, '&gt;:&lt;') !== false) {
                     $metadata = $this->parseColonArrows($textnode, $content, $name);
                     $textnode->setMetadata($metadata);
                 } else {
@@ -247,7 +247,7 @@ class StoryDataParser
      */
     private function parseColonArrows(Textnode $textnode, string $content, string $name): array
     {
-        $contentArray = explode('>:<', $content, 2);
+        $contentArray = explode('&gt;:&lt;', $content, 2);
 
         if (strlen($contentArray[0]) <= 0 || strlen($contentArray[1]) <= 0) {
             throw new \Exception(sprintf('The Twine archive file contains a \'%s\' with the invalid element \'[[%s>:<%s]]\'.', $name, $contentArray[0], $contentArray[1]));

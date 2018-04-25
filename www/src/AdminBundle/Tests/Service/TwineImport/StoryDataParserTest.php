@@ -212,6 +212,9 @@ class StoryDataParserTest extends TestCase
 
     /**
      * @return void
+     *
+     * @throws \Exception
+     * @throws \ReflectionException
      */
     public function testEndElementWithHitches(): void
     {
@@ -221,7 +224,7 @@ class StoryDataParserTest extends TestCase
         $textnodeMock = $this->createMock(Textnode::class);
         $textnodeMock->expects(self::any())
             ->method('getText')
-            ->willReturn('someText [[foo1-->foo2]] [[foo3->foo4]] [[foo5<-foo6]] [[foo7]] [[foo8>:<foo9]]');
+            ->willReturn('someText [[foo1--&gt;foo2]] [[foo3-&gt;foo4]] [[foo5&lt;-foo6]] [[foo7]] [[foo8&gt;:&lt;foo9]]');
         $textnodeMock->expects(self::once())
             ->method('setText')
             ->willReturnCallback(function (string $textNew) {
@@ -241,15 +244,15 @@ class StoryDataParserTest extends TestCase
 
         $this->hitchParserMock->expects(self::once())
             ->method('parseDoubleArrowRight')
-            ->with('foo1-->foo2')
+            ->with('foo1--&gt;foo2')
             ->willReturn($someHitch);
         $this->hitchParserMock->expects(self::once())
             ->method('parseSingleArrowRight')
-            ->with('foo3->foo4')
+            ->with('foo3-&gt;foo4')
             ->willReturn($someHitch);
         $this->hitchParserMock->expects(self::once())
             ->method('parseSingleArrowLeft')
-            ->with('foo5<-foo6')
+            ->with('foo5&lt;-foo6')
             ->willReturn($someHitch);
         $this->hitchParserMock->expects(self::once())
             ->method('parseSimpleHitch')
@@ -311,7 +314,7 @@ class StoryDataParserTest extends TestCase
         $textnodeMock = $this->createMock(Textnode::class);
         $textnodeMock->expects(self::any())
             ->method('getText')
-            ->willReturn('someText [[>:<value]] ');
+            ->willReturn('someText [[&gt;:&lt;value]] ');
         $textnodeMock->method('getChildHitches')->willReturn(new ArrayCollection());
 
         $textnodeMapping = [
@@ -342,7 +345,7 @@ class StoryDataParserTest extends TestCase
         $textnodeMock = $this->createMock(Textnode::class);
         $textnodeMock->expects(self::any())
             ->method('getText')
-            ->willReturn('someText [[key>:<value]] ');
+            ->willReturn('someText [[key&gt;:&lt;value]] ');
         $textnodeMock->expects(self::once())
             ->method('getMetadata')
             ->willReturn(['key' => 'foobar']);
