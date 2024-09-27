@@ -21,6 +21,7 @@ along with Dembelo. If not, see <http://www.gnu.org/licenses/>.
     <ul class="links">
         <li>
             <a href="{{ path('mainpage') }}"><i class="ion-home"></i> Startseite</a>
+            <a href="{{ path('bookmark') }}"><i class="ion-bookmark"></i> Lesezeichen</a>
         </li>
         {% if has_feature("login_enabled") %}
             {% if is_granted('ROLE_USER') %}
